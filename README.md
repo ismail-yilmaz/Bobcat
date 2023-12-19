@@ -3,6 +3,10 @@
 
 A cross-platform terminal emulator, based on [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal) and [U++](www.ultimatepp.org) framework.
 
+## Requirements
+- CLANG/GCC with at least C++17.
+- [U++](www.ultimatepp.org) framework.
+  
 ## Features
 
 To be written...
@@ -15,13 +19,21 @@ To be written...
 
 Below you can find a handful of screenshots of Bobcat, running on Linux & Windows.
 
-Profiles support (linux, btop)
+Multiple terminal profile support (linux, btop)
 
 ![bobcat-profiles](resources/bobcat-profiles-linux.png)
 
 Inline images support (linux, jexer)
 
-![bobcat-profiles](resources/bobcat-jexer-sixel-linux.png)
+![bobcat-sixel](resources/bobcat-jexer-sixel-linux.png)
+
+Settings windows (linux)
+
+![bobcat-settings](resources/bobcat-settings-linux.png)
+
+Far manager running on Bobcat (Windows 10)
+
+![bobcat-far-manager](resources/bobcat-far-manager-windows.png)
 
 ## Acknowledgements
 
