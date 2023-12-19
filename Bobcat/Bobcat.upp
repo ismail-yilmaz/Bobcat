@@ -1,0 +1,37 @@
+description "Yet another terminal emulator with modern goodies\377";
+
+uses
+	CtrlLib,
+	Terminal,
+	PtyProcess,
+	StackCtrl;
+
+file
+	Bobcat.h,
+	Bobcat.cpp,
+	main.cpp,
+	Utils.cpp,
+	Terminal readonly separator,
+	Terminal.h,
+	Terminal.cpp,
+	Profile readonly separator,
+	Profile.h,
+	Profile.cpp,
+	Palette readonly separator,
+	Palette.h,
+	Palette.cpp,
+	Resources readonly separator,
+	Application.key,
+	Terminal.key,
+	Bobcat.iml,
+	Bobcat.lay,
+	Docs readonly separator,
+	docs.tpp,
+	Info readonly separator,
+	Copying;
+
+mainconfig
+	"" = "GUI",
+	"" = "GUI NOGTK",
+	"" = "GUI WIN10";
+
