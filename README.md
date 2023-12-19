@@ -1,11 +1,11 @@
 # Bobcat (Still under construction!)
 ![info](resources/bobcat-about-linux.png)
 
-A cross-platform terminal emulator, based on [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal) and [U++](www.ultimatepp.org) framework.
+A cross-platform terminal emulator, based on [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal) and [U++](https://www.ultimatepp.org) framework.
 
 ## Requirements
 - CLANG/GCC with at least C++17.
-- [U++](www.ultimatepp.org) framework.
+- [U++](https://www.ultimatepp.org) framework.
   
 ## Features
 
