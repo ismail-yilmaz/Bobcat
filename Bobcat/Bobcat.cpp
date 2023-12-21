@@ -264,15 +264,12 @@ void Bobcat::SyncTitle()
 
 void Bobcat::SyncTerminalProfiles()
 {
-	if(VectorMap<String, Profile> p; LoadProfiles(p) >= 0) {
-		for(const Profile& q : p.GetValues()) {
-			Vector<Terminal*> v = GetTerminalGroup(q);
-			if(v.GetCount()) {
-				Palette r = LoadPalette(q.palette);
-				for(Terminal* t : v) {
-					t->Sync(q);
-					t->Sync(r);
-				}
+	if(VectorMap<String, Profile> v; LoadProfiles(v) >= 0) {
+		for(const Profile& p : v.GetValues()) {
+			Palette q = LoadPalette(p.palette);
+			for(Terminal* t : GetTerminalGroup(p)) {
+				t->SetProfile(p);
+				t->SetPalette(q);
 			}
 		}
 	}
@@ -398,7 +395,7 @@ void Bobcat::ScreenShot()
 		}
 		FileSel& fs = BobcatFs();
 		if(fs.Type(t_("PNG images (*.png)"), "*.png").ExecuteSaveAs(t_("Save Screenshot")))
-		PNGEncoder().SaveFile(~fs, w);
+			PNGEncoder().SaveFile(~fs, w);
 	}
 }
 
@@ -416,11 +413,6 @@ void Bobcat::About()
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
 	licenses.txt.SetZoom(Zoom(1, 2));
 	dlg.OK().Execute();
-}
-
-
-void Bobcat::Serialize(Stream& s)
-{
 }
 
 Bobcat::Config::Config()

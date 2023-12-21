@@ -21,27 +21,29 @@ Terminal::Terminal(Bobcat& ctx_)
 , keep(false)
 , filter(false)
 {
-	titlebar.newterm << [this] { ctx.AddTerminal(ctx.settings.activeprofile); };
-	titlebar.close   << [this] { Stop(); };
-	titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
-	InlineImages().Hyperlinks().WindowOps().DynamicColors().SetWantFocus();
+    titlebar.newterm << [this] { ctx.AddTerminal(ctx.settings.activeprofile); };
+    titlebar.close   << [this] { Stop(); };
+    titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
+    InlineImages().Hyperlinks().WindowOps().DynamicColors().SetWantFocus();
 
-	WhenBar		= [this](Bar& bar)			   { ContextMenu(bar);                };
-	WhenBell	= [this]()					   { if(bell) BeepExclamation();      };
-	WhenResize	= [this]()					   { pty.SetSize(GetPageSize());      };
-	WhenOutput	= [this](String s)			   { pty.Write(s);			          };
-	WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
-	WhenSetSize = [this](Size sz)			   { ctx.Resize(sz);                  };
-	WhenClip    = [this](PasteClip& dnd)       { return filter;                   };
-	WhenWindowMinimize       = [this](bool b)  { ctx.Minimize(b);                 };
-	WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
-	WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
-	WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
+    WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
+    WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
+    WhenResize  = [this]()                     { pty.SetSize(GetPageSize());      };
+    WhenOutput  = [this](String s)             { pty.Write(s);                    };
+    WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
+    WhenSetSize = [this](Size sz)              { ctx.Resize(sz);                  };
+    WhenClip    = [this](PasteClip& dnd)       { return filter;                   };
+    WhenWindowMinimize       = [this](bool b)  { ctx.Minimize(b);                 };
+    WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
+    WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
+    WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
 }
 
 bool Terminal::Start(const Profile& p)
 {
-	Sync(p);
+	SetProfile(p);
+	SetPalette(p.palette);
+	
 	#ifdef PLATFORM_POSIX
 	pty.WhenAttrs = [=, &p](termios& t) -> bool
 	{
@@ -122,7 +124,7 @@ Terminal& Terminal::Sync()
 	return *this;
 }
 
-Terminal& Terminal::Sync(const Profile& p)
+Terminal& Terminal::SetProfile(const Profile& p)
 {
 	bell = p.bell;
 	filter = p.filterctrl;
@@ -155,16 +157,16 @@ Terminal& Terminal::Sync(const Profile& p)
 	SetPadding(Size(0, p.linespacing));
 	SetFont(p.font);
 	OverrideTracking(GetModifierKey(p.overridetracking));
-	Sync(LoadPalette(p.palette));
 	return *this;
 }
 
-Terminal& Terminal::Sync(const Palette& p)
+Terminal& Terminal::SetPalette(const Palette& p)
 {
 	for(int i = 0; i< TerminalCtrl::MAX_COLOR_COUNT; i++)
 		SetColor(i, p.table[i]);
 	return *this;
 }
+
 
 Terminal& Terminal::SetLocale(const String& s)
 {

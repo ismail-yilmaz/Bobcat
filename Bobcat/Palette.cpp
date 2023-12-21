@@ -270,16 +270,16 @@ void Palettes::Store()
 			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
 			if(i == 0) {
 				data = s;
-				RDUMP(data);
+				LDUMP(data);
 			}
 		}
 		catch(const JsonizeError& e)
 		{
-			RLOG("Jsonization error: " << e);
+			LLOG("Jsonization error: " << e);
 		}
 		catch(const ValueTypeError& e)
 		{
-			RLOG("Value type error: " << e);
+			LLOG("Value type error: " << e);
 		}
 	}
 	Sync();
@@ -297,19 +297,19 @@ Palette LoadPalette(const String& name)
 		}
 		catch(const JsonizeError& e)
 		{
-			RLOG("Jsonization error: " << e);
+			LLOG("Jsonization error: " << e);
 		}
 		catch(const ValueTypeError& e)
 		{
-			RLOG("Value type error: " << e);
+			LLOG("Value type error: " << e);
 		}
 		catch(const CParser::Error& e)
 		{
-			RLOG("Parser error: " << e);
+			LLOG("Parser error: " << e);
 		}
 		catch(...)
 		{
-			RLOG("Unknown exception");
+			LLOG("Unknown exception");
 		}
 	}
 	return pick(p);
@@ -328,21 +328,21 @@ int LoadPalettes(VectorMap<String, Palette>& v)
 		catch(const JsonizeError& e)
 		{
 			failures++;
-			RLOG(e);
+			LLOG(e);
 		}
 		catch(const ValueTypeError& e)
 		{
 			failures++;
-			RLOG(e);
+			LLOG(e);
 		}
 		catch(const CParser::Error& e)
 		{
 			failures++;
-			RLOG(e);
+			LLOG(e);
 		}
 		catch(...)
 		{
-			RLOG("Unknown exception");
+			LLOG("Unknown exception");
 		}
 	}
 	return v.GetCount() ? failures : -1;

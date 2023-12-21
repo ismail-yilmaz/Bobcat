@@ -84,9 +84,6 @@ struct Bobcat {
     void        ScreenShot();
     void        About();
 //  void        Help();
-    
-    void        Serialize(Stream& s);
-    
 
     struct  Config {
         Config();

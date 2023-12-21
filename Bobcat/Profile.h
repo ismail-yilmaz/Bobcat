@@ -7,88 +7,88 @@
 // Terminal profiles.
 
 struct Profile : Moveable<Profile> {
-	Profile();
-	Profile(const String& s) : Profile() { name = s; }
-	String		name;
-	String		user;
-	String		command;
-	String		address;
-	String		env;
-	Font		font;
-	bool		bell;
-	bool		blinktext;
-	int			blinkinterval;
-	String		palette;
-	bool		lightcolors;
-	bool		adjustcolors;
-	bool		intensify;
-	bool        dynamiccolors;
-	String		cursorstyle;
-	bool		lockcursor;
-	bool		blinkcursor;
-	bool        inlineimages;
-	bool		hyperlinks;
-	bool		windowactions;
-	bool		windowreports;
-	bool		clipboardread;
-	bool		clipboardwrite;
-	String		functionkeystyle;
-	bool        altescapeskeys;
-	bool        altshiftskeys;
-	bool		keynavigation;
-	int         mousewheelstep;
-	bool		alternatescroll;
-	bool        autohidemouse;
-	bool		history;
-	int			historysize;
-	bool		delayedrefresh;
-	bool		lazyresize;
-	String		encoding;
-	String		erasechar;
-	int			linespacing;
-	String      overridetracking;
-	String      onexit;
-	bool        filterctrl;
-	hash_t      GetHashValue() const;
-	void        Serialize(Stream& s);
-	void		Jsonize(JsonIO& jio);
+    Profile();
+    Profile(const String& s) : Profile() { name = s; }
+    String      name;
+    String      user;
+    String      command;
+    String      address;
+    String      env;
+    Font        font;
+    bool        bell;
+    bool        blinktext;
+    int         blinkinterval;
+    String      palette;
+    bool        lightcolors;
+    bool        adjustcolors;
+    bool        intensify;
+    bool        dynamiccolors;
+    String      cursorstyle;
+    bool        lockcursor;
+    bool        blinkcursor;
+    bool        inlineimages;
+    bool        hyperlinks;
+    bool        windowactions;
+    bool        windowreports;
+    bool        clipboardread;
+    bool        clipboardwrite;
+    String      functionkeystyle;
+    bool        altescapeskeys;
+    bool        altshiftskeys;
+    bool        keynavigation;
+    int         mousewheelstep;
+    bool        alternatescroll;
+    bool        autohidemouse;
+    bool        history;
+    int         historysize;
+    bool        delayedrefresh;
+    bool        lazyresize;
+    String      encoding;
+    String      erasechar;
+    int         linespacing;
+    String      overridetracking;
+    String      onexit;
+    bool        filterctrl;
+    hash_t      GetHashValue() const;
+    void        Serialize(Stream& s);
+    void        Jsonize(JsonIO& jio);
 };
 
 class Profiles : public WithProfilesLayout<ParentCtrl> {
 public:
-	Profiles(Bobcat& ctx);
+    Profiles(Bobcat& ctx);
 
-	void		Add();
-	void		Remove();
-	void		Sync();
-	void		Activate();
-	void		ContextMenu(Bar& bar);
+    void        Add();
+    void        Remove();
+    void        Sync();
+    void        Activate();
+    void        ContextMenu(Bar& bar);
 
-	int			Load();
-	void		Store();
-	
+    int         Load();
+    void        Store();
+    
 private:
-	struct Setup : ParentCtrl {
-		Setup();
-		void			SetData(const Value& data) override;
-		Value			GetData() const override;
-		void			MapData(CtrlMapper& m, Profile& p) const;
-		void			Sync();
-		String			name;
-		TabCtrl			tabs;
-		FileSelButton	filesel;
-		SelectDirButton dirsel;
-		mutable			WithGeneralProfileLayout<ParentCtrl>   general;
-		mutable			WithVisualProfileLayout<ParentCtrl>    visuals;
-		mutable			WithEmulationProfileLayout<ParentCtrl> emulation;
-		mutable         Palettes                               palettes;
-	};
-	
-	ToolBar		toolbar;
-	Bobcat&     ctx;
+    struct Setup : ParentCtrl {
+        Setup();
+        void            SetData(const Value& data) override;
+        Value           GetData() const override;
+        void            MapData(CtrlMapper& m, Profile& p) const;
+        void            Sync();
+        String          name;
+        TabCtrl         tabs;
+        FileSelButton   filesel;
+        SelectDirButton dirsel;
+        mutable         WithGeneralProfileLayout<ParentCtrl>   general;
+        mutable         WithVisualProfileLayout<ParentCtrl>    visuals;
+        mutable         WithEmulationProfileLayout<ParentCtrl> emulation;
+        mutable         Palettes                               palettes;
+    };
+    
+    ToolBar     toolbar;
+    Bobcat&     ctx;
 
 public:
-	Setup		setup;
+    Setup       setup;
 };
 
 // Global functions

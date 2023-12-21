@@ -135,7 +135,7 @@ void InsertUnicodeCodePoint(Terminal& t)
 }
 
 static const Tuple<dword, const char*> mod_keys[] = {
-	{ K_SHIFT,              "K_SHIFT" },
+    { K_SHIFT,              "K_SHIFT" },
     { K_ALT,                "K_ALT"   },
     { K_CTRL,               "K_CTRL"  },
     { K_CTRL|K_ALT,         "K_CTRL_ALT" },
@@ -146,11 +146,11 @@ static const Tuple<dword, const char*> mod_keys[] = {
     { K_OPTION,                      "K_OPTION"      },
     { K_OPTION|K_SHIFT,              "K_SHIFT_OPTION " },
     { K_OPTION|K_ALT,                "K_ALT_OPTION " },
-	{ K_OPTION|K_CTRL,               "K_CTRL_OPTION" },
+    { K_OPTION|K_CTRL,               "K_CTRL_OPTION" },
     { K_OPTION|K_CTRL|K_ALT          "K_CTRL_ALT_OPTION " },
     { K_OPTION|K_SHIFT|K_ALT         "K_SHIFT_ALT_OPTION " },
     { K_OPTION|K_ALT,                "K_SHIFT_CTRL_OPTION " },
-	{ K_OPTION|K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT_OPTION" },
+    { K_OPTION|K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT_OPTION" },
 #endif
 };
 
@@ -174,7 +174,7 @@ String GetModifierKeyDesc(dword key)
 String GetVersion()
 {
 #ifdef bmGIT_REVCOUNT
-	return AsString(atoi(bmGIT_REVCOUNT) + 2270);
+	return AsString(atoi(bmGIT_REVCOUNT) + Date(23, 12, 19).Get());
 #endif
 	return "(pre-alpha)";
 }

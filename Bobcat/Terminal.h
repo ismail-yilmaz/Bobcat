@@ -17,9 +17,9 @@ struct Terminal : TerminalCtrl {
     hash_t      GetHashValue() const;
     
     Terminal&   Sync();
-    Terminal&   Sync(const Profile& p);
-    Terminal&   Sync(const Palette& p);
     
+    Terminal&   SetProfile(const Profile& p);
+    Terminal&   SetPalette(const Palette& p);
     Terminal&   SetLocale(const String& s);
     Terminal&   SetEraseKey(const String& s);
     Terminal&   SetCursorStyle(const String& s);
