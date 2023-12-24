@@ -188,7 +188,7 @@ Profiles::Setup::Setup()
 
 void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
 {
-	m(general.cmd,              p.command)
+    m(general.cmd,              p.command)
      (general.dir,              p.address)
      (general.env,              p.env)
      (general.cmdexit,          p.onexit)
@@ -225,7 +225,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.delayedrefresh, p.delayedrefresh)
      (emulation.lazyresize,     p.lazyresize)
      (emulation.filter,         p.filterctrl)
-	 (emulation.overridetracking, p.overridetracking);
+     (emulation.overridetracking, p.overridetracking);
 }
 
 void Profiles::Setup::SetData(const Value& data)

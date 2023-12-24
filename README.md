@@ -27,6 +27,10 @@ Inline images support (linux, jexer)
 
 ![bobcat-sixel](resources/bobcat-jexer-sixel-linux.png)
 
+Navigator (linux)
+
+![bobcat-navigator](resources/bobcat-navigator.linux.png)
+
 Settings windows (linux)
 
 ![bobcat-settings](resources/bobcat-settings-linux.png)

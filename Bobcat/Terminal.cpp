@@ -75,6 +75,8 @@ bool Terminal::Start(const Profile& p)
 		ctx.stack.Add(*this);
 		return true;
 	}
+	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
+	ErrorOK(Format(txt, p.name, p.command, pty.GetExitCode()));
 	return false;
 }
 

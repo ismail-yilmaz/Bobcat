@@ -48,12 +48,14 @@ static void sEventLoop(Bobcat& app)
 }
 
 Bobcat::Bobcat()
+: navigator(*this)
 {
 	SyncTitle();
 	window.Sizeable().Zoomable().CenterScreen();
 	window.WhenClose = [this]() { Close(); };
-	window.AddFrame(menubar);
-	window.Add(stack.Animation().Wheel().Horz().SizePos());
+	window.Add(view.SizePos());
+	view.AddFrame(menubar);
+	view.Add(stack.Animation().Wheel().Horz().SizePos());
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
 }
 
@@ -181,7 +183,7 @@ Bobcat& Bobcat::Resize(Size sz)
 {
 	NoFullScreen();
 	Point p = window.GetRect().TopLeft();
-	sz = window.AddFrameSize(sz);
+	sz = view.AddFrameSize(sz);
 	window.SetRect(p.x, p.y, sz.cx, sz.cy);
 	return *this;
 }
@@ -220,12 +222,12 @@ bool Bobcat::IsFullScreen() const
 Bobcat& Bobcat::ShowMenuBar(bool b)
 {
 	if(HasMenuBar() && !b)  {
-		window.RemoveFrame(menubar);
+		view.RemoveFrame(menubar);
 		settings.showmenu = b;
 	}
 	else
 	if(!HasMenuBar() && b) {
-		window.AddFrame(menubar);
+		view.AddFrame(menubar);
 		settings.showmenu = b;
 	}
 	return *this;
@@ -241,6 +243,20 @@ bool Bobcat::HasMenuBar() const
 	return menubar.IsChild();
 }
 
+Bobcat& Bobcat::ToggleNavigator()
+{
+	if(view.IsShown()) {
+		view.Hide();
+		navigator.Show().SetFocus();
+	}
+	else {
+		navigator.Hide();
+		view.Show();
+		GetActiveTerminal()->SetFocus();
+	}
+	return *this;
+}
+
 void Bobcat::Sync()
 {
 	ShowMenuBar(settings.showmenu);
@@ -252,6 +268,7 @@ void Bobcat::Sync()
 		t.Sync();
 	}
 	SyncTitle();
+	navigator.Sync();
 }
 
 void Bobcat::SyncTitle()
@@ -366,21 +383,17 @@ void Bobcat::TermMenu(Bar& menu)
 			}
 		}
 	});
-
-	menu.AddKey(AK_LIST, [this, &menu] { ShowTerminalList(menu); });
+	menu.AddKey(AK_NAVIGATOR, [this, &menu] { ToggleNavigator(); });
 }
 
 void Bobcat::ListMenu(Bar& menu)
 {
+	menu.Add(AK_NAVIGATOR, [this, &menu] { ToggleNavigator(); });
+	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = (Terminal &) stack[i];
 		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); }).Radio(stack.GetCursor() == i);
 	}
-}
-
-void Bobcat::ShowTerminalList(Bar& menu)
-{
-	MenuBar::Execute([this](Bar& menu) { TermMenu(menu); menu.Separator(); ListMenu(menu); });
 }
 
 void Bobcat::ScreenShot()

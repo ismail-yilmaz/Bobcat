@@ -32,6 +32,7 @@ struct Bobcat;
 
 #include "Profile.h"
 #include "Terminal.h"
+#include "Navigator.h"
 
 struct Bobcat {
     Bobcat();
@@ -66,6 +67,8 @@ struct Bobcat {
     Bobcat&     ShowMenuBar(bool b = true);
     Bobcat&     HideMenuBar();
     bool        HasMenuBar() const;
+    
+    Bobcat&     ToggleNavigator();
 
     void        Sync();
     void        SyncTitle();
@@ -79,7 +82,6 @@ struct Bobcat {
     void        HelpMenu(Bar& menu);
     void        TermMenu(Bar& menu);
     void        ListMenu(Bar& menu);
-    void        ShowTerminalList(Bar& menu);
     
     void        ScreenShot();
     void        About();
@@ -100,10 +102,12 @@ struct Bobcat {
         void        Jsonize(JsonIO& jio);
     };
     
-    TopWindow window;
-    MenuBar   menubar;
-    StackCtrl stack;
-    Config    settings;
+    TopWindow  window;
+    MenuBar    menubar;
+    Navigator  navigator;
+    ParentCtrl view;
+    StackCtrl  stack;
+    Config     settings;
     Array<Terminal> terminals;
 };
 
