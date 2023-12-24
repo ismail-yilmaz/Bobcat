@@ -366,8 +366,8 @@ Terminal::TitleBar::TitleBar()
 	Add(newterm.LeftPosZ(4, 12).VCenterPosZ(12, 0));
 	Add(menu.LeftPosZ(18, 12).VCenterPosZ(12, 0));
 	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
-	newterm.Image(Images::New()).Tip(t_("Open new terminal"));
-	close.Image(Images::Close()).Tip(t_("Close terminal"));
+	newterm.Image(Images::Add()).Tip(t_("Open new terminal"));
+	close.Image(Images::Delete()).Tip(t_("Close terminal"));
 	menu.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
 }
 
@@ -388,6 +388,11 @@ void Terminal::TitleBar::FrameLayout(Rect& r)
 	data == "bottom"
 		? LayoutFrameBottom(r, this, cy ? cy : r.Width())
 		: LayoutFrameTop(r, this, cy ? cy : r.Width()); // default
+}
+
+Terminal& AsTerminal(Ctrl& c)
+{
+	return static_cast<Terminal&>(c);
 }
 
 }

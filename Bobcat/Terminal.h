@@ -71,8 +71,8 @@ struct Terminal : TerminalCtrl {
 
 
 // Global functions
-
-void InsertUnicodeCodePoint(Terminal& term);
+Terminal& AsTerminal(Ctrl& c);
+void      InsertUnicodeCodePoint(Terminal& term);
 
 // Operators
 

@@ -20,11 +20,6 @@ FileSel& BobcatFs()
 	return Single<FileSel>();
 }
 
-static Terminal& AsTerminal(Ctrl& c)
-{
-	return static_cast<Terminal&>(c);
-}
-
 static void sEventLoop(Bobcat& app)
 {
 	app.Resize(app.GetActiveTerminal()->GetStdSize());

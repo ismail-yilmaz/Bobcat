@@ -97,7 +97,6 @@ void Navigator::Layout()
 void Navigator::Paint(Draw& w)
 {
 	w.DrawRect(GetSize(), SColorPaper);
-	
 	int n = ctx.stack.GetCursor();
 	for(int i = 0, y = -sb; i < shots.GetCount(); i++) {
 		const Snapshot& o = shots[i];
@@ -122,14 +121,14 @@ void Navigator::Paint(Draw& w)
 		StdCenterDisplay().Paint(w, o.nrect.OffsetedVert(y), o.name, tc, SColorPaper, 0);
 		DrawFrame(w, r.Inflated(1), fc1);
 		DrawFrame(w, r.Inflated(2), fc2);
-
-	};
+	}
 }
 
 void Navigator::LeftDown(Point pt, dword keyflags)
 {
 	for(int i = 0; i < shots.GetCount(); i++) {
-		if(shots[i].irect.Contains(pt)) {
+		const Rect& r = shots[i].irect;
+		if(r.Contains(pt)) {
 			ctx.ToggleNavigator();
 			ctx.stack.Goto(i);
 			break;
