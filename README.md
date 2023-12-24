@@ -29,7 +29,7 @@ Inline images support (linux, jexer)
 
 Navigator (linux)
 
-![bobcat-navigator](resources/bobcat-navigator.linux.png)
+![bobcat-navigator](resources/bobcat-navigator-linux.png)
 
 Settings windows (linux)
 
