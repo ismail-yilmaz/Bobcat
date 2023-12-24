@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright 2023, İsmail Yılmaz
+
 #include "Bobcat.h"
 
 #define LLOG(x)  // RLOG(x)
