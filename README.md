@@ -2,18 +2,26 @@
 
 ![info](resources/bobcat-about-linux.png)
 
-## About
-
  
 Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ultimatepp.org/index.html) rapid application development framework and [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal), a powerful vt widget. It leverages these technologies to provide a versatile and user-friendly command-line interface.
 
-*Disclaimer: Bobcat is a work in progress. Although it *should be* pretty stable by now, use it with with caution.*
+*Disclaimer: Bobcat is a work in progress. Although it *should be* pretty stable by now, use it with caution.*
 
+## Table of Contents
 
-## Features
+ 1. [Features](#Features)
+ 2. [Requirements](#Requirements)
+ 3. [Installation](#Installation)
+ 4. [To Do](#ToDo)
+ 5. [Screenshots](#Screenshots)
+ 6. [Acknowledgements](#Acknowledgements)
+ 7. [License](#License)
 
-*For a full range of supported VT features, see the [Features](https://github.com/ismail-yilmaz/Terminal#features) section of TerminalCtrl's docs.
-For a full range of supported VT sequences, modes and control commands, see the [technical specifications document](https://github.com/ismail-yilmaz/Terminal/blob/master/Terminal/Specs.md) of TerminalCtrl.*
+## [Features](#Features)
+
+*For a full range of supported VT features, see the [Features](https://github.com/ismail-yilmaz/Terminal#features) section of TerminalCtrl's docs.*
+
+*For a full range of supported VT sequences, modes and control commands, see the [technical specifications document](https://github.com/ismail-yilmaz/Terminal/blob/master/Terminal/Specs.md) of TerminalCtrl.*
 
 - **Cross-Platform:** Bobcat can basically run on any OS that U++ can be compiled on: Linux, Windows, MacOS, and BSD.
 - **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC) sequences, ensuring high VT (DEC/ANSI) and xterm compatibility. 
@@ -32,7 +40,8 @@ For a full range of supported VT sequences, modes and control commands, see the 
 - **Performance:** Reasonably fast and less memory-hungry.
 
 
-## Requirements
+## [Requirements](#Requirements)
+
 Requirements are not heavy.  Below are the tools you need to compile Bobcat.
 
 - CLANG/GCC with at least C++17.
@@ -40,16 +49,16 @@ Requirements are not heavy.  Below are the tools you need to compile Bobcat.
 - [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal)
 - [StackCtrl](https://github.com/ismail-yilmaz/StackCtrl)  
 
-## Installation
+## [Installation](#Installation)
 
 To be written...
 
-## To Do
+## [To Do](#ToDo)
 
 - Macro infrastructure, based on Upp::Esc scripting language.
 - A "lite" plugin framework.
 
-## Screenshots
+## [Screenshots](#Screenshots)
 
 Below you can find a handful of screenshots of Bobcat, running on Linux & Windows.
 
@@ -73,11 +82,11 @@ Far manager running on Bobcat (Windows 10)
 
 ![bobcat-far-manager](resources/bobcat-far-manager-windows.png)
 
-## Acknowledgements
+## [Acknowledgements](#Acknowledgements)
 
 To be written...
 
-## License
+## [License](#License)
 
 Copyright (c) 2023, İsmail Yılmaz
 
