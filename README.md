@@ -1,8 +1,5 @@
 # Bobcat - Terminal Emulator
 
-![info](resources/bobcat-about-linux.png)
-
- 
 Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ultimatepp.org/index.html) rapid application development framework and [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal), a powerful vt widget. It leverages these technologies to provide a versatile and user-friendly command-line interface.
 
 *Disclaimer: Bobcat is a work in progress. Although it *should be* pretty stable by now, use it with caution.*
@@ -61,6 +58,14 @@ To be written...
 ## [Screenshots](#Screenshots)
 
 Below you can find a handful of screenshots of Bobcat, running on Linux & Windows.
+
+Bobcat on Linux 
+
+![bobcat-linux](resources/bobcat-about-linux.png)
+
+Bobcat on Windows
+
+![bobcat-windows](resources/bobcat-about-windows.png)
 
 Multiple terminal profile support (linux, btop)
 
