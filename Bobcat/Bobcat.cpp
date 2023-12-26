@@ -423,8 +423,7 @@ void Bobcat::SizeMenu(Bar& menu)
 				Size sz(StrInt(col), StrInt(row));
 				if(2 <= sz.cx && sz.cx <= 300
 				&& 2 <= sz.cy && sz.cy <= 300) {
-					sz = GetActiveTerminal()->PageSizeToClient(sz);
-					menu.Add(col + "x" + row, [this, sz] { Resize(sz); });
+					menu.Add(col + "x" + row, [this, t, sz] { Resize(t->PageSizeToClient(sz)); });
 				}
 			}
 		}

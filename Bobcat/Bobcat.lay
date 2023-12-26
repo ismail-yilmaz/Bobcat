@@ -92,7 +92,7 @@ LAYOUT(SettingsLayout, 587, 426)
 	ITEM(Upp::DropList, titlepos, LeftPosZ(159, 135).TopPosZ(17, 20))
 	ITEM(Upp::Label, dv___11, SetLabel(t_("Titlebar Placement")).LeftPosZ(8, 148).TopPosZ(17, 20))
 	ITEM(Upp::Label, dv___12, SetLabel(t_("ms")).LeftPosZ(297, 24).TopPosZ(70, 20))
-	ITEM(Upp::LineEdit, pagesizes, SetFont(Upp::Monospace()).Tip(t_("Page size format is ROWxCOLUMN. Valid size range is between 2 to 300 cells.")).LeftPosZ(8, 153).TopPosZ(297, 96))
+	ITEM(Upp::LineEdit, pagesizes, SetFont(Upp::Monospace()).Tip(t_("Page size format is  COLUMNSxROWS. Valid size range is between 2 to 300 cells.")).LeftPosZ(8, 153).TopPosZ(297, 96))
 	ITEM(Upp::Label, dv___14, SetLabel(t_("Custom page sizes")).LeftPosZ(8, 148).TopPosZ(274, 20))
 END_LAYOUT
 
