@@ -97,11 +97,14 @@ void Navigator::Layout()
 void Navigator::Paint(Draw& w)
 {
 	w.DrawRect(GetSize(), SColorPaper);
-	int n = ctx.stack.GetCursor();
+	int  n = ctx.stack.GetCursor();
+	Size isz = Size(16, 16);
 	for(int i = 0, y = -sb; i < shots.GetCount(); i++) {
 		const Snapshot& o = shots[i];
-		Rect r = o.irect.OffsetedVert(y);
+		Rect  r  = o.irect.OffsetedVert(y);
 		Color tc = SColorText, fc1, fc2;
+		Rect  rc = Rect(r.TopRight(), isz);
+		rc.Offset(-isz.cx - 2, 2);
 		if(r.Contains(mouse) || cursor == i) {
 			fc1 = Color(150, 150, 150);
 			fc2 = Color(130, 130, 130);
@@ -118,6 +121,7 @@ void Navigator::Paint(Draw& w)
 			}
 		}
 		w.DrawImage(r, o.img);
+		w.DrawImage(rc, rc.Contains(mouse) ? Images::DeleteHL() : Images::Delete());
 		StdCenterDisplay().Paint(w, o.nrect.OffsetedVert(y), o.name, tc, SColorPaper, 0);
 		DrawFrame(w, r.Inflated(1), fc1);
 		DrawFrame(w, r.Inflated(2), fc2);
@@ -129,9 +133,15 @@ void Navigator::LeftDown(Point pt, dword keyflags)
 	for(int i = 0; i < shots.GetCount(); i++) {
 		const Rect& r = shots[i].irect;
 		if(r.Contains(pt)) {
-			ctx.ToggleNavigator();
-			ctx.stack.Goto(i);
-			break;
+			if(Rect(r.TopRight(), Size(16, 16)).Offseted(-18, 2).Contains(pt)) {
+				ctx.RemoveTerminal(AsTerminal(ctx.stack[i]));
+			}
+			else {
+				ctx.ToggleNavigator();
+				ctx.stack.Goto(i);
+				ctx.Sync();
+				break;
+			}
 		}
 	}
 }

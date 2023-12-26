@@ -30,9 +30,7 @@ static void sEventLoop(Bobcat& app)
 		for(int i = 0; i < app.terminals.GetCount(); i++) {
 			Terminal& t = app.terminals[i];
 			if(int n = t.Do(); n < 0) {
-				app.stack.Remove(t);
-				app.terminals.Remove(i);
-				app.Sync();
+				app.RemoveTerminal(t);
 				break;
 			}
 			else
@@ -59,6 +57,15 @@ bool Bobcat::AddTerminal(const Value& key)
 	bool ok = terminals.Create(*this).Start(key);
 	if(ok) Sync();
 	return ok;
+}
+
+void Bobcat::RemoveTerminal(Terminal& t)
+{
+	if(t.pty.IsRunning())
+		t.Stop();
+	stack.Remove(t);
+	terminals.RemoveIf([this, &t](int i) { return &t == &terminals[i]; });
+	Sync();
 }
 
 void Bobcat::ActivateTerminal()
@@ -247,7 +254,8 @@ Bobcat& Bobcat::ToggleNavigator()
 	else {
 		navigator.Hide();
 		view.Show();
-		GetActiveTerminal()->SetFocus();
+		if(Terminal * t = GetActiveTerminal(); t)
+			t->SetFocus();
 	}
 	return *this;
 }

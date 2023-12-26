@@ -38,6 +38,7 @@ struct Bobcat {
     Bobcat();
 
     bool        AddTerminal(const Value& key = Null);
+    void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
 
