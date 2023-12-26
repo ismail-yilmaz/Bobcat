@@ -404,7 +404,7 @@ void Bobcat::ListMenu(Bar& menu)
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = (Terminal &) stack[i];
-		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); }).Radio(stack.GetCursor() == i);
+		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); Sync(); }).Radio(stack.GetCursor() == i);
 	}
 }
 
