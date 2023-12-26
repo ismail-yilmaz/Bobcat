@@ -51,6 +51,7 @@ Profile::Profile()
 , adjustcolors(false)
 , intensify(false)
 , dynamiccolors(false)
+, cursorstyle("block")
 , lockcursor(false)
 , blinkcursor(true)
 , inlineimages(false)
@@ -72,15 +73,15 @@ Profile::Profile()
 , filterctrl(false)
 , font(Monospace())
 , linespacing(0)
+, noenv(false)
+, onexit("exit")
+, erasechar("delete")
+, functionkeystyle("vt")
+, overridetracking("K_SHIFT_CTRL")
+, encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
 {
-	onexit = "exit";
-	cursorstyle = "block";
-	erasechar = "delete";
-	functionkeystyle = "vt";
-	overridetracking = "K_SHIFT_CTRL";
-	encoding = CharsetName(CHARSET_UTF8);
 #ifdef PLATFORM_POSIX
 	command = Nvl(GetEnv("SHELL"), "/bin/sh");
 	env << "TERM=" << Nvl(GetEnv("TERM"), "xterm-256color") << "\n"
@@ -103,6 +104,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("Command",				 command)
 	("Address",				 address)
 	("Env",					 env)
+	("DontInheritEnv",       noenv)
 	("Encoding",             encoding)
 	("Font",				 font)
 	("LineSpacing",          linespacing)
@@ -191,6 +193,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
     m(general.cmd,              p.command)
      (general.dir,              p.address)
      (general.env,              p.env)
+     (general.noenv,            p.noenv)
      (general.cmdexit,          p.onexit)
      (visuals.font,             p.font)
      (visuals.linespacing,      p.linespacing)

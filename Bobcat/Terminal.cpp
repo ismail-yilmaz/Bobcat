@@ -61,7 +61,9 @@ bool Terminal::Start(const Profile& p)
 	};
 	#endif
 	
-	VectorMap<String, String> vv = clone(Environment());
+	VectorMap<String, String> vv;
+	if(!p.noenv)
+		vv = clone(Environment());
 	MemReadStream ms(p.env, p.env.GetLength());
 	while(!ms.IsEof()) {
 		String k, v;

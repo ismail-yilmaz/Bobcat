@@ -14,6 +14,7 @@ struct Profile : Moveable<Profile> {
     String      command;
     String      address;
     String      env;
+    bool        noenv;
     Font        font;
     bool        bell;
     bool        blinktext;
