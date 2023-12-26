@@ -83,6 +83,7 @@ struct Bobcat {
     void        HelpMenu(Bar& menu);
     void        TermMenu(Bar& menu);
     void        ListMenu(Bar& menu);
+    void        SizeMenu(Bar& menu);
     
     void        ScreenShot();
     void        About();
@@ -97,6 +98,7 @@ struct Bobcat {
         bool        stackwheel;
         bool        savescreenshot;
         bool        custominputmethod;
+        String      custompagesizes;
         bool        showmenu;
         bool        showtitle;
         bool        serializeplacement;

@@ -139,6 +139,7 @@ void Bobcat::Settings()
 	settingspane.direction.Add("vertical", tt_("Vertical"));
 	settingspane.direction.GoBegin();
 
+	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
 	cr(settingspane.direction, settings.stackdirection);
@@ -148,6 +149,8 @@ void Bobcat::Settings()
 	cr(settingspane.showtitle, settings.showtitle);
 	cr(settingspane.savescreenshot, settings.savescreenshot);
 	cr(settingspane.custominput, settings.custominputmethod);
+	cr(settingspane.pagesizes, settings.custompagesizes);
+	
 	cr.Set();
 
 	profiles.Load();
@@ -405,6 +408,29 @@ void Bobcat::ListMenu(Bar& menu)
 	}
 }
 
+void Bobcat::SizeMenu(Bar& menu)
+{
+	if(Terminal *t = GetActiveTerminal(); t) {
+		menu.Separator();
+		menu.Add(AK_80X24,  [this, t] { Resize(t->PageSizeToClient(80, 24));  });
+		menu.Add(AK_80X48,  [this, t] { Resize(t->PageSizeToClient(80, 48));  });
+		menu.Add(AK_132X24, [this, t] { Resize(t->PageSizeToClient(132, 24)); });
+		menu.Add(AK_132X48, [this, t] { Resize(t->PageSizeToClient(132, 48)); });
+		StringStream ss(settings.custompagesizes);
+		while(!ss.IsEof()) {
+			String row, col;
+			if(SplitTo(ss.GetLine(), 'x', col, row)) {
+				Size sz(StrInt(col), StrInt(row));
+				if(2 <= sz.cx && sz.cx <= 300
+				&& 2 <= sz.cy && sz.cy <= 300) {
+					sz = GetActiveTerminal()->PageSizeToClient(sz);
+					menu.Add(col + "x" + row, [this, sz] { Resize(sz); });
+				}
+			}
+		}
+	}
+}
+
 void Bobcat::ScreenShot()
 {
 	if(Terminal *t = GetActiveTerminal(); t) {
@@ -461,6 +487,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("ShowTitleBar", showtitle)
 	   ("SaveScreenshot", savescreenshot)
 	   ("CustomInputMethod", custominputmethod)
+	   ("CustomPageSizes", custompagesizes)
 	   ("SeralizePlacement", serializeplacement);
 }
 

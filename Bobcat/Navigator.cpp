@@ -98,6 +98,7 @@ void Navigator::Paint(Draw& w)
 {
 	w.DrawRect(GetSize(), SColorPaper);
 	int  n = ctx.stack.GetCursor();
+
 	Size isz = Size(16, 16);
 	for(int i = 0, y = -sb; i < shots.GetCount(); i++) {
 		const Snapshot& o = shots[i];

@@ -311,11 +311,7 @@ void Terminal::EditMenu(Bar& menu)
 
 void Terminal::ViewMenu(Bar& menu)
 {
-	menu.Separator();
-	menu.Add(AK_80X24,         [this] { ctx.Resize(PageSizeToClient(80, 24));  });
-	menu.Add(AK_80X48,         [this] { ctx.Resize(PageSizeToClient(80, 48));  });
-	menu.Add(AK_132X24,        [this] { ctx.Resize(PageSizeToClient(132, 24)); });
-	menu.Add(AK_132X48,        [this] { ctx.Resize(PageSizeToClient(132, 48)); });
+	ctx.SizeMenu(menu);
 	menu.AddKey(AK_ZOOMIN,     [this] { SetFontZoom(1);     });
 	menu.AddKey(AK_ZOOMOUT,    [this] { SetFontZoom(-1);    });
 	menu.AddKey(AK_NOZOOM,     [this] { SetFontZoom(0);     });

@@ -21,7 +21,7 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 *For a full range of supported VT sequences, modes and control commands, see the [technical specifications document](https://github.com/ismail-yilmaz/Terminal/blob/master/Terminal/Specs.md) of TerminalCtrl.*
 
 - **Cross-Platform:** Bobcat can basically run on any OS that U++ can be compiled on: Linux, Windows, MacOS, and BSD.
-- **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC) sequences, ensuring high VT (DEC/ANSI) and xterm compatibility. 
+- **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC) sequences, ensuring high VT (DEC/ANSI) and xterm compatibility. (By default Bobcat emulates a DEC VT420 with various extensions)
 - **Image Support:** Supports both legacy (sixel) and modern image formats (png, jpg, bmp, tiff) for inline image display, and recognizes sixel, iterm2 & jexer protocols.
 - **OSC Extensions:** Implements newer OSC extensions, including hyperlinks, clipboard manipulation protocol, etc.
 - **Versatile Copy/Paste:** Supports copy/paste/drag-and-drop operations on texts, links, and inline-images.
@@ -29,7 +29,7 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 - **Configurable UI:** Offers a configurable user interface, allowing for a bare-bone terminal or fully-fledged GUI.
 - **Stacked Interface:** Uses a stacked interface to reduce UI clutter, including a terminal manager called Navigator to navigate between open/stacked terminals.
 - **Simple Configuration:** Uses a simple JSON format for configuration files.
-- **Multiple Pty Support on Windows:** Can use ConPty or WinPty (compile-time feature, with plans to make it runtime) on Windows. WinPty backend is statically linked and *does not* require msys2 or cygwin environments.
+- **Multiple Pty Support on Windows:** Can use ConPty or WinPty (compile-time feature, with plans to make it runtime) on Windows. WinPty backend is statically linked and *does not* require msys2 or cygwin environments but can be also used with them.
 - **Mouse Events:** Supports mouse events for almost all protocols.
 - **Configurable Keys:** Supports configurable keyboard shortcuts for a personalized experience.
 - **Emoji Support:** Can display color emojis (depending on the font).
