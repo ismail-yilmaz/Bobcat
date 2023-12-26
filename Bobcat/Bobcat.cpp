@@ -116,8 +116,14 @@ void Bobcat::RunWithProfile(const String& name)
 
 void Bobcat::Close()
 {
-	if(window.IsOpen())
-		window.Close();
+	if(!window.IsOpen())
+		return;
+
+	if(int n = terminals.GetCount(); n > 1)
+		if(!PromptYesNo(Format(tt_("%d terminals are open.&Close them all and exit?"), n)))
+			return;
+
+	window.Close();
 }
 
 void Bobcat::Settings()
