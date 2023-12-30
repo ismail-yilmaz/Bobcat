@@ -39,6 +39,16 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
 }
 
+void Terminal::SetData(const Value& v)
+{
+	data = v;
+}
+
+Value Terminal::GetData() const
+{
+	return data;
+}
+
 bool Terminal::Start(const Profile& p)
 {
 	SetProfile(p);
@@ -220,18 +230,19 @@ Terminal& Terminal::SetLineSpacing(int n)
 
 void Terminal::MakeTitle(const String& s)
 {
-	title.Clear();
+	String title;
 	if(!profilename.IsEmpty())
 		title << profilename;
 	if(!s.IsEmpty() && s != profilename)
 		title << " :: " << s;
 	titlebar.title.SetText("\1[g= " << DeQtf(title) << " ]");
 	ctx.SyncTitle();
+	SetData(title);
 }
 
 String Terminal::GetTitle() const
 {
-	return title;
+	return GetData();
 }
 
 void Terminal::ShowTitleBar(bool b)

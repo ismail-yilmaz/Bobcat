@@ -8,7 +8,7 @@ topic "$>Bobcat";
 [s0;=%- [%%C0 Copyright ][C0 © 2023, ][C^https`:`/`/github`.com`/ismail`-yilmaz^0 İsmail 
 Yılmaz]&]
 [s0;=C2%- &]
-[s0;= [C0 TEXT]&]
+[s0;= [C0 `$(BUILD)]&]
 [s0;=C0 &]
 [s0;= [C^https`:`/`/github`.com`/ismail`-yilmaz`/Bobcat^0 Bobcat][C0  
 is using ][C^https`:`/`/github`.com`/ismail`-yilmaz`/Terminal^0 TerminalCtrl][C0 , 

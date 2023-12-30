@@ -7,6 +7,9 @@
 struct Terminal : TerminalCtrl {
     Terminal(Bobcat& ctx);
 
+    void        SetData(const Value& data) override;
+    Value       GetData() const override;
+
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);
     void        Stop();
@@ -54,7 +57,7 @@ struct Terminal : TerminalCtrl {
     bool        keep;
     bool        filter;
     String      profilename;
-    String      title;
+    Value       data;
 
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar();

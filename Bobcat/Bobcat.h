@@ -63,6 +63,7 @@ struct Bobcat {
     bool        IsFullScreen() const;
 
     Bobcat&     Resize(Size sz);
+    Bobcat&     SetPageSize(Size sz);
     Bobcat&     SetRect(Rect r);
 
     Bobcat&     ShowMenuBar(bool b = true);

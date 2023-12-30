@@ -20,6 +20,7 @@ void PrintHelp()
 		"\t-l, --list                     List available profiles\n"
 		"\t-p, --profile PROFILE          Run with the given PROFILE (Names are case-sensitive)\n"
 		"\t-s, --settings                 Open settings window\n"
+//		"\t-g, --geometry                 Set initial window geometry. (E.g. 80x24, 132x24)\n"
 	);
 	Cout() << sHelpText;
 #else

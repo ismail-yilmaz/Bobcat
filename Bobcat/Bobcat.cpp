@@ -20,35 +20,46 @@ FileSel& BobcatFs()
 	return Single<FileSel>();
 }
 
+static void sProcessEvents(Bobcat& app)
+{
+	int l = 10;
+	app.window.ProcessEvents();
+	for(int i = 0; i < app.terminals.GetCount(); i++) {
+		Terminal& t = app.terminals[i];
+		if(int n = t.Do(); n < 0) {
+			app.RemoveTerminal(t);
+			break;
+		}
+		else
+			l = max(l, n);
+	}
+	Sleep(l >= 1024 ? 1024 * 10 / l : 10);
+}
+
 static void sEventLoop(Bobcat& app)
 {
 	app.Resize(app.GetActiveTerminal()->GetStdSize());
 	app.window.OpenMain();
 	while(app.window.IsOpen() && app.terminals.GetCount()) {
-		app.window.ProcessEvents();
-		int l = 10;
-		for(int i = 0; i < app.terminals.GetCount(); i++) {
-			Terminal& t = app.terminals[i];
-			if(int n = t.Do(); n < 0) {
-				app.RemoveTerminal(t);
-				break;
-			}
-			else
-				l = max(l, n);
-		}
-		Sleep(l >= 1024 ? 1024 * 10 / l : 10);
+		sProcessEvents(app);
 	}
 }
 
 Bobcat::Bobcat()
-: navigator(*this)
+: navigator(stack)
 {
 	SyncTitle();
 	window.Sizeable().Zoomable().CenterScreen();
 	window.WhenClose = [this]() { Close(); };
 	window.Add(view.SizePos());
+	window.Add(navigator.SizePos());
 	view.AddFrame(menubar);
 	view.Add(stack.Animation().Wheel().Horz().SizePos());
+	navigator.WhenBar        = [this](Bar& menu) { TermMenu(menu); };
+	navigator.WhenClose      = [this]()          { ToggleNavigator(); };
+	navigator.WhenGotoItem   = [this](Ctrl& c)   { ToggleNavigator(); stack.Goto(c); };
+	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
+	stack.WhenAction         = [this]()          { Sync(); };
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
 }
 
@@ -138,7 +149,6 @@ void Bobcat::Settings()
 	settingspane.direction.Add("horizontal", tt_("Horizontal"));
 	settingspane.direction.Add("vertical", tt_("Vertical"));
 	settingspane.direction.GoBegin();
-
 	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
@@ -159,13 +169,24 @@ void Bobcat::Settings()
 	dlg.Add(profiles, tt_("Profiles"));
 	dlg.Add(settingspane, tt_("General"));
 	dlg.WhenClose = dlg.Acceptor(IDEXIT);
-	if(dlg.OK().Cancel().Title(tt_("Settings")).ExecuteOK()) {
-		cr.Retrieve();
-		profiles.Store();
-		Sync();
-		SyncTerminalProfiles();
-	}
+	dlg.OK().Cancel().Title(tt_("Settings")).OpenMain();
 
+	while(dlg.IsOpen()) {
+		if(window.IsOpen())
+			sProcessEvents(*this);
+		if(int rc = dlg.GetExitCode(); rc == IDOK) {
+			cr.Retrieve();
+			profiles.Store();
+			if(window.IsOpen())
+				Sync();
+			SyncTerminalProfiles();
+			break;
+		}
+		else
+		if(rc)
+			break;
+		dlg.ProcessEvents();
+	}
 }
 
 Bobcat& Bobcat::Maximize(bool b)
@@ -196,6 +217,13 @@ Bobcat& Bobcat::Resize(Size sz)
 	Point p = window.GetRect().TopLeft();
 	sz = view.AddFrameSize(sz);
 	window.SetRect(p.x, p.y, sz.cx, sz.cy);
+	return *this;
+}
+
+Bobcat& Bobcat::SetPageSize(Size sz)
+{
+	if(Terminal *t = GetActiveTerminal(); t)
+		Resize(t->PageSizeToClient(sz));
 	return *this;
 }
 
@@ -404,27 +432,25 @@ void Bobcat::ListMenu(Bar& menu)
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = (Terminal &) stack[i];
-		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); Sync(); }).Radio(stack.GetCursor() == i);
+		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); SyncTitle(); }).Radio(stack.GetCursor() == i);
 	}
 }
 
 void Bobcat::SizeMenu(Bar& menu)
 {
-	if(Terminal *t = GetActiveTerminal(); t) {
-		menu.Separator();
-		menu.Add(AK_80X24,  [this, t] { Resize(t->PageSizeToClient(80, 24));  });
-		menu.Add(AK_80X48,  [this, t] { Resize(t->PageSizeToClient(80, 48));  });
-		menu.Add(AK_132X24, [this, t] { Resize(t->PageSizeToClient(132, 24)); });
-		menu.Add(AK_132X48, [this, t] { Resize(t->PageSizeToClient(132, 48)); });
-		StringStream ss(settings.custompagesizes);
-		while(!ss.IsEof()) {
-			String row, col;
-			if(SplitTo(ss.GetLine(), 'x', col, row)) {
-				Size sz(StrInt(col), StrInt(row));
-				if(2 <= sz.cx && sz.cx <= 300
-				&& 2 <= sz.cy && sz.cy <= 300) {
-					menu.Add(col + "x" + row, [this, t, sz] { Resize(t->PageSizeToClient(sz)); });
-				}
+	menu.Separator();
+	menu.Add(AK_80X24,  [this] { SetPageSize(Size(80, 24));  });
+	menu.Add(AK_80X48,  [this] { SetPageSize(Size(80, 48));  });
+	menu.Add(AK_132X24, [this] { SetPageSize(Size(132, 24)); });
+	menu.Add(AK_132X48, [this] { SetPageSize(Size(132, 48)); });
+	StringStream ss(settings.custompagesizes);
+	while(!ss.IsEof()) {
+		String row, col;
+		if(SplitTo(ss.GetLine(), 'x', col, row)) {
+			Size sz(StrInt(col), StrInt(row));
+			if(2 <= sz.cx && sz.cx <= 300
+			&& 2 <= sz.cy && sz.cy <= 300) {
+				menu.Add(col + "x" + row, [this, sz] { SetPageSize(sz); });
 			}
 		}
 	}
@@ -455,11 +481,15 @@ void Bobcat::About()
 	dlg.Add(about, tt_("About"));
 	dlg.Add(licenses, tt_("Licenses"));
 	String atxt =  GetTopic("topic://Bobcat/docs/about_en-us");
-	atxt.Replace("TEXT", DeQtf(GetBuildInfo()));
+	atxt.Replace("$(BUILD)", DeQtf(GetBuildInfo()));
 	about.txt.SetQTF(atxt);
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
 	licenses.txt.SetZoom(Zoom(1, 2));
-	dlg.OK().Execute();
+	dlg.OK().Open(&window);
+	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
+		sProcessEvents(*this);
+		dlg.ProcessEvents();
+	}
 }
 
 Bobcat::Config::Config()
