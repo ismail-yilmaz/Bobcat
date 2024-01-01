@@ -1,4 +1,4 @@
-topic "Keyboard Shortcurs";
+topic "Keyboard Shortcuts";
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_} 
 [s0; [* Keyboard Shortcuts]&]
