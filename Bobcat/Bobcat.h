@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright 2023, İsmail Yılmaz
+// Copyright 2023-2024, İsmail Yılmaz
 
 #ifndef _Bobcat_Bobcat_h
 #define _Bobcat_Bobcat_h
