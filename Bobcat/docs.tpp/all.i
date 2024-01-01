@@ -6,6 +6,14 @@ TOPIC("licenses_en-us")
 #include "licenses_en-us.tppi"
 END_TOPIC
 
+TOPIC("overview_en-us")
+#include "overview_en-us.tppi"
+END_TOPIC
+
+TOPIC("shortcuts_en-us")
+#include "shortcuts_en-us.tppi"
+END_TOPIC
+
 TOPIC("usage_en-us")
 #include "usage_en-us.tppi"
 END_TOPIC

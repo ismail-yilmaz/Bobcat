@@ -1,4 +1,4 @@
-topic "Usage";
+topic "Command Line Options";
 [a83;*R6 $$1,0#31310162474203024125188417583966:caption]
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_}%EN-US 
@@ -6,11 +6,11 @@ topic "Usage";
 [s0;%- [C@3   bobcat `[OPTIONS`] `-`- `[COMMAND`]]&]
 [s0;%- &]
 [s0;%- [* General Options]&]
-[s0;%- [C1   ][C@3;1 `-h, `-`-help][C1                Show help]&]
-[s0;%- [C1   ][C@3;1 `-l, `-`-list ][C1               List available profiles]&]
+[s0;%- [C1   ][C@3;1 `-h, `-`-help][C1                Show help.]&]
+[s0;%- [C1   ][C@3;1 `-l, `-`-list ][C1               List available profiles.]&]
 [s0;%- [C1   ][C@3;1 `-p, `-`-profile PROFILE][C1     Run with the given 
-PROFILE]&]
-[s0;%- [C1   ][C@3;1 `-s, `-`-settings][C1            Open settings window]&]
+PROFILE.]&]
+[s0;%- [C1   ][C@3;1 `-s, `-`-settings][C1            Open settings window.]&]
 [s0; [C1   ][C@3;1 `-b, `-`-show`-bars][C1           Show the menu and 
 title bar.]&]
 [s0; [C1   ][C@3;1 `-B, `-`-hide`-bars][C1           Hide the menu and 

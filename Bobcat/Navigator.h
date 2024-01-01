@@ -34,7 +34,7 @@ struct Navigator : ParentCtrl {
         Rect         GetCloseButtonRect();
 
         void         Paint(Draw& w) override;
-        void         LeftDown(Point pt, dword keyflags) override;
+        void         LeftUp(Point pt, dword keyflags) override;
         void         MouseEnter(Point pt, dword keyflags) override;
         void         MouseLeave() override;
         void         MouseMove(Point pt, dword keyflags) override;

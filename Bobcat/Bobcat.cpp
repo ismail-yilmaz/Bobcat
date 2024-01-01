@@ -180,10 +180,11 @@ void Bobcat::Settings()
 		if(int rc = dlg.GetExitCode(); rc == IDOK) {
 			cr.Retrieve();
 			profiles.Store();
-			if(window.IsOpen())
-				Sync();
-			SyncTerminalProfiles();
 			SaveConfig(*this);
+			if(window.IsOpen()) {
+				Sync();
+				SyncTerminalProfiles();
+			}
 			break;
 		}
 		else
@@ -398,6 +399,7 @@ void Bobcat::SetupMenu(Bar& menu)
 void Bobcat::HelpMenu(Bar& menu)
 {
 	menu.Add(t_("About"), [this] { About(); });
+	menu.Add(t_("Help"), [this] { Help(); });
 }
 
 void Bobcat::TermMenu(Bar& menu)
@@ -457,8 +459,8 @@ void Bobcat::SizeMenu(Bar& menu)
 		String row, col;
 		if(SplitTo(ss.GetLine(), 'x', col, row)) {
 			Size sz(StrInt(col), StrInt(row));
-			if(2 <= sz.cx && sz.cx <= 300
-			&& 2 <= sz.cy && sz.cy <= 300) {
+			if(10 <= sz.cx && sz.cx <= 300
+			&& 10 <= sz.cy && sz.cy <= 300) {
 				menu.Add(col + "x" + row, [this, sz] { SetPageSize(sz); });
 			}
 		}
@@ -495,6 +497,29 @@ void Bobcat::About()
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
 	licenses.txt.SetZoom(Zoom(1, 2));
 	dlg.OK().Open(&window);
+	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
+		sProcessEvents(*this);
+		dlg.ProcessEvents();
+	}
+}
+
+void Bobcat::Help()
+{
+	static const Tuple<const char*, const char*> topics[] {
+		{ "overview",  t_("Overview")             },
+		{ "usage",     t_("Command line options") },
+		{ "shortcuts", t_("Keyboard shortcuts")   }
+	};
+	
+	HelpWindow dlg;
+	dlg.MaximizeBox().Title(t_("Bobcat Help"));
+	for(int i = 0; i < __countof(topics); i++) {
+		String s = "topic://Bobcat/docs/";
+		dlg.AddTree(0, Null, s << topics[i].a << "_en-us", topics[i].b);
+	}
+	dlg.CurrentOrHome();
+	dlg.SetRect(0, 0, 800, 600);
+	dlg.Open(&window);
 	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
 		sProcessEvents(*this);
 		dlg.ProcessEvents();

@@ -88,7 +88,7 @@ struct Bobcat {
     
     void        ScreenShot();
     void        About();
-//  void        Help();
+    void        Help();
 
     struct  Config {
         Config();

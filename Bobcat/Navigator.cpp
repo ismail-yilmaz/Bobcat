@@ -20,16 +20,20 @@ Navigator::Item::Item()
 
 void Navigator::Item::Paint(Draw& w)
 {
-	Rect r = GetCloseButtonRect(), q = GetView();
-	w.DrawRect(q, SColorPaper);
-	w.DrawImage(q.Deflated(8), img);
-	w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL() : Images::Delete());
-	Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
-	DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
-	DrawFrame(w, q.Deflated(1), c);
+	if(Rect q = GetView(); q.Width() - 16 >= 1 && q.GetHeight() - 16 >= 1) {
+		Rect r = GetCloseButtonRect();
+		w.Clip(q);
+		w.DrawRect(q, SColorPaper);
+		w.DrawImage(q.Deflated(8), img);
+		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL() : Images::Delete());
+		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
+		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
+		DrawFrame(w, q.Deflated(1), c);
+		w.End();
+	}
 }
 
-void Navigator::Item::LeftDown(Point pt, dword keyflags)
+void Navigator::Item::LeftUp(Point pt, dword keyflags)
 {
 	if(GetCloseButtonRect().Contains(pt) && ctrl)
 		WhenClose(*ctrl);
@@ -136,10 +140,11 @@ void Navigator::Sync()
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
 			m.ctrl  = &stack[i];
-			ImageDraw w(m.ctrl->GetSize());
+			Size csz = max(Size(1, 1), m.ctrl->GetSize());
+			Size isz = max(Size(1, 1), m.GetSize());
+			ImageDraw w(csz);
 			m.ctrl->Paint(w);
-			Size sz = m.GetSize();
-			m.img = Upp::Rescale(w, sz.cx - 4, sz.cy - fsz.cy);
+			m.img = Rescale(w, max(1, isz.cx - 4), max(1, isz.cy - fsz.cy));
 			if(!m.IsChild())
 				Add(m);
 			if(stack.GetActiveCtrl() == m.ctrl) {
@@ -168,10 +173,11 @@ void Navigator::Paint(Draw& w)
 	w.Clip(sz);
 	w.DrawRect(GetSize(), SColorPaper);
 	for(const Item& m : items) {
-		Rect r = m.GetRect();
-		r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-		if(m.ctrl)
+		if(m.ctrl) {
+			Rect r = m.GetRect();
+			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
 			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorPaper, 0);
+		}
 	}
 	w.End();
 }
