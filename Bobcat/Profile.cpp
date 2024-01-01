@@ -44,7 +44,8 @@ const Display& NormalProfileNameDisplay()  { return Single<NormalProfileNameDisp
 const Display& FontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
 
 Profile::Profile()
-: bell(false)
+: name(String::GetVoid())
+, bell(false)
 , blinktext(true)
 , blinkinterval(500)
 , lightcolors(false)

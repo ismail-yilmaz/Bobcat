@@ -81,6 +81,7 @@ bool Terminal::Start(const Profile& p)
 			vv.GetAdd(k, v);
 		}
 	}
+
 	if(pty.Start(p.command, vv, p.address)) {
 		profilename = p.name;
 		MakeTitle(profilename);
@@ -236,8 +237,8 @@ void Terminal::MakeTitle(const String& s)
 	if(!s.IsEmpty() && s != profilename)
 		title << " :: " << s;
 	titlebar.title.SetText("\1[g= " << DeQtf(title) << " ]");
-	ctx.SyncTitle();
 	SetData(title);
+	ctx.SyncTitle();
 }
 
 String Terminal::GetTitle() const

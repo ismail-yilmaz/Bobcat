@@ -38,8 +38,6 @@ static void sProcessEvents(Bobcat& app)
 
 static void sEventLoop(Bobcat& app)
 {
-	app.Resize(app.GetActiveTerminal()->GetStdSize());
-	app.window.OpenMain();
 	while(app.window.IsOpen() && app.terminals.GetCount()) {
 		sProcessEvents(app);
 	}
@@ -63,9 +61,16 @@ Bobcat::Bobcat()
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
 }
 
-bool Bobcat::AddTerminal(const Value& key)
+bool Bobcat::AddTerminal(const String& key)
 {
 	bool ok = terminals.Create(*this).Start(key);
+	if(ok) Sync();
+	return ok;
+}
+
+bool Bobcat::AddTerminal(const Profile& profile)
+{
+	bool ok = terminals.Create(*this).Start(profile);
 	if(ok) Sync();
 	return ok;
 }
@@ -105,24 +110,22 @@ Vector<Terminal *> Bobcat::GetTerminalGroup(const Profile& p)
 	return GetTerminalGroup(p.GetHashValue());
 }
 
-void Bobcat::RunCommand(const String& cmd)
+void Bobcat::Run(const Profile& profile, Size size, bool fullscreen)
 {
-	Profile p("external");
-	p.command = cmd;
-	if(HideMenuBar().terminals.Create(*this).Start(p))
+	if(AddTerminal(profile)) {
+		if(fullscreen) {
+			FullScreen(1);
+			#ifdef PLATFORM_POSIX
+			window.OpenMain();
+			#endif
+		}
+		else {
+			if(!IsMaximized())
+				SetPageSize(size);
+			window.OpenMain();
+		}
 		sEventLoop(*this);
-}
-
-void Bobcat::Run()
-{
-	if(AddTerminal(settings.activeprofile))
-		sEventLoop(*this);
-}
-
-void Bobcat::RunWithProfile(const String& name)
-{
-	if(AddTerminal(name))
-		sEventLoop(*this);
+	}
 }
 
 void Bobcat::Close()
@@ -191,7 +194,7 @@ void Bobcat::Settings()
 
 Bobcat& Bobcat::Maximize(bool b)
 {
-	window.Maximize();
+	b ?	window.Maximize() : window.Overlap();
 	return *this;
 }
 
@@ -202,7 +205,7 @@ bool Bobcat::IsMaximized() const
 
 Bobcat& Bobcat::Minimize(bool b)
 {
-	window.Minimize();
+	b ? window.Minimize() : window.Overlap();
 	return *this;
 }
 
@@ -236,20 +239,25 @@ Bobcat& Bobcat::SetRect(Rect r)
 
 Bobcat& Bobcat::FullScreen(int mode)
 {
-	window.FullScreen(mode == 0 ? !IsFullScreen() : mode == 1);
+	switch(mode) {
+	case -1: window.FullScreen(false); break;
+	case  0: window.FullScreen(!IsFullScreen()); break;
+	case  1: window.FullScreen(true); break;
+	default: return *this;
+	}
+	Sync();
 	return *this;
 }
 
 Bobcat& Bobcat::ToggleFullScreen()
 {
-	window.FullScreen(!IsFullScreen());
-	return *this;
+	return FullScreen(0);
 }
 
 Bobcat& Bobcat::NoFullScreen()
 {
 	if(IsFullScreen())
-		window.FullScreen(false);
+		FullScreen(-1);
 	return *this;
 }
 
@@ -315,7 +323,7 @@ void Bobcat::SyncTitle()
 {
 	String s = t_("Bobcat");
 	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t)
-		s << " [" << t->GetTitle() << "]";
+		s << " [" << t->GetData() << "]";
 	window.Title(s);
 }
 

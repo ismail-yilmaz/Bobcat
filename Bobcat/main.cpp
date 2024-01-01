@@ -13,14 +13,40 @@ void PrintHelp()
 #ifdef PLATFORM_POSIX
 	const String sHelpText = t_(
 		"Usage:\n"
-		"\tbobcat [OPTIONS] -- [COMMAND...]"
+		"   bobcat [OPTIONS] -- [COMMAND...]"
 		"\n\n"
-		"Options:\n"
-		"\t-h, --help                     Show help\n"
-		"\t-l, --list                     List available profiles\n"
-		"\t-p, --profile PROFILE          Run with the given PROFILE (Names are case-sensitive)\n"
-		"\t-s, --settings                 Open settings window\n"
-//		"\t-g, --geometry                 Set initial window geometry. (E.g. 80x24, 132x24)\n"
+		"General options:\n"
+		"   -h, --help                     Show help.\n"
+		"   -l, --list                     List available profiles.\n"
+		"   -p, --profile PROFILE          Run with the given PROFILE (Names are case-sensitive).\n"
+		"   -s, --settings                 Open settings window.\n"
+		"   -b, --show-bars                Show the menu and title bar.\n"
+		"   -B, --hide-bars                Hide the menu and title bar.\n"
+		"       --show-menubar             Show the menu bar.\n"
+		"       --hide-menubar             Hide the menu bar.\n"
+		"       --show-titlebar            Show the title bar.\n"
+		"       --hide-titlebar            Hide the title bar.\n"
+		"\n"
+		"Environment options:\n"
+		"   -k, --keep                     Don't close the terminal on exit.\n"
+		"   -K, --dont-keep                Close the terminal on exit.\n"
+		"   -n, --no-environment           Don't inherit the environment.\n"
+		"   -d, --working-dir PATH         Set the working directory to PATH.\n"
+		"   -f, --fullscreen               Full screen mode.\n"
+		"   -m, --maximize                 Maximize the window.\n"
+		"   -g, --geometry GEOMETRY        Set the initial window geometry. (E.g. 80x24, 132x24)\n"
+		"\n"
+		"Emulation options:\n"
+		"   -q, --vt-style-fkeys           Use VT-style function keys.\n"
+		"   -Q, --pc-style-fkeys           Use PC-style function keys.\n"
+		"   -w, --window-reports           Enable window reports.\n"
+		"   -W, --no-window-reports        Disable window reports.\n"
+		"   -a, --window-actions           Enable window actions.\n"
+		"   -A, --no-window-actions        Disable window actions.\n"
+		"       --hyperlinks               Enable hyperlink detection (OSC 52).\n"
+		"       --no-hyperlinks            Disable hyperlink detection.\n"
+		"       --inline-images            Enable inline images support (sixel, iterm2, jexer).\n"
+		"       --no-inline-images         Disable inline images support.\n"
 	);
 	Cout() << sHelpText;
 #else
@@ -40,78 +66,153 @@ void PrintProfileList()
 #endif
 }
 
-void OpenSettings(Bobcat& app)
-{
-	LoadConfig(app);
-	app.Settings();
-	SaveConfig(app);
-}
-
-void RunWithProfile(Bobcat& app, const Vector<String>& cmdline, int i)
-{
-	if(i < cmdline.GetCount()) {
-		if(FindIndex(GetProfileNames(), cmdline[i]) < 0)
-			Cout() << Format(t_("Couldn't find profile '%s'. Falling back to active profile.\n"), cmdline[i]);
-		LoadConfig(app);
-		app.RunWithProfile(cmdline[i]);
-		SaveConfig(app);
-	}
-}
-
-void ExecuteCommand(Bobcat& app, const Vector<String>& cmdline, int i)
-{
-	if(i < cmdline.GetCount()) {
-		const auto r = SubRange(cmdline, i, cmdline.GetCount() - 1);
-		String cmd = Join((const Vector<String>&) r, " ", true);
-		LoadConfig(app);
-		app.RunCommand(cmd);
-		SaveConfig(app);
-	}
-}
-
 GUI_APP_MAIN
 {
 	StdLogSetup(LOG_FILE);
 	
+	Size page_size(80, 24);
+	bool fullscreen = false;
+	
 	Bobcat app;
+	LoadConfig(app);
+
+	// Try loading the active profile, if any, and fallback to default on failure.
+	Profile p = LoadProfile(app.settings.activeprofile);
+	
 	const Vector<String>& cmd = CommandLine();
 
-	// TODO: Rudimentary. Fine tune this part.
-	
-	for(int i = 0; i < cmd.GetCount(); i++)
+	for(int i = 0, n = cmd.GetCount(); i < n; i++)
 	{
-		if(findarg(cmd[i], "-l", "--list") != -1)
-		{
+		String s = cmd[i];
+		if(findarg(s, "-l", "--list") != -1) {
 			PrintProfileList();
 			return;
 		}
 		else
-		if(findarg(cmd[i], "-s", "--settings") != -1)
-		{
-			OpenSettings(app);
+		if(findarg(s, "-s", "--settings") != -1) {
+			app.Settings();
 			return;
 		}
 		else
-		if(findarg(cmd[i], "-p", "--profile") != -1)
-		{
-			RunWithProfile(app, cmd, ++i);
-			return;
+		if(findarg(s, "-p", "--profile") != -1) {
+			if(++i < n)
+				p = LoadProfile(cmd[i]);
 		}
 		else
-		if(findarg(cmd[i], "--") != -1)
-		{
-			ExecuteCommand(app, cmd, ++i);
-			return;
+		if(findarg(s, "-b", "--show-bars") != -1) {
+			app.settings.showmenu = true;
+			app.settings.showtitle = true;
 		}
 		else
-		{
+		if(findarg(s, "-B", "--hide-bars") != -1) {
+			app.settings.showmenu = false;
+			app.settings.showtitle = false;
+		}
+		else
+		if(findarg(s, "--show-menubar") != -1) {
+			app.settings.showmenu = true;
+		}
+		else
+		if(findarg(s, "--hide-menubar") != -1) {
+			app.settings.showmenu = false;
+		}
+		else
+		if(findarg(s, "--show-titlebar") != -1) {
+			app.settings.showtitle = true;
+		}
+		else
+		if(findarg(s, "--hide-titlebar") != -1) {
+			app.settings.showtitle = false;
+		}
+		else
+		if(findarg(s, "-k", "--keep") != -1) {
+			p.onexit = "keep";
+		}
+		else
+		if(findarg(s, "-K", "--dont-keep") != -1) {
+			p.onexit = "exit";
+		}
+		else
+		if(findarg(s, "-n", "--no-environment") != -1) {
+			p.noenv = true;
+		}
+		else
+		if(findarg(s, "-d", "--working-dir") != -1) {
+			if(++i < n)
+				p.address = cmd[i];
+		}
+		else
+		if(findarg(s, "-f", "--fullscreen") != -1) {
+			fullscreen = true;
+			app.Maximize(false);
+		}
+		else
+		if(findarg(s, "-m", "--maximize") != -1) {
+			app.Maximize();
+			fullscreen = false;
+		}
+		else
+		if(findarg(s, "-g", "--geometry") != -1) {
+			if(String r, c; ++i < n && SplitTo(ToLower(cmd[i]), "x", c, r)) {
+				page_size.cx = clamp(StrInt(c), 10, 300);
+				page_size.cy = clamp(StrInt(r), 10, 300);
+				app.Maximize(false);
+				fullscreen = false;
+			}
+		}
+		else
+		if(findarg(s, "-q", "--vt-style-fkeys") != -1) {
+			p.functionkeystyle = "vt";
+		}
+		else
+		if(findarg(s, "-Q", "--pc-style-fkeys") != -1) {
+			p.functionkeystyle = "pc";
+		}
+		else
+		if(findarg(s, "-w", "--window-reports") != -1) {
+			p.windowreports = true;
+		}
+		else
+		if(findarg(s, "-W", "--no-window-reports") != -1) {
+			p.windowreports = false;
+		}
+		else
+		if(findarg(s, "-a", "--window-actions") != -1) {
+			p.windowactions = true;
+		}
+		else
+		if(findarg(s, "-A", "--no-window-actions") != -1) {
+			p.windowactions = false;
+		}
+		else
+		if(findarg(s, "--hyperlinks") != -1) {
+			p.hyperlinks = true;
+		}
+		else
+		if(findarg(s, "--no-hyperlinks") != -1) {
+			p.hyperlinks = false;
+		}
+		else
+		if(findarg(s, "--inline-images") != -1) {
+			p.inlineimages = true;
+		}
+		else
+		if(findarg(s, "--no-inline-images") != -1) {
+			p.inlineimages = false;
+		}
+		else
+		if(s.IsEqual("--"))	{
+			String s;
+			for(int j = ++i; j < n; j++)
+				s << cmd[j] << ' ';
+			if(!s.IsEmpty())
+				p.command = TrimBoth(s);
+			break;
+		}
+		else {
 			PrintHelp();
 			return;
 		}
-			
 	}
-	
-	LoadConfig(app);
-	app.Run();
-	SaveConfig(app);
+	app.Run(p, page_size, fullscreen);
 }

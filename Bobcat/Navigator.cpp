@@ -21,6 +21,7 @@ Navigator::Item::Item()
 void Navigator::Item::Paint(Draw& w)
 {
 	Rect r = GetCloseButtonRect(), q = GetView();
+	w.DrawRect(q, SColorPaper);
 	w.DrawImage(q.Deflated(8), img);
 	w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL() : Images::Delete());
 	Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
@@ -169,7 +170,8 @@ void Navigator::Paint(Draw& w)
 	for(const Item& m : items) {
 		Rect r = m.GetRect();
 		r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-		StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorPaper, 0);
+		if(m.ctrl)
+			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorPaper, 0);
 	}
 	w.End();
 }

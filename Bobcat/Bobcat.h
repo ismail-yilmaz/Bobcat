@@ -37,7 +37,8 @@ struct Bobcat;
 struct Bobcat {
     Bobcat();
 
-    bool        AddTerminal(const Value& key = Null);
+    bool        AddTerminal(const String& key = Null);
+    bool        AddTerminal(const Profile& profile);
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
@@ -45,9 +46,8 @@ struct Bobcat {
     Vector<Terminal*> GetTerminalGroup(hash_t id);
     Vector<Terminal*> GetTerminalGroup(const Profile& p);
     
-    void        Run();
-    void        RunCommand(const String& cmd);
-    void        RunWithProfile(const String& name);
+    void        Run(const Profile& profile, Size size, bool fullscreen = false);
+
     
     void        Close();
     void        Settings();

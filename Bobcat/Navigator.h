@@ -15,11 +15,11 @@ struct Navigator : ParentCtrl {
     void        Layout() override;
 
     void        Paint(Draw& w) override;
-    
+
     void        RightDown(Point pt, dword keyflags) override;
     void        MouseWheel(Point pt, int zdelta, dword keyflags) override;
     bool        Key(dword key, int count) override;
-    
+
     Event<Bar&>   WhenBar;
     Event<>       WhenClose;
     Event<Ctrl&>  WhenGotoItem;
@@ -30,9 +30,9 @@ struct Navigator : ParentCtrl {
         Item();
         Event<Ctrl&> WhenItem;
         Event<Ctrl&> WhenClose;
-        
+
         Rect         GetCloseButtonRect();
-        
+
         void         Paint(Draw& w) override;
         void         LeftDown(Point pt, dword keyflags) override;
         void         MouseEnter(Point pt, dword keyflags) override;
@@ -41,7 +41,7 @@ struct Navigator : ParentCtrl {
 
         Ptr<Ctrl>    ctrl;
         Image        img;
-    
+
     private:
         Point        pos = {0, 0};
     };
@@ -51,7 +51,7 @@ struct Navigator : ParentCtrl {
         TIMEID_SYNC = Ctrl::TIMEID_COUNT,
         TIMEID_COUNT
     };
-    
+
     StackCtrl&  stack;
     int         columns;
     int         cursor;
