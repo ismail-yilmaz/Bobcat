@@ -183,6 +183,7 @@ void Bobcat::Settings()
 			if(window.IsOpen())
 				Sync();
 			SyncTerminalProfiles();
+			SaveConfig(*this);
 			break;
 		}
 		else
