@@ -82,6 +82,10 @@ Navigator::Navigator(StackCtrl& sctrl)
 	AddFrame(sb);
 	sb.AutoHide();
 	sb.WhenScroll = [=] { Geometry(); Refresh(); };
+	CtrlLayout(searchbar);
+	AddFrame(searchbar.Height(Zy(28)));
+	searchbar.search.NullText(t_("Search terminal..."));
+	searchbar.search.WhenAction = [=] { Geometry(); Refresh(); };
 }
 
 Navigator::~Navigator()
@@ -94,6 +98,7 @@ Navigator& Navigator::Show(bool ok)
 	if(!ok) {
 		Ctrl::Hide();
 		items.Clear();
+		searchbar.search.Clear();
 		return *this;
 	}
 
@@ -115,10 +120,20 @@ void Navigator::Geometry()
 	Size wsz = GetSize();
 	Size tsz = ScaleDown(wsz, 1.0 / max(1, columns));
 	Size fsz = GetStdFontSize();
-	for(int i = 0, row = 0, col = 0; i < items.GetCount(); i++) {
-		Item& m = items[i];
+	auto q = FilterRange(items, [=](const Item& m) {
+		if(m.ctrl) {
+			WString s = ~*m.ctrl;
+			return s.Find((WString) ~searchbar.search) >= 0;
+		}
+		return true;
+	});
+	for(auto& m : items)
+		m.Hide();
+	for(int i = 0, row = 0, col = 0; i < q.GetCount(); i++) {
+		Item& m = q[i];
 		Rect r = RectC(col * tsz.cx, row * (tsz.cy + fsz.cy), tsz.cx, tsz.cy);
 		m.SetRect(r.Deflated(4).OffsetedVert(-sb));
+		m.Show();
 		if(++col == columns) {
 			col = 0;
 			row++;
@@ -173,7 +188,7 @@ void Navigator::Paint(Draw& w)
 	w.Clip(sz);
 	w.DrawRect(GetSize(), SColorPaper);
 	for(const Item& m : items) {
-		if(m.ctrl) {
+		if(m.ctrl && m.IsVisible()) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
 			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorPaper, 0);

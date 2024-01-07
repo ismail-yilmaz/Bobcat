@@ -57,6 +57,7 @@ struct Navigator : ParentCtrl {
     int         cursor;
     VScrollBar  sb;
     Array<Item> items;
+    FrameTop<WithNavigatorLayout<ParentCtrl>> searchbar;
 };
 
 #endif

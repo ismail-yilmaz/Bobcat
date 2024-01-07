@@ -121,3 +121,7 @@ LAYOUT(AboutLayout, 400, 200)
 	ITEM(Upp::RichTextCtrl, txt, HSizePosZ(0, 1).VSizePosZ(1, 1))
 END_LAYOUT
 
+LAYOUT(NavigatorLayout, 593, 30)
+	ITEM(Upp::EditString, search, HSizePosZ(128, 129).TopPosZ(5, 20))
+END_LAYOUT
+
