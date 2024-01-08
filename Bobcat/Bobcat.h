@@ -33,6 +33,7 @@ struct Bobcat;
 #include "Profile.h"
 #include "Terminal.h"
 #include "Navigator.h"
+#include "Finder.h"
 
 struct Bobcat {
     Bobcat();

@@ -123,6 +123,11 @@ bool Terminal::CanExit() const
 	return !keep;
 }
 
+void Terminal::Search()
+{
+	Finder(*this).Search();
+}
+
 hash_t Terminal::GetHashValue() const
 {
 	return profilename.GetHashValue();;
@@ -319,6 +324,8 @@ void Terminal::EditMenu(Bar& menu)
 		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
 
 	}
+	menu.Separator();
+	menu.Add(AK_FIND, [this] { Search(); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
@@ -366,6 +373,7 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Separator();
 	ctx.SetupMenu(menu);
 	ctx.HelpMenu(menu);
+	menu.AddKey(AK_FIND, [this] { Search(); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 

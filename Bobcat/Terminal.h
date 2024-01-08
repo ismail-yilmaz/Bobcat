@@ -17,6 +17,8 @@ struct Terminal : TerminalCtrl {
     void        Reset();
     bool        CanExit() const;
 
+	void		Search();
+	
     hash_t      GetHashValue() const;
     
     Terminal&   Sync();
