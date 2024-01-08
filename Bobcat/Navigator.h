@@ -8,17 +8,17 @@ struct Navigator : ParentCtrl {
     Navigator(StackCtrl& sctrl);
     ~Navigator();
 
-    Navigator&  Show(bool ok = true);
-    Navigator&  Hide();
-    void        Geometry();
-    void        Sync();
-    void        Layout() override;
+    Navigator&    Show(bool ok = true);
+    Navigator&    Hide();
+    void          SyncItemLayout();
+    void          Sync();
+    void          Layout() override;
 
-    void        Paint(Draw& w) override;
+    void          Paint(Draw& w) override;
 
-    void        RightDown(Point pt, dword keyflags) override;
-    void        MouseWheel(Point pt, int zdelta, dword keyflags) override;
-    bool        Key(dword key, int count) override;
+    void          RightDown(Point pt, dword keyflags) override;
+    void          MouseWheel(Point pt, int zdelta, dword keyflags) override;
+    bool          Key(dword key, int count) override;
 
     Event<Bar&>   WhenBar;
     Event<>       WhenClose;
@@ -33,6 +33,8 @@ struct Navigator : ParentCtrl {
 
         Rect         GetCloseButtonRect();
 
+		void         GotFocus() override;
+		void         LostFocus() override;
         void         Paint(Draw& w) override;
         void         LeftUp(Point pt, dword keyflags) override;
         void         MouseEnter(Point pt, dword keyflags) override;
@@ -52,10 +54,12 @@ struct Navigator : ParentCtrl {
         TIMEID_COUNT
     };
 
+	bool		  FilterItem(const Item& item);
+	
     StackCtrl&  stack;
     int         columns;
-    int         cursor;
     VScrollBar  sb;
+    Button      newterm;
     Array<Item> items;
     FrameTop<WithNavigatorLayout<ParentCtrl>> searchbar;
 };

@@ -20,29 +20,6 @@ FileSel& BobcatFs()
 	return Single<FileSel>();
 }
 
-static void sProcessEvents(Bobcat& app)
-{
-	int l = 10;
-	app.window.ProcessEvents();
-	for(int i = 0; i < app.terminals.GetCount(); i++) {
-		Terminal& t = app.terminals[i];
-		if(int n = t.Do(); n < 0) {
-			app.RemoveTerminal(t);
-			break;
-		}
-		else
-			l = max(l, n);
-	}
-	Sleep(l >= 1024 ? 1024 * 10 / l : 10);
-}
-
-static void sEventLoop(Bobcat& app)
-{
-	while(app.window.IsOpen() && app.terminals.GetCount()) {
-		sProcessEvents(app);
-	}
-}
-
 Bobcat::Bobcat()
 : navigator(stack)
 {
@@ -110,6 +87,22 @@ Vector<Terminal *> Bobcat::GetTerminalGroup(const Profile& p)
 	return GetTerminalGroup(p.GetHashValue());
 }
 
+void Bobcat::ProcessEvents()
+{
+	int l = 10;
+	window.ProcessEvents();
+	for(int i = 0; i < terminals.GetCount(); i++) {
+		Terminal& t = terminals[i];
+		if(int n = t.Do(); n < 0) {
+			RemoveTerminal(t);
+			break;
+		}
+		else
+			l = max(l, n);
+	}
+	Sleep(l >= 1024 ? 1024 * 10 / l : 10);
+}
+
 void Bobcat::Run(const Profile& profile, Size size, bool fullscreen)
 {
 	if(AddTerminal(profile)) {
@@ -124,7 +117,9 @@ void Bobcat::Run(const Profile& profile, Size size, bool fullscreen)
 				SetPageSize(size);
 			window.OpenMain();
 		}
-		sEventLoop(*this);
+		while(window.IsOpen() && terminals.GetCount()) {
+			ProcessEvents();
+		};
 	}
 }
 
@@ -176,7 +171,7 @@ void Bobcat::Settings()
 
 	while(dlg.IsOpen()) {
 		if(window.IsOpen())
-			sProcessEvents(*this);
+			ProcessEvents();
 		if(int rc = dlg.GetExitCode(); rc == IDOK) {
 			cr.Retrieve();
 			profiles.Store();
@@ -398,8 +393,8 @@ void Bobcat::SetupMenu(Bar& menu)
 
 void Bobcat::HelpMenu(Bar& menu)
 {
-	menu.Add(t_("About"), [this] { About(); });
 	menu.Add(t_("Help"), [this] { Help(); });
+	menu.Add(t_("About"), [this] { About(); });
 }
 
 void Bobcat::TermMenu(Bar& menu)
@@ -498,7 +493,7 @@ void Bobcat::About()
 	licenses.txt.SetZoom(Zoom(1, 2));
 	dlg.OK().Open(&window);
 	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
-		sProcessEvents(*this);
+		ProcessEvents();
 		dlg.ProcessEvents();
 	}
 }
@@ -521,7 +516,7 @@ void Bobcat::Help()
 	dlg.SetRect(0, 0, 800, 600);
 	dlg.Open(&window);
 	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
-		sProcessEvents(*this);
+		ProcessEvents();
 		dlg.ProcessEvents();
 	}
 }

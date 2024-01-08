@@ -90,6 +90,8 @@ struct Bobcat {
     void        About();
     void        Help();
 
+    void        ProcessEvents();
+    
     struct  Config {
         Config();
         String      activeprofile;

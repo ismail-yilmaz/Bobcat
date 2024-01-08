@@ -204,10 +204,6 @@ String GetBuildInfo()
 	h << " (C++20)";
 #elif __cplusplus >= 201700
 	h << " (C++17)";
-#elif __cplusplus >= 201400
-	h << " (C++14)";
-#elif __cplusplus >= 201100
-	h << " (C++11)";
 #endif
 
 #if CPU_ARM

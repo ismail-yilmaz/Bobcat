@@ -18,6 +18,16 @@ Navigator::Item::Item()
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
 }
 
+void Navigator::Item::GotFocus()
+{
+	Refresh();
+}
+
+void Navigator::Item::LostFocus()
+{
+	Refresh();
+}
+
 void Navigator::Item::Paint(Draw& w)
 {
 	if(Rect q = GetView(); q.Width() - 16 >= 1 && q.GetHeight() - 16 >= 1) {
@@ -25,7 +35,7 @@ void Navigator::Item::Paint(Draw& w)
 		w.Clip(q);
 		w.DrawRect(q, SColorPaper);
 		w.DrawImage(q.Deflated(8), img);
-		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL() : Images::Delete());
+		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL2() : Images::DeleteHL());
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
 		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
 		DrawFrame(w, q.Deflated(1), c);
@@ -75,17 +85,17 @@ Rect Navigator::Item::GetCloseButtonRect()
 
 Navigator::Navigator(StackCtrl& sctrl)
 : stack(sctrl)
-, cursor(-1)
 , columns(4)
 {
 	Hide();
 	AddFrame(sb);
 	sb.AutoHide();
-	sb.WhenScroll = [=] { Geometry(); Refresh(); };
+	sb.WhenScroll = [=] { SyncItemLayout(); Refresh(); };
 	CtrlLayout(searchbar);
+	searchbar.search.WantFocus();
 	AddFrame(searchbar.Height(Zy(28)));
-	searchbar.search.NullText(t_("Search terminal..."));
-	searchbar.search.WhenAction = [=] { Geometry(); Refresh(); };
+	searchbar.search.NullText(t_("Search terminal (Ctrl+S)..."));
+	searchbar.search.WhenAction = [=] { SyncItemLayout(); Refresh();  };
 }
 
 Navigator::~Navigator()
@@ -112,26 +122,30 @@ Navigator& Navigator::Hide()
 	return Show(false);
 }
 
-void Navigator::Geometry()
+bool Navigator::FilterItem(const Item& item)
+{
+	if(item.ctrl) {
+		WString s = ~*item.ctrl;
+		return s.Find((const WString&) ~searchbar.search) >= 0;
+	}
+	return true;
+}
+
+void Navigator::SyncItemLayout()
 {
 	int cnt = stack.GetCount();
 	if(!cnt)
 		return;
-	Size wsz = GetSize();
+	int  tcy = searchbar.GetHeight();
+	Size wsz = GetSize() + Size(0, tcy);
 	Size tsz = ScaleDown(wsz, 1.0 / max(1, columns));
-	Size fsz = GetStdFontSize();
-	auto q = FilterRange(items, [=](const Item& m) {
-		if(m.ctrl) {
-			WString s = ~*m.ctrl;
-			return s.Find((WString) ~searchbar.search) >= 0;
-		}
-		return true;
-	});
 	for(auto& m : items)
 		m.Hide();
-	for(int i = 0, row = 0, col = 0; i < q.GetCount(); i++) {
-		Item& m = q[i];
-		Rect r = RectC(col * tsz.cx, row * (tsz.cy + fsz.cy), tsz.cx, tsz.cy);
+	int row = 0, col = 0, fcy = GetStdFontSize().cy;
+	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
+	cnt = max(v.GetCount(), 1);
+	for(Item& m : v) {
+		Rect r = RectC(col * tsz.cx, row * (tsz.cy + fcy), tsz.cx, tsz.cy);
 		m.SetRect(r.Deflated(4).OffsetedVert(-sb));
 		m.Show();
 		if(++col == columns) {
@@ -139,7 +153,7 @@ void Navigator::Geometry()
 			row++;
 		}
 	}
-	sb.Set(sb.Get(), wsz.cy, (tsz.cy + fsz.cy) * (cnt / columns + (cnt % columns != 0)));
+	sb.Set(sb.Get(), wsz.cy - tcy, (tsz.cy + fcy) * (cnt / columns + (cnt % columns != 0)));
 }
 
 void Navigator::Sync()
@@ -150,7 +164,7 @@ void Navigator::Sync()
 		if(!cnt || !IsVisible())
 			return;
 		items.SetCount(cnt);
-		Geometry();
+		SyncItemLayout();
 		Size fsz = GetStdFontSize();
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
@@ -162,10 +176,9 @@ void Navigator::Sync()
 			m.img = Rescale(w, max(1, isz.cx - 4), max(1, isz.cy - fsz.cy));
 			if(!m.IsChild())
 				Add(m);
-			if(stack.GetActiveCtrl() == m.ctrl) {
+			m.WantFocus();
+			if(stack.GetActiveCtrl() == m.ctrl)
 				m.SetFocus();
-				cursor = i;
-			}
 			m.WhenItem = WhenGotoItem;
 			m.WhenClose = WhenRemoveItem;
 			m.Update();
@@ -209,45 +222,22 @@ void Navigator::MouseWheel(Point pt, int zdelta, dword keyflags)
 
 bool Navigator::Key(dword key, int count)
 {
-	int n = items.GetCount();
-
 	switch(key) {
-	case K_TAB:
-		cursor = ++cursor % n;
-		break;
-	case K_LEFT:
-		cursor = clamp(--cursor, 0, n - 1);
-		break;
-	case K_RIGHT:
-		cursor = clamp(++cursor, 0, n - 1);
-		break;
-	case K_UP:
-		cursor = cursor - columns < 0 ? cursor : cursor - columns;
-		break;
-	case K_DOWN:
-		cursor = cursor + columns >= n ? cursor : cursor + columns;
-		break;
 	case K_ESCAPE:
 		WhenClose();
 		return true;
 	case K_RETURN:
-		if(cursor >= 0 && cursor < n) {
-			items[cursor].Action();
-			return true;
-		}
-		break;
+		if(Ctrl *c = GetFocusCtrl(); c)
+			c->Action();
+		return true;
+	case K_CTRL_S:
+		searchbar.search.SetFocus();
+		return true;
 	default:
 		if(MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key))
 			return true;
-		return Ctrl::Key(key, count);
 	}
-
-	if(cursor >= 0 && cursor < n) {
-		items[cursor].SetFocus();
-		items[cursor].Update();
-	}
-	Refresh();
-	return true;
+	return Ctrl::Key(key, count);
 }
 
 
