@@ -90,6 +90,9 @@ Navigator (linux)
 
 ![bobcat-navigator](resources/bobcat-navigator-linux.png)
 
+Finder (linux)
+![bobcat-finder](resources/bobcat-finder-linux.png)
+
 Settings windows (linux)
 
 ![bobcat-settings](resources/bobcat-settings-linux.png)
