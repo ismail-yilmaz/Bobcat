@@ -490,7 +490,7 @@ void Bobcat::About()
 	atxt.Replace("$(BUILD)", DeQtf(GetBuildInfo()));
 	about.txt.SetQTF(atxt);
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
-	licenses.txt.SetZoom(Zoom(1, 2));
+	licenses.txt.SetZoom(Zoom(900, 1800));
 	dlg.OK().Open(&window);
 	while(window.IsOpen() && dlg.IsOpen() && !dlg.GetExitCode()) {
 		ProcessEvents();
