@@ -31,6 +31,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenResize  = [this]()                     { pty.SetSize(GetPageSize());      };
     WhenOutput  = [this](String s)             { pty.Write(s);                    };
     WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
+    WhenLink    = [this](const String& s)      { LaunchWebBrowser(s);             };
     WhenSetSize = [this](Size sz)              { ctx.Resize(sz);                  };
     WhenClip    = [this](PasteClip& dnd)       { return filter;                   };
     WhenWindowMinimize       = [this](bool b)  { ctx.Minimize(b);                 };
