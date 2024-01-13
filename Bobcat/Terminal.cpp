@@ -177,6 +177,8 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	SetLocale(p.encoding);
 	SetPadding(Size(0, p.linespacing));
 	SetFont(p.font);
+	AlternateScroll(p.alternatescroll);
+	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
 	return *this;
 }
@@ -345,6 +347,7 @@ void Terminal::EmulationMenu(Bar& menu)
 	menu.Add(AK_PCFUNCTIONKEYS, [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
 	menu.Add(AK_KEYNAVIGATION,  [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
 	menu.Add(AK_SCROLLBAR,      [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());
+	menu.Add(AK_NOSCROLL,       [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());
 	menu.Add(AK_ALTERNATESCROLL,[this] { AlternateScroll(!HasAlternateScroll()); }).Check(HasAlternateScroll());
 	menu.Add(AK_HIDEMOUSE,	    [this] { AutoHideMouseCursor(!IsMouseCursorAutoHidden()); }).Check(IsMouseCursorAutoHidden());
 	menu.Add(AK_REVERSEWRAP,    [this] { ReverseWrap(!HasReverseWrap()); }).Check(HasReverseWrap());

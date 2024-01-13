@@ -38,6 +38,7 @@ struct Profile : Moveable<Profile> {
     bool        altshiftskeys;
     bool        keynavigation;
     int         mousewheelstep;
+    bool        dontscrolltoend;
     bool        alternatescroll;
     bool        autohidemouse;
     bool        history;
