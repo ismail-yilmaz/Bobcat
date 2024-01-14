@@ -277,13 +277,7 @@ bool Terminal::HasTitleBar() const
 
 void Terminal::ShowFinder(bool b)
 {
-	if(!finder.IsChild() && b) {
-		finder.Show();
-	}
-	else
-	if(finder.IsChild() && !b) {
-		finder.Hide();
-	}
+	b ? finder.Show() : finder.Hide();
 }
 
 void Terminal::HideFinder()
@@ -350,7 +344,7 @@ void Terminal::EditMenu(Bar& menu)
 
 	}
 	menu.Separator();
-	menu.Add(AK_FINDER, [this] { ShowFinder(!HasFinder()); }).Check(HasFinder());
+	menu.Add(AK_FINDER, [this] { ShowFinder(true); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
@@ -399,7 +393,6 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Separator();
 	ctx.SetupMenu(menu);
 	ctx.HelpMenu(menu);
-	menu.AddKey(AK_FINDER, [this] { ShowFinder(!HasFinder()); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 

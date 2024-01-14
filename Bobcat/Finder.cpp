@@ -62,27 +62,31 @@ void Finder::FrameLayout(Rect& r)
 
 void Finder::Show()
 {
-	bool b = ctx.HasSizeHint();
-	ctx.HideSizeHint();
-	ctx.AddFrame(Height(StdFont().GetCy() + Zy(16)));
-	ctx.WhenSearch << THISFN(OnSearch);
-	ctx.WhenHighlight << THISFN(OnHighlight);
-	text.WhenAction << THISFN(Search);
+	if(!IsChild()) {
+		bool b = ctx.HasSizeHint();
+		ctx.HideSizeHint();
+		ctx.AddFrame(Height(StdFont().GetCy() + Zy(16)));
+		ctx.WhenSearch << THISFN(OnSearch);
+		ctx.WhenHighlight << THISFN(OnHighlight);
+		text.WhenAction << THISFN(Search);
+		ctx.ShowSizeHint(b);
+	}
 	text.SetFocus();
-	ctx.ShowSizeHint(b);
 }
 
 void Finder::Hide()
 {
-	bool b = ctx.HasSizeHint();
-	ctx.HideSizeHint();
-	ctx.RemoveFrame(*this);
-	ctx.WhenSearch = Null;
-	ctx.WhenHighlight = Null;
-	text.WhenAction = Null;
+	if(IsChild()) {
+		bool b = ctx.HasSizeHint();
+		ctx.HideSizeHint();
+		ctx.RemoveFrame(*this);
+		ctx.WhenSearch = Null;
+		ctx.WhenHighlight = Null;
+		text.WhenAction = Null;
+		ctx.RefreshLayout();
+		ctx.ShowSizeHint(b);
+	}
 	ctx.SetFocus();
-	ctx.RefreshLayout();
-	ctx.ShowSizeHint(b);
 }
 
 void Finder::Next()
@@ -129,7 +133,8 @@ void Finder::StdBar(Bar& menu)
 
 bool Finder::Key(dword key, int count)
 {
-	return MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
+	MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
+	return true;
 }
 
 void Finder::Sync()
@@ -199,7 +204,7 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 	int len = s.GetLength();
 	Point p = pos[index];
 
-	for(Point pt : pos)
+	for(const Point& pt : pos)
 		for(int row = 0, col = 0, ln = hl.GetKey(row); ln == pt.y && row < hl.GetCount(); row++) {
 			for(auto& q : hl[row]) {
 				if(pt.x <= col && col < pt.x + len) {
