@@ -8,24 +8,31 @@
 
 namespace Upp {
 
-Finder::Finder(TerminalCtrl& t)
+#define KEYGROUPNAME "Finder"
+#define KEYNAMESPACE FinderKeys
+#define KEYFILE <Bobcat/Finder.key>
+#include <CtrlLib/key_source.h>
+
+using namespace FinderKeys;
+
+Finder::Finder(Terminal& t)
 : ctx(t)
 , index(0)
 {
-	CtrlLayout(dlg);
-	dlg.begin << dlg.Breaker(100);
-	dlg.end   << dlg.Breaker(101);
-	dlg.next  << dlg.Breaker(102);
-	dlg.prev  << dlg.Breaker(103);
-	dlg.next.SetImage(Images::Next());
-	dlg.prev.SetImage(Images::Prev());
-	dlg.begin.SetImage(Images::Begin());
-	dlg.end.SetImage(Images::End());
-	ctx.WhenSearch << THISFN(OnSearch);
-	ctx.WhenHighlight << THISFN(OnHighlight);
-	dlg.text.WhenAction  << THISFN(DoSearch);
-	dlg.text.NullText(t_("Type to search..."));
-	dlg.Title(t_("Finder"));
+	CtrlLayout(*this);
+	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
+	close.Image(Images::Delete()).Tip(t_("Close finder"));
+	next.Image(Images::Next());
+	prev.Image(Images::Prev());
+	begin.Image(Images::Begin());
+	end.Image(Images::End());
+	next  << THISFN(Next);
+    prev  << THISFN(Prev);
+    begin << THISFN(Begin);
+    end   << THISFN(End);
+    close << THISFN(Hide);
+    showall << THISFN(Sync);
+	text.NullText(t_("Type to search..."));
 	Sync();
 }
 
@@ -35,51 +42,118 @@ Finder::~Finder()
 	ctx.WhenHighlight = Null;
 }
 
+void Finder::SetData(const Value& v)
+{
+	data = v;
+	ctx.RefreshLayout();
+}
+
+Value Finder::GetData() const
+{
+	return data;
+}
+
+void Finder::FrameLayout(Rect& r)
+{
+	data == "top"
+		? LayoutFrameTop(r, this, cy ? cy : r.Width())
+		: LayoutFrameBottom(r, this, cy ? cy : r.Width()); // default
+}
+
+void Finder::Show()
+{
+	bool b = ctx.HasSizeHint();
+	ctx.HideSizeHint();
+	ctx.AddFrame(Height(StdFont().GetCy() + Zy(16)));
+	ctx.WhenSearch << THISFN(OnSearch);
+	ctx.WhenHighlight << THISFN(OnHighlight);
+	text.WhenAction << THISFN(Search);
+	text.SetFocus();
+	ctx.ShowSizeHint(b);
+}
+
+void Finder::Hide()
+{
+	bool b = ctx.HasSizeHint();
+	ctx.HideSizeHint();
+	ctx.RemoveFrame(*this);
+	ctx.WhenSearch = Null;
+	ctx.WhenHighlight = Null;
+	text.WhenAction = Null;
+	ctx.SetFocus();
+	ctx.RefreshLayout();
+	ctx.ShowSizeHint(b);
+}
+
+void Finder::Next()
+{
+	if(int n = pos.GetCount(); n >= 0) {
+		index = clamp(++index, 0, n - 1);
+		Sync();
+	}
+}
+
+void Finder::Prev()
+{
+	if(int n = pos.GetCount(); n >= 0) {
+		index = clamp(--index, 0, n - 1);
+		Sync();
+	}
+}
+
+void Finder::Begin()
+{
+	if(int n = pos.GetCount(); n >= 0) {
+		index = 0;
+		Sync();
+	}
+}
+
+void Finder::End()
+{
+	if(int n = pos.GetCount(); n >= 0) {
+		index = n - 1;
+		Sync();
+	}
+}
+
+void Finder::StdBar(Bar& menu)
+{
+	menu.AddKey(AK_FIND_ALL,    [this] { bool b = showall; showall = !showall; Sync(); });
+	menu.AddKey(AK_FIND_NEXT,   [this] { Next();  });
+	menu.AddKey(AK_FIND_PREV,   [this] { Prev();  });
+	menu.AddKey(AK_FIND_FIRST,  [this] { Begin(); });
+	menu.AddKey(AK_FIND_LAST,   [this] { End();   });
+	menu.AddKey(AK_HIDE_FINDER, [this] { Hide();  });
+}
+
+bool Finder::Key(dword key, int count)
+{
+	return MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
+}
+
 void Finder::Sync()
 {
 	int cnt = pos.GetCount();
 	if(index >= 0 && index < cnt)
 		ctx.Goto(pos[index].y);;
-	if(dlg.text.GetLength() > 0)
-		dlg.status = Format(t_("%d instances found. (%d/%d)"), cnt, cnt ? index +  1 : 0 , cnt);
+	if(text.GetLength() > 0)
+		status = Format(t_("Found %d/%d"), cnt ? index +  1 : 0 , cnt);
 	else
-		dlg.status = "";
-	dlg.prev.Enable(cnt > 0 && index > 0);
-	dlg.next.Enable(cnt > 0 && index < cnt - 1);
-	dlg.begin.Enable(cnt > 0 && index > 0);
-	dlg.end.Enable(cnt > 0 && index < cnt - 1);
+		status = "";
+	prev.Enable(cnt > 0 && index > 0);
+	next.Enable(cnt > 0 && index < cnt - 1);
+	begin.Enable(cnt > 0 && index > 0);
+	end.Enable(cnt > 0 && index < cnt - 1);
 	ctx.Refresh();
-}
-
-void Finder::DoSearch()
-{
-	index = 0;
-	pos.Clear();
-	ctx.Find((WString)~dlg.text);
-	Sync();
-
 }
 
 void Finder::Search()
 {
-	dlg.Open();
-	while(dlg.IsOpen()) {
-		dlg.ProcessEvents();
-		int rc = dlg.Run();
-		if(rc < 100 || rc > 103)
-			return;
-		int cnt = pos.GetCount();
-		if(cnt) {
-			switch(rc) {
-			case 100: index = 0;  break;
-			case 101: index = cnt - 1;   break;
-			case 102: index = clamp(++index, 0, cnt - 1); break;
-			case 103: index = clamp(--index, 0, cnt - 1); break;
-			default: return;
-			}
-		}
-		Sync();
-	}
+	index = 0;
+	pos.Clear();
+	ctx.Find((WString)~text);
+	Sync();
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -120,20 +194,28 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 {
 	if(!pos.GetCount() || index < 0)
 		return;
-	WString s = ~dlg.text;
+
+	WString s = ~text;
 	int len = s.GetLength();
-	for(int i = 0; i < hl.GetCount(); i++) { // Note: hl.GetCount() > 1 == line is wrapped.
-		Point p = pos[index];
-		for(int row = i, ln = hl.GetKey(i), col = 0; ln == p.y && row < hl.GetCount(); row++) {
+	Point p = pos[index];
+
+	for(Point pt : pos)
+		for(int row = 0, col = 0, ln = hl.GetKey(row); ln == pt.y && row < hl.GetCount(); row++) {
 			for(auto& q : hl[row]) {
-				if(p.x <= col && col < p.x + len) {
-					q.Ink(LtRed());
-					q.Paper(Yellow());
+				if(pt.x <= col && col < pt.x + len) {
+					if(pt == p) {
+						q.Ink(SColorHighlightText);
+						q.Paper(SColorHighlight);
+					}
+					else
+					if(~showall) {
+						q.Ink(LtRed());
+						q.Paper(Yellow());
+					}
 				}
 				col++;
 			}
 		}
-	}
 }
 
 }

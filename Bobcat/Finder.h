@@ -7,27 +7,42 @@
 // TODO: Make this an abstract base class and derive different types of "search engines" from it
 // (E.g. SimpleFinder, RegexFinder. etc.)
 
-class Finder
+class Finder : public FrameTB<WithFinderLayout<ParentCtrl>>
 {
 public:
-	typedef Finder CLASSNAME;
-	
-	Finder(TerminalCtrl& t);
-	~Finder();
-	
-	void		Sync();
+    typedef Finder CLASSNAME;
+    
+    Finder(Terminal& t);
+    virtual ~Finder();
 
-	void		DoSearch();
-	void		Search();
+    void        SetData(const Value& v) override;
+    Value       GetData() const override;
+    void        FrameLayout(Rect& r) override;
 
-	bool		OnSearch(const VectorMap<int, WString>& m, const WString& s);
-	void		OnHighlight(VectorMap<int, VTLine>& hl);
+    void        StdBar(Bar& menu);
+    bool        Key(dword key, int count) override;
+    
+    void        Show();
+    void        Hide();
+
+    void        Next();
+    void        Prev();
+    void        Begin();
+    void        End();
+    
+    void        Sync();
+
+    void        Search();
+    
+    bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
+    void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
-	int			index = 0;
-	TerminalCtrl& ctx;
-	Vector<Point> pos;
-	WithFinderLayout<TopWindow> dlg;
+    int           index = 0;
+    Terminal&     ctx;
+    Vector<Point> pos;
+    Value         data;
+    ToolButton    close;
 };
 
 

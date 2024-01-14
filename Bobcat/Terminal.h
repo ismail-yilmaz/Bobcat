@@ -17,8 +17,8 @@ struct Terminal : TerminalCtrl {
     void        Reset();
     bool        CanExit() const;
 
-	void		Search();
-	
+    void        Search();
+    
     hash_t      GetHashValue() const;
     
     Terminal&   Sync();
@@ -37,6 +37,10 @@ struct Terminal : TerminalCtrl {
     void        ShowTitleBar(bool b);
     void        HideTitleBar();
     bool        HasTitleBar() const;
+    
+    void        ShowFinder(bool b);
+    void        HideFinder();
+    bool        HasFinder() const;
     
     void        CopyImage();
     void        OpenImage();
@@ -60,12 +64,18 @@ struct Terminal : TerminalCtrl {
     bool        filter;
     String      profilename;
     Value       data;
+    Finder      finder;
 
     struct TitleBar : FrameTB<Ctrl> {
-        TitleBar();
+        TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
         Value       GetData() const override;
         void        FrameLayout(Rect& r) override;
+ 
+        void        Show();
+        void        Hide();
+
+        Terminal&   ctx;
         ToolButton  close;
         ToolButton  menu;
         ToolButton  newterm;

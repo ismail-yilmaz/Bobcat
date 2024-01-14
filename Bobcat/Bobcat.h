@@ -29,11 +29,13 @@ namespace Upp {
 
 // Forward declaration
 struct Bobcat;
+struct Terminal;
 
 #include "Profile.h"
+#include "Finder.h"
 #include "Terminal.h"
 #include "Navigator.h"
-#include "Finder.h"
+
 
 struct Bobcat {
     Bobcat();

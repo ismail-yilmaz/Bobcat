@@ -126,12 +126,13 @@ LAYOUT(NavigatorLayout, 593, 30)
 	ITEM(Upp::EditString, search, HSizePosZ(128, 129).TopPosZ(5, 20))
 END_LAYOUT
 
-LAYOUT(FinderLayout, 342, 57)
-	ITEM(Upp::EditString, text, HSizePosZ(5, 95).TopPosZ(7, 20))
-	ITEM(Upp::Button, prev, RightPosZ(74, 19).TopPosZ(7, 20))
-	ITEM(Upp::Button, next, RightPosZ(54, 19).TopPosZ(7, 20))
-	ITEM(Upp::Button, begin, RightPosZ(34, 19).TopPosZ(7, 20))
-	ITEM(Upp::Button, end, RightPosZ(14, 19).TopPosZ(7, 20))
-	ITEM(Upp::StaticText, status, SetText(t_("Nothing to search...")).HSizePosZ(5, 95).TopPosZ(31, 20))
+LAYOUT(FinderLayout, 526, 31)
+	ITEM(Upp::EditString, text, LeftPosZ(5, 180).TopPosZ(6, 18))
+	ITEM(ToolButton, prev, LeftPosZ(186, 19).TopPosZ(6, 18))
+	ITEM(ToolButton, next, LeftPosZ(206, 19).TopPosZ(6, 18))
+	ITEM(ToolButton, begin, LeftPosZ(226, 19).TopPosZ(6, 18))
+	ITEM(ToolButton, end, LeftPosZ(246, 19).TopPosZ(6, 18))
+	ITEM(Upp::StaticText, status, SetText(t_("Nothing to search...")).HSizePosZ(353, 34).TopPosZ(6, 18))
+	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).LeftPosZ(270, 56).TopPosZ(7, 16))
 END_LAYOUT
 

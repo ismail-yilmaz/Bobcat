@@ -3,14 +3,15 @@ topic "Keyboard Shortcuts";
 [{_} 
 [s0; [* Keyboard Shortcuts]&]
 [s0;C+75 &]
-[s0; [C+75 Bobcat predefines two groups of configurable keyboard shortcuts: 
-][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75 global][/C+75  
-][C+75 and ][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
-erminal specific][C+75 . The main difference is that terminal specific 
-shortcuts can only be called in the active terminal and only 
-affect the active terminal, while the global shortcuts are valid 
-across the application. All of the predefined and undefined keys 
-can be configured via the keyboard configuration manager.]&]
+[s0; [C+75 Bobcat predefines three groups of configurable keyboard 
+shortcuts: ][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75 gl
+obal][/C+75  ][C+75 and ][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
+erminal][C+75 , and ][C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
+inder][C+75  specific. Terminal and finder specific shortcuts can 
+only be called in the active terminal and only affect the active 
+terminal, while the global shortcuts are valid across the application. 
+All of the predefined and undefined keys can be configured via 
+the keyboard configuration manager.]&]
 [s0;C+75 &]
 [s0;:global`_shortcuts: [* Global Shortcuts]&]
 [s0;* &]
@@ -78,7 +79,7 @@ can be configured via the keyboard configuration manager.]&]
 [ {{4103:5897 [s0; [*C1 Shift`+Ctrl`+L]]
 :: [s0; [C1 Make terminal read`-only.]]
 :: [s0; [*C1 Shift`+Ctrl`+F]]
-:: [s0; [C1 Search text.]]
+:: [s0; [C1 Toggle finder.]]
 :: [s0; [*C1 Shift`+Ctrl`+C]]
 :: [s0; [C1 Copy text.]]
 :: [s0; [*C1 Shift`+Ctrl`+V]]
@@ -140,5 +141,19 @@ can be configured via the keyboard configuration manager.]&]
 :: [s0; [*C1 Shift`+Ctrl`+W]]
 :: [s0; [C1 Toggle size hint]]}}&]
 [s0; &]
+[s0;:finder`_shortcuts: [* Finder Specific Shortcuts]&]
+[s0; &]
+[ {{4103:5897 [s0; [*C1 Escape]]
+:: [s0; [C1 Close finder bar.]]
+:: [s0; [*C1 Ctrl`+Home]]
+:: [s0; [C1 Find first.]]
+:: [s0; [*C1 Ctrl`+End]]
+:: [s0; [C1 Find last.]]
+:: [s0; [*C1 Down `[Arrow key`]]]
+:: [s0; [C1 Find next.]]
+:: [s0; [*C1 Up `[Arrow key`]]]
+:: [s0; [C1 Find previous]]
+:: [s0; [*C1 Ctrl`+S]]
+:: [s0; [C1 Show current/all.]]}}&]
 [s0; &]
 [s0; ]]

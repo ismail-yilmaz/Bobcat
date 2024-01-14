@@ -29,6 +29,7 @@ file
 	Resources readonly separator,
 	Application.key,
 	Terminal.key,
+	Finder.key,
 	Bobcat.iml,
 	Bobcat.lay,
 	Docs readonly separator,

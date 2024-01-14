@@ -20,11 +20,13 @@ Terminal::Terminal(Bobcat& ctx_)
 , bell(true)
 , keep(false)
 , filter(false)
+, finder(*this)
+, titlebar(*this)
 {
     titlebar.newterm << [this] { ctx.AddTerminal(ctx.settings.activeprofile); };
     titlebar.close   << [this] { Stop(); };
     titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
-    InlineImages().Hyperlinks().WindowOps().DynamicColors().SetWantFocus();
+    InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
     WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
@@ -126,7 +128,6 @@ bool Terminal::CanExit() const
 
 void Terminal::Search()
 {
-	Finder(*this).Search();
 }
 
 hash_t Terminal::GetHashValue() const
@@ -257,11 +258,11 @@ String Terminal::GetTitle() const
 void Terminal::ShowTitleBar(bool b)
 {
 	if(!titlebar.IsChild() && b) {
-		AddFrame(titlebar.Height(StdFont().GetCy() + Zy(4)));
+		titlebar.Show();
 	}
 	else
 	if(titlebar.IsChild() && !b)
-		RemoveFrame(titlebar);
+		titlebar.Hide();
 }
 
 void Terminal::HideTitleBar()
@@ -272,6 +273,27 @@ void Terminal::HideTitleBar()
 bool Terminal::HasTitleBar() const
 {
 	return titlebar.IsChild();
+}
+
+void Terminal::ShowFinder(bool b)
+{
+	if(!finder.IsChild() && b) {
+		finder.Show();
+	}
+	else
+	if(finder.IsChild() && !b) {
+		finder.Hide();
+	}
+}
+
+void Terminal::HideFinder()
+{
+	ShowFinder(false);
+}
+
+bool Terminal::HasFinder() const
+{
+	return finder.IsChild();
 }
 
 void Terminal::CopyImage()
@@ -328,7 +350,7 @@ void Terminal::EditMenu(Bar& menu)
 
 	}
 	menu.Separator();
-	menu.Add(AK_FIND, [this] { Search(); });
+	menu.Add(AK_FINDER, [this] { ShowFinder(!HasFinder()); }).Check(HasFinder());
 }
 
 void Terminal::ViewMenu(Bar& menu)
@@ -377,11 +399,12 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Separator();
 	ctx.SetupMenu(menu);
 	ctx.HelpMenu(menu);
-	menu.AddKey(AK_FIND, [this] { Search(); });
+	menu.AddKey(AK_FINDER, [this] { ShowFinder(!HasFinder()); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 
-Terminal::TitleBar::TitleBar()
+Terminal::TitleBar::TitleBar(Terminal& ctx_)
+: ctx(ctx_)
 {
 	SetData("top");
 	Add(title.VSizePosZ(0, 0).HSizePosZ(24, 24));
@@ -396,8 +419,7 @@ Terminal::TitleBar::TitleBar()
 void Terminal::TitleBar::SetData(const Value& v)
 {
 	data = v;
-	if(auto *p = GetParent(); p)
-		p->RefreshLayout();
+	ctx.RefreshLayout();
 }
 
 Value Terminal::TitleBar::GetData() const
@@ -410,6 +432,23 @@ void Terminal::TitleBar::FrameLayout(Rect& r)
 	data == "bottom"
 		? LayoutFrameBottom(r, this, cy ? cy : r.Width())
 		: LayoutFrameTop(r, this, cy ? cy : r.Width()); // default
+}
+
+void Terminal::TitleBar::Show()
+{
+	bool b = ctx.HasSizeHint();
+	ctx.HideSizeHint();
+	ctx.AddFrame(Height(StdFont().GetCy() + Zy(4)));
+	ctx.ShowSizeHint(b);
+}
+
+void Terminal::TitleBar::Hide()
+{
+	bool b = ctx.HasSizeHint();
+	ctx.HideSizeHint();
+	ctx.RemoveFrame(*this);
+	ctx.ShowSizeHint(b);
+	ctx.SetFocus();
 }
 
 Terminal& AsTerminal(Ctrl& c)
