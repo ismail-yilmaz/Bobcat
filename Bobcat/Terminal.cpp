@@ -55,7 +55,7 @@ Value Terminal::GetData() const
 bool Terminal::Start(const Profile& p)
 {
 	SetProfile(p);
-	SetPalette(p.palette);
+	SetPalette(LoadPalette(p.palette));
 	
 	#ifdef PLATFORM_POSIX
 	pty.WhenAttrs = [=, &p](termios& t) -> bool
