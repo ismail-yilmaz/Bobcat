@@ -40,7 +40,6 @@ Finder::~Finder()
 {
 	ctx.WhenSearch = Null;
 	ctx.WhenHighlight = Null;
-	KillTimeCallback(TIMEID_UPDATE);
 }
 
 void Finder::SetData(const Value& v)
@@ -64,9 +63,10 @@ void Finder::FrameLayout(Rect& r)
 void Finder::Show()
 {
 	if(!IsChild()) {
+		timer.Kill();
 		bool b = ctx.HasSizeHint();
 		ctx.HideSizeHint();
-		ctx.AddFrame(Height(StdFont().GetCy() + Zy(16)));
+		ctx.AddFrame(Height(StdFont().GetCy() + 16));
 		ctx.WhenSearch << THISFN(OnSearch);
 		ctx.WhenHighlight << THISFN(OnHighlight);
 		text.WhenAction << THISFN(Search);
@@ -78,7 +78,7 @@ void Finder::Show()
 void Finder::Hide()
 {
 	if(IsChild()) {
-		KillTimeCallback(TIMEID_UPDATE);
+		timer.Kill();
 		bool b = ctx.HasSizeHint();
 		ctx.HideSizeHint();
 		ctx.RemoveFrame(*this);
@@ -172,7 +172,7 @@ void Finder::Search()
 
 void Finder::Update()
 {
-	SetTimeCallback(20, THISFN(Search), TIMEID_UPDATE);
+	timer.KillSet(20, THISFN(Search));
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)

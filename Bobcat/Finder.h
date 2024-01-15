@@ -39,18 +39,13 @@ public:
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
-    enum TimerId
-    {
-        TIMEID_UPDATE = Ctrl::TIMEID_COUNT,
-        TIMEID_COUNT
-    };
-
 private:
     int           index = 0;
     Terminal&     ctx;
     Vector<Point> pos;
     Value         data;
     ToolButton    close;
+    TimeCallback  timer;
 };
 
 
