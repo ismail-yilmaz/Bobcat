@@ -52,6 +52,13 @@ Value Terminal::GetData() const
 	return data;
 }
 
+void Terminal::PostParse()
+{
+	TerminalCtrl::PostParse();
+	if(HasFinder()) // Keep the finder data updated.
+		finder.Update();
+}
+
 bool Terminal::Start(const Profile& p)
 {
 	SetProfile(p);

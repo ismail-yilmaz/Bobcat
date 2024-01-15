@@ -7,6 +7,7 @@
 struct Terminal : TerminalCtrl {
     Terminal(Bobcat& ctx);
 
+	void		PostParse() override;
     void        SetData(const Value& data) override;
     Value       GetData() const override;
 

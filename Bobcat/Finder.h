@@ -29,13 +29,21 @@ public:
     void        Prev();
     void        Begin();
     void        End();
+    void        Goto(int i);
     
     void        Sync();
 
     void        Search();
+    void        Update();
     
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
+
+    enum TimerId
+    {
+        TIMEID_UPDATE = Ctrl::TIMEID_COUNT,
+        TIMEID_COUNT
+    };
 
 private:
     int           index = 0;

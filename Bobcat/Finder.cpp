@@ -40,6 +40,7 @@ Finder::~Finder()
 {
 	ctx.WhenSearch = Null;
 	ctx.WhenHighlight = Null;
+	KillTimeCallback(TIMEID_UPDATE);
 }
 
 void Finder::SetData(const Value& v)
@@ -77,6 +78,7 @@ void Finder::Show()
 void Finder::Hide()
 {
 	if(IsChild()) {
+		KillTimeCallback(TIMEID_UPDATE);
 		bool b = ctx.HasSizeHint();
 		ctx.HideSizeHint();
 		ctx.RemoveFrame(*this);
@@ -89,11 +91,19 @@ void Finder::Hide()
 	ctx.SetFocus();
 }
 
+void Finder::Goto(int i)
+{
+	if(i >= 0) {
+		ctx.Goto(pos[i].y);;
+		Sync();
+	}
+}
+
 void Finder::Next()
 {
 	if(int n = pos.GetCount(); n >= 0) {
 		index = clamp(++index, 0, n - 1);
-		Sync();
+		Goto(index);
 	}
 }
 
@@ -101,7 +111,7 @@ void Finder::Prev()
 {
 	if(int n = pos.GetCount(); n >= 0) {
 		index = clamp(--index, 0, n - 1);
-		Sync();
+		Goto(index);
 	}
 }
 
@@ -109,7 +119,7 @@ void Finder::Begin()
 {
 	if(int n = pos.GetCount(); n >= 0) {
 		index = 0;
-		Sync();
+		Goto(index);
 	}
 }
 
@@ -117,18 +127,18 @@ void Finder::End()
 {
 	if(int n = pos.GetCount(); n >= 0) {
 		index = n - 1;
-		Sync();
+		Goto(index);
 	}
 }
 
 void Finder::StdBar(Bar& menu)
 {
 	menu.AddKey(AK_FIND_ALL,    [this] { bool b = showall; showall = !showall; Sync(); });
-	menu.AddKey(AK_FIND_NEXT,   [this] { Next();  });
-	menu.AddKey(AK_FIND_PREV,   [this] { Prev();  });
-	menu.AddKey(AK_FIND_FIRST,  [this] { Begin(); });
-	menu.AddKey(AK_FIND_LAST,   [this] { End();   });
-	menu.AddKey(AK_HIDE_FINDER, [this] { Hide();  });
+	menu.AddKey(AK_FIND_NEXT,   THISFN(Next));
+	menu.AddKey(AK_FIND_PREV,   THISFN(Prev));
+	menu.AddKey(AK_FIND_FIRST,  THISFN(Begin));
+	menu.AddKey(AK_FIND_LAST,   THISFN(End));
+	menu.AddKey(AK_HIDE_FINDER, THISFN(Hide));
 }
 
 bool Finder::Key(dword key, int count)
@@ -140,8 +150,6 @@ bool Finder::Key(dword key, int count)
 void Finder::Sync()
 {
 	int cnt = pos.GetCount();
-	if(index >= 0 && index < cnt)
-		ctx.Goto(pos[index].y);;
 	if(text.GetLength() > 0)
 		status = Format(t_("Found %d/%d"), cnt ? index +  1 : 0 , cnt);
 	else
@@ -155,10 +163,16 @@ void Finder::Sync()
 
 void Finder::Search()
 {
-	index = 0;
+	int i = index;
 	pos.Clear();
 	ctx.Find((WString)~text);
+	index = clamp(i, 0, max(0, pos.GetCount() - 1));
 	Sync();
+}
+
+void Finder::Update()
+{
+	SetTimeCallback(20, THISFN(Search), TIMEID_UPDATE);
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -209,11 +223,13 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 			for(auto& q : hl[row]) {
 				if(pt.x <= col && col < pt.x + len) {
 					if(pt == p) {
+						q.Normal();
 						q.Ink(SColorHighlightText);
 						q.Paper(SColorHighlight);
 					}
 					else
 					if(~showall) {
+						q.Normal();
 						q.Ink(LtRed());
 						q.Paper(Yellow());
 					}
