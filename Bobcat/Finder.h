@@ -69,7 +69,6 @@ private:
     ToolButton    close;
     FrameLeft<ToolButton>    menu;
     TimeCallback  timer;
-
 };
 
 
