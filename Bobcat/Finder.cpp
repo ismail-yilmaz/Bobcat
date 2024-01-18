@@ -312,8 +312,6 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 	if(!pos.GetCount() || index < 0)
 		return;
 
-	WString s = ~text;
-	int len = s.GetLength();
 	Pos p = pos[index];
 
 	LTIMING("OnHighlight");

@@ -4,9 +4,6 @@
 #ifndef _Bobcat_Finder_h_
 #define _Bobcat_Finder_h_
 
-// TODO: Make this an abstract base class and derive different types of "search engines" from it
-// (E.g. SimpleFinder, RegexFinder. etc.)
-
 class Finder : public FrameTB<WithFinderLayout<ParentCtrl>>
 {
 public:
@@ -44,7 +41,6 @@ public:
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
-    
     bool        CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
