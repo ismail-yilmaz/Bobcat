@@ -5,6 +5,7 @@
 
 #define LLOG(x)  // RLOG(x)
 #define LDUMP(x) // RDUMP(x)
+#define LTIMING(x) // RTIMING(x)
 
 namespace Upp {
 
@@ -18,6 +19,7 @@ using namespace FinderKeys;
 Finder::Finder(Terminal& t)
 : ctx(t)
 , index(0)
+, searchtype(Search::CaseSensitive)
 {
 	CtrlLayout(*this);
 	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
@@ -33,6 +35,9 @@ Finder::Finder(Terminal& t)
     close << THISFN(Hide);
     showall << THISFN(Sync);
 	text.NullText(t_("Type to search..."));
+	text.AddFrame(menu);
+	menu.Image(CtrlImg::down_arrow());
+	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
 	Sync();
 }
 
@@ -94,7 +99,7 @@ void Finder::Hide()
 void Finder::Goto(int i)
 {
 	if(i >= 0) {
-		ctx.Goto(pos[i].y);;
+		ctx.Goto(pos[i].row);;
 		Sync();
 	}
 }
@@ -131,8 +136,30 @@ void Finder::End()
 	}
 }
 
+void Finder::CheckCase()
+{
+	searchtype = Search::CaseSensitive;
+	Update();
+}
+
+void Finder::IgnoreCase()
+{
+	searchtype = Search::CaseInsensitive;
+	Update();
+}
+
+void Finder::CheckPattern()
+{
+	searchtype = Search::Regex;
+	Update();
+}
+
 void Finder::StdBar(Bar& menu)
 {
+	menu.Add(AK_CHECKCASE,      THISFN(CheckCase)).Radio(searchtype == Search::CaseSensitive);
+	menu.Add(AK_IGNORECASE,     THISFN(IgnoreCase)).Radio(searchtype == Search::CaseInsensitive);
+	menu.Add(AK_REGEX,          THISFN(CheckPattern)).Radio(searchtype == Search::Regex);
+
 	menu.AddKey(AK_FIND_ALL,    [this] { bool b = showall; showall = !showall; Sync(); });
 	menu.AddKey(AK_FIND_NEXT,   THISFN(Next));
 	menu.AddKey(AK_FIND_PREV,   THISFN(Prev));
@@ -175,16 +202,18 @@ void Finder::Update()
 	timer.KillSet(20, THISFN(Search));
 }
 
-bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
+bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
 	int offset = m.GetKey(0);
 	
-	for(int row = 0; row < m.GetCount(); row++) { // Note: m.GetCount() > 1 == text is wrapped.
-		for(int col = 0; col < m[row].GetLength(); col++) {
+	LTIMING("CaseSensitiveSearch");
+
+	for(int row = 0, i = 0; row < m.GetCount(); row++) { // Note: m.GetCount() > 1 == text is wrapped.
+		for(int col = 0; col < m[row].GetLength(); col++, i++) {
 			if(m[row][col] == s[0]) {
 				int trow = row, tcol = col, tlen = slen;
-				// Check if the substring is present starting from the current position
+				// Check if the substring is present starting from the current position.
 				while(tlen > 0 && trow < m.GetCount()) {
 					if(m[trow][tcol] == s[slen - tlen])
 						tlen--;
@@ -199,14 +228,85 @@ bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 				}
 				// If tlen is 0, then the substring is found.
 				if(!tlen) {
-					pos.Add({ col, row + offset });
+					Pos& sp = pos.Add();
+					sp.row = offset;
+					sp.col = i;
+					sp.length = slen;
 				}
 			}
 		}
 	}
-	
 	return true;
+}
 
+bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
+{
+	LTIMING("CaseInsensitiveSearch");
+
+	int offset = m.GetKey(0);
+	
+	WString u = ToLower(s), q;
+	for(const WString& ss : m)
+		q << ss;
+
+	q = ToLower(q);
+
+	int i = 0, len = u.GetLength();
+	while((i = q.Find(u, i)) >= 0) {
+		Pos& sp = pos.Add();
+		sp.row = offset;
+		sp.col = i;
+		sp.length = len;
+		i += len;
+	}
+
+	return true;
+}
+
+bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
+{
+	LTIMING("RegexSearch");
+
+	int offset = m.GetKey(0);
+	
+	WString q;
+	for(const WString& ss : m)
+		q << ss;
+
+	RegExp r(ToUtf8(s));
+	while(r.GlobalMatch(ToUtf8(q))) {
+		for(int i = 0; i < r.GetCount(); i++) {
+			int b = 0, e = 0;
+			r.GetMatchPos(i, b, e);
+			Pos& p = pos.Add();
+			p.row = offset;
+			p.col = b;
+			p.length = e - b;
+		}
+	}
+
+	return true;
+}
+
+
+bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
+{
+	LTIMING("OnSearch");
+
+	switch(searchtype) {
+	case Search::CaseInsensitive:
+		CaseInsensitiveSearch(m, s);
+		break;
+	case Search::CaseSensitive:
+		CaseSensitiveSearch(m, s);
+		break;
+	case Search::Regex:
+		RegexSearch(m, s);
+		break;
+	default:
+		break;
+	}
+	return true;
 }
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
@@ -216,27 +316,34 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 
 	WString s = ~text;
 	int len = s.GetLength();
-	Point p = pos[index];
+	Pos p = pos[index];
 
-	for(const Point& pt : pos)
-		for(int row = 0, col = 0, ln = hl.GetKey(row); ln == pt.y && row < hl.GetCount(); row++) {
-			for(auto& q : hl[row]) {
-				if(pt.x <= col && col < pt.x + len) {
-					if(pt == p) {
-						q.Normal();
-						q.Ink(SColorHighlightText);
-						q.Paper(SColorHighlight);
+	LTIMING("OnHighlight");
+
+	for(const Pos& pt : pos)
+		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
+			if(hl.GetKey(row) != pt.row)
+				continue;
+			for(VTLine& l : hl) {
+				for(VTCell& c : l) {
+					if(pt.col <= col && col < pt.col + pt.length) {
+						if(pt.row == p.row && pt.col == p.col) {
+							c.Normal();
+							c.Ink(SColorHighlightText);
+							c.Paper(SColorHighlight);
+						}
+						else
+						if(~showall) {
+							c.Normal();
+							c.Ink(LtRed());
+							c.Paper(Yellow());
+						}
 					}
-					else
-					if(~showall) {
-						q.Normal();
-						q.Ink(LtRed());
-						q.Paper(Yellow());
-					}
+					col++;
 				}
-				col++;
 			}
 		}
+		
 }
 
 }

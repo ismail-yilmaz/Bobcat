@@ -31,6 +31,10 @@ public:
     void        End();
     void        Goto(int i);
     
+    void        CheckCase();
+    void        IgnoreCase();
+    void        CheckPattern();
+    
     void        Sync();
 
     void        Search();
@@ -40,12 +44,32 @@ public:
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
+    
+    bool        CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
+    bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
+    bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
+    
+    struct Pos : Moveable<Pos> {
+        int row = 0;
+        int col = 0;
+        int length = 0;
+    };
+    
+    Vector<Pos> pos;
+    
+    enum class Search {
+        CaseSensitive,
+        CaseInsensitive,
+        Regex
+    }   searchtype;
+
     int           index = 0;
     Terminal&     ctx;
-    Vector<Point> pos;
     Value         data;
     ToolButton    close;
+    FrameLeft<ToolButton>    menu;
     TimeCallback  timer;
+
 };
 
 

@@ -7,6 +7,7 @@
 #include <StackCtrl/StackCtrl.h>
 #include <Terminal/Terminal.h>
 #include <PtyProcess/PtyProcess.h>
+#include <plugin/pcre/Pcre.h>
 
 namespace Upp {
 
