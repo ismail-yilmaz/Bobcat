@@ -90,7 +90,7 @@ Navigator (linux)
 
 ![bobcat-navigator](resources/bobcat-navigator-linux.png)
 
-Finder (linux)
+Finder, in regex-based search mode (linux)
 ![bobcat-finder](resources/bobcat-finder-linux.png)
 
 Settings windows (linux)
