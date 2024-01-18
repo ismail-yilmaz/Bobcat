@@ -457,4 +457,24 @@ Vector<String> GetProfileNames()
 		q.Add(GetFileTitle(s));
 	return q;
 }
+
+String ShortcutKeysFile()
+{
+	return ConfigFile("bobcat.keys");
+}
+
+bool LoadShortcutKeys()
+{
+	String s = LoadFile(ShortcutKeysFile());
+	if(!s.IsVoid())
+		RestoreKeys(s);
+	return !s.IsVoid();
+}
+
+void SaveShortcutKeys()
+{
+	String s = StoreKeys();
+	SaveFile(ShortcutKeysFile(), s);
+}
+
 }

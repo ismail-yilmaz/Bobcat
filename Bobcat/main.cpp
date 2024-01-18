@@ -214,5 +214,7 @@ GUI_APP_MAIN
 			return;
 		}
 	}
+	LoadShortcutKeys();
 	app.Run(p, page_size, fullscreen);
+	SaveShortcutKeys();
 }

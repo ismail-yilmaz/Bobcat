@@ -388,7 +388,7 @@ void Bobcat::ViewMenu(Bar& menu)
 void Bobcat::SetupMenu(Bar& menu)
 {
 	menu.Add(AK_SETTINGS,  [this] { Settings(); });
-	menu.Add(AK_KEYCONFIG, [this] { EditKeys(); });
+	menu.Add(AK_KEYCONFIG, [this] { EditKeys(); SaveShortcutKeys(); });
 }
 
 void Bobcat::HelpMenu(Bar& menu)

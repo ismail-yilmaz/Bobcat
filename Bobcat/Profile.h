@@ -106,6 +106,10 @@ String         ProfileFile(const String& name);
 Vector<String> GetProfileFilePaths();
 Vector<String> GetProfileNames();
 
+String         ShortcutKeysFile();
+bool           LoadShortcutKeys();
+void           SaveShortcutKeys();
+
 Font SelectFont(Font f);
 
 // Operators
