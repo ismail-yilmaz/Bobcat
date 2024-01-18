@@ -276,13 +276,11 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	RegExp r(s.ToString());
 	String ln = ToUtf8(q);
 	while(r.GlobalMatch(ln)) {
-		for(int i = 0; i < r.GetCount(); i++) {
-			Pos& p = pos.Add();
-			int o = r.GetOffset();
-			p.row = offset;
-			p.col = Utf32Len(~ln, o);
-			p.length = Utf32Len(~ln + o, r.GetLength());
-		}
+		Pos& p = pos.Add();
+		int o = r.GetOffset();
+		p.row = offset;
+		p.col = Utf32Len(~ln, o);
+		p.length = Utf32Len(~ln + o, r.GetLength());
 	}
 
 	return true;
