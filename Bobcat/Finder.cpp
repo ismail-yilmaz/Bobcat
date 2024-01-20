@@ -336,14 +336,14 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 					if(pt.col <= col && col < pt.col + pt.length) {
 						if(pt.row == p.row && pt.col == p.col) {
 							c.Normal();
-							c.Ink(SColorHighlightText);
-							c.Paper(SColorHighlight);
+							c.Ink(ctx.HighlightCursorInk);
+							c.Paper(ctx.HighlightCursorPaper);
 						}
 						else
 						if(~showall) {
 							c.Normal();
-							c.Ink(LtRed());
-							c.Paper(Yellow());
+							c.Ink(ctx.HighlightInk);
+							c.Paper(ctx.HighlightPaper);
 						}
 					}
 					col++;

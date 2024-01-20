@@ -66,6 +66,10 @@ struct Terminal : TerminalCtrl {
     String      profilename;
     Value       data;
     Finder      finder;
+    Color       HighlightInk;
+    Color       HighlightPaper;
+    Color       HighlightCursorInk;
+    Color       HighlightCursorPaper;
 
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);

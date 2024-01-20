@@ -38,7 +38,7 @@ const Display& DefaultPaletteNameDisplay()   { return Single<DefaulPaletteNameDi
 const Display& NormalPaletteNameDisplay()    { return Single<NormalPaletteNameDisplayCls>();  }
 const Display& NormalPaletteSampleDisplay()  { return Single<NormalPaletteSampleDisplayCls>();}
 
-static const Tuple<Color, const char*> sColorTable[TerminalCtrl::MAX_COLOR_COUNT] {
+static const Tuple<Color, const char*> sColorTable[Palette::MAX_COLOR_COUNT] {
 	{ Black(),               "Color_1" },
 	{ Red(),                 "Color_2" },
 	{ Green(),               "Color_3" },
@@ -58,7 +58,11 @@ static const Tuple<Color, const char*> sColorTable[TerminalCtrl::MAX_COLOR_COUNT
 	{ SColorText(),          "Ink"      },
 	{ SColorHighlightText(), "SelectionInk" },
 	{ SColorPaper(),         "Paper"        },
-	{ SColorHighlight(),     "SelectionPaper" }
+	{ SColorHighlight(),     "SelectionPaper" },
+	{ LtRed(),               "HighlightInk" },
+	{ SColorHighlightText(), "HighlightCursorInk" },
+	{ Yellow(),              "HighlightPaper" },
+	{ SColorHighlight(),     "HighlightCursorPaper" },
 };
 
 Palette::Palette()
@@ -82,7 +86,11 @@ Palette::Palette()
 	SColorText(),
 	SColorHighlightText(),
 	SColorPaper(),
-	SColorHighlight()
+	SColorHighlight(),
+	LtRed(),
+	SColorHighlightText(),
+	Yellow(),
+	SColorHighlight(),
 }
 {
 }
@@ -92,7 +100,7 @@ void Palette::Jsonize(JsonIO& jio)
 	jio("Name", name);
 	
 	if(jio.IsLoading()) {
-		for(int i = 0; i < TerminalCtrl::MAX_COLOR_COUNT; i++) {
+		for(int i = 0; i < MAX_COLOR_COUNT; i++) {
 			String q;
 			jio(sColorTable[i].b, q);
 			table[i] = ConvertHashColorSpec().Scan(q);
@@ -100,7 +108,7 @@ void Palette::Jsonize(JsonIO& jio)
 	}
 	else
 	if(jio.IsStoring()) {
-		for(int i = 0; i < TerminalCtrl::MAX_COLOR_COUNT; i++) {
+		for(int i = 0; i < MAX_COLOR_COUNT; i++) {
 			String s = ConvertHashColorSpec().Format(table[i]);
 			jio(sColorTable[i].b, s);
 		}
@@ -130,7 +138,7 @@ void Palettes::ContextMenu(Bar& bar)
 	bar.Add(b, tt_("Remove palette"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
-		bar.Add(b, tt_("Set as active palette"), [this]() { data = list.Get(list.GetCursor(), 0); Sync(); }).Key(K_CTRL|K_D);
+		bar.Add(b, tt_("Set as active palette"), [this]() { MakeActive(); }).Key(K_CTRL|K_D);
 	}
 }
 
@@ -166,6 +174,10 @@ void Palettes::Remove()
 	}
 }
 
+void Palettes::Reset()
+{
+}
+
 void Palettes::SetPalette()
 {
 	if(!list.IsCursor())
@@ -181,16 +193,29 @@ void Palettes::SetPalette()
 
 	Palette p = list.Get(list.GetCursor(), 1).To<Palette>();
 	
-	for(int i = 0; i < TerminalCtrl::MAX_COLOR_COUNT; i++) {
-		dlg.colors.Add(
-			decode(i,
-				TerminalCtrl::COLOR_INK, tt_("Ink"),
-				TerminalCtrl::COLOR_PAPER, tt_("Paper"),
-				TerminalCtrl::COLOR_INK_SELECTED, tt_("Selection Ink"),
-				TerminalCtrl::COLOR_PAPER_SELECTED, tt_("Selection Paper"),
-				Format(t_("Color %d"), i + 1)),
-			p.table[i]);
-	}
+	auto ResetColors = [&](Palette q) {
+		int cursor = dlg.colors.GetCursor();
+		dlg.colors.Clear();
+		for(int i = 0; i < Palette::MAX_COLOR_COUNT; i++) {
+			dlg.colors.Add(
+				decode(i,
+					TerminalCtrl::COLOR_INK, tt_("Ink"),
+					TerminalCtrl::COLOR_PAPER, tt_("Paper"),
+					TerminalCtrl::COLOR_INK_SELECTED, tt_("Selection Ink"),
+					TerminalCtrl::COLOR_PAPER_SELECTED, tt_("Selection Paper"),
+					TerminalCtrl::MAX_COLOR_COUNT, tt_("[Finder] Highlight Ink"),
+					TerminalCtrl::MAX_COLOR_COUNT + 1, tt_("[Finder] Highlight Cursor Ink"),
+					TerminalCtrl::MAX_COLOR_COUNT + 2, tt_("[Finder] Highlight Paper"),
+					TerminalCtrl::MAX_COLOR_COUNT + 3, tt_("[Finder] Highlight Cursor Paper"),
+					Format(t_("Color %d"), i + 1)),
+				q.table[i]);
+		}
+		if(cursor >= 0)
+			dlg.colors.SetCursor(cursor);
+	};
+
+	dlg.reset << [&] { ResetColors(Palette()); };
+	ResetColors(p);
 
 	if(dlg.Title(Format(tt_("Color Profile: %"), p.name)).ExecuteOK()) {
 		for(int i = 0; i < dlg.colors.GetCount(); i++)
@@ -208,14 +233,8 @@ void Palettes::SetPalette()
 
 void Palettes::MakeActive()
 {
-	if(int i = list.GetCursor(); i >= 0) {
-		Vector<Value> v = list.GetLine(i);
-		list.Remove(i);
-		list.Insert(0, v);
-		list.SetCursor(0);
-		SetModify();
-		Sync();
-	}
+	data = list.Get(list.GetCursor(), 0);
+	Sync();
 }
 
 void Palettes::Sync()
@@ -250,7 +269,7 @@ int Palettes::Load()
 		for(const auto& p : ~palettes)
 			list.Add(p.key, RawToValue(clone(p.value)));
 		list.FindSetCursor(data);
-		MakeActive();
+		Sync();
 	}
 	return rc;
 }
@@ -268,10 +287,6 @@ void Palettes::Store()
 			if(!FileExists(path))
 				RealizePath(path);
 			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
-			if(i == 0) {
-				data = s;
-				LDUMP(data);
-			}
 		}
 		catch(const JsonizeError& e)
 		{
