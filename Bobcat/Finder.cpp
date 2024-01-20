@@ -39,7 +39,7 @@ Finder::Finder(Terminal& t)
 	text.AddFrame(mode);
 	text.AddFrame(menu);
 	text.WhenBar << THISFN(StdKeys);
-	menu.Image(CtrlImg::down_arrow());
+	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
 	mode.SetDisplay(StdCenterDisplay());
 	mode <<= AttrText("C").Bold().Ink(SColorDisabled);

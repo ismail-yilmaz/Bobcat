@@ -352,7 +352,7 @@ void Terminal::EditMenu(Bar& menu)
 
 	}
 	menu.Separator();
-	menu.Add(AK_FINDER, [this] { ShowFinder(true); });
+	menu.Add(AK_FINDER, Images::Find(), [this] { ShowFinder(true); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
