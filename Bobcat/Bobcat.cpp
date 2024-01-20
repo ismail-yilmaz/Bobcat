@@ -140,16 +140,24 @@ void Bobcat::Settings()
 	Profiles  profiles(*this);
 	WithSettingsLayout<ParentCtrl> settingspane;
 
-	settingspane.titlepos.Add("top", tt_("Top"));
-	settingspane.titlepos.Add("bottom", tt_("Bottom"));
+	String st = tt_("Top");
+	String sb = tt_("Bottom");
+	
+	settingspane.titlepos.Add("top", st);
+	settingspane.titlepos.Add("bottom", sb);
 	settingspane.titlepos.GoBegin();
+
+	settingspane.finderpos.Add("top", st);
+	settingspane.finderpos.Add("bottom", sb);
+	settingspane.finderpos.GoBegin();
 	
 	settingspane.direction.Add("horizontal", tt_("Horizontal"));
 	settingspane.direction.Add("vertical", tt_("Vertical"));
-	settingspane.direction.GoBegin();
+	settingspane.direction.GoEnd();
 	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
+	cr(settingspane.finderpos, settings.finderalignment);
 	cr(settingspane.direction, settings.stackdirection);
 	cr(settingspane.animation, settings.stackanimation);
 	cr(settingspane.wheel, settings.stackwheel);
@@ -523,6 +531,7 @@ void Bobcat::Help()
 
 Bobcat::Config::Config()
 : titlealignment("top")
+, finderalignment("bottom")
 , stackdirection("horizontal")
 , stackanimation(150)
 , stackwheel(true)
@@ -538,6 +547,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 {
 	jio("ActiveProfile", activeprofile)
 	   ("TitleBarAlignment", titlealignment)
+	   ("FinderBarAlignment", finderalignment)
 	   ("StackAnimationDirection", stackdirection)
 	   ("StackAnimationDuration", stackanimation)
 	   ("StackWheelMode", stackwheel)

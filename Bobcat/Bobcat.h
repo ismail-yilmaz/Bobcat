@@ -100,6 +100,7 @@ struct Bobcat {
         Config();
         String      activeprofile;
         String      titlealignment;
+        String      finderalignment;
         String      stackdirection;
         int         stackanimation;
         bool        stackwheel;

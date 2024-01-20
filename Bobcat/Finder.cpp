@@ -180,7 +180,6 @@ void Finder::StdKeys(Bar& menu)
 	menu.AddKey(AK_HIDE_FINDER, THISFN(Hide));
 }
 
-
 bool Finder::Key(dword key, int count)
 {
 	MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
@@ -288,8 +287,8 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	RegExp r(s.ToString());
 	String ln = ToUtf8(q);
 	while(r.GlobalMatch(ln)) {
-		Pos& p = pos.Add();
 		int o = r.GetOffset();
+		Pos& p = pos.Add();
 		p.row = offset;
 		p.col = Utf32Len(~ln, o);
 		p.length = Utf32Len(~ln + o, r.GetLength());

@@ -150,6 +150,7 @@ Terminal& Terminal::Sync()
 	titlebar.close.Show(b || ctx.window.IsFullScreen());
 	ShowTitleBar(ctx.settings.showtitle);
 	titlebar <<= ctx.settings.titlealignment;
+	finder   <<= ctx.settings.finderalignment;
 	return *this;
 }
 
@@ -438,7 +439,7 @@ void Terminal::TitleBar::Show()
 {
 	bool b = ctx.HasSizeHint();
 	ctx.HideSizeHint();
-	ctx.AddFrame(Height(StdFont().GetCy() + Zy(4)));
+	ctx.InsertFrame(0, Height(StdFont().GetCy() + Zy(4)));
 	ctx.ShowSizeHint(b);
 }
 
