@@ -24,13 +24,12 @@ struct FontListDisplayCls : Display
 
 const Display& FontListDisplay()    { return Single<FontListDisplayCls>(); }
 
-Font SelectFont(Font f)
+Font SelectFont(Font f, dword type)
 {
 	WithFontSelectorLayout<TopWindow> dlg;
 	CtrlLayoutOKCancel(dlg, tt_("Select Font"));
 
 	dlg.font.SetDisplay(FontListDisplay());
-	dlg.font.ItemHeight(Draw::GetStdFontSize().cy + 8);
 	dlg.font.WhenSel = [&]
 	{
 		dlg.preview.SetFont(Font().FaceName(~dlg.font).Height(~dlg.fontsize));
@@ -40,13 +39,18 @@ Font SelectFont(Font f)
 	dlg.slider.MinMax(6, 128).Step(1) <<= ~dlg.fontsize;
 	dlg.slider << [&] { dlg.fontsize  <<= ~dlg.slider; dlg.font.WhenSel(); };
 	
+	int h = Draw::GetStdFontSize().cy + 8;
 	for(int i = 0; i < Font::GetFaceCount(); i++) {
-		if(Font::GetFaceInfo(i) & Font::FIXEDPITCH) {
+		dword fi = Font::GetFaceInfo(i);
+		if(((type & Font::FIXEDPITCH) & fi) || ((type & Font::SCALEABLE) & fi)) {
 			String face = Font::GetFaceName(i);
 			if(dlg.font.Find(face) < 0)
 				dlg.font.Add(face);
 		}
+		h = max(Font().Face(i).GetCy(), h);
 	}
+
+	dlg.font.ItemHeight(h);
 
 	int i = dlg.font.Find(f.GetFaceName());
 	if(i >= 0) dlg.font.SetCursor(i);
@@ -55,6 +59,7 @@ Font SelectFont(Font f)
 		f.FaceName(~dlg.font).Height(~dlg.fontsize);
 	return f;
 }
+
 
 struct EditCodePoint : EditString {
 	Terminal& term;
@@ -226,6 +231,35 @@ String GetBuildInfo()
 	h << GetExeFilePath();
 
 	return h;
+}
+
+Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
+{
+	return Vector<Tuple<void (*)(), String, String>> {
+		{ ChHostSkin, "host", tt_("Host platform") },
+	    { ChClassicSkin, "classic", tt_("Classic") },
+		{ ChStdSkin, "standard", tt_("Standard") },
+		{ ChGraySkin, "gray", tt_("Gray") },
+		{ ChDarkSkin, "dark", tt_("Dark") },
+		{ ChFlatSkin, "flat", tt_("Flat") },
+		{ ChFlatGraySkin, "flatgray", tt_("Flat Gray") },
+		{ ChFlatDarkSkin, "flatdark", tt_("Flat Dark") }
+	};
+}
+
+void LoadGuiTheme(Bobcat& ctx)
+{
+	for(const auto& ch : GetAllGuiThemes()) {
+		if(ctx.settings.guitheme == ch.b) {
+			Ctrl::SetSkin(ch.a);
+			return;
+		}
+	}
+}
+
+void LoadGuiFont(Bobcat& ctx)
+{
+	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
 }
 
 }

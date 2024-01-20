@@ -42,6 +42,7 @@ struct FontProfileDisplayCls : Display
 const Display& DefaultProfileNameDisplay() { return Single<DefaultProfileNameDisplayCls>(); }
 const Display& NormalProfileNameDisplay()  { return Single<NormalProfileNameDisplayCls>();  }
 const Display& FontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
+const Display& GuiFontProfileDisplay()     { return Single<FontProfileDisplayCls>(); }
 
 Profile::Profile()
 : name(String::GetVoid())

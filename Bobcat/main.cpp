@@ -75,7 +75,7 @@ GUI_APP_MAIN
 	
 	Bobcat app;
 	LoadConfig(app);
-
+	
 	// Try loading the active profile, if any, and fallback to default on failure.
 	Profile p = LoadProfile(app.settings.activeprofile);
 	
@@ -214,7 +214,10 @@ GUI_APP_MAIN
 			return;
 		}
 	}
+
 	LoadShortcutKeys();
+	LoadGuiFont(app);
+	LoadGuiTheme(app);
 	app.Run(p, page_size, fullscreen);
 	SaveShortcutKeys();
 }

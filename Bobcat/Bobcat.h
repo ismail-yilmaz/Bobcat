@@ -98,6 +98,8 @@ struct Bobcat {
     
     struct  Config {
         Config();
+        String      guitheme;
+        Font        guifont;
         String      activeprofile;
         String      titlealignment;
         String      finderalignment;
@@ -128,5 +130,9 @@ void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
 String GetBuildInfo();
+
+void LoadGuiTheme(Bobcat& ctx);
+void LoadGuiFont(Bobcat& ctx);
+Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 }
 #endif

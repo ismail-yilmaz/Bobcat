@@ -155,6 +155,20 @@ void Bobcat::Settings()
 	settingspane.direction.Add("vertical", tt_("Vertical"));
 	settingspane.direction.GoEnd();
 	
+	for(auto& ch : GetAllGuiThemes()) {
+		settingspane.chstyle.Add(ch.b, ch.c);
+		settingspane.chstyle.GoBegin();
+	}
+
+	settingspane.guifont.SetDisplay(FontProfileDisplay());
+
+	settingspane.guifont.WhenPush = [&]
+	{
+		dword type = Font::FIXEDPITCH|Font::SCALEABLE;
+		settingspane.guifont <<= SelectFont(~settingspane.guifont, type);
+		settingspane.guifont.Action();
+	};
+	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
 	cr(settingspane.finderpos, settings.finderalignment);
@@ -166,6 +180,8 @@ void Bobcat::Settings()
 	cr(settingspane.savescreenshot, settings.savescreenshot);
 	cr(settingspane.custominput, settings.custominputmethod);
 	cr(settingspane.pagesizes, settings.custompagesizes);
+	cr(settingspane.chstyle, settings.guitheme);
+	cr(settingspane.guifont, settings.guifont);
 	
 	cr.Set();
 
@@ -530,7 +546,9 @@ void Bobcat::Help()
 }
 
 Bobcat::Config::Config()
-: titlealignment("top")
+: guitheme("host")
+, guifont(GetStdFont())
+, titlealignment("top")
 , finderalignment("bottom")
 , stackdirection("horizontal")
 , stackanimation(150)
@@ -556,7 +574,8 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("SaveScreenshot", savescreenshot)
 	   ("CustomInputMethod", custominputmethod)
 	   ("CustomPageSizes", custompagesizes)
-	   ("SeralizePlacement", serializeplacement);
+	   ("GuiTheme", guitheme)
+	   ("GuiFont", guifont);
 }
 
 String GetConfigFile()

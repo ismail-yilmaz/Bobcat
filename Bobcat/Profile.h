@@ -110,7 +110,8 @@ String         ShortcutKeysFile();
 bool           LoadShortcutKeys();
 void           SaveShortcutKeys();
 
-Font SelectFont(Font f);
+Font SelectFont(Font f, dword type = Font::FIXEDPITCH);
+const Display& FontProfileDisplay();
 
 // Operators
 
