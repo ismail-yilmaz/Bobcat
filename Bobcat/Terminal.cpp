@@ -88,10 +88,10 @@ bool Terminal::Start(const Profile& p)
 	while(!ms.IsEof()) {
 		String k, v;
 		if(SplitTo(ms.GetLine(), '=', k, v)) {
-			vv.GetAdd(k, v);
+			vv.GetAdd(k) = v;
 		}
 	}
-
+	
 	if(pty.Start(p.command, vv, p.address)) {
 		profilename = p.name;
 		MakeTitle(profilename);
