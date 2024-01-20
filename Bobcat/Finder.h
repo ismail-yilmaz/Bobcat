@@ -17,6 +17,8 @@ public:
     void        FrameLayout(Rect& r) override;
 
     void        StdBar(Bar& menu);
+    void        StdKeys(Bar& menu);
+    
     bool        Key(dword key, int count) override;
     
     void        Show();
@@ -59,11 +61,20 @@ private:
         Regex
     }   searchtype;
 
+    struct SearchField : EditString {
+        typedef SearchField CLASSNAME;
+        SearchField();
+        void SearchBar(Bar& menu);
+        bool Key(dword key, int count) override;
+    };
+    
     int           index = 0;
     Terminal&     ctx;
     Value         data;
     ToolButton    close;
-    FrameLeft<ToolButton>    menu;
+    SearchField   text;
+    FrameLeft<ToolButton> menu;
+    FrameRight<DisplayCtrl> mode;
     TimeCallback  timer;
 };
 

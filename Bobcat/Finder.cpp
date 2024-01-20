@@ -29,15 +29,20 @@ Finder::Finder(Terminal& t)
 	begin.Image(Images::Begin());
 	end.Image(Images::End());
 	next  << THISFN(Next);
-    prev  << THISFN(Prev);
-    begin << THISFN(Begin);
-    end   << THISFN(End);
-    close << THISFN(Hide);
-    showall << THISFN(Sync);
+	prev  << THISFN(Prev);
+	begin << THISFN(Begin);
+	end   << THISFN(End);
+	close << THISFN(Hide);
+	showall << THISFN(Sync);
+	Add(text.LeftPosZ(5, 180).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
+	text.AddFrame(mode);
 	text.AddFrame(menu);
+	text.WhenBar << THISFN(StdKeys);
 	menu.Image(CtrlImg::down_arrow());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
+	mode.SetDisplay(StdCenterDisplay());
+	mode <<= AttrText("C").Bold().Ink(SColorDisabled);
 	Sync();
 }
 
@@ -139,18 +144,21 @@ void Finder::End()
 void Finder::CheckCase()
 {
 	searchtype = Search::CaseSensitive;
+	mode <<= AttrText("C").Bold().Ink(SColorDisabled);
 	Update();
 }
 
 void Finder::IgnoreCase()
 {
 	searchtype = Search::CaseInsensitive;
+	mode <<= AttrText("I").Bold().Ink(SColorDisabled);
 	Update();
 }
 
 void Finder::CheckPattern()
 {
 	searchtype = Search::Regex;
+	mode <<= AttrText("R").Bold().Ink(SColorDisabled);
 	Update();
 }
 
@@ -159,7 +167,11 @@ void Finder::StdBar(Bar& menu)
 	menu.Add(AK_CHECKCASE,      THISFN(CheckCase)).Radio(searchtype == Search::CaseSensitive);
 	menu.Add(AK_IGNORECASE,     THISFN(IgnoreCase)).Radio(searchtype == Search::CaseInsensitive);
 	menu.Add(AK_REGEX,          THISFN(CheckPattern)).Radio(searchtype == Search::Regex);
+	StdKeys(menu);
+}
 
+void Finder::StdKeys(Bar& menu)
+{
 	menu.AddKey(AK_FIND_ALL,    [this] { bool b = showall; showall = !showall; Sync(); });
 	menu.AddKey(AK_FIND_NEXT,   THISFN(Next));
 	menu.AddKey(AK_FIND_PREV,   THISFN(Prev));
@@ -167,6 +179,7 @@ void Finder::StdBar(Bar& menu)
 	menu.AddKey(AK_FIND_LAST,   THISFN(End));
 	menu.AddKey(AK_HIDE_FINDER, THISFN(Hide));
 }
+
 
 bool Finder::Key(dword key, int count)
 {
@@ -177,6 +190,7 @@ bool Finder::Key(dword key, int count)
 void Finder::Sync()
 {
 	int cnt = pos.GetCount();
+	index = clamp(index, 0, max(0, cnt - 1));
 	if(text.GetLength() > 0)
 		status = Format(t_("Found %d/%d"), cnt ? index +  1 : 0 , cnt);
 	else
@@ -190,10 +204,8 @@ void Finder::Sync()
 
 void Finder::Search()
 {
-	int i = index;
 	pos.Clear();
 	ctx.Find((WString)~text);
-	index = clamp(i, 0, max(0, pos.GetCount() - 1));
 	Sync();
 }
 
@@ -339,6 +351,29 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 				}
 			}
 		}
+}
+
+Finder::SearchField::SearchField()
+{
+	WhenBar = THISFN(SearchBar);
+}
+
+void Finder::SearchField::SearchBar(Bar& menu)
+{
+	menu.Add(IsEditable(), AK_FIND_UNDO, Images::Undo(), THISFN(Undo));
+	menu.Separator();
+	menu.Add(IsEditable() && IsSelection(), AK_FIND_CUT, Images::Cut(), THISFN(Cut));
+	menu.Add(IsSelection(), AK_FIND_COPY, Images::Copy(),THISFN(Copy));
+	menu.Add(IsEditable() && IsClipboardAvailableText(), AK_FIND_PASTE, Images::Paste(), THISFN(Paste));
+	menu.Separator();
+	menu.Add(text.GetLength(), AK_FIND_SELECTALL, Images::SelectAll(), THISFN(SelectAll));
+}
+
+bool Finder::SearchField::Key(dword key, int count)
+{
+	if(MenuBar::Scan(WhenBar, key))
+		return true;
+	return EditField::Key(key, count);
 }
 
 }

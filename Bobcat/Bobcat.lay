@@ -127,7 +127,6 @@ LAYOUT(NavigatorLayout, 593, 30)
 END_LAYOUT
 
 LAYOUT(FinderLayout, 526, 24)
-	ITEM(Upp::EditString, text, LeftPosZ(5, 180).TopPosZ(3, 18))
 	ITEM(ToolButton, prev, LeftPosZ(186, 19).TopPosZ(3, 18))
 	ITEM(ToolButton, next, LeftPosZ(206, 19).TopPosZ(3, 18))
 	ITEM(ToolButton, begin, LeftPosZ(226, 19).TopPosZ(3, 18))
