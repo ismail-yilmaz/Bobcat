@@ -36,6 +36,10 @@ public:
     void        IgnoreCase();
     void        CheckPattern();
     
+    bool        IsCaseSensitive() const;
+    bool        IsCaseInsensitive() const;
+    bool        IsRegex() const;
+    
     void        Sync();
 
     void        Search();

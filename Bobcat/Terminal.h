@@ -60,9 +60,9 @@ struct Terminal : TerminalCtrl {
     
     Bobcat&     ctx;
     PtyProcess  pty;
-    bool        bell;
-    bool        keep;
-    bool        filter;
+    bool        bell:1;
+    bool        keep:1;
+    bool        filter:1;
     String      profilename;
     Value       data;
     Finder      finder;

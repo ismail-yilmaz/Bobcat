@@ -167,11 +167,26 @@ void Finder::CheckPattern()
 	Update();
 }
 
+bool Finder::IsCaseSensitive() const
+{
+	return searchtype == Search::CaseSensitive;
+}
+
+bool Finder::IsCaseInsensitive() const
+{
+	return searchtype == Search::CaseInsensitive;
+}
+
+bool Finder::IsRegex() const
+{
+	return searchtype == Search::Regex;
+}
+
 void Finder::StdBar(Bar& menu)
 {
-	menu.Add(AK_CHECKCASE,      THISFN(CheckCase)).Radio(searchtype == Search::CaseSensitive);
-	menu.Add(AK_IGNORECASE,     THISFN(IgnoreCase)).Radio(searchtype == Search::CaseInsensitive);
-	menu.Add(AK_REGEX,          THISFN(CheckPattern)).Radio(searchtype == Search::Regex);
+	menu.Add(AK_CHECKCASE, THISFN(CheckCase)).Radio(IsCaseSensitive());
+	menu.Add(AK_IGNORECASE,THISFN(IgnoreCase)).Radio(IsCaseInsensitive());
+	menu.Add(AK_REGEX,     THISFN(CheckPattern)).Radio(IsRegex());
 	StdKeys(menu);
 }
 
@@ -309,7 +324,7 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	LTIMING("OnSearch");
-
+		 
 	switch(searchtype) {
 	case Search::CaseInsensitive:
 		CaseInsensitiveSearch(m, s);
