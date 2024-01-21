@@ -51,6 +51,8 @@ struct Profile : Moveable<Profile> {
     String      overridetracking;
     String      onexit;
     bool        filterctrl;
+    String      searchmode;
+    bool        searchshowall;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);

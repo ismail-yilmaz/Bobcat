@@ -30,6 +30,8 @@ public:
     void        End();
     void        Goto(int i);
     
+    void        SetSearchMode(const String& mode);
+
     void        CheckCase();
     void        IgnoreCase();
     void        CheckPattern();

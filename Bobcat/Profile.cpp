@@ -81,6 +81,7 @@ Profile::Profile()
 , erasechar("delete")
 , functionkeystyle("pc")
 , overridetracking("K_SHIFT_CTRL")
+, searchmode("sensitive")
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
@@ -139,6 +140,8 @@ void Profile::Jsonize(JsonIO& jio)
 	("AutoHideMouseCursor",  autohidemouse)
 	("HistoryBuffer",		 history)
 	("HistorySize",			 historysize)
+	("SearchMode",           searchmode)
+	("SearchShowsAll",       searchshowall)
 	("BufferedRefresh",      delayedrefresh)
 	("LazyPageResize",       lazyresize)
 	("FilterCtrlBytes",      filterctrl)
@@ -175,6 +178,10 @@ Profiles::Setup::Setup()
 	emulation.charset.SetIndex(0);
 	emulation.erasechar.Add("delete", t_("Delete [^?]"));
 	emulation.erasechar.Add("backspace", t_("Backspace [^H]"));
+	emulation.erasechar.SetIndex(0);
+	emulation.searchmode.Add("sensitive",   t_("Case sensitive"));
+	emulation.searchmode.Add("insensitive", t_("Case insensitive"));
+	emulation.searchmode.Add("regex",       t_("Regex"));
 	emulation.erasechar.SetIndex(0);
 	emulation.overridetracking.Add("K_SHIFT", "Shift");
 	emulation.overridetracking.Add("K_ALT",  "Alt");
@@ -233,7 +240,9 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.delayedrefresh, p.delayedrefresh)
      (emulation.lazyresize,     p.lazyresize)
      (emulation.filter,         p.filterctrl)
-     (emulation.overridetracking, p.overridetracking);
+     (emulation.overridetracking, p.overridetracking)
+     (emulation.searchmode,     p.searchmode)
+     (emulation.showall, p.searchshowall);
 }
 
 void Profiles::Setup::SetData(const Value& data)

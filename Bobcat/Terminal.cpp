@@ -195,6 +195,8 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	AlternateScroll(p.alternatescroll);
 	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
+	finder.SetSearchMode(p.searchmode);
+	finder.showall = p.searchshowall;
 	return *this;
 }
 

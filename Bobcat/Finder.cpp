@@ -140,24 +140,30 @@ void Finder::End()
 	}
 }
 
+void Finder::SetSearchMode(const String& mode)
+{
+	searchtype = decode( mode,
+		"insensitive", Search::CaseInsensitive,
+		"regex", Search::Regex,
+	     Search::CaseSensitive);
+	Sync();
+}
+
 void Finder::CheckCase()
 {
 	searchtype = Search::CaseSensitive;
-	mode <<= AttrText("C").Bold().Ink(SColorDisabled);
 	Update();
 }
 
 void Finder::IgnoreCase()
 {
 	searchtype = Search::CaseInsensitive;
-	mode <<= AttrText("I").Bold().Ink(SColorDisabled);
 	Update();
 }
 
 void Finder::CheckPattern()
 {
 	searchtype = Search::Regex;
-	mode <<= AttrText("R").Bold().Ink(SColorDisabled);
 	Update();
 }
 
@@ -197,6 +203,9 @@ void Finder::Sync()
 	next.Enable(cnt > 0 && index < cnt - 1);
 	begin.Enable(cnt > 0 && index > 0);
 	end.Enable(cnt > 0 && index < cnt - 1);
+	AttrText txt;
+	txt = decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C");
+	mode <<= txt.Bold().Ink(SColorDisabled);
 	ctx.Refresh();
 }
 
