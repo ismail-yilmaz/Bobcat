@@ -172,13 +172,13 @@ void Palettes::SetPalette()
 
 	Palette p = list.Get(list.GetCursor(), 1).To<Palette>();
 	
-	auto LoadColors = [&](Palette q)
+	auto LoadColors = [&dlg](const Palette& q)
 	{
 		int cursor = dlg.colors.GetCursor();
 		dlg.colors.Clear();
 		const auto& lst = GetColorList();
 		for(int i = 0; i < Palette::MAX_COLOR_COUNT; i++)
-			dlg.colors.Add(lst[i].c, p.table[i]);
+			dlg.colors.Add(lst[i].c, q.table[i]);
 		if(cursor >= 0)
 			dlg.colors.SetCursor(cursor);
 	};
