@@ -38,79 +38,62 @@ const Display& DefaultPaletteNameDisplay()   { return Single<DefaulPaletteNameDi
 const Display& NormalPaletteNameDisplay()    { return Single<NormalPaletteNameDisplayCls>();  }
 const Display& NormalPaletteSampleDisplay()  { return Single<NormalPaletteSampleDisplayCls>();}
 
-static const Tuple<Color, const char*> sColorTable[Palette::MAX_COLOR_COUNT] {
-	{ Black(),               "Color_1" },
-	{ Red(),                 "Color_2" },
-	{ Green(),               "Color_3" },
-	{ Yellow(),              "Color_4" },
-	{ Blue(),                "Color_5" },
-	{ Magenta(),             "Color_6" },
-	{ Cyan(),                "Color_7" },
-	{ White(),               "Color_8" },
-	{ Gray(),                "Color_9" },
-	{ LtRed(),               "Color_10" },
-	{ LtGreen(),             "Color_11" },
-	{ LtYellow(),            "Color_12" },
-	{ LtBlue(),              "Color_13" },
-	{ LtMagenta(),           "Color_14" },
-	{ LtCyan(),              "Color_15" },
-	{ White(),               "Color_16" },
-	{ SColorText(),          "Ink"      },
-	{ SColorHighlightText(), "SelectionInk" },
-	{ SColorPaper(),         "Paper"        },
-	{ SColorHighlight(),     "SelectionPaper" },
-	{ LtRed(),               "HighlightInk" },
-	{ SColorHighlightText(), "HighlightCursorInk" },
-	{ Yellow(),              "HighlightPaper" },
-	{ SColorHighlight(),     "HighlightCursorPaper" },
-};
+static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
+{
+	static Vector<Tuple<Color, const char*, const char*>> sColorTable = {
+		{ Black(),               "Color_1", t_("Color_1") },
+		{ Red(),                 "Color_2", t_("Color_2") },
+		{ Green(),               "Color_3", t_("Color_3") },
+		{ Yellow(),              "Color_4", t_("Color_4") },
+		{ Blue(),                "Color_5", t_("Color_5") },
+		{ Magenta(),             "Color_6", t_("Color_6") },
+		{ Cyan(),                "Color_7", t_("Color_7") },
+		{ White(),               "Color_8", t_("Color_8") },
+		{ Gray(),                "Color_9", t_("Color_9") },
+		{ LtRed(),               "Color_10", t_("Color_10") },
+		{ LtGreen(),             "Color_11", t_("Color_11") },
+		{ LtYellow(),            "Color_12", t_("Color_12") },
+		{ LtBlue(),              "Color_13", t_("Color_13") },
+		{ LtMagenta(),           "Color_14", t_("Color_14") },
+		{ LtCyan(),              "Color_15", t_("Color_15") },
+		{ White(),               "Color_16", t_("Color_16") },
+		{ SColorText,            "Ink"     , t_("Ink") },
+		{ SColorHighlightText,   "SelectionInk", t_("Selection Ink") },
+		{ SColorPaper,           "Paper"       , t_("Paper") },
+		{ SColorHighlight,       "SelectionPaper", t_("Selection Paper") },
+		{ LtRed(),               "HighlightInk", t_("Highlight Ink") },
+		{ SColorHighlightText,   "HighlightCursorInk", t_("Highlight Cursor Ink") },
+		{ Yellow(),              "HighlightPaper", t_("Highlight Paper") },
+		{ SColorHighlight,       "HighlightCursorPaper", t_("Highlight Cursor Paper") },
+	};
+	return sColorTable;
+}
 
 Palette::Palette()
-: table {
-	Black(),
-	Red(),
-	Green(),
-	Yellow(),
-	Blue(),
-	Magenta(),
-	Cyan(),
-	White(),
-	Gray(),
-	LtRed(),
-	LtGreen(),
-	LtYellow(),
-	LtBlue(),
-	LtMagenta(),
-	LtCyan(),
-	White(),
-	SColorText(),
-	SColorHighlightText(),
-	SColorPaper(),
-	SColorHighlight(),
-	LtRed(),
-	SColorHighlightText(),
-	Yellow(),
-	SColorHighlight(),
-}
 {
+	const auto& lst = GetColorList();
+	for(int i = 0; i < lst.GetCount(); i++)
+		table[i] = lst[i].a;
 }
 
 void Palette::Jsonize(JsonIO& jio)
 {
 	jio("Name", name);
 	
+	const auto& lst = GetColorList();
+	
 	if(jio.IsLoading()) {
-		for(int i = 0; i < MAX_COLOR_COUNT; i++) {
+		for(int i = 0; i < lst.GetCount(); i++) {
 			String q;
-			jio(sColorTable[i].b, q);
-			table[i] = ConvertHashColorSpec().Scan(q);
+			jio(lst[i].b, q);
+			table[i] = Nvl((Color) ConvertHashColorSpec().Scan(q), lst[i].a);
 		}
 	}
 	else
 	if(jio.IsStoring()) {
-		for(int i = 0; i < MAX_COLOR_COUNT; i++) {
+		for(int i = 0; i < lst.GetCount(); i++) {
 			String s = ConvertHashColorSpec().Format(table[i]);
-			jio(sColorTable[i].b, s);
+			jio(lst[i].b, s);
 		}
 	}
 }
@@ -174,10 +157,6 @@ void Palettes::Remove()
 	}
 }
 
-void Palettes::Reset()
-{
-}
-
 void Palettes::SetPalette()
 {
 	if(!list.IsCursor())
@@ -196,20 +175,9 @@ void Palettes::SetPalette()
 	auto ResetColors = [&](Palette q) {
 		int cursor = dlg.colors.GetCursor();
 		dlg.colors.Clear();
-		for(int i = 0; i < Palette::MAX_COLOR_COUNT; i++) {
-			dlg.colors.Add(
-				decode(i,
-					TerminalCtrl::COLOR_INK, tt_("Ink"),
-					TerminalCtrl::COLOR_PAPER, tt_("Paper"),
-					TerminalCtrl::COLOR_INK_SELECTED, tt_("Selection Ink"),
-					TerminalCtrl::COLOR_PAPER_SELECTED, tt_("Selection Paper"),
-					TerminalCtrl::MAX_COLOR_COUNT, tt_("[Finder] Highlight Ink"),
-					TerminalCtrl::MAX_COLOR_COUNT + 1, tt_("[Finder] Highlight Cursor Ink"),
-					TerminalCtrl::MAX_COLOR_COUNT + 2, tt_("[Finder] Highlight Paper"),
-					TerminalCtrl::MAX_COLOR_COUNT + 3, tt_("[Finder] Highlight Cursor Paper"),
-					Format(t_("Color %d"), i + 1)),
-				q.table[i]);
-		}
+		const auto& lst = GetColorList();
+		for(int i = 0; i < lst.GetCount(); i++)
+			dlg.colors.Add(lst[i].c, lst[i].a);
 		if(cursor >= 0)
 			dlg.colors.SetCursor(cursor);
 	};

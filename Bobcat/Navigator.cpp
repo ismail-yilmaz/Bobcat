@@ -90,12 +90,14 @@ Navigator::Navigator(StackCtrl& sctrl)
 	Hide();
 	AddFrame(sb);
 	sb.AutoHide();
-	sb.WhenScroll = [=] { SyncItemLayout(); Refresh(); };
+	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
 	CtrlLayout(searchbar);
 	searchbar.search.WantFocus();
 	AddFrame(searchbar.Height(Zy(28)));
 	searchbar.search.NullText(t_("Search terminal (Ctrl+S)..."));
-	searchbar.search.WhenAction = [=] { SyncItemLayout(); Refresh();  };
+	searchbar.search << [this] { SyncItemLayout(); Refresh();  };
+	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
+	searchbar.close  << [this] { WhenClose(); };
 }
 
 Navigator::~Navigator()

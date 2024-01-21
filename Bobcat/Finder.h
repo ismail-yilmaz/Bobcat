@@ -71,7 +71,6 @@ private:
     int           index = 0;
     Terminal&     ctx;
     Value         data;
-    ToolButton    close;
     SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;

@@ -5,9 +5,7 @@
 #define _Bobcat_Palette_h_
 
 struct Palette : Moveable<Palette> {
-    enum {
-        MAX_COLOR_COUNT = TerminalCtrl::MAX_COLOR_COUNT + 4
-    };
+    enum {  MAX_COLOR_COUNT = TerminalCtrl::MAX_COLOR_COUNT + 4 };
     Palette();
     Palette(const String& s) : Palette() { name = s; }
     void        Jsonize(JsonIO& jio);
@@ -21,7 +19,6 @@ public:
     void        Add();
     void        Edit();
     void        Remove();
-    void        Reset();
     void        Sync();
     void        MakeActive();
     void        ContextMenu(Bar& bar);

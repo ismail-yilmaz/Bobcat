@@ -22,7 +22,6 @@ Finder::Finder(Terminal& t)
 , searchtype(Search::CaseSensitive)
 {
 	CtrlLayout(*this);
-	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
 	next.Image(Images::Next());
 	prev.Image(Images::Prev());
@@ -336,14 +335,14 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 					if(pt.col <= col && col < pt.col + pt.length) {
 						if(pt.row == p.row && pt.col == p.col) {
 							c.Normal();
-							c.Ink(ctx.HighlightCursorInk);
-							c.Paper(ctx.HighlightCursorPaper);
+							c.Ink(ctx.highlight[1]);
+							c.Paper(ctx.highlight[3]);
 						}
 						else
 						if(~showall) {
 							c.Normal();
-							c.Ink(ctx.HighlightInk);
-							c.Paper(ctx.HighlightPaper);
+							c.Ink(ctx.highlight[0]);
+							c.Paper(ctx.highlight[2]);
 						}
 					}
 					col++;

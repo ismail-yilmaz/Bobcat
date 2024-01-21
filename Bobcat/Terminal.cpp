@@ -22,10 +22,12 @@ Terminal::Terminal(Bobcat& ctx_)
 , filter(false)
 , finder(*this)
 , titlebar(*this)
-, HighlightInk(Yellow())
-, HighlightCursorInk(SColorHighlightText)
-, HighlightPaper(LtRed())
-, HighlightCursorPaper(SColorHighlight)
+, highlight {
+	Yellow(),
+	SColorHighlightText,
+	LtRed(),
+	SColorHighlight
+	}
 {
     titlebar.newterm << [this] { ctx.AddTerminal(ctx.settings.activeprofile); };
     titlebar.close   << [this] { Stop(); };
@@ -198,15 +200,15 @@ Terminal& Terminal::SetProfile(const Profile& p)
 
 Terminal& Terminal::SetPalette(const Palette& p)
 {
-	for(int i = 0; i< TerminalCtrl::MAX_COLOR_COUNT; i++)
-		SetColor(i, p.table[i]);
-	HighlightInk         = p.table[TerminalCtrl::MAX_COLOR_COUNT];
-	HighlightCursorInk   = p.table[TerminalCtrl::MAX_COLOR_COUNT + 1];
-	HighlightPaper       = p.table[TerminalCtrl::MAX_COLOR_COUNT + 2];
-	HighlightCursorPaper = p.table[TerminalCtrl::MAX_COLOR_COUNT + 3];
+	int i = 0;
+	for(int i = 0, j = 0; i < Palette::MAX_COLOR_COUNT; i++) {
+		if(i < TerminalCtrl::MAX_COLOR_COUNT)
+			SetColor(i, p.table[i]);
+		else
+			highlight[j++] = p.table[i];
+	}
 	return *this;
 }
-
 
 Terminal& Terminal::SetLocale(const String& s)
 {
