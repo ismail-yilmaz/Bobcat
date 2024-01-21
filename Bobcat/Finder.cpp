@@ -142,10 +142,10 @@ void Finder::End()
 
 void Finder::SetSearchMode(const String& mode)
 {
-	searchtype = decode( mode,
+	searchtype = decode(mode,
 		"insensitive", Search::CaseInsensitive,
 		"regex", Search::Regex,
-	     Search::CaseSensitive);
+		Search::CaseSensitive);
 	Sync();
 }
 

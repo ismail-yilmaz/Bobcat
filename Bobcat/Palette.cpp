@@ -172,18 +172,20 @@ void Palettes::SetPalette()
 
 	Palette p = list.Get(list.GetCursor(), 1).To<Palette>();
 	
-	auto ResetColors = [&](Palette q) {
+	auto LoadColors = [&](Palette q)
+	{
 		int cursor = dlg.colors.GetCursor();
 		dlg.colors.Clear();
 		const auto& lst = GetColorList();
-		for(int i = 0; i < lst.GetCount(); i++)
-			dlg.colors.Add(lst[i].c, lst[i].a);
+		for(int i = 0; i < Palette::MAX_COLOR_COUNT; i++)
+			dlg.colors.Add(lst[i].c, p.table[i]);
 		if(cursor >= 0)
 			dlg.colors.SetCursor(cursor);
 	};
 
-	dlg.reset << [&] { ResetColors(Palette()); };
-	ResetColors(p);
+	dlg.reset << [&] { LoadColors(Palette()); };
+
+	LoadColors(p);
 
 	if(dlg.Title(Format(tt_("Color Profile: %"), p.name)).ExecuteOK()) {
 		for(int i = 0; i < dlg.colors.GetCount(); i++)
