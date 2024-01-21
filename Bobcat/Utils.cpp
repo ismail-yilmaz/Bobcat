@@ -222,7 +222,7 @@ String GetBuildInfo()
 #ifdef GUI_GTK
 	h << " (Gtk)";
 #endif
-	h << '\n';;
+	h << '\n';
 #ifdef bmTIME
 	h << "Compiled: " << bmTIME;
 #endif

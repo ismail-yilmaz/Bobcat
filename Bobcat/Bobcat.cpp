@@ -400,10 +400,10 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.AddKey(AK_MAXIMIZE,   [this] { Maximize(!window.IsMaximized()); });
 	menu.AddKey(AK_MINIMIZE,   [this] { Minimize(!window.IsMinimized()); });
 	menu.Separator();
-	menu.Add(enable, AK_PREV,  [this] { stack.Prev();    SyncTitle(); });
-	menu.Add(enable, AK_NEXT,  [this] { stack.Next();    SyncTitle(); });
-	menu.Add(enable, AK_BEGIN, [this] { stack.GoBegin(); SyncTitle(); });
-	menu.Add(enable, AK_END,   [this] { stack.GoEnd();   SyncTitle(); });
+	menu.Add(enable, AK_PREV, Images::Prev(),  [this] { stack.Prev();    SyncTitle(); });
+	menu.Add(enable, AK_NEXT, Images::Next(),  [this] { stack.Next();    SyncTitle(); });
+	menu.Add(enable, AK_BEGIN,Images::Begin(), [this] { stack.GoBegin(); SyncTitle(); });
+	menu.Add(enable, AK_END,  Images::End(),   [this] { stack.GoEnd();   SyncTitle(); });
 
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->ViewMenu(menu);
@@ -458,7 +458,7 @@ void Bobcat::TermMenu(Bar& menu)
 
 void Bobcat::ListMenu(Bar& menu)
 {
-	menu.Add(AK_NAVIGATOR, [this, &menu] { ToggleNavigator(); });
+	menu.Add(AK_NAVIGATOR, Images::Navigator(), [this, &menu] { ToggleNavigator(); });
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = (Terminal &) stack[i];
