@@ -53,6 +53,7 @@ struct Profile : Moveable<Profile> {
     bool        filterctrl;
     String      searchmode;
     bool        searchshowall;
+    bool        sizehint;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);

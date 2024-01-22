@@ -189,6 +189,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	PCStyleFunctionKeys(p.functionkeystyle == "pc");
 	DelayedRefresh(p.delayedrefresh);
 	LazyResize(p.lazyresize);
+	ShowSizeHint(p.sizehint);
 	SetLocale(p.encoding);
 	SetPadding(Size(0, p.linespacing));
 	SetFont(p.font);
