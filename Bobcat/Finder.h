@@ -80,6 +80,7 @@ private:
     SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;
+    FrameRight<DisplayCtrl> counter;
 };
 
 #endif

@@ -17,7 +17,7 @@ struct Terminal : TerminalCtrl {
     void        MouseLeave() override;
     void        MouseMove(Point pt, dword keyflags) override;
     void        LeftDouble(Point pt, dword keyflags) override;
-    Image       CursorImage(Point p, dword keyflags) override;
+    Image       CursorImage(Point pt, dword keyflags) override;
 
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);

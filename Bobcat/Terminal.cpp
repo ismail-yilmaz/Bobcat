@@ -237,7 +237,7 @@ void Terminal::MouseMove(Point pt, dword keyflags)
 
 void Terminal::LeftDouble(Point pt, dword keyflags)
 {
-	if((keyflags & K_CTRL)
+	if((keyflags & K_CTRL) == K_CTRL
 	&& !IsMouseOverExplicitHyperlink()
 	&&  IsMouseOverImplicitHyperlink()) {
 		OpenLink();
@@ -246,11 +246,11 @@ void Terminal::LeftDouble(Point pt, dword keyflags)
 		TerminalCtrl::LeftDouble(pt, keyflags);
 }
 
-Image Terminal::CursorImage(Point p, dword keyflags)
+Image Terminal::CursorImage(Point pt, dword keyflags)
 {
 	if(IsMouseOverImplicitHyperlink())
 		return Image::Hand();
-	return TerminalCtrl::CursorImage(p, keyflags);
+	return TerminalCtrl::CursorImage(pt, keyflags);
 }
 
 Terminal& Terminal::SetPalette(const Palette& p)

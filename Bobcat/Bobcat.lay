@@ -146,12 +146,11 @@ LAYOUT(NavigatorLayout, 593, 30)
 END_LAYOUT
 
 LAYOUT(FinderLayout, 526, 24)
-	ITEM(ToolButton, prev, LeftPosZ(186, 19).TopPosZ(3, 18))
-	ITEM(ToolButton, next, LeftPosZ(206, 19).TopPosZ(3, 18))
-	ITEM(ToolButton, begin, LeftPosZ(226, 19).TopPosZ(3, 18))
-	ITEM(ToolButton, end, LeftPosZ(246, 19).TopPosZ(3, 18))
-	ITEM(Upp::StaticText, status, SetText(t_("Nothing to search...")).LeftPosZ(353, 139).TopPosZ(3, 18))
-	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).LeftPosZ(270, 56).TopPosZ(4, 16))
+	ITEM(ToolButton, prev, RightPosZ(175, 19).TopPosZ(3, 18))
+	ITEM(ToolButton, next, RightPosZ(155, 19).TopPosZ(3, 18))
+	ITEM(ToolButton, begin, RightPosZ(135, 19).TopPosZ(3, 18))
+	ITEM(ToolButton, end, RightPosZ(115, 19).TopPosZ(3, 18))
+	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).RightPosZ(23, 87).TopPosZ(4, 16))
 	ITEM(ToolButton, close, RightPosZ(4, 12).VCenterPosZ(12, 0))
 END_LAYOUT
 

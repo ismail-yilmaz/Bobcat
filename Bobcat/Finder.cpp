@@ -16,6 +16,12 @@ namespace Upp {
 
 using namespace FinderKeys;
 
+static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
+{
+	int cx = max(GetStdFont().GetMonoWidth() * 2, GetTextSize(txt, GetStdFont()).cx);
+	f.Width(cx) <<= AttrText(txt).Bold().Ink(SColorDisabled);
+}
+
 Finder::Finder(Terminal& t)
 : ctx(t)
 , index(0)
@@ -35,16 +41,19 @@ Finder::Finder(Terminal& t)
 	showall << THISFN(Sync);
 	ctx.WhenSearch << THISFN(OnSearch);
 	ctx.WhenHighlight << THISFN(OnHighlight);
-	Add(text.LeftPosZ(5, 180).TopPosZ(3, 18));
+	Add(text.HSizePosZ(4, 200).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(mode);
+	text.AddFrame(counter);
 	text.AddFrame(menu);
 	text.WhenBar << THISFN(StdKeys);
 	text.WhenAction << THISFN(Search);
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
+	counter.SetDisplay(StdCenterDisplay());
 	mode.SetDisplay(StdCenterDisplay());
-	mode <<= AttrText("C").Bold().Ink(SColorDisabled);
+	sWriteToDisplay(counter, "0/0");
+	sWriteToDisplay(mode, "C");
 	Sync();
 }
 
@@ -206,16 +215,14 @@ void Finder::Sync()
 	int cnt = pos.GetCount();
 	index = clamp(index, 0, max(0, cnt - 1));
 	if(text.GetLength() > 0)
-		status = Format(t_("Found %d/%d"), cnt ? index +  1 : 0 , cnt);
+		sWriteToDisplay(counter, Format("%d/%d", cnt ? index + 1 : 0, cnt));
 	else
-		status = "";
+		sWriteToDisplay(counter, "0/0");
 	prev.Enable(cnt > 0 && index > 0);
 	next.Enable(cnt > 0 && index < cnt - 1);
 	begin.Enable(cnt > 0 && index > 0);
 	end.Enable(cnt > 0 && index < cnt - 1);
-	AttrText txt;
-	txt = decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C");
-	mode <<= txt.Bold().Ink(SColorDisabled);
+	sWriteToDisplay(mode, decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C"));
 	ctx.Refresh();
 }
 
