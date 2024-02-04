@@ -5,11 +5,19 @@
 #define _Bobcat_Terminal_h_
 
 struct Terminal : TerminalCtrl {
+    typedef Terminal CLASSNAME;
+    
     Terminal(Bobcat& ctx);
 
     void        PostParse() override;
     void        SetData(const Value& data) override;
     Value       GetData() const override;
+
+    void        MouseEnter(Point pt, dword keyflags) override;
+    void        MouseLeave() override;
+    void        MouseMove(Point pt, dword keyflags) override;
+    void        LeftDouble(Point pt, dword keyflags) override;
+    Image       CursorImage(Point p, dword keyflags) override;
 
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);
@@ -17,12 +25,12 @@ struct Terminal : TerminalCtrl {
     int         Do();
     void        Reset();
     bool        CanExit() const;
-
-    void        Search();
     
     hash_t      GetHashValue() const;
     
+    void        Update();
     Terminal&   Sync();
+    void        SyncHighlight();
     
     Terminal&   SetProfile(const Profile& p);
     Terminal&   SetPalette(const Palette& p);
@@ -46,8 +54,17 @@ struct Terminal : TerminalCtrl {
     void        CopyImage();
     void        OpenImage();
 
+    String      GetLink();
     void        CopyLink();
     void        OpenLink();
+    void        OnHighlightLinks(VectorMap<int, VTLine>& m);
+
+    void        Hyperlinks(bool b);
+    bool        HasHyperlinks() const;
+    bool        HasLinkifier() const;
+    bool        IsMouseOverExplicitHyperlink();
+    bool        IsMouseOverImplicitHyperlink();
+    bool        IsMouseOverLink();
     
     void        EmulationMenu(Bar& menu);
     void        FileMenu(Bar& menu);
@@ -58,16 +75,18 @@ struct Terminal : TerminalCtrl {
     int         GetExitCode()                   { return pty.GetExitCode();     }
     String      GetExitMessage()                { return pty.GetExitMessage();  }
     
-    Bobcat&     ctx;
-    PtyProcess  pty;
-    bool        bell:1;
-    bool        keep:1;
-    bool        filter:1;
-    String      profilename;
-    Value       data;
-    Finder      finder;
-    Color       highlight[4];
-
+    Bobcat&      ctx;
+    PtyProcess   pty;
+    bool         bell:1;
+    bool         keep:1;
+    bool         filter:1;
+    String       profilename;
+    Value        data;
+    Finder       finder;
+    Linkifier    linkifier;
+    Color        highlight[4];
+    TimeCallback timer;
+   
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;

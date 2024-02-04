@@ -54,9 +54,9 @@ private:
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
     
     struct Pos : Moveable<Pos> {
-        int row = 0;
-        int col = 0;
-        int length = 0;
+        int     row = 0;
+        int     col = 0;
+        int     length = 0;
     };
     
     Vector<Pos> pos;
@@ -80,8 +80,6 @@ private:
     SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;
-    TimeCallback  timer;
 };
-
 
 #endif

@@ -33,11 +33,14 @@ Finder::Finder(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
+	ctx.WhenSearch << THISFN(OnSearch);
+	ctx.WhenHighlight << THISFN(OnHighlight);
 	Add(text.LeftPosZ(5, 180).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(mode);
 	text.AddFrame(menu);
 	text.WhenBar << THISFN(StdKeys);
+	text.WhenAction << THISFN(Search);
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
 	mode.SetDisplay(StdCenterDisplay());
@@ -47,8 +50,6 @@ Finder::Finder(Terminal& t)
 
 Finder::~Finder()
 {
-	ctx.WhenSearch = Null;
-	ctx.WhenHighlight = Null;
 }
 
 void Finder::SetData(const Value& v)
@@ -72,13 +73,10 @@ void Finder::FrameLayout(Rect& r)
 void Finder::Show()
 {
 	if(!IsChild()) {
-		timer.Kill();
 		bool b = ctx.HasSizeHint();
 		ctx.HideSizeHint();
 		ctx.AddFrame(Height(StdFont().GetCy() + 16));
-		ctx.WhenSearch << THISFN(OnSearch);
-		ctx.WhenHighlight << THISFN(OnHighlight);
-		text.WhenAction << THISFN(Search);
+		ctx.SyncHighlight();
 		ctx.ShowSizeHint(b);
 	}
 	text.SetFocus();
@@ -87,13 +85,10 @@ void Finder::Show()
 void Finder::Hide()
 {
 	if(IsChild()) {
-		timer.Kill();
 		bool b = ctx.HasSizeHint();
 		ctx.HideSizeHint();
 		ctx.RemoveFrame(*this);
-		ctx.WhenSearch = Null;
-		ctx.WhenHighlight = Null;
-		text.WhenAction = Null;
+		ctx.SyncHighlight();
 		ctx.RefreshLayout();
 		ctx.ShowSizeHint(b);
 	}
@@ -233,7 +228,8 @@ void Finder::Search()
 
 void Finder::Update()
 {
-	timer.KillSet(20, THISFN(Search));
+	if(IsChild())
+		Search();
 }
 
 bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -343,7 +339,7 @@ bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!pos.GetCount() || index < 0)
+	if(!IsChild() || !pos.GetCount() || index < 0)
 		return;
 
 	Pos p = pos[index];

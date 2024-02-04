@@ -44,6 +44,11 @@ const Display& NormalProfileNameDisplay()  { return Single<NormalProfileNameDisp
 const Display& FontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
 const Display& GuiFontProfileDisplay()     { return Single<FontProfileDisplayCls>(); }
 
+VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()
+{
+	return Single<VectorMap<String, Vector<PatternInfo>>>();
+}
+
 Profile::Profile()
 : name(String::GetVoid())
 , bell(false)
@@ -57,7 +62,7 @@ Profile::Profile()
 , lockcursor(false)
 , blinkcursor(true)
 , inlineimages(false)
-, hyperlinks(false)
+, hyperlinks("disabled")
 , windowactions(false)
 , windowreports(true)
 , clipboardread(false)
@@ -124,7 +129,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("CursorBlink",			 blinkcursor)
 	("CursorLocked",		 lockcursor)
 	("InlineImages",         inlineimages)
-	("Hyperlinks",			 hyperlinks)
+	("Hyperlinks",           hyperlinks)
 	("WindowActions",		 windowactions)
 	("WindowReports",		 windowreports)
 	("ClipboardReadAccess",  clipboardread)
@@ -149,10 +154,42 @@ void Profile::Jsonize(JsonIO& jio)
 	("FilterCtrlBytes",      filterctrl)
 	("OnExit",               onexit)
 	("Palette",              palette);
+	
+	if(jio.IsLoading() && !IsNull(name)) {
+		auto& m = GetHyperlinkPatterns();
+		INTERLOCKED
+		{
+			if(int i = m.FindAdd(name); i >= 0) {
+				m[i].Clear();
+				jio("Linkifier", m[i]);
+			}
+		}
+	}
+	else
+	if(jio.IsStoring() && !IsNull(name)) {
+		auto& m = GetHyperlinkPatterns();
+		INTERLOCKED
+		{
+			if(int i = m.Find(name); i >= 0 && m[i].GetCount()) {
+				jio("Linkifier", m[i]);
+			}
+		}
+	}
 }
 
 Profiles::Setup::Setup()
 {
+	ONCELOCK
+	{
+		CtrlImg::Set(CtrlImg::I_cut, Images::Cut());
+		CtrlImg::Set(CtrlImg::I_copy, Images::Copy());
+		CtrlImg::Set(CtrlImg::I_paste, Images::Paste());
+		CtrlImg::Set(CtrlImg::I_undo, Images::Undo());
+		CtrlImg::Set(CtrlImg::I_undo, Images::Redo());
+		CtrlImg::Set(CtrlImg::I_remove, Images::Delete());
+		CtrlImg::Set(CtrlImg::I_select_all, Images::SelectAll());
+	}
+	
 	for(int i = 0; i < CharsetCount(); i++) {
 		String cset = CharsetName(i);
 		if(!cset.StartsWith("dec-"))
@@ -168,6 +205,7 @@ Profiles::Setup::Setup()
 	tabs.Add(general.SizePos(), t_("Environment"));
 	tabs.Add(visuals.SizePos(), t_("Appearance"));
 	tabs.Add(emulation.SizePos(), t_("Emulation"));
+	tabs.Add(linkifier.SizePos(), t_("Linkifier"));
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	visuals.cursorstyle.Add("block", t_("Block"));
@@ -197,12 +235,14 @@ Profiles::Setup::Setup()
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : emulation) c.WhenAction << [this] { Sync(); };
-
+	
 	Sync();
 }
 
 void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
 {
+	String dummy = name; // Don't modify the current profile name in linkifier.
+	
     m(general.cmd,              p.command)
      (general.dir,              p.address)
      (general.env,              p.env)
@@ -245,7 +285,8 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.filter,         p.filterctrl)
      (emulation.overridetracking, p.overridetracking)
      (emulation.searchmode,     p.searchmode)
-     (emulation.showall, p.searchshowall);
+     (emulation.showall, p.searchshowall)
+     (linkifier,                dummy);
 }
 
 void Profiles::Setup::SetData(const Value& data)
@@ -394,6 +435,7 @@ Profile LoadProfile(const String& name)
 			Value q = ParseJSON(LoadFile(f.GetPath()));
 			JsonIO jio(q);
 			p.Jsonize(jio);
+			p.name = Nvl(p.name, name);
 		}
 		catch(const JsonizeError& e)
 		{
@@ -421,9 +463,12 @@ int LoadProfiles(VectorMap<String, Profile>& v)
 	for(const String& s : GetProfileFilePaths()) {
 		try
 		{
+			String name = GetFileTitle(s);
 			Value q = ParseJSON(LoadFile(s));
 			JsonIO jio(q);
-			v.GetAdd(GetFileTitle(s)).Jsonize(jio);
+			Profile& p = v.GetAdd(name);
+			p.Jsonize(jio);
+			p.name = Nvl(p.name, name);
 		}
 		catch(const JsonizeError& e)
 		{

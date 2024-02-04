@@ -23,15 +23,16 @@ namespace Upp {
 #define IMAGECLASS Images
 #include <Draw/iml_header.h>
 
+// Forward declaration
+struct Bobcat;
+struct Terminal;
+
 #include "Palette.h"
 
 #define LAYOUTFILE <Bobcat/Bobcat.lay>
 #include <CtrlCore/lay.h>
 
-// Forward declaration
-struct Bobcat;
-struct Terminal;
-
+#include "Linkifier.h"
 #include "Profile.h"
 #include "Finder.h"
 #include "Terminal.h"

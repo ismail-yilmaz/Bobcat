@@ -21,6 +21,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , keep(false)
 , filter(false)
 , finder(*this)
+, linkifier(*this)
 , titlebar(*this)
 , highlight {
 	Yellow(),
@@ -46,6 +47,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
     WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
+	WhenHighlight << THISFN(OnHighlightLinks);
 }
 
 void Terminal::SetData(const Value& v)
@@ -61,15 +63,14 @@ Value Terminal::GetData() const
 void Terminal::PostParse()
 {
 	TerminalCtrl::PostParse();
-	if(HasFinder()) // Keep the finder data updated.
-		finder.Update();
+	if(HasFinder() || linkifier.IsEnabled())
+		timer.KillSet(20, THISFN(Update));
 }
 
 bool Terminal::Start(const Profile& p)
 {
 	SetProfile(p);
 	SetPalette(LoadPalette(p.palette));
-	
 	#ifdef PLATFORM_POSIX
 	pty.WhenAttrs = [=, &p](termios& t) -> bool
 	{
@@ -99,7 +100,6 @@ bool Terminal::Start(const Profile& p)
 	}
 	
 	if(pty.Start(p.command, vv, p.address)) {
-		profilename = p.name;
 		MakeTitle(profilename);
 		ctx.stack.Add(*this);
 		return true;
@@ -139,13 +139,23 @@ bool Terminal::CanExit() const
 	return !keep;
 }
 
-void Terminal::Search()
-{
-}
-
 hash_t Terminal::GetHashValue() const
 {
-	return profilename.GetHashValue();;
+	return profilename.GetHashValue();
+}
+
+void Terminal::Update()
+{
+	SyncHighlight();
+	linkifier.Update();
+	finder.Update();
+	if(!HasFinder()) // Finder, if visible, refreshes the display.
+		Refresh();
+}
+
+void Terminal::SyncHighlight()
+{
+	EnableHighlight(HasFinder() || HasLinkifier());
 }
 
 Terminal& Terminal::Sync()
@@ -157,15 +167,17 @@ Terminal& Terminal::Sync()
 	ShowTitleBar(ctx.settings.showtitle);
 	titlebar <<= ctx.settings.titlealignment;
 	finder   <<= ctx.settings.finderalignment;
+	Update();
 	return *this;
 }
 
+
 Terminal& Terminal::SetProfile(const Profile& p)
 {
+	profilename = p.name;
 	bell = p.bell;
 	filter = p.filterctrl;
 	keep = p.onexit == "keep";
-	Hyperlinks(p.hyperlinks);
 	WindowActions(p.windowactions);
 	WindowReports(p.windowreports);
 	History(p.history);
@@ -196,9 +208,49 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	AlternateScroll(p.alternatescroll);
 	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
+	Hyperlinks(p.hyperlinks);
 	finder.SetSearchMode(p.searchmode);
 	finder.showall = p.searchshowall;
 	return *this;
+}
+
+void Terminal::MouseEnter(Point pt, dword keyflags)
+{
+	linkifier.UpdatePos();
+	Refresh();
+}
+
+void Terminal::MouseLeave()
+{
+	linkifier.ClearPos();
+	Refresh();
+}
+
+void Terminal::MouseMove(Point pt, dword keyflags)
+{
+	if(linkifier.IsEnabled()) {
+		linkifier.Sync();
+		Refresh();
+	}
+	TerminalCtrl::MouseMove(pt, keyflags);
+}
+
+void Terminal::LeftDouble(Point pt, dword keyflags)
+{
+	if((keyflags & K_CTRL)
+	&& !IsMouseOverExplicitHyperlink()
+	&&  IsMouseOverImplicitHyperlink()) {
+		OpenLink();
+	}
+	else
+		TerminalCtrl::LeftDouble(pt, keyflags);
+}
+
+Image Terminal::CursorImage(Point p, dword keyflags)
+{
+	if(IsMouseOverImplicitHyperlink())
+		return Image::Hand();
+	return TerminalCtrl::CursorImage(p, keyflags);
 }
 
 Terminal& Terminal::SetPalette(const Palette& p)
@@ -323,16 +375,100 @@ void Terminal::OpenImage()
 		WhenImage(PNGEncoder().SaveString(img));
 }
 
+bool Terminal::HasLinkifier() const
+{
+	if(!linkifier.IsEnabled())
+		return false;
+	const auto& m = GetHyperlinkPatterns();
+	int i = m.Find(profilename);
+	return i >= 0 && m[i].GetCount();
+}
+
+void Terminal::Hyperlinks(bool b)
+{
+	TerminalCtrl::Hyperlinks(b);
+	linkifier.Enable(b);
+	Refresh();
+}
+
+bool Terminal::HasHyperlinks() const
+{
+	return TerminalCtrl::HasHyperlinks() || HasLinkifier();
+}
+
+bool Terminal::IsMouseOverExplicitHyperlink()
+{
+	return IsMouseOverHyperlink();
+}
+
+bool Terminal::IsMouseOverImplicitHyperlink()
+{
+	return linkifier.IsCursor();
+}
+
+bool Terminal::IsMouseOverLink()
+{
+	return IsMouseOverExplicitHyperlink() || IsMouseOverImplicitHyperlink();
+}
+
+String Terminal::GetLink()
+{
+	if(IsMouseOverExplicitHyperlink())
+		return GetHyperlinkUri();
+	if(IsMouseOverImplicitHyperlink())
+		return linkifier[linkifier.GetCursor()].url;
+	return Null;
+}
+
 void Terminal::CopyLink()
 {
-	if(String uri = GetHyperlinkUri(); !IsNull(uri))
+	if(String uri = GetLink(); !IsNull(uri))
 		Copy(uri.ToWString());
+	linkifier.ClearCursor();
 }
 
 void Terminal::OpenLink()
 {
-	if(String uri = GetHyperlinkUri(); !IsNull(uri))
+	if(String uri = GetLink(); !IsNull(uri))
 		WhenLink(uri);
+	linkifier.ClearCursor();
+}
+
+void Terminal::OnHighlightLinks(VectorMap<int, VTLine>& m)
+{
+	if(!HasLinkifier())
+		return;
+	
+	WString text;
+	for(const VTLine& ss : m) // Unwrap the line...
+		text << ss.ToWString();
+
+	int offset = m.GetKey(0);
+
+	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(profilename))
+		linkifier.Scan(offset, text, pi.pattern);
+
+	for(const LinkInfo& pt : linkifier)
+		for(int row = 0, col = 0; row < m.GetCount(); row++) {
+			if(m.GetKey(row) != pt.pos.y)
+				continue;
+			for(VTLine& l : m) {
+				for(VTCell& c : l) {
+					if(!c.IsHyperlink() && pt.pos.x <= col && col < pt.pos.x + pt.length) {     // First, check if the cell is already a hyperlink.
+						int q = linkifier.GetPos();
+						if(int ii = PagePosToIndex(pt.pos); q  >= ii && q < ii + pt.length) {
+							c.Hyperlink();
+							c.data = 0;
+						}
+						else {
+							c.Hyperlink();
+							c.data = (dword) -1;
+						}
+					}
+					col++;
+				}
+			}
+		}
 }
 
 void Terminal::FileMenu(Bar& menu)
@@ -345,13 +481,13 @@ void Terminal::EditMenu(Bar& menu)
 
 	if(IsMouseOverImage()) {
 		menu.Separator();
-		menu.Add(AK_COPYIMAGE, Images::Copy(), [this] { CopyImage(); });
+		menu.Add(AK_COPYIMAGE, Images::Copy(),  [this] { CopyImage(); });
 		menu.Add(AK_OPENIMAGE, CtrlImg::open(), [this] { OpenImage(); });
 	}
 	else
-	if(IsMouseOverHyperlink()) {
+	if(IsMouseOverLink()) {
 		menu.Separator();
-		menu.Add(AK_COPYLINK, Images::Copy(), [this] { CopyLink(); });
+		menu.Add(AK_COPYLINK, Images::Copy(),  [this] { CopyLink(); });
 		menu.Add(AK_OPENLINK, CtrlImg::open(), [this] { OpenLink(); });
 	}
 	else {

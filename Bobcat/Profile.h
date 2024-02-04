@@ -86,6 +86,7 @@ private:
         mutable         WithGeneralProfileLayout<ParentCtrl>   general;
         mutable         WithVisualProfileLayout<ParentCtrl>    visuals;
         mutable         WithEmulationProfileLayout<ParentCtrl> emulation;
+        mutable         LinkifierSetup                         linkifier;
         mutable         Palettes                               palettes;
     };
     
@@ -96,7 +97,16 @@ public:
     Setup       setup;
 };
 
+struct PatternInfo : Moveable<PatternInfo> {
+    String      cmd;
+    String      pattern;
+    void        Jsonize(JsonIO& jio) { jio("Command", cmd)("Pattern", pattern); }
+    String      ToString() const     { return "Command: " << cmd << ", Pattern: " << pattern; }
+};
+
 // Global functions
+
+VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns();
 
 dword          GetModifierKey(String s);
 String         GetModifierKeyDesc(dword keyflags);
@@ -121,5 +131,6 @@ const Display& FontProfileDisplay();
 inline bool operator==(const Profile& p, const Profile& q) { return p.name == q.name; }
 inline bool operator==(const Profile& p, const String& s)  { return p.name == s; }
 inline bool operator==(const String& s, const Profile& p)  { return p == s; }
+
 
 #endif
