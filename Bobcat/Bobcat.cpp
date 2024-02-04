@@ -505,14 +505,17 @@ void Bobcat::ScreenShot()
 void Bobcat::About()
 {
 	TabDlg dlg;
-	WithAboutLayout<ParentCtrl> about, licenses;
+	WithAboutLayout<ParentCtrl> about, contributors, licenses;
 	CtrlLayout(about);
+	CtrlLayout(contributors);
 	CtrlLayout(licenses);
 	dlg.Add(about, tt_("About"));
+	dlg.Add(contributors, tt_("Contributors"));
 	dlg.Add(licenses, tt_("Licenses"));
 	String atxt =  GetTopic("topic://Bobcat/docs/about_en-us");
 	atxt.Replace("$(BUILD)", DeQtf(GetBuildInfo()));
 	about.txt.SetQTF(atxt);
+	contributors.txt.SetQTF(GetTopic("topic://Bobcat/docs/contributors_en-us"));
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
 	licenses.txt.SetZoom(Zoom(1200, 1800));
 	dlg.OK().Open(&window);
