@@ -6,7 +6,7 @@
 
 struct Terminal : TerminalCtrl {
     typedef Terminal CLASSNAME;
-    
+
     Terminal(Bobcat& ctx);
 
     void        PostParse() override;
@@ -19,12 +19,17 @@ struct Terminal : TerminalCtrl {
     void        LeftDouble(Point pt, dword keyflags) override;
     Image       CursorImage(Point pt, dword keyflags) override;
 
+    bool        StartPty(const Profile& profile);
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);
     void        Stop();
     int         Do();
+    void        Restart();
     void        Reset();
-    bool        CanExit() const;
+    
+    bool        ShouldExit() const;
+    bool        ShouldKeep() const;
+    bool        ShouldRestart() const;
     
     hash_t      GetHashValue() const;
     
@@ -34,6 +39,7 @@ struct Terminal : TerminalCtrl {
     
     Terminal&   SetProfile(const Profile& p);
     Terminal&   SetPalette(const Palette& p);
+    Terminal&   SetExitMode(const String& s);
     Terminal&   SetLocale(const String& s);
     Terminal&   SetEraseKey(const String& s);
     Terminal&   SetCursorStyle(const String& s);
@@ -74,12 +80,18 @@ struct Terminal : TerminalCtrl {
 
     int         GetExitCode()                   { return pty.GetExitCode();     }
     String      GetExitMessage()                { return pty.GetExitMessage();  }
-    
+ 
+    enum class ExitMode {
+        Keep,
+        Restart,
+        Exit
+    };
+
     Bobcat&      ctx;
     PtyProcess   pty;
     bool         bell:1;
-    bool         keep:1;
     bool         filter:1;
+    ExitMode     exitmode;
     String       profilename;
     Value        data;
     Finder       finder;

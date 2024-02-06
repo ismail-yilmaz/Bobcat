@@ -18,11 +18,11 @@ using namespace TermKeys;
 Terminal::Terminal(Bobcat& ctx_)
 : ctx(ctx_)
 , bell(true)
-, keep(false)
 , filter(false)
 , finder(*this)
 , linkifier(*this)
 , titlebar(*this)
+, exitmode(ExitMode::Exit)
 , highlight {
 	Yellow(),
 	SColorHighlightText,
@@ -67,10 +67,8 @@ void Terminal::PostParse()
 		timer.KillSet(20, THISFN(Update));
 }
 
-bool Terminal::Start(const Profile& p)
+bool Terminal::StartPty(const Profile& p)
 {
-	SetProfile(p);
-	SetPalette(LoadPalette(p.palette));
 	#ifdef PLATFORM_POSIX
 	pty.WhenAttrs = [=, &p](termios& t) -> bool
 	{
@@ -87,7 +85,7 @@ bool Terminal::Start(const Profile& p)
 		return true;
 	};
 	#endif
-	
+
 	VectorMap<String, String> vv;
 	if(!p.noenv)
 		vv = clone(Environment());
@@ -101,12 +99,20 @@ bool Terminal::Start(const Profile& p)
 	
 	if(pty.Start(p.command, vv, p.address)) {
 		MakeTitle(profilename);
-		ctx.stack.Add(*this);
+		if(ctx.stack.Find(*this) < 0)
+			ctx.stack.Add(*this);
 		return true;
 	}
 	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
 	ErrorOK(Format(txt, p.name, p.command, pty.GetExitCode()));
 	return false;
+}
+
+bool Terminal::Start(const Profile& p)
+{
+	SetProfile(p);
+	SetPalette(LoadPalette(p.palette));
+	return StartPty(p);
 }
 
 bool Terminal::Start(const String& profile_name)
@@ -117,7 +123,7 @@ bool Terminal::Start(const String& profile_name)
 
 void Terminal::Stop()
 {
-	keep = false;
+	exitmode = ExitMode::Exit;
 	if(!pty.IsRunning())
 		return;
 	pty.Kill();
@@ -129,7 +135,16 @@ int Terminal::Do()
 	Write(s, IsUtf8Mode());
 	if(pty.IsRunning())
 		return s.GetLength();
-	return CanExit() ? -1 : 0;
+	if(ShouldExit())
+		return  -1;
+	if(ShouldRestart())
+		Restart();
+	return 0;
+}
+
+void Terminal::Restart()
+{
+	StartPty(LoadProfile(profilename));
 }
 
 void Terminal::Reset()
@@ -137,9 +152,19 @@ void Terminal::Reset()
 	HardReset();
 }
 
-bool Terminal::CanExit() const
+bool Terminal::ShouldExit() const
 {
-	return !keep;
+	return exitmode == ExitMode::Exit;
+}
+
+bool Terminal::ShouldKeep() const
+{
+	return exitmode == ExitMode::Keep;
+}
+
+bool Terminal::ShouldRestart() const
+{
+	return exitmode == ExitMode::Restart;
 }
 
 hash_t Terminal::GetHashValue() const
@@ -180,10 +205,10 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	profilename = p.name;
 	bell = p.bell;
 	filter = p.filterctrl;
-	keep = p.onexit == "keep";
 	WindowActions(p.windowactions);
 	WindowReports(p.windowreports);
 	History(p.history);
+	SetExitMode(p.onexit);
 	SetHistorySize(p.historysize);
 	LightColors(p.lightcolors);
 	AdjustColors(p.adjustcolors);
@@ -265,6 +290,15 @@ Terminal& Terminal::SetPalette(const Palette& p)
 		else
 			highlight[j++] = p.table[i];
 	}
+	return *this;
+}
+
+Terminal& Terminal::SetExitMode(const String& s)
+{
+	exitmode = decode(s,
+		"restart", ExitMode::Restart,
+		"keep",    ExitMode::Keep,
+	 /* "exit" */  ExitMode::Exit);
 	return *this;
 }
 

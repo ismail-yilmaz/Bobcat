@@ -208,6 +208,7 @@ Profiles::Setup::Setup()
 	tabs.Add(linkifier.SizePos(), t_("Linkifier"));
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
+	general.cmdexit.Add("restart", t_("Restart command"));
 	visuals.cursorstyle.Add("block", t_("Block"));
 	visuals.cursorstyle.Add("beam", t_("Beam"));
 	visuals.cursorstyle.Add("underline", t_("Underline")).SetIndex(0);
