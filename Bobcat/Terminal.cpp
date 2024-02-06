@@ -117,6 +117,7 @@ bool Terminal::Start(const String& profile_name)
 
 void Terminal::Stop()
 {
+	keep = false;
 	if(!pty.IsRunning())
 		return;
 	pty.Kill();
@@ -126,7 +127,9 @@ int Terminal::Do()
 {
 	String s = pty.Get();
 	Write(s, IsUtf8Mode());
-	return CanExit() ? (pty.IsRunning() ? s.GetLength() : -1) : 0;
+	if(pty.IsRunning())
+		return s.GetLength();
+	return CanExit() ? -1 : 0;
 }
 
 void Terminal::Reset()
@@ -550,6 +553,7 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Separator();
 	ctx.SetupMenu(menu);
 	ctx.HelpMenu(menu);
+	menu.AddKey(AK_CLOSE, [this] { Stop(); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 
