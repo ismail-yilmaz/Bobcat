@@ -331,7 +331,8 @@ Profiles::Profiles(Bobcat& ctx)
 void Profiles::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
-	bar.Add(tt_("Add profile"),	Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(tt_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
 	bar.Add(b, tt_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
@@ -344,6 +345,23 @@ void Profiles::Add()
 	if(String s; EditTextNotNull(s, t_("New Profile"), t_("Name"))) {
 		if(!list.FindSetCursor(s)) {
 			list.Add(s, RawToValue(Profile(s)));
+			list.GoEnd();
+		}
+	}
+	Sync();
+}
+
+void Profiles::Clone()
+{
+	if(String s; EditTextNotNull(s, t_("Clone Profile"), t_("Name"))) {
+		if(!list.FindSetCursor(s)) {
+			Profile source = list.Get(1).To<Profile>();
+			Profile p(source);
+			p.name = s;
+			auto& m = GetHyperlinkPatterns();
+			int i = m.FindAdd(p.name);
+			m[i] <<= m.Get(source.name);
+			list.Add(s, RawToValue(p));
 			list.GoEnd();
 		}
 	}

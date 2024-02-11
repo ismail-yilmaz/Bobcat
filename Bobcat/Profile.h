@@ -64,6 +64,7 @@ public:
     Profiles(Bobcat& ctx);
 
     void        Add();
+    void        Clone();
     void        Remove();
     void        Sync();
     void        Activate();
