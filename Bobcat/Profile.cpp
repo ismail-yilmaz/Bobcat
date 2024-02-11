@@ -79,6 +79,7 @@ Profile::Profile()
 , delayedrefresh(true)
 , lazyresize(false)
 , sizehint(true)
+, order(0)
 , filterctrl(false)
 , font(Monospace())
 , linespacing(0)
@@ -111,6 +112,7 @@ void Profile::Jsonize(JsonIO& jio)
 	jio
 	("Name",				 name)
 	("User",				 user)
+	("Order",				 order)
 	("Command",				 command)
 	("Address",				 address)
 	("Env",					 env)
@@ -331,10 +333,13 @@ Profiles::Profiles(Bobcat& ctx)
 void Profiles::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
+	bool q = b && list.GetCursor() < list.GetCount() - 1;
 	bar.Add(tt_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
 	bar.Add(tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
 	bar.Add(tt_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
 	bar.Add(b, tt_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
+	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
 		bar.Add(b, tt_("Set as active profile"), [this]() { Activate(); }).Key(K_CTRL|K_D);
@@ -408,9 +413,7 @@ void Profiles::Activate()
 {
 	if(int i = list.GetCursor(); i >= 0) {
 		Vector<Value> v = list.GetLine(i);
-		list.Remove(i);
-		list.Insert(0, v);
-		list.SetCursor(0);
+		list.SetCursor(i);
 		SetModify();
 		Sync();
 	}
@@ -433,6 +436,7 @@ int Profiles::Load()
 		list.Clear();
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
+		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
 		list.FindSetCursor(ctx.settings.activeprofile);
 		Activate();
 	}
@@ -444,6 +448,7 @@ void Profiles::Store()
 	for(int i = 0; i < list.GetCount(); i++) {
 		String  s = list.Get(i, 0).To<String>();
 		Profile p = list.Get(i, 1).To<Profile>();
+		p.order = i;
 		try
 		{
 			JsonIO jio;

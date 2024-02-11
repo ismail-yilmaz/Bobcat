@@ -54,6 +54,7 @@ struct Profile : Moveable<Profile> {
     String      searchmode;
     bool        searchshowall;
     bool        sizehint;
+    int         order;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);
