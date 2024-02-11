@@ -65,6 +65,7 @@ public:
 
     void        Add();
     void        Clone();
+    void        Rename();
     void        Remove();
     void        Sync();
     void        Activate();
