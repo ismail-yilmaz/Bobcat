@@ -38,6 +38,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
     WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
     WhenResize  = [this]()                     { pty.SetSize(GetPageSize());      };
+    WhenScroll  = [this]()                     { Update();                        };
     WhenOutput  = [this](String s)             { pty.Write(s);                    };
     WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
     WhenLink    = [this](const String& s)      { LaunchWebBrowser(s);             };
@@ -47,7 +48,6 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
     WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
-	WhenHighlight << THISFN(OnHighlightLinks);
 }
 
 void Terminal::SetData(const Value& v)
@@ -63,8 +63,7 @@ Value Terminal::GetData() const
 void Terminal::PostParse()
 {
 	TerminalCtrl::PostParse();
-	if(HasFinder() || linkifier.IsEnabled())
-		timer.KillSet(20, THISFN(Update));
+	Update();
 }
 
 bool Terminal::StartPty(const Profile& p)
@@ -174,16 +173,25 @@ hash_t Terminal::GetHashValue() const
 
 void Terminal::Update()
 {
-	SyncHighlight();
-	linkifier.Update();
-	finder.Update();
-	if(!HasFinder()) // Finder, if visible, refreshes the display.
-		Refresh();
+	if(!IsVisible() && !HasFinder() && !linkifier.IsEnabled())
+		return;
+
+	auto cb = [this]()
+	{
+		SyncHighlight();
+		linkifier.Update();
+		finder.Update();
+		if(!HasFinder()) // Finder, if visible, refreshes the display.
+			Refresh();
+	};
+	
+	timer.KillSet(20, cb); // Safeguard against spamming.
 }
 
 void Terminal::SyncHighlight()
 {
 	EnableHighlight(HasFinder() || HasLinkifier());
+	RefreshDisplay();
 }
 
 Terminal& Terminal::Sync()
@@ -199,6 +207,11 @@ Terminal& Terminal::Sync()
 	return *this;
 }
 
+void Terminal::Layout()
+{
+	TerminalCtrl::Layout();
+	Update();
+}
 
 Terminal& Terminal::SetProfile(const Profile& p)
 {
@@ -256,10 +269,8 @@ void Terminal::MouseLeave()
 
 void Terminal::MouseMove(Point pt, dword keyflags)
 {
-	if(linkifier.IsEnabled()) {
-		linkifier.Sync();
+	if(linkifier.Sync())
 		Refresh();
-	}
 	TerminalCtrl::MouseMove(pt, keyflags);
 }
 
@@ -296,9 +307,9 @@ Terminal& Terminal::SetPalette(const Palette& p)
 Terminal& Terminal::SetExitMode(const String& s)
 {
 	exitmode = decode(s,
-		"restart", ExitMode::Restart,
-		"keep",    ExitMode::Keep,
-	 /* "exit" */  ExitMode::Exit);
+        "restart", ExitMode::Restart,
+        "keep",    ExitMode::Keep,
+     /* "exit" */  ExitMode::Exit);
 	return *this;
 }
 
@@ -425,7 +436,7 @@ void Terminal::Hyperlinks(bool b)
 {
 	TerminalCtrl::Hyperlinks(b);
 	linkifier.Enable(b);
-	Refresh();
+	Update();
 }
 
 bool Terminal::HasHyperlinks() const
@@ -453,7 +464,7 @@ String Terminal::GetLink()
 	if(IsMouseOverExplicitHyperlink())
 		return GetHyperlinkUri();
 	if(IsMouseOverImplicitHyperlink())
-		return linkifier[linkifier.GetCursor()].url;
+		return linkifier.GetCurrentLinkInfo().url;
 	return Null;
 }
 
@@ -471,41 +482,20 @@ void Terminal::OpenLink()
 	linkifier.ClearCursor();
 }
 
-void Terminal::OnHighlightLinks(VectorMap<int, VTLine>& m)
+int Terminal::GetPosAsIndex(Point pt)
 {
-	if(!HasLinkifier())
-		return;
-	
-	WString text;
-	for(const VTLine& ss : m) // Unwrap the line...
-		text << ss.ToWString();
+	if(const VTPage& p = GetPage(); pt.y >= 0 && pt.y < p.GetLineCount()) {
+		int i = 0, n = 0;
+		while(i < pt.y)
+			n += p.FetchLine(i++).GetCount();
+		return n + pt.x;
+	}
+	return -1;
+}
 
-	int offset = m.GetKey(0);
-
-	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(profilename))
-		linkifier.Scan(offset, text, pi.pattern);
-
-	for(const LinkInfo& pt : linkifier)
-		for(int row = 0, col = 0; row < m.GetCount(); row++) {
-			if(m.GetKey(row) != pt.pos.y)
-				continue;
-			for(VTLine& l : m) {
-				for(VTCell& c : l) {
-					if(!c.IsHyperlink() && pt.pos.x <= col && col < pt.pos.x + pt.length) {     // First, check if the cell is already a hyperlink.
-						int q = linkifier.GetPos();
-						if(int ii = PagePosToIndex(pt.pos); q  >= ii && q < ii + pt.length) {
-							c.Hyperlink();
-							c.data = 0;
-						}
-						else {
-							c.Hyperlink();
-							c.data = (dword) -1;
-						}
-					}
-					col++;
-				}
-			}
-		}
+int Terminal::GetMousePosAsIndex()
+{
+	return GetPosAsIndex(GetMousePagePos());
 }
 
 void Terminal::FileMenu(Bar& menu)

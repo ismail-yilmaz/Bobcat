@@ -37,6 +37,8 @@ struct Terminal : TerminalCtrl {
     Terminal&   Sync();
     void        SyncHighlight();
     
+    void        Layout() override;
+    
     Terminal&   SetProfile(const Profile& p);
     Terminal&   SetPalette(const Palette& p);
     Terminal&   SetExitMode(const String& s);
@@ -63,7 +65,6 @@ struct Terminal : TerminalCtrl {
     String      GetLink();
     void        CopyLink();
     void        OpenLink();
-    void        OnHighlightLinks(VectorMap<int, VTLine>& m);
 
     void        Hyperlinks(bool b);
     bool        HasHyperlinks() const;
@@ -71,6 +72,9 @@ struct Terminal : TerminalCtrl {
     bool        IsMouseOverExplicitHyperlink();
     bool        IsMouseOverImplicitHyperlink();
     bool        IsMouseOverLink();
+    
+    int         GetPosAsIndex(Point pt);
+    int         GetMousePosAsIndex();
     
     void        EmulationMenu(Bar& menu);
     void        FileMenu(Bar& menu);

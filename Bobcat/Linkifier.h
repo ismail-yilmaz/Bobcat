@@ -12,6 +12,8 @@ struct LinkInfo : Moveable<LinkInfo> {
 
 class Linkifier {
 public:
+    typedef Linkifier CLASSNAME;
+    
     Linkifier(Terminal& ctx);
 
     Linkifier&  Enable(bool b = true);
@@ -25,14 +27,19 @@ public:
     int         GetPos();
     void        UpdatePos();
     void        ClearPos();
-    
+
     int         GetCount() const;
     LinkInfo&   operator[](int i);
 
+    const LinkInfo& GetCurrentLinkInfo() const;
+    
     void        Clear();
-    void        Sync();
+    bool        Sync();
+
+    void        Search();
     void        Update();
-    bool        Scan(int offset, const WString& txt, const String& pattern);
+    bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
+    void        OnHighlight(VectorMap<int, VTLine>& hl);
     
     const LinkInfo* begin() const;
     LinkInfo*       begin();
@@ -49,8 +56,8 @@ private:
 
 class LinkifierSetup : public WithLinkifierProfileLayout<ParentCtrl> {
 public:
-	typedef LinkifierSetup CLASSNAME;
-	
+    typedef LinkifierSetup CLASSNAME;
+    
     LinkifierSetup();
 
     void        Sync();
@@ -63,7 +70,7 @@ public:
     Value       GetData() const override;
 
 private:
-	String      name;
+    String      name;
     ToolBar     toolbar;
     EditStringNotNull edit;
 };

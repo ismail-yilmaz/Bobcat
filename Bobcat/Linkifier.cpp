@@ -15,6 +15,8 @@ Linkifier::Linkifier(Terminal& ctx)
 , pos(-1)
 , enabled(false)
 {
+	ctx.WhenSearch << THISFN(OnSearch);
+	ctx.WhenHighlight << THISFN(OnHighlight);
 }
 
 Linkifier& Linkifier::Enable(bool b)
@@ -57,7 +59,7 @@ int Linkifier::GetPos()
 
 void Linkifier::UpdatePos()
 {
-	pos = ctx.GetMousePagePosAsIndex();
+	pos = ctx.GetMousePosAsIndex();
 }
 
 void Linkifier::ClearPos()
@@ -76,6 +78,11 @@ LinkInfo& Linkifier::operator[](int i)
 	 return links[i];
 }
 
+const LinkInfo& Linkifier::GetCurrentLinkInfo() const
+{
+	return links.Get(cursor, Single<LinkInfo>());
+}
+
 void Linkifier::Clear()
 {
 	pos    = -1;
@@ -83,39 +90,23 @@ void Linkifier::Clear()
 	links.Clear();
 }
 
-void Linkifier::Sync()
+bool Linkifier::Sync()
 {
 	cursor = -1;
 	if(!enabled || links.IsEmpty())
-		return;
-	pos = ctx.GetMousePagePosAsIndex();
+		return false;
+	pos = ctx.GetMousePosAsIndex();
 	cursor = FindMatch(links, [this](const LinkInfo& q) {
-		int i = ctx.PagePosToIndex(q.pos);
+		int i = ctx.GetPosAsIndex(q.pos);
 		return pos >= i && pos < i + q.length;
 	});
+	return true;
 }
 
 void Linkifier::Update()
 {
-	Clear();
-	Sync();
-}
-
-bool Linkifier::Scan(int offset, const WString& txt, const String& pattern)
-{
-	RegExp r(pattern);
-	String s = ToUtf8(txt);
-
-	while(r.GlobalMatch(s)) {
-		int o = r.GetOffset();
-		LinkInfo& p = links.Add();
-		p.pos.y = offset;
-		p.pos.x = Utf32Len(~s, o);
-		p.length = Utf32Len(~s + o, r.GetLength());
-		p.url = s.Mid(o, r.GetLength());
-	}
-
-	return r.GetCount() != 0;
+	if(ctx.HasLinkifier())
+		Search();
 }
 
 const LinkInfo *Linkifier::begin() const
@@ -138,6 +129,70 @@ LinkInfo *Linkifier::end()
 	 return links.end();
 }
 
+void Linkifier::Search()
+{
+	Clear();
+	ctx.Find(WString("NIL"), true); // We don't really search for a specific string.
+	Sync();
+}
+
+bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
+{
+	if(!ctx.HasLinkifier())
+		return true;
+
+	LTIMING("Linkifier::OnSearch");
+	
+	WString text;
+	for(const WString& s : m) // Unwrap the line...
+		text << s;
+
+	int offset = m.GetKey(0);
+
+	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(ctx.profilename)) {
+		RegExp r(pi.pattern);
+		String s = ToUtf8(text);
+		while(r.GlobalMatch(s)) {
+			int o = r.GetOffset();
+			LinkInfo& p = links.Add();
+			p.pos.y = offset;
+			p.pos.x = Utf32Len(~s, o);
+			p.length = Utf32Len(~s + o, r.GetLength());
+			p.url = s.Mid(o, r.GetLength());
+		}
+	}
+	return true;
+}
+  
+void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
+{
+	if(!ctx.HasLinkifier())
+		return;
+
+	LTIMING("Linkifier::OnHighlight");
+	
+	for(const LinkInfo& pt : links)
+		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
+			if(hl.GetKey(row) != pt.pos.y)
+				continue;
+			int ipos = ctx.GetPosAsIndex(pt.pos);
+			for(VTLine& l : hl) {
+				for(VTCell& c : l) {
+					if(!c.IsHyperlink() && pt.pos.x <= col && col < pt.pos.x + pt.length) {     // First, check if the cell isn't already a hyperlink.
+						if(pos >= ipos && pos < ipos + pt.length) {
+							c.Hyperlink();
+							c.data = 0;
+						}
+						else {
+							c.Hyperlink();
+							c.data = (dword) -1;
+						}
+					}
+					col++;
+				}
+			}
+		}
+}
 LinkifierSetup::LinkifierSetup()
 {
 	CtrlLayout(*this);

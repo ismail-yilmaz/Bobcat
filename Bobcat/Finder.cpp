@@ -39,8 +39,8 @@ Finder::Finder(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
-	ctx.WhenSearch << THISFN(OnSearch);
-	ctx.WhenHighlight << THISFN(OnHighlight);
+	ctx.WhenSearch = THISFN(OnSearch);
+	ctx.WhenHighlight = THISFN(OnHighlight);
 	Add(text.HSizePosZ(4, 200).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(mode);
@@ -106,7 +106,7 @@ void Finder::Hide()
 
 void Finder::Goto(int i)
 {
-	if(i >= 0) {
+	if(i >= 0 && i < pos.GetCount()) {
 		ctx.Goto(pos[i].row);;
 		Sync();
 	}
@@ -326,8 +326,11 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
-	LTIMING("OnSearch");
-		 
+	if(!ctx.HasFinder())
+		return true;
+
+	LTIMING("Finder::OnSearch");
+	
 	switch(searchtype) {
 	case Search::CaseInsensitive:
 		CaseInsensitiveSearch(m, s);
@@ -351,7 +354,7 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 
 	Pos p = pos[index];
 
-	LTIMING("OnHighlight");
+	LTIMING("Finder::OnHighlight");
 
 	for(const Pos& pt : pos)
 		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
