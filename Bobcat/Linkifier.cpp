@@ -138,7 +138,7 @@ void Linkifier::Search()
 
 bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
 {
-	if(!ctx.HasLinkifier())
+	if(!ctx.HasLinkifier() || ctx.HasFinder())
 		return true;
 
 	LTIMING("Linkifier::OnSearch");
@@ -149,9 +149,9 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 
 	int offset = m.GetKey(0);
 
+	String s = ToUtf8(text);
 	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(ctx.profilename)) {
 		RegExp r(pi.pattern);
-		String s = ToUtf8(text);
 		while(r.GlobalMatch(s)) {
 			int o = r.GetOffset();
 			LinkInfo& p = links.Add();
@@ -166,7 +166,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
   
 void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!ctx.HasLinkifier())
+	if(!ctx.HasLinkifier() || ctx.HasFinder())
 		return;
 
 	LTIMING("Linkifier::OnHighlight");
