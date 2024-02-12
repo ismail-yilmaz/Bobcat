@@ -229,7 +229,7 @@ void Finder::Sync()
 void Finder::Search()
 {
 	pos.Clear();
-	ctx.Find((WString)~text);
+	ctx.Find(~text);
 	Sync();
 }
 
@@ -360,10 +360,12 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
 			if(hl.GetKey(row) != pt.row)
 				continue;
+			int offset = 0;
 			for(VTLine& l : hl) {
 				for(VTCell& c : l) {
-					if(pt.col <= col && col < pt.col + pt.length) {
-						if(pt.row == p.row && pt.col == p.col) {
+					offset += c == 1; // Double width char, second half.
+					if(pt.col + offset <= col && col < pt.col + offset + pt.length) {
+						if(pt.row == p.row && pt.col + offset == p.col + offset) {
 							c.Normal();
 							c.Ink(ctx.highlight[1]);
 							c.Paper(ctx.highlight[3]);

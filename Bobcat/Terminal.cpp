@@ -173,7 +173,7 @@ hash_t Terminal::GetHashValue() const
 
 void Terminal::Update()
 {
-	if(!IsVisible() && !HasFinder() && !linkifier.IsEnabled())
+	if(!IsVisible() || (!HasFinder() && !linkifier.IsEnabled()))
 		return;
 
 	auto cb = [this]()

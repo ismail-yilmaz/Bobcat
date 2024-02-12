@@ -137,7 +137,7 @@ void Linkifier::Search()
 }
 
 bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
-{
+{ 
 	if(!ctx.HasLinkifier() || ctx.HasFinder())
 		return true;
 
@@ -176,10 +176,12 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 			if(hl.GetKey(row) != pt.pos.y)
 				continue;
 			int ipos = ctx.GetPosAsIndex(pt.pos);
+			int offset = 0;
 			for(VTLine& l : hl) {
 				for(VTCell& c : l) {
-					if(!c.IsHyperlink() && pt.pos.x <= col && col < pt.pos.x + pt.length) {     // First, check if the cell isn't already a hyperlink.
-						if(pos >= ipos && pos < ipos + pt.length) {
+					offset += c == 1; // Double width char, second half.
+					if(!c.IsHyperlink() && pt.pos.x + offset <= col && col < pt.pos.x + pt.length + offset) { // First, check if the cell isn't already a hyperlink.
+						if(pos >= ipos + offset && pos < ipos + offset + pt.length) {
 							c.Hyperlink();
 							c.data = 0;
 						}
