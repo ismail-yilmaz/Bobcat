@@ -349,7 +349,9 @@ void Profiles::ContextMenu(Bar& bar)
 void Profiles::Add()
 {
 	if(String s; EditTextNotNull(s, t_("New Profile"), t_("Name"))) {
-		if(!list.FindSetCursor(s)) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
 			list.Add(s, RawToValue(Profile(s)));
 			list.GoEnd();
 		}
@@ -360,7 +362,9 @@ void Profiles::Add()
 void Profiles::Clone()
 {
 	if(String s; EditTextNotNull(s, t_("Clone Profile"), t_("Name"))) {
-		if(!list.FindSetCursor(s)) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
 			Profile source = list.Get(1).To<Profile>();
 			Profile p(source);
 			p.name = s;
@@ -377,7 +381,9 @@ void Profiles::Clone()
 void Profiles::Rename()
 {
 	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Profile"), t_("New name"))) {
-		if(!list.FindSetCursor(s)) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
 			Profile p = list.Get(1).To<Profile>();
 			auto& m = GetHyperlinkPatterns();
 			String f = ProfileFile(p.name);
