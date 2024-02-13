@@ -464,7 +464,7 @@ void Profiles::Store()
 				RealizePath(path);
 			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
 			if(i == 0)
-				ctx.settings.activeprofile = GetFileTitle(path);
+				ctx.settings.activeprofile = p.name;
 		}
 		catch(const JsonizeError& e)
 		{
@@ -486,7 +486,6 @@ Profile LoadProfile(const String& name)
 			Value q = ParseJSON(LoadFile(f.GetPath()));
 			JsonIO jio(q);
 			p.Jsonize(jio);
-			p.name = Nvl(p.name, name);
 		}
 		catch(const JsonizeError& e)
 		{
@@ -514,12 +513,12 @@ int LoadProfiles(VectorMap<String, Profile>& v)
 	for(const String& s : GetProfileFilePaths()) {
 		try
 		{
-			String name = GetFileTitle(s);
 			Value q = ParseJSON(LoadFile(s));
 			JsonIO jio(q);
-			Profile& p = v.GetAdd(name);
+			Profile p;
 			p.Jsonize(jio);
-			p.name = Nvl(p.name, name);
+			String name = p.name;
+			v.Add(name, pick(p));
 		}
 		catch(const JsonizeError& e)
 		{
@@ -561,10 +560,9 @@ Vector<String> GetProfileFilePaths()
 
 Vector<String> GetProfileNames()
 {
-	Vector<String> q;
-	for(const String& s : GetProfileFilePaths())
-		q.Add(GetFileTitle(s));
-	return q;
+	VectorMap<String, Profile> v;
+	LoadProfiles(v);
+	return v.PickKeys();
 }
 
 String ShortcutKeysFile()
