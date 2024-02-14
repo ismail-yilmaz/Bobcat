@@ -79,6 +79,7 @@ Profile::Profile()
 , delayedrefresh(true)
 , lazyresize(false)
 , sizehint(true)
+, order(0)
 , filterctrl(false)
 , font(Monospace())
 , linespacing(0)
@@ -111,6 +112,7 @@ void Profile::Jsonize(JsonIO& jio)
 	jio
 	("Name",				 name)
 	("User",				 user)
+	("Order",				 order)
 	("Command",				 command)
 	("Address",				 address)
 	("Env",					 env)
@@ -331,8 +333,13 @@ Profiles::Profiles(Bobcat& ctx)
 void Profiles::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
-	bar.Add(tt_("Add profile"),	Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bool q = b && list.GetCursor() < list.GetCount() - 1;
+	bar.Add(tt_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
+	bar.Add(tt_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
 	bar.Add(b, tt_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
+	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
 		bar.Add(b, tt_("Set as active profile"), [this]() { Activate(); }).Key(K_CTRL|K_D);
@@ -342,9 +349,52 @@ void Profiles::ContextMenu(Bar& bar)
 void Profiles::Add()
 {
 	if(String s; EditTextNotNull(s, t_("New Profile"), t_("Name"))) {
-		if(!list.FindSetCursor(s)) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
 			list.Add(s, RawToValue(Profile(s)));
 			list.GoEnd();
+		}
+	}
+	Sync();
+}
+
+void Profiles::Clone()
+{
+	if(String s; EditTextNotNull(s, t_("Clone Profile"), t_("Name"))) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
+			Profile source = list.Get(1).To<Profile>();
+			Profile p(source);
+			p.name = s;
+			auto& m = GetHyperlinkPatterns();
+			int i = m.FindAdd(p.name);
+			m[i] <<= m.Get(source.name);
+			list.Add(s, RawToValue(p));
+			list.GoEnd();
+		}
+	}
+	Sync();
+}
+
+void Profiles::Rename()
+{
+	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Profile"), t_("New name"))) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
+			Profile p = list.Get(1).To<Profile>();
+			auto& m = GetHyperlinkPatterns();
+			String f = ProfileFile(p.name);
+			if(FileExists(f))
+				DeleteFile(f);
+			int i = m.Find(p.name);
+			p.name = s;
+			m.Add(p.name, pick(m[i]));
+			m.Remove(i);
+			list.Set(0, p.name);
+			list.Set(1, RawToValue(p));
 		}
 	}
 	Sync();
@@ -369,9 +419,7 @@ void Profiles::Activate()
 {
 	if(int i = list.GetCursor(); i >= 0) {
 		Vector<Value> v = list.GetLine(i);
-		list.Remove(i);
-		list.Insert(0, v);
-		list.SetCursor(0);
+		list.SetCursor(i);
 		SetModify();
 		Sync();
 	}
@@ -394,6 +442,7 @@ int Profiles::Load()
 		list.Clear();
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
+		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
 		list.FindSetCursor(ctx.settings.activeprofile);
 		Activate();
 	}
@@ -405,6 +454,7 @@ void Profiles::Store()
 	for(int i = 0; i < list.GetCount(); i++) {
 		String  s = list.Get(i, 0).To<String>();
 		Profile p = list.Get(i, 1).To<Profile>();
+		p.order = i;
 		try
 		{
 			JsonIO jio;
@@ -414,7 +464,7 @@ void Profiles::Store()
 				RealizePath(path);
 			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
 			if(i == 0)
-				ctx.settings.activeprofile = GetFileTitle(path);
+				ctx.settings.activeprofile = p.name;
 		}
 		catch(const JsonizeError& e)
 		{
@@ -436,7 +486,6 @@ Profile LoadProfile(const String& name)
 			Value q = ParseJSON(LoadFile(f.GetPath()));
 			JsonIO jio(q);
 			p.Jsonize(jio);
-			p.name = Nvl(p.name, name);
 		}
 		catch(const JsonizeError& e)
 		{
@@ -464,12 +513,12 @@ int LoadProfiles(VectorMap<String, Profile>& v)
 	for(const String& s : GetProfileFilePaths()) {
 		try
 		{
-			String name = GetFileTitle(s);
 			Value q = ParseJSON(LoadFile(s));
 			JsonIO jio(q);
-			Profile& p = v.GetAdd(name);
+			Profile p;
 			p.Jsonize(jio);
-			p.name = Nvl(p.name, name);
+			String name = p.name;
+			v.Add(name, pick(p));
 		}
 		catch(const JsonizeError& e)
 		{
@@ -511,10 +560,9 @@ Vector<String> GetProfileFilePaths()
 
 Vector<String> GetProfileNames()
 {
-	Vector<String> q;
-	for(const String& s : GetProfileFilePaths())
-		q.Add(GetFileTitle(s));
-	return q;
+	VectorMap<String, Profile> v;
+	LoadProfiles(v);
+	return v.PickKeys();
 }
 
 String ShortcutKeysFile()

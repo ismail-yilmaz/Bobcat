@@ -54,6 +54,7 @@ struct Profile : Moveable<Profile> {
     String      searchmode;
     bool        searchshowall;
     bool        sizehint;
+    int         order;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);
@@ -64,6 +65,8 @@ public:
     Profiles(Bobcat& ctx);
 
     void        Add();
+    void        Clone();
+    void        Rename();
     void        Remove();
     void        Sync();
     void        Activate();
