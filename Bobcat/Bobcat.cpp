@@ -424,15 +424,9 @@ void Bobcat::HelpMenu(Bar& menu)
 void Bobcat::TermMenu(Bar& menu)
 {
 	Vector<String> pnames = GetProfileNames();
-	menu.Add(AK_NEWTAB, Images::Terminal(), [this] {  AddTerminal(settings.activeprofile); });
+	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { AddTerminal(GetActiveTerminal()->profilename); });
 	if(!pnames.GetCount())
 		return;
-	
-	if(int n = FindIndex(pnames, settings.activeprofile); n > 0) {
-		String s = pnames[n];
-		pnames.Remove(n);
-		pnames.Insert(0, s); // Move the active (default) profile to the top of the menu.
-	}
 	
 	menu.Sub(t_("New terminal from"), [this, pnames = pick(pnames)](Bar& menu) {
 		for(int i = 0; i < pnames.GetCount(); i++) {
@@ -566,7 +560,7 @@ Bobcat::Config::Config()
 
 void Bobcat::Config::Jsonize(JsonIO& jio)
 {
-	jio("ActiveProfile", activeprofile)
+	jio("DefaultProfile", defaultprofile)
 	   ("TitleBarAlignment", titlealignment)
 	   ("FinderBarAlignment", finderalignment)
 	   ("StackAnimationDirection", stackdirection)

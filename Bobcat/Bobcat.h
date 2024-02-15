@@ -101,7 +101,7 @@ struct Bobcat {
         Config();
         String      guitheme;
         Font        guifont;
-        String      activeprofile;
+        String      defaultprofile;
         String      titlealignment;
         String      finderalignment;
         String      stackdirection;

@@ -60,6 +60,16 @@ struct Profile : Moveable<Profile> {
     void        Jsonize(JsonIO& jio);
 };
 
+class Profiles;
+
+struct ProfileNameDisplay : Display
+{
+	Bobcat& ctx;
+
+	ProfileNameDisplay(Bobcat& ctx): ctx(ctx) {}
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final;
+};
+
 class Profiles : public WithProfilesLayout<ParentCtrl> {
 public:
     Profiles(Bobcat& ctx);
@@ -69,7 +79,7 @@ public:
     void        Rename();
     void        Remove();
     void        Sync();
-    void        Activate();
+    void        SetDefault();
     void        ContextMenu(Bar& bar);
 
     int         Load();
@@ -93,8 +103,9 @@ private:
         mutable         Palettes                               palettes;
     };
     
-    ToolBar     toolbar;
-    Bobcat&     ctx;
+    ToolBar            toolbar;
+    Bobcat&            ctx;
+    ProfileNameDisplay display;
 
 public:
     Setup       setup;

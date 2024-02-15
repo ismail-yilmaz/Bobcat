@@ -30,7 +30,7 @@ Terminal::Terminal(Bobcat& ctx_)
 	SColorHighlight
 	}
 {
-    titlebar.newterm << [this] { ctx.AddTerminal(ctx.settings.activeprofile); };
+    titlebar.newterm << [this] { ctx.AddTerminal(ctx.GetActiveTerminal()->profilename); };
     titlebar.close   << [this] { Stop(); };
     titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();

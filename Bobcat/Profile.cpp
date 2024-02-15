@@ -12,21 +12,12 @@ namespace Upp {
 #define IMAGECLASS Images
 #include <Draw/iml_source.h>
 
-struct DefaultProfileNameDisplayCls : Display
+void ProfileNameDisplay::Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
 {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::Terminal()).Bold(), ink, paper, style);
-	}
-};
-
-struct NormalProfileNameDisplayCls : Display
-{
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::Terminal()), ink, paper, style);
-	}
-};
+	const Image& img = ctx.settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
+	bool current = ctx.GetActiveTerminal()->profilename == q;
+	StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
+}
 
 struct FontProfileDisplayCls : Display
 {
@@ -39,8 +30,6 @@ struct FontProfileDisplayCls : Display
 	}
 };
 
-const Display& DefaultProfileNameDisplay() { return Single<DefaultProfileNameDisplayCls>(); }
-const Display& NormalProfileNameDisplay()  { return Single<NormalProfileNameDisplayCls>();  }
 const Display& FontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
 const Display& GuiFontProfileDisplay()     { return Single<FontProfileDisplayCls>(); }
 
@@ -318,7 +307,8 @@ void Profiles::Setup::Sync()
 }
 
 Profiles::Profiles(Bobcat& ctx)
-: ctx(ctx)
+: ctx(ctx),
+display(ProfileNameDisplay(ctx))
 {
 	CtrlLayout(*this);
 	Ctrl::Add(setup.HSizePosZ(141, 2).VSizePosZ(3, 3));
@@ -342,7 +332,7 @@ void Profiles::ContextMenu(Bar& bar)
 	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
-		bar.Add(b, tt_("Set as active profile"), [this]() { Activate(); }).Key(K_CTRL|K_D);
+		bar.Add(b, tt_("Set as default profile"), [this]() { SetDefault(); }).Key(K_CTRL|K_D);
 	}
 }
 
@@ -389,6 +379,10 @@ void Profiles::Rename()
 			String f = ProfileFile(p.name);
 			if(FileExists(f))
 				DeleteFile(f);
+			if (p.name == ctx.settings.defaultprofile) {
+				ctx.settings.defaultprofile = s;
+				SaveConfig(ctx);
+			}
 			int i = m.Find(p.name);
 			p.name = s;
 			m.Add(p.name, pick(m[i]));
@@ -415,14 +409,10 @@ void Profiles::Remove()
 	}
 }
 
-void Profiles::Activate()
-{
-	if(int i = list.GetCursor(); i >= 0) {
-		Vector<Value> v = list.GetLine(i);
-		list.SetCursor(i);
-		SetModify();
-		Sync();
-	}
+void Profiles::SetDefault() {
+	ctx.settings.defaultprofile = list.Get(0);
+	SaveConfig(ctx);
+	Sync();
 }
 
 void Profiles::Sync()
@@ -430,7 +420,7 @@ void Profiles::Sync()
 	setup.Sync();
 	toolbar.Set([this](Bar& bar) { ContextMenu(bar); });
 	for(int i = 0; i < list.GetCount(); i++) {
-		list.SetDisplay(i, 0, i == 0 ? DefaultProfileNameDisplay() : NormalProfileNameDisplay());
+		list.SetDisplay(i, 0, display);
 	}
 }
 
@@ -443,18 +433,18 @@ int Profiles::Load()
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
 		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
-		list.FindSetCursor(ctx.settings.activeprofile);
-		Activate();
 	}
 	return rc;
 }
 
 void Profiles::Store()
 {
+	bool hasDefault = false;
 	for(int i = 0; i < list.GetCount(); i++) {
 		String  s = list.Get(i, 0).To<String>();
 		Profile p = list.Get(i, 1).To<Profile>();
 		p.order = i;
+		hasDefault |= s == ctx.settings.defaultprofile;
 		try
 		{
 			JsonIO jio;
@@ -463,8 +453,6 @@ void Profiles::Store()
 			if(!FileExists(path))
 				RealizePath(path);
 			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
-			if(i == 0)
-				ctx.settings.activeprofile = p.name;
 		}
 		catch(const JsonizeError& e)
 		{
@@ -474,6 +462,10 @@ void Profiles::Store()
 		{
 			LLOG("Value type error: " << e);
 		}
+	}
+	if(!hasDefault && list.GetCount()) {
+		ctx.settings.defaultprofile = list.Get(0, 0).To<String>();
+		SaveConfig(ctx);
 	}
 }
 

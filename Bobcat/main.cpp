@@ -76,8 +76,8 @@ GUI_APP_MAIN
 	Bobcat app;
 	LoadConfig(app);
 	
-	// Try loading the active profile, if any, and fallback to default on failure.
-	Profile p = LoadProfile(app.settings.activeprofile);
+	// Try loading the default profile, if any, and fallback to default configuration on failure.
+	Profile p = LoadProfile(app.settings.defaultprofile);
 	
 	const Vector<String>& cmd = CommandLine();
 
