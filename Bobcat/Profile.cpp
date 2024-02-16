@@ -325,8 +325,8 @@ void Profiles::ContextMenu(Bar& bar)
 	bool b = list.IsCursor();
 	bool q = b && list.GetCursor() < list.GetCount() - 1;
 	bar.Add(tt_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
-	bar.Add(tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
-	bar.Add(tt_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
+	bar.Add(b, tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
+	bar.Add(b, tt_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
 	bar.Add(b, tt_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
 	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
 	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
