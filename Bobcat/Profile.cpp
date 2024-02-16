@@ -557,7 +557,9 @@ Vector<String> GetProfileNames()
 {
 	VectorMap<String, Profile> v;
 	LoadProfiles(v);
-	return v.PickKeys();
+	Vector<String> names(v.GetKeys(), 0);
+	Sort(names, [&v](const String& a, const String& b) -> int { return v.Get(a).order < v.Get(b).order; });
+	return names;
 }
 
 String ShortcutKeysFile()
