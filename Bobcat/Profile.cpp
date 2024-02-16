@@ -433,6 +433,9 @@ int Profiles::Load()
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
 		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
+		int current = list.Find(ctx.GetActiveTerminal()->profilename, 0);
+		if (current >= 0)
+			list.SetCursor(current);
 	}
 	return rc;
 }
