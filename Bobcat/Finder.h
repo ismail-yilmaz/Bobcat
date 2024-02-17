@@ -53,13 +53,12 @@ private:
     bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
     
-    struct Pos : Moveable<Pos> {
-        int     row = 0;
-        int     col = 0;
+    struct TextAnchor : Moveable<TextAnchor> {
+        Point   pos = {0, 0};
         int     length = 0;
-    };
+	};
     
-    Vector<Pos> pos;
+    Vector<TextAnchor> foundtext;
     
     enum class Search {
         CaseSensitive,
@@ -75,7 +74,7 @@ private:
     };
     
     int           index = 0;
-    Terminal&     ctx;
+    Terminal&     term;
     Value         data;
     SearchField   text;
     FrameLeft<ToolButton> menu;

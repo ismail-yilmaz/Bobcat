@@ -47,7 +47,7 @@ public:
     LinkInfo*       end();
     
 private:
-    Terminal&   ctx;
+    Terminal&   term;
     int         cursor;
     int         pos;
     bool        enabled:1;

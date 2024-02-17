@@ -33,11 +33,10 @@ struct Terminal;
 #include <CtrlCore/lay.h>
 
 #include "Linkifier.h"
-#include "Profile.h"
 #include "Finder.h"
-#include "Terminal.h"
 #include "Navigator.h"
-
+#include "Profile.h"
+#include "Terminal.h"
 
 struct Bobcat {
     Bobcat();

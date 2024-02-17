@@ -134,5 +134,4 @@ inline bool operator==(const Profile& p, const Terminal& t)   { return t == p; }
 inline bool operator==(const Terminal& t,hash_t id)           { return t.GetHashValue() == id; }
 inline bool operator==(hash_t id, const Terminal& t)          { return t == id; }
 
-
 #endif

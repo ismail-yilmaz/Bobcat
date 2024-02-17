@@ -23,7 +23,7 @@ static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 }
 
 Finder::Finder(Terminal& t)
-: ctx(t)
+: term(t)
 , index(0)
 , searchtype(Search::CaseSensitive)
 {
@@ -39,8 +39,8 @@ Finder::Finder(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
-	ctx.WhenSearch = THISFN(OnSearch);
-	ctx.WhenHighlight = THISFN(OnHighlight);
+	term.WhenSearch = THISFN(OnSearch);
+	term.WhenHighlight = THISFN(OnHighlight);
 	Add(text.HSizePosZ(4, 200).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(mode);
@@ -64,7 +64,7 @@ Finder::~Finder()
 void Finder::SetData(const Value& v)
 {
 	data = v;
-	ctx.RefreshLayout();
+	term.RefreshLayout();
 }
 
 Value Finder::GetData() const
@@ -82,11 +82,11 @@ void Finder::FrameLayout(Rect& r)
 void Finder::Show()
 {
 	if(!IsChild()) {
-		bool b = ctx.HasSizeHint();
-		ctx.HideSizeHint();
-		ctx.AddFrame(Height(StdFont().GetCy() + 16));
-		ctx.SyncHighlight();
-		ctx.ShowSizeHint(b);
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.AddFrame(Height(StdFont().GetCy() + 16));
+		term.SyncHighlight();
+		term.ShowSizeHint(b);
 	}
 	text.SetFocus();
 }
@@ -94,27 +94,27 @@ void Finder::Show()
 void Finder::Hide()
 {
 	if(IsChild()) {
-		bool b = ctx.HasSizeHint();
-		ctx.HideSizeHint();
-		ctx.RemoveFrame(*this);
-		ctx.SyncHighlight();
-		ctx.RefreshLayout();
-		ctx.ShowSizeHint(b);
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.RemoveFrame(*this);
+		term.SyncHighlight();
+		term.RefreshLayout();
+		term.ShowSizeHint(b);
 	}
-	ctx.SetFocus();
+	term.SetFocus();
 }
 
 void Finder::Goto(int i)
 {
-	if(i >= 0 && i < pos.GetCount()) {
-		ctx.Goto(pos[i].row);;
+	if(i >= 0 && i < foundtext.GetCount()) {
+		term.Goto(foundtext[i].pos.y);;
 		Sync();
 	}
 }
 
 void Finder::Next()
 {
-	if(int n = pos.GetCount(); n >= 0) {
+	if(int n = foundtext.GetCount(); n >= 0) {
 		index = clamp(++index, 0, n - 1);
 		Goto(index);
 	}
@@ -122,7 +122,7 @@ void Finder::Next()
 
 void Finder::Prev()
 {
-	if(int n = pos.GetCount(); n >= 0) {
+	if(int n = foundtext.GetCount(); n >= 0) {
 		index = clamp(--index, 0, n - 1);
 		Goto(index);
 	}
@@ -130,7 +130,7 @@ void Finder::Prev()
 
 void Finder::Begin()
 {
-	if(int n = pos.GetCount(); n >= 0) {
+	if(int n = foundtext.GetCount(); n >= 0) {
 		index = 0;
 		Goto(index);
 	}
@@ -138,7 +138,7 @@ void Finder::Begin()
 
 void Finder::End()
 {
-	if(int n = pos.GetCount(); n >= 0) {
+	if(int n = foundtext.GetCount(); n >= 0) {
 		index = n - 1;
 		Goto(index);
 	}
@@ -212,7 +212,7 @@ bool Finder::Key(dword key, int count)
 
 void Finder::Sync()
 {
-	int cnt = pos.GetCount();
+	int cnt = foundtext.GetCount();
 	index = clamp(index, 0, max(0, cnt - 1));
 	if(text.GetLength() > 0)
 		sWriteToDisplay(counter, Format("%d/%d", cnt ? index + 1 : 0, cnt));
@@ -223,13 +223,16 @@ void Finder::Sync()
 	begin.Enable(cnt > 0 && index > 0);
 	end.Enable(cnt > 0 && index < cnt - 1);
 	sWriteToDisplay(mode, decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C"));
-	ctx.Refresh();
+	term.Refresh();
 }
 
 void Finder::Search()
 {
-	pos.Clear();
-	ctx.Find(~text);
+	if(term.IsSearching())
+		return;
+
+	foundtext.Clear();
+	term.Find(~text);
 	Sync();
 }
 
@@ -245,34 +248,42 @@ bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString
 	int offset = m.GetKey(0);
 	
 	LTIMING("CaseSensitiveSearch");
-
-	for(int row = 0, i = 0; row < m.GetCount(); row++) { // Note: m.GetCount() > 1 == text is wrapped.
-		for(int col = 0; col < m[row].GetLength(); col++, i++) {
-			if(m[row][col] == s[0]) {
-				int trow = row, tcol = col, tlen = slen;
-				// Check if the substring is present starting from the current position.
-				while(tlen > 0 && trow < m.GetCount()) {
-					if(m[trow][tcol] == s[slen - tlen])
-						tlen--;
-					else
-						break;
-					if(tcol + 1 < m[trow].GetLength())
-						tcol++;
-					else {
-						trow++;
-						tcol = 0;
+	
+	// Notes: 1) We are using this for CS search, because it is faster than WString::Find().
+	//        2) m.GetCount() > 1 == text is wrapped.
+	
+	auto ScanText = [&m, &s, slen, offset](Vector<TextAnchor>& v) {
+		for(int row = 0, i = 0; row < m.GetCount(); row++) {
+			for(int col = 0; col < m[row].GetLength(); col++, i++) {
+				if(m[row][col] == s[0]) {
+					int trow = row, tcol = col, tlen = slen;
+					// Check if the substring is present starting from the current position.
+					while(tlen > 0 && trow < m.GetCount()) {
+						if(m[trow][tcol] == s[slen - tlen])
+							tlen--;
+						else
+							break;
+						if(tcol + 1 < m[trow].GetLength())
+							tcol++;
+						else {
+							trow++;
+							tcol = 0;
+						}
 					}
-				}
-				// If tlen is 0, then the substring is found.
-				if(!tlen) {
-					Pos& sp = pos.Add();
-					sp.row = offset;
-					sp.col = i;
-					sp.length = slen;
+					// If tlen is 0, then the substring is found.
+					if(!tlen) {
+						TextAnchor& a = v.Add();
+						a.pos.y = offset;
+						a.pos.x = i;
+						a.length = slen;
+					}
 				}
 			}
 		}
-	}
+		return !v.IsEmpty();
+	};
+	
+	ScanText(foundtext);
 	return true;
 }
 
@@ -287,16 +298,20 @@ bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WStri
 		q << ss;
 
 	q = ToLower(q);
+	
+	auto ScanText = [&q, &u, &offset](Vector<TextAnchor>& v) {
+		int i = 0, len = u.GetLength();
+		while((i = q.Find(u, i)) >= 0) {
+			TextAnchor& a = v.Add();
+			a.pos.y = offset;
+			a.pos.x = i;
+			a.length = len;
+			i += len;
+		}
+		return !v.IsEmpty();
+	};
 
-	int i = 0, len = u.GetLength();
-	while((i = q.Find(u, i)) >= 0) {
-		Pos& sp = pos.Add();
-		sp.row = offset;
-		sp.col = i;
-		sp.length = len;
-		i += len;
-	}
-
+	ScanText(foundtext);
 	return true;
 }
 
@@ -310,25 +325,28 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	for(const WString& ss : m)
 		q << ss;
 
-	RegExp r(s.ToString());
-	String ln = ToUtf8(q);
-	while(r.GlobalMatch(ln)) {
-		int o = r.GetOffset();
-		Pos& p = pos.Add();
-		p.row = offset;
-		p.col = Utf32Len(~ln, o);
-		p.length = Utf32Len(~ln + o, r.GetLength());
-	}
+	auto ScanText = [&q, &s, &offset](Vector<TextAnchor>& v) {
+		RegExp r(s.ToString());
+		String ln = ToUtf8(q);
+		while(r.GlobalMatch(ln)) {
+			int o = r.GetOffset();
+			TextAnchor& a = v.Add();
+			a.pos.y = offset;
+			a.pos.x = Utf32Len(~ln, o);
+			a.length = Utf32Len(~ln + o, r.GetLength());
+		}
+		return !v.IsEmpty();
+	};
 
+	ScanText(foundtext);
 	return true;
 }
 
-
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
-	if(!ctx.HasFinder())
+	if(!term.HasFinder())
 		return true;
-
+	
 	LTIMING("Finder::OnSearch");
 	
 	switch(searchtype) {
@@ -349,32 +367,32 @@ bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!IsChild() || !pos.GetCount() || index < 0)
+	if(!IsChild() || term.IsSearching() || !foundtext.GetCount() || index < 0)
 		return;
 
-	Pos p = pos[index];
+	TextAnchor p = foundtext[index];
 
 	LTIMING("Finder::OnHighlight");
 
-	for(const Pos& pt : pos)
+	for(const TextAnchor& a : foundtext)
 		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
-			if(hl.GetKey(row) != pt.row)
+			if(hl.GetKey(row) != a.pos.y)
 				continue;
 			int offset = 0;
 			for(VTLine& l : hl) {
 				for(VTCell& c : l) {
 					offset += c == 1; // Double width char, second half.
-					if(pt.col + offset <= col && col < pt.col + offset + pt.length) {
-						if(pt.row == p.row && pt.col + offset == p.col + offset) {
+					if(a.pos.x + offset <= col && col < a.pos.x + offset + a.length) {
+						if(a.pos.y == p.pos.y && a.pos.x + offset == p.pos.x + offset) {
 							c.Normal();
-							c.Ink(ctx.highlight[1]);
-							c.Paper(ctx.highlight[3]);
+							c.Ink(term.highlight[1]);
+							c.Paper(term.highlight[3]);
 						}
 						else
 						if(~showall) {
 							c.Normal();
-							c.Ink(ctx.highlight[0]);
-							c.Paper(ctx.highlight[2]);
+							c.Ink(term.highlight[0]);
+							c.Paper(term.highlight[2]);
 						}
 					}
 					col++;

@@ -9,21 +9,21 @@
 
 namespace Upp {
 	
-Linkifier::Linkifier(Terminal& ctx)
-: ctx(ctx)
+Linkifier::Linkifier(Terminal& t)
+: term(t)
 , cursor(-1)
 , pos(-1)
 , enabled(false)
 {
-	ctx.WhenSearch << THISFN(OnSearch);
-	ctx.WhenHighlight << THISFN(OnHighlight);
+	term.WhenSearch << THISFN(OnSearch);
+	term.WhenHighlight << THISFN(OnHighlight);
 }
 
 Linkifier& Linkifier::Enable(bool b)
 {
 	if(enabled = b; !enabled)
 		Clear();
-	ctx.SyncHighlight();
+	term.SyncHighlight();
 	return *this;
 }
 
@@ -59,7 +59,7 @@ int Linkifier::GetPos()
 
 void Linkifier::UpdatePos()
 {
-	pos = ctx.GetMousePosAsIndex();
+	pos = term.GetMousePosAsIndex();
 }
 
 void Linkifier::ClearPos()
@@ -95,9 +95,9 @@ bool Linkifier::Sync()
 	cursor = -1;
 	if(!enabled || links.IsEmpty())
 		return false;
-	pos = ctx.GetMousePosAsIndex();
+	pos = term.GetMousePosAsIndex();
 	cursor = FindMatch(links, [this](const LinkInfo& q) {
-		int i = ctx.GetPosAsIndex(q.pos);
+		int i = term.GetPosAsIndex(q.pos);
 		return pos >= i && pos < i + q.length;
 	});
 	return true;
@@ -105,7 +105,7 @@ bool Linkifier::Sync()
 
 void Linkifier::Update()
 {
-	if(ctx.HasLinkifier())
+	if(term.HasLinkifier())
 		Search();
 }
 
@@ -132,13 +132,13 @@ LinkInfo *Linkifier::end()
 void Linkifier::Search()
 {
 	Clear();
-	ctx.Find(WString("NIL"), true); // We don't really search for a specific string.
+	term.Find(WString("NIL"), true); // We don't really search for a specific string.
 	Sync();
 }
 
 bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
 { 
-	if(!ctx.HasLinkifier() || ctx.HasFinder())
+	if(!term.HasLinkifier() || term.HasFinder())
 		return true;
 
 	LTIMING("Linkifier::OnSearch");
@@ -150,7 +150,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 	int offset = m.GetKey(0);
 
 	String s = ToUtf8(text);
-	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(ctx.profilename)) {
+	for(const PatternInfo& pi : GetHyperlinkPatterns().Get(term.profilename)) {
 		RegExp r(pi.pattern);
 		while(r.GlobalMatch(s)) {
 			int o = r.GetOffset();
@@ -166,7 +166,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
   
 void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!ctx.HasLinkifier() || ctx.HasFinder())
+	if(!term.HasLinkifier() || term.HasFinder())
 		return;
 
 	LTIMING("Linkifier::OnHighlight");
@@ -175,7 +175,7 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
 			if(hl.GetKey(row) != pt.pos.y)
 				continue;
-			int ipos = ctx.GetPosAsIndex(pt.pos);
+			int ipos = term.GetPosAsIndex(pt.pos);
 			int offset = 0;
 			for(VTLine& l : hl) {
 				for(VTCell& c : l) {
