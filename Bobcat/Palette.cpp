@@ -70,6 +70,7 @@ static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
 }
 
 Palette::Palette()
+: order(0)
 {
 	const auto& lst = GetColorList();
 	for(int i = 0; i < lst.GetCount(); i++)
@@ -78,7 +79,8 @@ Palette::Palette()
 
 void Palette::Jsonize(JsonIO& jio)
 {
-	jio("Name", name);
+    jio("Name", name)
+       ("Order", order);
 	
 	const auto& lst = GetColorList();
 	
@@ -116,9 +118,14 @@ Palettes::Palettes()
 void Palettes::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
+	bool q = b && list.GetCursor() < list.GetCount() - 1;
 	bar.Add(tt_("Add palette"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(tt_("Clone palette"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
 	bar.Add(b, tt_("Edit palette"), Images::Edit(), [this]() { Edit(); }).Key(K_SPACE);
+	bar.Add(tt_("Rename palette"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
 	bar.Add(b, tt_("Remove palette"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
+	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
 		bar.Add(b, tt_("Set as active palette"), [this]() { MakeActive(); }).Key(K_CTRL|K_D);
@@ -127,19 +134,53 @@ void Palettes::ContextMenu(Bar& bar)
 
 void Palettes::Add()
 {
-	if(String s; EditTextNotNull(s, t_("New Profile"), t_("Name"))) {
-		if(!list.FindSetCursor(s)) {
+	if(String s; EditTextNotNull(s, t_("New Palette"), t_("Name"))) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Profile named \"" + s + "\" already exists.");
+		} else {
 			list.Add(s, RawToValue(Palette(s)));
 			list.GoEnd();
-			Store();
+			Edit();
 		}
 	}
 }
 
 void Palettes::Edit()
 {
-	if(list.IsCursor())
-		SetPalette();
+	SetPalette();
+}
+
+void Palettes::Clone()
+{
+	if(String s; EditTextNotNull(s, t_("Clone Palette"), t_("Name"))) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Palette named \"" + s + "\" already exists.");
+		} else {
+			Palette source = list.Get(1).To<Palette>();
+			Palette p(source);
+			p.name = s;
+			list.Add(s, RawToValue(p));
+			list.GoEnd();
+		}
+	}
+	Sync();
+}
+
+void Palettes::Rename()
+{
+	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Palette"), t_("New name"))) {
+		if(list.Find(s) >= 0) {
+			Exclamation("Palette named \"" + s + "\" already exists.");
+		} else {
+			Palette p = list.Get(0).To<Palette>();
+			String f = PaletteFile(p.name);
+			if(FileExists(f))
+				DeleteFile(f);
+			p.name = s;
+			list.Set(0, RawToValue(p));
+		}
+	}
+	Sync();
 }
 
 void Palettes::Remove()
@@ -153,8 +194,8 @@ void Palettes::Remove()
 		if(FileExists(f))
 			DeleteFile(f);
 		list.Remove(list.GetCursor());
-		Store();
 	}
+	Sync();
 }
 
 void Palettes::SetPalette()
@@ -227,6 +268,7 @@ void Palettes::SetData(const Value& data_)
 
 Value Palettes::GetData() const
 {
+	Store();
 	return data;
 }
 
@@ -238,17 +280,19 @@ int Palettes::Load()
 		list.Clear();
 		for(const auto& p : ~palettes)
 			list.Add(p.key, RawToValue(clone(p.value)));
+		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Palette>().order - b.To<Palette>().order; });
 		list.FindSetCursor(data);
 		Sync();
 	}
 	return rc;
 }
 
-void Palettes::Store()
+void Palettes::Store() const
 {
 	for(int i = 0; i < list.GetCount(); i++) {
 		String  s = list.Get(i, 0).To<String>();
 		Palette p = list.Get(i, 1).To<Palette>();
+		p.order = i;
 		try
 		{
 			JsonIO jio;
@@ -267,7 +311,6 @@ void Palettes::Store()
 			LLOG("Value type error: " << e);
 		}
 	}
-	Sync();
 }
 
 Palette LoadPalette(const String& name)

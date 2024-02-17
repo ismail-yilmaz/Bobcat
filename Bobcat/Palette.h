@@ -10,6 +10,7 @@ struct Palette : Moveable<Palette> {
     Palette(const String& s) : Palette() { name = s; }
     void        Jsonize(JsonIO& jio);
     String      name;
+    int         order;
     Color       table[MAX_COLOR_COUNT];
 };
 
@@ -18,13 +19,15 @@ public:
     Palettes();
     void        Add();
     void        Edit();
+    void        Clone();
+    void        Rename();
     void        Remove();
     void        Sync();
     void        MakeActive();
     void        ContextMenu(Bar& bar);
 
     int         Load();
-    void        Store();
+    void        Store() const;
 
     void        SetPalette();
 
