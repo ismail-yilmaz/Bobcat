@@ -15,8 +15,6 @@ Linkifier::Linkifier(Terminal& t)
 , pos(-1)
 , enabled(false)
 {
-	term.WhenSearch << THISFN(OnSearch);
-	term.WhenHighlight << THISFN(OnHighlight);
 }
 
 Linkifier& Linkifier::Enable(bool b)
@@ -137,9 +135,9 @@ void Linkifier::Search()
 }
 
 bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
-{ 
-	if(!term.HasLinkifier() || term.HasFinder())
-		return true;
+{
+	if(!term.HasLinkifier() || term.HasFinder() || !term.IsVisible())
+		return false;
 
 	LTIMING("Linkifier::OnSearch");
 	
@@ -147,6 +145,9 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 	for(const WString& s : m) // Unwrap the line...
 		text << s;
 
+	if(text.IsEmpty())
+		return false;
+		
 	int offset = m.GetKey(0);
 
 	String s = ToUtf8(text);
@@ -166,7 +167,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
   
 void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!term.HasLinkifier() || term.HasFinder())
+	if(!term.HasLinkifier() || term.HasFinder() || !term.IsVisible() || links.IsEmpty())
 		return;
 
 	LTIMING("Linkifier::OnHighlight");
@@ -195,6 +196,7 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 			}
 		}
 }
+
 LinkifierSetup::LinkifierSetup()
 {
 	CtrlLayout(*this);

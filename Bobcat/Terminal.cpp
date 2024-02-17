@@ -48,6 +48,8 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
     WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
+    WhenSearch = THISFN(OnSearch);
+    WhenHighlight = THISFN(OnHighlight);
 }
 
 void Terminal::SetData(const Value& v)
@@ -191,7 +193,7 @@ void Terminal::Update()
 void Terminal::SyncHighlight()
 {
 	EnableHighlight(HasFinder() || HasLinkifier());
-	RefreshDisplay();
+	Refresh();
 }
 
 Terminal& Terminal::Sync()
@@ -496,6 +498,20 @@ int Terminal::GetPosAsIndex(Point pt)
 int Terminal::GetMousePosAsIndex()
 {
 	return GetPosAsIndex(GetMousePagePos());
+}
+
+bool Terminal::OnSearch(const VectorMap<int, WString>& m, const WString& s)
+{
+	bool ok = false;
+	ok |= linkifier.OnSearch(m, s);
+	ok |= finder.OnSearch(m, s);
+	return ok;
+}
+
+void Terminal::OnHighlight(VectorMap<int, VTLine>& hl)
+{
+	linkifier.OnHighlight(hl);
+	finder.OnHighlight(hl);
 }
 
 void Terminal::FileMenu(Bar& menu)

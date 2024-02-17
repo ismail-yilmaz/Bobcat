@@ -39,8 +39,6 @@ Finder::Finder(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
-	term.WhenSearch = THISFN(OnSearch);
-	term.WhenHighlight = THISFN(OnHighlight);
 	Add(text.HSizePosZ(4, 200).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(mode);
@@ -230,7 +228,6 @@ void Finder::Search()
 {
 	if(term.IsSearching())
 		return;
-
 	foundtext.Clear();
 	term.Find(~text);
 	Sync();
@@ -297,6 +294,9 @@ bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WStri
 	for(const WString& ss : m)
 		q << ss;
 
+	if(q.IsEmpty())
+		return false;
+	
 	q = ToLower(q);
 	
 	auto ScanText = [&q, &u, &offset](Vector<TextAnchor>& v) {
@@ -325,6 +325,9 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	for(const WString& ss : m)
 		q << ss;
 
+	if(q.IsEmpty())
+		return false;
+	
 	auto ScanText = [&q, &s, &offset](Vector<TextAnchor>& v) {
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
@@ -337,7 +340,7 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 		}
 		return !v.IsEmpty();
 	};
-
+	
 	ScanText(foundtext);
 	return true;
 }
@@ -345,29 +348,27 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	if(!term.HasFinder())
-		return true;
+		return false;
 	
 	LTIMING("Finder::OnSearch");
 	
 	switch(searchtype) {
 	case Search::CaseInsensitive:
-		CaseInsensitiveSearch(m, s);
-		break;
+		return CaseInsensitiveSearch(m, s);
 	case Search::CaseSensitive:
-		CaseSensitiveSearch(m, s);
-		break;
+		return CaseSensitiveSearch(m, s);
 	case Search::Regex:
-		RegexSearch(m, s);
-		break;
+		return RegexSearch(m, s);
 	default:
 		break;
 	}
-	return true;
+
+	return false;
 }
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 {
-	if(!IsChild() || term.IsSearching() || !foundtext.GetCount() || index < 0)
+	if(!term.HasFinder() || term.IsSearching() || !foundtext.GetCount() || index < 0)
 		return;
 
 	TextAnchor p = foundtext[index];

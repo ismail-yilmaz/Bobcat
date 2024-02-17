@@ -102,7 +102,7 @@ void Palette::Jsonize(JsonIO& jio)
 
 Palettes::Palettes()
 {
-	int cx = Zx(GetSmartTextSize(sSampleText, Monospace()).cx);
+	int cx = Zx(GetTextSize(sSampleText, Monospace()).cx);
 	Ctrl::Add(list.SizePos());
 	list.AddColumn(tt_("Name"));
 	list.AddColumn(tt_("Sample")).SetDisplay(NormalPaletteSampleDisplay()).HeaderTab().Fixed(cx);
