@@ -224,6 +224,7 @@ void Finder::Sync()
 	begin.Enable(a);
 	end.Enable(b);
 	sWriteToDisplay(mode, decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C"));
+	text.Error(!IsNull(~text) && !cnt);
 	term.Refresh();
 }
 
@@ -269,8 +270,7 @@ void Finder::Harvest()
 				if(q.IsEmpty())
 					return false;
 				Vector<String> reaped;
-				for(int i = 0; i < foundtext.GetCount(); i++) {
-					const TextAnchor& a = foundtext[i];
+				for(const TextAnchor& a : foundtext) {
 					if(m.GetKey(0) != a.pos.y)
 						continue;
 					if((aborted = pi.StepCanceled()))
@@ -284,8 +284,7 @@ void Finder::Harvest()
 			term.Find(~text, false, Reap);
 			fo.Close();
 			if(!aborted)
-				FileCopy(tmp, path);
-			DeleteFile(tmp);
+				FileMove(tmp, path);
 		}
 	}
 }
