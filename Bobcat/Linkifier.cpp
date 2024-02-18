@@ -130,14 +130,14 @@ LinkInfo *Linkifier::end()
 void Linkifier::Search()
 {
 	Clear();
-	term.Find(WString("NIL"), true); // We don't really search for a specific string.
+	term.Find(WString("NIL"), true, THISFN(OnSearch)); // We don't really search for a specific string.
 	Sync();
 }
 
 bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL */)
 {
 	if(!term.HasLinkifier() || term.HasFinder() || !term.IsVisible())
-		return false;
+		return true;
 
 	LTIMING("Linkifier::OnSearch");
 	
@@ -146,7 +146,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 		text << s;
 
 	if(text.IsEmpty())
-		return false;
+		return true;
 		
 	int offset = m.GetKey(0);
 
@@ -162,7 +162,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 			p.url = s.Mid(o, r.GetLength());
 		}
 	}
-	return true;
+	return false;
 }
   
 void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)

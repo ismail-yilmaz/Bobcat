@@ -194,12 +194,13 @@ void Finder::StdBar(Bar& menu)
 
 void Finder::StdKeys(Bar& menu)
 {
-	menu.AddKey(AK_FIND_ALL,    [this] { bool b = showall; showall = !showall; Sync(); });
+	menu.AddKey(AK_FIND_ALL,    [this] { showall = !showall; Sync(); });
 	menu.AddKey(AK_FIND_NEXT,   THISFN(Next));
 	menu.AddKey(AK_FIND_PREV,   THISFN(Prev));
 	menu.AddKey(AK_FIND_FIRST,  THISFN(Begin));
 	menu.AddKey(AK_FIND_LAST,   THISFN(End));
 	menu.AddKey(AK_HIDE_FINDER, THISFN(Hide));
+	menu.AddKey(AK_HARVEST,     THISFN(Harvest));
 }
 
 bool Finder::Key(dword key, int count)
@@ -216,10 +217,12 @@ void Finder::Sync()
 		sWriteToDisplay(counter, Format("%d/%d", cnt ? index + 1 : 0, cnt));
 	else
 		sWriteToDisplay(counter, "0/0");
-	prev.Enable(cnt > 0 && index > 0);
-	next.Enable(cnt > 0 && index < cnt - 1);
-	begin.Enable(cnt > 0 && index > 0);
-	end.Enable(cnt > 0 && index < cnt - 1);
+	bool a = !term.IsSearching() && cnt > 0 && index > 0;
+	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
+	prev.Enable(a);
+	next.Enable(b);
+	begin.Enable(a);
+	end.Enable(b);
 	sWriteToDisplay(mode, decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C"));
 	term.Refresh();
 }
@@ -229,7 +232,7 @@ void Finder::Search()
 	if(term.IsSearching())
 		return;
 	foundtext.Clear();
-	term.Find(~text);
+	term.Find(~text, false, THISFN(OnSearch));
 	Sync();
 }
 
@@ -237,6 +240,49 @@ void Finder::Update()
 {
 	if(IsChild())
 		Search();
+}
+
+void Finder::Harvest()
+{
+	if(term.IsSearching() || foundtext.IsEmpty())
+		return;
+	
+	// TODO: List mode.
+
+	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
+		LTIMING("Finder::Harvester");
+		String tmp = GetTempFileName();
+		bool aborted = false;
+		if(FileOut fo(tmp); fo) {
+			Progress pi(&term);
+			pi.Set(0, foundtext.GetCount());
+			const char *status = t_("%d of %d item(s) written to file. [%d byte(s)]");
+			auto Reap = [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
+				WString q;
+				for(const WString& s : m)
+					q << s;
+				if(q.IsEmpty())
+					return false;
+				Vector<String> reaped;
+				for(int i = 0; i < foundtext.GetCount(); i++) {
+					const TextAnchor& a = foundtext[i];
+					if(m.GetKey(0) != a.pos.y)
+						continue;
+					if((aborted = pi.StepCanceled()))
+						return true;
+					reaped.Add() << CsvString(ToUtf8(q.Mid(a.pos.x, a.length)));
+				}
+				fo << Join(reaped, ",", true) << "\r\n";
+				pi.SetText(Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(fo.GetSize())));
+				return false;
+			};
+			term.Find(~text, false, Reap);
+			fo.Close();
+			if(!aborted)
+				FileCopy(tmp, path);
+			DeleteFile(tmp);
+		}
+	}
 }
 
 bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -277,11 +323,11 @@ bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString
 				}
 			}
 		}
-		return !v.IsEmpty();
+		return v.IsEmpty();
 	};
 	
 	ScanText(foundtext);
-	return true;
+	return false;
 }
 
 bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -295,7 +341,7 @@ bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WStri
 		q << ss;
 
 	if(q.IsEmpty())
-		return false;
+		return true;
 	
 	q = ToLower(q);
 	
@@ -308,11 +354,11 @@ bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WStri
 			a.length = len;
 			i += len;
 		}
-		return !v.IsEmpty();
+		return v.IsEmpty();
 	};
 
 	ScanText(foundtext);
-	return true;
+	return false;
 }
 
 bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -326,7 +372,7 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 		q << ss;
 
 	if(q.IsEmpty())
-		return false;
+		return true;
 	
 	auto ScanText = [&q, &s, &offset](Vector<TextAnchor>& v) {
 		RegExp r(s.ToString());
@@ -338,17 +384,17 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 			a.pos.x = Utf32Len(~ln, o);
 			a.length = Utf32Len(~ln + o, r.GetLength());
 		}
-		return !v.IsEmpty();
+		return v.IsEmpty();
 	};
 	
 	ScanText(foundtext);
-	return true;
+	return false;
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	if(!term.HasFinder())
-		return false;
+		return true;
 	
 	LTIMING("Finder::OnSearch");
 	
@@ -363,7 +409,7 @@ bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 		break;
 	}
 
-	return false;
+	return true;
 }
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)

@@ -44,6 +44,7 @@ public:
 
     void        Search();
     void        Update();
+    void        Harvest();
     
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
@@ -56,7 +57,7 @@ private:
     struct TextAnchor : Moveable<TextAnchor> {
         Point   pos = {0, 0};
         int     length = 0;
-	};
+    };
     
     Vector<TextAnchor> foundtext;
     

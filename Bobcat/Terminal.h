@@ -76,7 +76,6 @@ struct Terminal : TerminalCtrl {
     int         GetPosAsIndex(Point pt);
     int         GetMousePosAsIndex();
     
-    bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
     
     void        EmulationMenu(Bar& menu);
