@@ -15,7 +15,7 @@ namespace Upp {
 void ProfileNameDisplay::Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
 {
 	const Image& img = ctx.settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
-	bool current = ctx.GetActiveTerminal()->profilename == q;
+	bool current = ctx.GetActiveProfile() == q;
 	StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
 }
 
@@ -433,7 +433,7 @@ int Profiles::Load()
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
 		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
-		int current = list.Find(ctx.GetActiveTerminal()->profilename, 0);
+		int current = list.Find(ctx.GetActiveProfile(), 0);
 		if (current >= 0)
 			list.SetCursor(current);
 	}

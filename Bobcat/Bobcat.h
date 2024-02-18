@@ -47,6 +47,7 @@ struct Bobcat {
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
+    String      GetActiveProfile();
 
     Vector<Terminal*> GetTerminalGroup(hash_t id);
     Vector<Terminal*> GetTerminalGroup(const Profile& p);

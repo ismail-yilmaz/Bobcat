@@ -72,6 +72,14 @@ Terminal *Bobcat::GetActiveTerminal()
 	return dynamic_cast<Terminal*>(stack.GetActiveCtrl());
 }
 
+String Bobcat::GetActiveProfile()
+{
+	if (Terminal *t = GetActiveTerminal(); t)
+		return t->profilename;
+	else
+		return "";
+}
+
 Vector<Terminal *> Bobcat::GetTerminalGroup(hash_t id)
 {
 	Vector<Terminal*> v;
@@ -424,7 +432,7 @@ void Bobcat::HelpMenu(Bar& menu)
 void Bobcat::TermMenu(Bar& menu)
 {
 	Vector<String> pnames = GetProfileNames();
-	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { AddTerminal(GetActiveTerminal()->profilename); });
+	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { AddTerminal(GetActiveProfile()); });
 	if(!pnames.GetCount())
 		return;
 	
