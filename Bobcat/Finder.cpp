@@ -205,13 +205,14 @@ void Finder::StdBar(Bar& menu)
 
 void Finder::StdKeys(Bar& menu)
 {
-	menu.AddKey(AK_FIND_ALL,    [this] { showall = !showall; Sync(); });
-	menu.AddKey(AK_FIND_NEXT,   THISFN(Next));
-	menu.AddKey(AK_FIND_PREV,   THISFN(Prev));
-	menu.AddKey(AK_FIND_FIRST,  THISFN(Begin));
-	menu.AddKey(AK_FIND_LAST,   THISFN(End));
-	menu.AddKey(AK_HIDE_FINDER, THISFN(Hide));
-	menu.AddKey(AK_HARVEST,     THISFN(Harvest));
+	menu.AddKey(AK_FIND_ALL,     [this] { showall = !showall; Sync(); });
+	menu.AddKey(AK_FIND_NEXT,    THISFN(Next));
+	menu.AddKey(AK_FIND_PREV,    THISFN(Prev));
+	menu.AddKey(AK_FIND_FIRST,   THISFN(Begin));
+	menu.AddKey(AK_FIND_LAST,    THISFN(End));
+	menu.AddKey(AK_HIDE_FINDER,  THISFN(Hide));
+	menu.AddKey(AK_HARVEST_FILE, THISFN(SaveToFile));
+	menu.AddKey(AK_HARVEST_CLIP, THISFN(SaveToClipboard));
 }
 
 bool Finder::Key(dword key, int count)
@@ -254,56 +255,74 @@ void Finder::Update()
 		Search();
 }
 
-void Finder::Harvest()
+void Finder::SaveToFile()
+{
+	if(!CheckHarvest())
+		return;
+
+	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
+		String tmp = GetTempFileName();
+		if(FileOut fo(tmp); fo && Harvest(fo))
+			FileCopy(tmp, path);
+		DeleteFile(tmp);
+	}
+}
+
+void Finder::SaveToClipboard()
+{
+	if(!CheckHarvest())
+		return;
+
+	if(StringStream ss; Harvest(ss))
+		AppendClipboardText(ss);
+}
+
+bool Finder::CheckHarvest()
 {
 	if(term.IsSearching())
-		return;
+		return false;
 
 	if(foundtext.IsEmpty()) {
 		Exclamation(t_("Nothing to harvest."));
-		return;
+		return false;
 	}
 
 	if(!IsRegex()) {
 		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
-		return;
+		return false;
 	}
 	
-	// TODO: List mode.
+	return true;
+}
 
-	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
-		LTIMING("Finder::Harvester");
-		String tmp = GetTempFileName();
-		bool aborted = false;
-		if(FileOut fo(tmp); fo) {
-			Progress pi(&term);
-			pi.Set(0, foundtext.GetCount());
-			const char *status = t_("%d of %d item(s) written to file. [%s]");
-			auto Reap = [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
-				WString q;
-				for(const WString& s : m)
-					q << s;
-				if(q.IsEmpty())
-					return false;
-				Vector<String> reaped;
-				for(const TextAnchor& a : foundtext) {
-					if(m.GetKey(0) != a.pos.y)
-						continue;
-					if((aborted = pi.StepCanceled()))
-						return true;
-					reaped.Add() << CsvString(ToUtf8(q.Mid(a.pos.x, a.length)));
-				}
-				fo << Join(reaped, ",", true) << "\r\n";
-				pi.SetText(Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(fo.GetSize())));
-				return false;
-			};
-			term.Find(~text, false, Reap);
-			fo.Close();
-			if(!aborted)
-				FileCopy(tmp, path);
-			DeleteFile(tmp);
+bool Finder::Harvest(Stream& ss)
+{
+	bool aborted = false;
+	Progress pi(&term);
+	pi.Title(t_("Harvester"));
+	pi.Set(0, foundtext.GetCount());
+	const char *status = t_("Saved %d of %d item(s). [%s]");
+	auto Reap = [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
+		WString q;
+		for(const WString& s : m)
+			q << s;
+		if(q.IsEmpty())
+			return false;
+		Vector<String> reaped;
+		for(const TextAnchor& a : foundtext) {
+			if(m.GetKey(0) != a.pos.y)
+				continue;
+			if((aborted = pi.StepCanceled()))
+				return true;
+			reaped.Add() << CsvString(ToUtf8(q.Mid(a.pos.x, a.length)));
 		}
-	}
+		ss << Join(reaped, ",", true) << "\r\n";
+		pi.SetText(Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(ss.GetSize())));
+		return false;
+	};
+	term.Find(~text, false, Reap);
+	ss.Close();
+	return !aborted;
 }
 
 bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)

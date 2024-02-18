@@ -14,7 +14,7 @@ class Linkifier {
 public:
     typedef Linkifier CLASSNAME;
     
-    Linkifier(Terminal& ctx);
+    Linkifier(Terminal& t);
 
     Linkifier&  Enable(bool b = true);
     Linkifier&  Disable();

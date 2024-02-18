@@ -22,7 +22,6 @@ struct ProfileNameDisplayCls : Display {
 	}
 };
 
-
 struct FontProfileDisplayCls : Display {
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
@@ -33,9 +32,9 @@ struct FontProfileDisplayCls : Display {
 	}
 };
 
-const Display& ProfileNameDisplay()               { return Single<ProfileNameDisplayCls>(); }
-const Display& FontProfileDisplay()               { return Single<FontProfileDisplayCls>(); }
-const Display& GuiFontProfileDisplay()            { return Single<FontProfileDisplayCls>(); }
+const Display& ProfileNameDisplay()       { return Single<ProfileNameDisplayCls>(); }
+const Display& FontProfileDisplay()       { return Single<FontProfileDisplayCls>(); }
+const Display& GuiFontProfileDisplay()    { return Single<FontProfileDisplayCls>(); }
 
 VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()
 {

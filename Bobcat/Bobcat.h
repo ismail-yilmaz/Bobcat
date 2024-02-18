@@ -56,7 +56,6 @@ struct Bobcat : Pte<Bobcat> {
     Vector<Terminal*> GetTerminalGroup(const Profile& p);
     
     void        Run(const Profile& profile, Size size, bool fullscreen = false);
-
     
     void        Close();
     void        Settings();

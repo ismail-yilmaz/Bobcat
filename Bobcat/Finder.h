@@ -47,12 +47,15 @@ public:
 
     void        Search();
     void        Update();
-    void        Harvest();
+    void        SaveToFile();
+    void        SaveToClipboard();
     
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
+    bool        CheckHarvest();
+    bool        Harvest(Stream& s);
     bool        CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
@@ -70,12 +73,12 @@ private:
         Regex
     }   searchtype;
 
-	enum class Harvest {
-		Csv,
-		Json,
-		Xml
-	} harvesttype;
-	
+    enum class Harvest {
+        Csv,
+        Json,
+        Xml
+    } harvesttype;
+    
     struct SearchField : EditString {
         typedef SearchField CLASSNAME;
         SearchField();

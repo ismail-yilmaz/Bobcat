@@ -93,7 +93,7 @@ String Bobcat::GetActiveProfile()
 		return "";
 }
 
-Vector<Terminal *> Bobcat::GetTerminalGroup(hash_t id)
+Vector<Terminal*> Bobcat::GetTerminalGroup(hash_t id)
 {
 	Vector<Terminal*> v;
 	for(Terminal& t : terminals) {
@@ -103,7 +103,7 @@ Vector<Terminal *> Bobcat::GetTerminalGroup(hash_t id)
 	return v;
 }
 
-Vector<Terminal *> Bobcat::GetTerminalGroup(const Profile& p)
+Vector<Terminal*> Bobcat::GetTerminalGroup(const Profile& p)
 {
 	return GetTerminalGroup(p.GetHashValue());
 }
@@ -438,7 +438,7 @@ void Bobcat::SetupMenu(Bar& menu)
 
 void Bobcat::HelpMenu(Bar& menu)
 {
-	menu.Add(t_("Help"), [this] { Help(); });
+	menu.Add(t_("Help"),  [this] { Help();  });
 	menu.Add(t_("About"), [this] { About(); });
 }
 
