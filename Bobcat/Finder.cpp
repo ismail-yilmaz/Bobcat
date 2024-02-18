@@ -244,9 +244,14 @@ void Finder::Update()
 
 void Finder::Harvest()
 {
-	if(term.IsSearching() || foundtext.IsEmpty())
+	if(term.IsSearching())
 		return;
 	
+	if(foundtext.IsEmpty()) {
+		Exclamation(t_("Nothing to harvest."));
+		return;
+	}
+
 	// TODO: List mode.
 
 	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
