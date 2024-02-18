@@ -187,7 +187,7 @@ Profiles::Setup::Setup()
 	
 	for(int i = 0; i < CharsetCount(); i++) {
 		String cset = CharsetName(i);
-	//	if(!cset.StartsWith("dec-"))
+		if(!cset.StartsWith("dec-"))
 			emulation.charset.Add(cset);
 	}
 	
