@@ -26,6 +26,7 @@ Finder::Finder(Terminal& t)
 : term(t)
 , index(0)
 , searchtype(Search::CaseSensitive)
+, harvesttype(Harvest::Csv)
 {
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
@@ -100,6 +101,16 @@ void Finder::Hide()
 		term.ShowSizeHint(b);
 	}
 	term.SetFocus();
+}
+
+int Finder::GetCount() const
+{
+	return foundtext.GetCount();
+}
+
+bool Finder::HasFound() const
+{
+	return foundtext.GetCount() > 0;
 }
 
 void Finder::Goto(int i)
@@ -247,12 +258,17 @@ void Finder::Harvest()
 {
 	if(term.IsSearching())
 		return;
-	
+
 	if(foundtext.IsEmpty()) {
 		Exclamation(t_("Nothing to harvest."));
 		return;
 	}
 
+	if(!IsRegex()) {
+		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
+		return;
+	}
+	
 	// TODO: List mode.
 
 	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
@@ -284,7 +300,8 @@ void Finder::Harvest()
 			term.Find(~text, false, Reap);
 			fo.Close();
 			if(!aborted)
-				FileMove(tmp, path);
+				FileCopy(tmp, path);
+			DeleteFile(tmp);
 		}
 	}
 }

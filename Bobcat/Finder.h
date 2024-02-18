@@ -29,6 +29,9 @@ public:
     void        Begin();
     void        End();
     void        Goto(int i);
+
+    int         GetCount() const;
+    bool        HasFound() const;
     
     void        SetSearchMode(const String& mode);
 
@@ -67,6 +70,12 @@ private:
         Regex
     }   searchtype;
 
+	enum class Harvest {
+		Csv,
+		Json,
+		Xml
+	} harvesttype;
+	
     struct SearchField : EditString {
         typedef SearchField CLASSNAME;
         SearchField();
