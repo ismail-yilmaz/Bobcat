@@ -60,16 +60,6 @@ struct Profile : Moveable<Profile> {
     void        Jsonize(JsonIO& jio);
 };
 
-class Profiles;
-
-struct ProfileNameDisplay : Display
-{
-	Bobcat& ctx;
-
-	ProfileNameDisplay(Bobcat& ctx): ctx(ctx) {}
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final;
-};
-
 class Profiles : public WithProfilesLayout<ParentCtrl> {
 public:
     Profiles(Bobcat& ctx);
@@ -105,7 +95,6 @@ private:
     
     ToolBar            toolbar;
     Bobcat&            ctx;
-    ProfileNameDisplay display;
 
 public:
     Setup       setup;

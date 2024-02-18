@@ -27,6 +27,10 @@ namespace Upp {
 struct Bobcat;
 struct Terminal;
 
+// Global context
+Ptr<Bobcat> GetContext();
+void SetContext(Bobcat& ctx);
+
 #include "Palette.h"
 
 #define LAYOUTFILE <Bobcat/Bobcat.lay>
@@ -38,7 +42,7 @@ struct Terminal;
 #include "Profile.h"
 #include "Terminal.h"
 
-struct Bobcat {
+struct Bobcat : Pte<Bobcat> {
     Bobcat();
 
     bool        AddTerminal(const String& key = Null);

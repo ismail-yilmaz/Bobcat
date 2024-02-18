@@ -12,15 +12,18 @@ namespace Upp {
 #define IMAGECLASS Images
 #include <Draw/iml_source.h>
 
-void ProfileNameDisplay::Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
-{
-	const Image& img = ctx.settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
-	bool current = ctx.GetActiveProfile() == q;
-	StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
-}
+struct ProfileNameDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		auto ctx = GetContext();
+		const Image& img = ctx && ctx->settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
+		bool current = ctx && ctx->GetActiveProfile() == q;
+		StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
+	}
+};
 
-struct FontProfileDisplayCls : Display
-{
+
+struct FontProfileDisplayCls : Display {
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		Font f = q.To<Font>();
@@ -30,8 +33,9 @@ struct FontProfileDisplayCls : Display
 	}
 };
 
-const Display& FontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
-const Display& GuiFontProfileDisplay()     { return Single<FontProfileDisplayCls>(); }
+const Display& ProfileNameDisplay()               { return Single<ProfileNameDisplayCls>(); }
+const Display& FontProfileDisplay()               { return Single<FontProfileDisplayCls>(); }
+const Display& GuiFontProfileDisplay()            { return Single<FontProfileDisplayCls>(); }
 
 VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()
 {
@@ -183,7 +187,7 @@ Profiles::Setup::Setup()
 	
 	for(int i = 0; i < CharsetCount(); i++) {
 		String cset = CharsetName(i);
-		if(!cset.StartsWith("dec-"))
+	//	if(!cset.StartsWith("dec-"))
 			emulation.charset.Add(cset);
 	}
 	
@@ -277,7 +281,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.filter,         p.filterctrl)
      (emulation.overridetracking, p.overridetracking)
      (emulation.searchmode,     p.searchmode)
-     (emulation.showall, p.searchshowall)
+     (emulation.showall,        p.searchshowall)
      (linkifier,                dummy);
 }
 
@@ -307,8 +311,7 @@ void Profiles::Setup::Sync()
 }
 
 Profiles::Profiles(Bobcat& ctx)
-: ctx(ctx),
-display(ProfileNameDisplay(ctx))
+: ctx(ctx)
 {
 	CtrlLayout(*this);
 	Ctrl::Add(setup.HSizePosZ(141, 2).VSizePosZ(3, 3));
@@ -420,7 +423,7 @@ void Profiles::Sync()
 	setup.Sync();
 	toolbar.Set([this](Bar& bar) { ContextMenu(bar); });
 	for(int i = 0; i < list.GetCount(); i++) {
-		list.SetDisplay(i, 0, display);
+		list.SetDisplay(i, 0, ProfileNameDisplay());
 	}
 }
 

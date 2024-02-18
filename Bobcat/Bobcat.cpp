@@ -15,6 +15,18 @@ namespace Upp {
 
 using namespace AppKeys;
 
+static Ptr<Bobcat> sBobcatCtx;
+
+Ptr<Bobcat> GetContext()
+{
+	return sBobcatCtx;
+}
+
+void SetContext(Bobcat& ctx)
+{
+	sBobcatCtx = &ctx;
+}
+
 FileSel& BobcatFs()
 {
 	return Single<FileSel>();
@@ -23,6 +35,7 @@ FileSel& BobcatFs()
 Bobcat::Bobcat()
 : navigator(stack)
 {
+	SetContext(*this);
 	SyncTitle();
 	window.Sizeable().Zoomable().CenterScreen();
 	window.WhenClose = [this]() { Close(); };
