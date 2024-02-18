@@ -46,6 +46,7 @@ struct Bobcat {
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
+    String      GetActiveProfile();
 
     Vector<Terminal*> GetTerminalGroup(hash_t id);
     Vector<Terminal*> GetTerminalGroup(const Profile& p);
@@ -100,7 +101,7 @@ struct Bobcat {
         Config();
         String      guitheme;
         Font        guifont;
-        String      activeprofile;
+        String      defaultprofile;
         String      titlealignment;
         String      finderalignment;
         String      stackdirection;
