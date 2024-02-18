@@ -256,7 +256,7 @@ void Finder::Harvest()
 		if(FileOut fo(tmp); fo) {
 			Progress pi(&term);
 			pi.Set(0, foundtext.GetCount());
-			const char *status = t_("%d of %d item(s) written to file. [%d byte(s)]");
+			const char *status = t_("%d of %d item(s) written to file. [%s]");
 			auto Reap = [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
 				WString q;
 				for(const WString& s : m)
