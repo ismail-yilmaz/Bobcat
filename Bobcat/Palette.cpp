@@ -129,6 +129,9 @@ void Palettes::ContextMenu(Bar& bar)
 	if(bar.IsMenuBar()) {
 		bar.Separator();
 		bar.Add(b, tt_("Set as active palette"), [this]() { MakeActive(); }).Key(K_CTRL|K_D);
+		bar.Separator();
+		bar.Add(tt_("Open palettes directory"), Images::Directory(), []{ LaunchWebBrowser(PaletteDir()); }).Key(K_CTRL_HOME);
+
 	}
 }
 
