@@ -26,7 +26,6 @@ Finder::Finder(Terminal& t)
 : term(t)
 , index(0)
 , searchtype(Search::CaseSensitive)
-, harvesttype(Harvest::Csv)
 {
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
@@ -257,72 +256,12 @@ void Finder::Update()
 
 void Finder::SaveToFile()
 {
-	if(!CheckHarvest())
-		return;
-
-	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
-		String tmp = GetTempFileName();
-		if(FileOut fo(tmp); fo && Harvest(fo))
-			FileCopy(tmp, path);
-		DeleteFile(tmp);
-	}
+	Harvester(*this).SaveToFile();
 }
 
 void Finder::SaveToClipboard()
 {
-	if(!CheckHarvest())
-		return;
-
-	if(StringStream ss; Harvest(ss))
-		AppendClipboardText(ss);
-}
-
-bool Finder::CheckHarvest()
-{
-	if(term.IsSearching())
-		return false;
-
-	if(foundtext.IsEmpty()) {
-		Exclamation(t_("Nothing to harvest."));
-		return false;
-	}
-
-	if(!IsRegex()) {
-		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
-		return false;
-	}
-	
-	return true;
-}
-
-bool Finder::Harvest(Stream& ss)
-{
-	bool aborted = false;
-	Progress pi(&term);
-	pi.Title(t_("Harvester"));
-	pi.Set(0, foundtext.GetCount());
-	const char *status = t_("Saved %d of %d item(s). [%s]");
-	auto Reap = [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
-		WString q;
-		for(const WString& s : m)
-			q << s;
-		if(q.IsEmpty())
-			return false;
-		Vector<String> reaped;
-		for(const TextAnchor& a : foundtext) {
-			if(m.GetKey(0) != a.pos.y)
-				continue;
-			if((aborted = pi.StepCanceled()))
-				return true;
-			reaped.Add() << CsvString(ToUtf8(q.Mid(a.pos.x, a.length)));
-		}
-		ss << Join(reaped, ",", true) << "\r\n";
-		pi.SetText(Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(ss.GetSize())));
-		return false;
-	};
-	term.Find(~text, false, Reap);
-	ss.Close();
-	return !aborted;
+	Harvester(*this).SaveToClipboard();
 }
 
 bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -381,7 +320,7 @@ bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WStri
 		q << ss;
 
 	if(q.IsEmpty())
-		return true;
+		return false;
 	
 	q = ToLower(q);
 	
@@ -412,7 +351,7 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 		q << ss;
 
 	if(q.IsEmpty())
-		return true;
+		return false;
 	
 	auto ScanText = [&q, &s, &offset](Vector<TextAnchor>& v) {
 		RegExp r(s.ToString());
@@ -487,6 +426,89 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 			}
 		}
 }
+
+Finder::Harvester::Harvester(Finder& f)
+: finder(f)
+, format(Fmt::Csv)
+{
+}
+
+Finder::Harvester& Finder::Harvester::Format(Fmt fmt)
+{
+	format = fmt;
+	return *this;
+}
+
+bool Finder::Harvester::Reap(Stream& s)
+{
+	bool aborted = false;
+	Progress pi(&finder.term);
+	pi.Title(t_("Harvester"));
+	pi.Set(0, finder.foundtext.GetCount());
+	const char *status = t_("Saved %d of %d item(s). [%s]");
+	finder.term.Find(~finder.text, false, [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
+		WString txt;
+		for(const WString& s : m)
+			txt << s;
+		if(txt.IsEmpty())
+			return false;
+		Vector<String> reaped;
+		for(const TextAnchor& a : finder.foundtext) {
+			if(m.GetKey(0) != a.pos.y)
+				continue;
+			if((aborted = pi.StepCanceled()))
+				return true;
+			String q = ToUtf8(txt.Mid(a.pos.x, a.length));
+			reaped.Add() << CsvString(q);
+		}
+		s << Join(reaped, ",", true) << "\r\n";
+		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
+		return false;
+	});
+	s.Close();
+	return !aborted;
+}
+
+bool Finder::Harvester::IsReady() const
+{
+	if(finder.term.IsSearching())
+		return false;
+
+	if(finder.foundtext.IsEmpty()) {
+		Exclamation(t_("Nothing to harvest."));
+		return false;
+	}
+
+	if(!finder.IsRegex()) {
+		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
+		return false;
+	}
+	
+	return true;
+}
+
+void Finder::Harvester::SaveToClipboard()
+{
+	if(!IsReady())
+		return;
+
+	if(StringStream ss; Reap(ss))
+		AppendClipboardText(ss);
+}
+
+void Finder::Harvester::SaveToFile()
+{
+	if(!IsReady())
+		return;
+
+	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
+		String tmp = GetTempFileName();
+		if(FileOut fo(tmp); fo && Reap(fo))
+			FileCopy(tmp, path);
+		DeleteFile(tmp);
+	}
+}
+
 
 Finder::SearchField::SearchField()
 {

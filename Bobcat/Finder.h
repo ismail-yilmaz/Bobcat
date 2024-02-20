@@ -8,7 +8,7 @@ class Finder : public FrameTB<WithFinderLayout<ParentCtrl>>
 {
 public:
     typedef Finder CLASSNAME;
-    
+
     Finder(Terminal& t);
     virtual ~Finder();
 
@@ -18,9 +18,9 @@ public:
 
     void        StdBar(Bar& menu);
     void        StdKeys(Bar& menu);
-    
+
     bool        Key(dword key, int count) override;
-    
+
     void        Show();
     void        Hide();
 
@@ -32,60 +32,65 @@ public:
 
     int         GetCount() const;
     bool        HasFound() const;
-    
+
     void        SetSearchMode(const String& mode);
 
     void        CheckCase();
     void        IgnoreCase();
     void        CheckPattern();
-    
+
     bool        IsCaseSensitive() const;
     bool        IsCaseInsensitive() const;
     bool        IsRegex() const;
-    
+
     void        Sync();
 
     void        Search();
     void        Update();
+
     void        SaveToFile();
     void        SaveToClipboard();
-    
+
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
-    bool        CheckHarvest();
-    bool        Harvest(Stream& s);
     bool        CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
-    
+
     struct TextAnchor : Moveable<TextAnchor> {
         Point   pos = {0, 0};
         int     length = 0;
     };
-    
+
     Vector<TextAnchor> foundtext;
-    
+
     enum class Search {
         CaseSensitive,
         CaseInsensitive,
         Regex
     }   searchtype;
 
-    enum class Harvest {
-        Csv,
-        Json,
-        Xml
-    } harvesttype;
-    
+    struct Harvester {
+        enum class Fmt { Txt, Csv, Json, Xml };
+        Finder& finder;
+        Fmt     format;
+        Harvester(Finder& f);
+        Harvester& Format(Fmt fmt);
+        void SaveToClipboard();
+        void SaveToFile();
+        bool Reap(Stream& s);
+        bool IsReady() const;
+    };
+
     struct SearchField : EditString {
         typedef SearchField CLASSNAME;
         SearchField();
         void SearchBar(Bar& menu);
         bool Key(dword key, int count) override;
     };
-    
+
     int           index = 0;
     Terminal&     term;
     Value         data;
