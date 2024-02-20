@@ -81,6 +81,7 @@ Profile::Profile()
 , functionkeystyle("pc")
 , overridetracking("K_SHIFT_CTRL")
 , searchmode("sensitive")
+, searchsaveformat("txt")
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
@@ -142,6 +143,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("HistorySize",			 historysize)
 	("SearchMode",           searchmode)
 	("SearchShowsAll",       searchshowall)
+	("SearchSaveFormat",     searchsaveformat)
 	("BufferedRefresh",      delayedrefresh)
 	("LazyPageResize",       lazyresize)
 	("ShowSizeHint",         sizehint)
@@ -226,6 +228,10 @@ Profiles::Setup::Setup()
 	emulation.overridetracking.Add("K_SHIFT_ALT", "Shift+Alt");
 	emulation.overridetracking.Add("K_SHIFT_CTRL_ALT", "Shift+Ctrl+Alt");
 	emulation.overridetracking.SetIndex(4);
+	emulation.searchsaveformat.Add("txt", t_("Plain text"));
+	emulation.searchsaveformat.Add("csv", "Csv");
+//	emulation.searchsaveformat.Add("json", "Json");
+	emulation.searchsaveformat.SetIndex(0);
 	
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
@@ -281,6 +287,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.overridetracking, p.overridetracking)
      (emulation.searchmode,     p.searchmode)
      (emulation.showall,        p.searchshowall)
+     (emulation.searchsaveformat, p.searchsaveformat)
      (linkifier,                dummy);
 }
 

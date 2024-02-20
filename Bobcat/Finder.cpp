@@ -25,6 +25,7 @@ static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 Finder::Finder(Terminal& t)
 : term(t)
 , index(0)
+, format(Harvester::Fmt::Txt)
 , searchtype(Search::CaseSensitive)
 {
 	CtrlLayout(*this);
@@ -254,14 +255,19 @@ void Finder::Update()
 		Search();
 }
 
+void Finder::SaveFormat(const String& fmt)
+{
+	format = decode(fmt, "csv", Harvester::Fmt::Csv, Harvester::Fmt::Txt);
+}
+
 void Finder::SaveToFile()
 {
-	Harvester(*this).SaveToFile();
+	Harvester(*this).Format(format).SaveToFile();
 }
 
 void Finder::SaveToClipboard()
 {
-	Harvester(*this).SaveToClipboard();
+	Harvester(*this).Format(format).SaveToClipboard();
 }
 
 bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -452,16 +458,18 @@ bool Finder::Harvester::Reap(Stream& s)
 			txt << s;
 		if(txt.IsEmpty())
 			return false;
-		Vector<String> reaped;
+		String reaped;
 		for(const TextAnchor& a : finder.foundtext) {
 			if(m.GetKey(0) != a.pos.y)
 				continue;
 			if((aborted = pi.StepCanceled()))
 				return true;
 			String q = ToUtf8(txt.Mid(a.pos.x, a.length));
-			reaped.Add() << CsvString(q);
+			if(!q.IsEmpty())
+				reaped << (format == Fmt::Csv ? CsvString(q) : q) << ",";
 		}
-		s << Join(reaped, ",", true) << "\r\n";
+		reaped.TrimEnd(",");
+		s << reaped << "\r\n";
 		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
 		return false;
 	});
@@ -501,7 +509,8 @@ void Finder::Harvester::SaveToFile()
 	if(!IsReady())
 		return;
 
-	if(String path = SelectFileSaveAs("*.csv"); !path.IsEmpty()) {
+	String fmt = decode(format,	Fmt::Csv,  "*.csv", "*.txt");
+	if(String path = SelectFileSaveAs(fmt); !path.IsEmpty()) {
 		String tmp = GetTempFileName();
 		if(FileOut fo(tmp); fo && Reap(fo))
 			FileCopy(tmp, path);

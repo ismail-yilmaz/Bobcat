@@ -253,6 +253,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	Hyperlinks(p.hyperlinks);
 	finder.SetSearchMode(p.searchmode);
 	finder.showall = p.searchshowall;
+	finder.SaveFormat(p.searchsaveformat);
 	return *this;
 }
 

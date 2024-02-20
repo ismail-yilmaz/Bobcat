@@ -48,6 +48,7 @@ public:
     void        Search();
     void        Update();
 
+    void        SaveFormat(const String& fmt);
     void        SaveToFile();
     void        SaveToClipboard();
 
@@ -95,6 +96,7 @@ private:
     Terminal&     term;
     Value         data;
     SearchField   text;
+    Harvester::Fmt format;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;
     FrameRight<DisplayCtrl> counter;

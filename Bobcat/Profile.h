@@ -53,6 +53,7 @@ struct Profile : Moveable<Profile> {
     bool        filterctrl;
     String      searchmode;
     bool        searchshowall;
+    String      searchsaveformat;
     bool        sizehint;
     int         order;
     hash_t      GetHashValue() const;
