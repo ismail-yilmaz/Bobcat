@@ -270,24 +270,34 @@ void Finder::SaveToClipboard()
 	Harvester(*this).Format(format).SaveToClipboard();
 }
 
-bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
+bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
 	int offset = m.GetKey(0);
-	
-	LTIMING("CaseSensitiveSearch");
-	
-	// Notes: 1) We are using this for CS search, because it is faster than WString::Find().
+
+	LTIMING("TrivialSearch");
+
+	// Notes: 1) We are using this for search, because it is faster than using WString::Find() here.
 	//        2) m.GetCount() > 1 == text is wrapped.
-	
-	auto ScanText = [&m, &s, slen, offset](Vector<TextAnchor>& v) {
+
+	auto ScanText = [&](Vector<TextAnchor>& v, bool tolower) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
 			for(int col = 0; col < m[row].GetLength(); col++, i++) {
-				if(m[row][col] == s[0]) {
+				int a = m[row][col], b = s[0];
+				if(tolower) {
+					a = ToLower(a);
+					b = ToLower(b);
+				}
+				if(a == b) {
 					int trow = row, tcol = col, tlen = slen;
 					// Check if the substring is present starting from the current position.
 					while(tlen > 0 && trow < m.GetCount()) {
-						if(m[trow][tcol] == s[slen - tlen])
+						a = m[trow][tcol], b = s[slen - tlen];
+						if(tolower) {
+							a = ToLower(a);
+							b = ToLower(b);
+						}
+						if(a == b)
 							tlen--;
 						else
 							break;
@@ -308,42 +318,10 @@ bool Finder::CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString
 				}
 			}
 		}
-		return v.IsEmpty();
-	};
-	
-	ScanText(foundtext);
-	return false;
-}
-
-bool Finder::CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s)
-{
-	LTIMING("CaseInsensitiveSearch");
-
-	int offset = m.GetKey(0);
-	
-	WString u = ToLower(s), q;
-	for(const WString& ss : m)
-		q << ss;
-
-	if(q.IsEmpty())
 		return false;
-	
-	q = ToLower(q);
-	
-	auto ScanText = [&q, &u, &offset](Vector<TextAnchor>& v) {
-		int i = 0, len = u.GetLength();
-		while((i = q.Find(u, i)) >= 0) {
-			TextAnchor& a = v.Add();
-			a.pos.y = offset;
-			a.pos.x = i;
-			a.length = len;
-			i += len;
-		}
-		return v.IsEmpty();
 	};
 
-	ScanText(foundtext);
-	return false;
+	return ScanText(foundtext, IsCaseInsensitive());
 }
 
 bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -351,15 +329,15 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	LTIMING("RegexSearch");
 
 	int offset = m.GetKey(0);
-	
+
 	WString q;
 	for(const WString& ss : m)
 		q << ss;
 
 	if(q.IsEmpty())
 		return false;
-	
-	auto ScanText = [&q, &s, &offset](Vector<TextAnchor>& v) {
+
+	auto ScanText = [&](Vector<TextAnchor>& v) {
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
 		while(r.GlobalMatch(ln)) {
@@ -369,32 +347,17 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 			a.pos.x = Utf32Len(~ln, o);
 			a.length = Utf32Len(~ln + o, r.GetLength());
 		}
-		return v.IsEmpty();
+		return false;
 	};
-	
-	ScanText(foundtext);
-	return false;
+
+	return ScanText(foundtext);
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	if(!term.HasFinder())
 		return true;
-	
-	LTIMING("Finder::OnSearch");
-	
-	switch(searchtype) {
-	case Search::CaseInsensitive:
-		return CaseInsensitiveSearch(m, s);
-	case Search::CaseSensitive:
-		return CaseSensitiveSearch(m, s);
-	case Search::Regex:
-		return RegexSearch(m, s);
-	default:
-		break;
-	}
-
-	return true;
+	return IsRegex() ? RegexSearch(m, s) : BasicSearch(m, s);
 }
 
 void Finder::OnHighlight(VectorMap<int, VTLine>& hl)

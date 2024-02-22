@@ -56,8 +56,7 @@ public:
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
 private:
-    bool        CaseSensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
-    bool        CaseInsensitiveSearch(const VectorMap<int, WString>& m, const WString& s);
+    bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
 
     struct TextAnchor : Moveable<TextAnchor> {
