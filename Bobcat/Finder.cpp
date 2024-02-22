@@ -216,6 +216,8 @@ void Finder::StdKeys(Bar& menu)
 	menu.AddKey(AK_HIDE_FINDER,  THISFN(Hide));
 	menu.AddKey(AK_HARVEST_FILE, THISFN(SaveToFile));
 	menu.AddKey(AK_HARVEST_CLIP, THISFN(SaveToClipboard));
+	menu.AddKey(AK_HARVEST_LIST, [this] { harvester.Mode("list"); });
+	menu.AddKey(AK_HARVEST_MAP,  [this] { harvester.Mode("map");  });
 }
 
 bool Finder::Key(dword key, int count)
