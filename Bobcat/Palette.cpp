@@ -30,7 +30,7 @@ struct NormalPaletteSampleDisplayCls : Display {
 		const Palette& p = q.To<Palette>();
 		ink   = p.table[TerminalCtrl::COLOR_INK];
 		paper = p.table[TerminalCtrl::COLOR_PAPER];
-		StdDisplay().Paint(w, r, AttrText(sSampleText).Right().SetFont(Monospace()), ink, paper, style);
+		StdCenterDisplay().Paint(w, r, AttrText(sSampleText).SetFont(Monospace()), ink, paper, style);
 	}
 };
 
@@ -102,7 +102,7 @@ void Palette::Jsonize(JsonIO& jio)
 
 Palettes::Palettes()
 {
-	int cx = Zx(GetTextSize(sSampleText, Monospace()).cx);
+	int cx = Zx(GetTextSize(sSampleText, Monospace()).cx + Zx(8));
 	Ctrl::Add(list.SizePos());
 	list.AddColumn(tt_("Name"));
 	list.AddColumn(tt_("Sample")).SetDisplay(NormalPaletteSampleDisplay()).HeaderTab().Fixed(cx);
