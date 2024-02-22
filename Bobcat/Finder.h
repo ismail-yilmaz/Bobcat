@@ -73,16 +73,18 @@ private:
     }   searchtype;
 
     struct Harvester {
-        enum class Fmt { Txt, Csv, Json, Xml };
+        enum class Fmt  { Txt, Csv, Json, Xml };
         Finder& finder;
         Fmt     format;
+        String  delimiter;
         Harvester(Finder& f);
-        Harvester& Format(Fmt fmt);
+        Harvester& Format(const String& fmt);
+        Harvester& Mode(const String& mode);
         void SaveToClipboard();
         void SaveToFile();
         bool Reap(Stream& s);
         bool IsReady() const;
-    };
+    } harvester;
 
     struct SearchField : EditString {
         typedef SearchField CLASSNAME;
@@ -95,7 +97,6 @@ private:
     Terminal&     term;
     Value         data;
     SearchField   text;
-    Harvester::Fmt format;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;
     FrameRight<DisplayCtrl> counter;

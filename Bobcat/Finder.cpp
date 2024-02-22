@@ -25,7 +25,7 @@ static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 Finder::Finder(Terminal& t)
 : term(t)
 , index(0)
-, format(Harvester::Fmt::Txt)
+, harvester(*this)
 , searchtype(Search::CaseSensitive)
 {
 	CtrlLayout(*this);
@@ -257,17 +257,17 @@ void Finder::Update()
 
 void Finder::SaveFormat(const String& fmt)
 {
-	format = decode(fmt, "csv", Harvester::Fmt::Csv, Harvester::Fmt::Txt);
+	harvester.Format(fmt);
 }
 
 void Finder::SaveToFile()
 {
-	Harvester(*this).Format(format).SaveToFile();
+	harvester.SaveToFile();
 }
 
 void Finder::SaveToClipboard()
 {
-	Harvester(*this).Format(format).SaveToClipboard();
+	harvester.SaveToClipboard();
 }
 
 bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -402,9 +402,15 @@ Finder::Harvester::Harvester(Finder& f)
 {
 }
 
-Finder::Harvester& Finder::Harvester::Format(Fmt fmt)
+Finder::Harvester& Finder::Harvester::Format(const String& fmt)
 {
-	format = fmt;
+	format = decode(fmt, "csv", Harvester::Fmt::Csv, Harvester::Fmt::Txt);
+	return *this;
+}
+
+Finder::Harvester& Finder::Harvester::Mode(const String& md)
+{
+	delimiter = decode(md, "list", "\r\n", ",");
 	return *this;
 }
 
@@ -429,10 +435,15 @@ bool Finder::Harvester::Reap(Stream& s)
 				return true;
 			String q = ToUtf8(txt.Mid(a.pos.x, a.length));
 			if(!q.IsEmpty())
-				reaped << (format == Fmt::Csv ? CsvString(q) : q) << ",";
+				reaped << (format == Fmt::Csv ? CsvString(q) : q) << delimiter;
 		}
-		reaped.TrimEnd(",");
-		s << reaped << "\r\n";
+		if(delimiter == ",") {
+			reaped.TrimEnd(",");
+			s << reaped << "\r\n";
+		}
+		else {
+			s << reaped;
+		}
 		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
 		return false;
 	});
@@ -480,7 +491,6 @@ void Finder::Harvester::SaveToFile()
 		DeleteFile(tmp);
 	}
 }
-
 
 Finder::SearchField::SearchField()
 {
