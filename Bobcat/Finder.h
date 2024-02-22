@@ -112,8 +112,7 @@ private:
     Value         data;
     SearchField   text;
     FrameLeft<ToolButton> menu;
-    FrameRight<DisplayCtrl> mode;
-    FrameRight<DisplayCtrl> counter;
+    FrameRight<DisplayCtrl> display;
 };
 
 class FinderSetup : public WithFinderProfileLayout<ParentCtrl> {

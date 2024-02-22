@@ -20,7 +20,7 @@ constexpr const int SEARCH_MAX = 256000;
 
 static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 {
-	int cx = max(GetStdFont().GetMonoWidth() * 2, GetTextSize(txt, GetStdFont()).cx);
+	int cx = GetTextSize(txt, GetStdFont()).cx + 8;
 	f.Width(cx) <<= AttrText(txt).Bold().Ink(SColorDisabled);
 }
 
@@ -45,17 +45,13 @@ Finder::Finder(Terminal& t)
 	showall << THISFN(Sync);
 	Add(text.HSizePosZ(4, 200).TopPosZ(3, 18));
 	text.NullText(t_("Type to search..."));
-	text.AddFrame(mode);
-	text.AddFrame(counter);
+	text.AddFrame(display);
 	text.AddFrame(menu);
 	text.WhenBar << THISFN(StdKeys);
 	text.WhenAction << THISFN(Search);
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
-	counter.SetDisplay(StdCenterDisplay());
-	mode.SetDisplay(StdCenterDisplay());
-	sWriteToDisplay(counter, "0/0");
-	sWriteToDisplay(mode, "C");
+	display.SetDisplay(StdRightDisplay());
 	Sync();
 }
 
@@ -230,17 +226,16 @@ void Finder::Sync()
 {
 	int cnt = foundtext.GetCount();
 	index = clamp(index, 0, max(0, cnt - 1));
-	if(text.GetLength() > 0)
-		sWriteToDisplay(counter, Format("%d/%d", cnt ? index + 1 : 0, cnt));
-	else
-		sWriteToDisplay(counter, "0/0");
+	String s;
+	s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
+	s << decode(searchtype, Search::Regex, "R", Search::CaseInsensitive, "I", "C") << " ";
+	sWriteToDisplay(display, s);
 	bool a = !term.IsSearching() && cnt > 0 && index > 0;
 	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
 	prev.Enable(a);
 	next.Enable(b);
 	begin.Enable(a);
 	end.Enable(b);
-	sWriteToDisplay(mode, decode(searchtype, Search::CaseInsensitive, "I", Search::Regex, "R", "C"));
 	text.Error(!IsNull(~text) && !cnt);
 	term.Refresh();
 }
