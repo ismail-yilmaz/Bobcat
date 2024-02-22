@@ -278,6 +278,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (finder.saveformat,        p.finder.saveformat)
      (finder.savemode,          p.finder.savemode)
      (finder.showall,           p.finder.showall)
+     (finder.delimiter,         p.finder.delimiter)
      (linkifier,                dummy);
 }
 

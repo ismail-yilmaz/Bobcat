@@ -60,6 +60,7 @@ public:
 		int     searchlimit;
 		String  saveformat;
 		String  savemode;
+		String  delimiter;
 		bool    showall;
 		void    Jsonize(JsonIO& jio);
 	};
@@ -91,6 +92,7 @@ private:
         Harvester(Finder& f);
         Harvester& Format(const String& fmt);
         Harvester& Mode(const String& mode);
+        Harvester& Delimiter(const String& delim);
         void SaveToClipboard();
         void SaveToFile();
         bool Reap(Stream& s);

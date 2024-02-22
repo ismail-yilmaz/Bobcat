@@ -403,12 +403,13 @@ void Finder::SetConfig(const Finder::Config& cfg)
 	SetSearchMode(cfg.searchmode);
 	limit = clamp(cfg.searchlimit, 1, SEARCH_MAX);
 	showall = cfg.showall;
-	harvester.Format(cfg.saveformat).Mode(cfg.savemode);
+	harvester.Format(cfg.saveformat).Delimiter(cfg.delimiter).Mode(cfg.savemode);
 }
 
 Finder::Harvester::Harvester(Finder& f)
 : finder(f)
 , format(Fmt::Csv)
+, delimiter(",")
 {
 }
 
@@ -420,7 +421,14 @@ Finder::Harvester& Finder::Harvester::Format(const String& fmt)
 
 Finder::Harvester& Finder::Harvester::Mode(const String& md)
 {
-	delimiter = decode(md, "list", "\r\n", ",");
+	if(md == "list")
+		delimiter = "\r\n";
+	return *this;
+}
+
+Finder::Harvester& Finder::Harvester::Delimiter(const String& delim)
+{
+	delimiter = delim;
 	return *this;
 }
 
@@ -447,10 +455,11 @@ bool Finder::Harvester::Reap(Stream& s)
 			if(!q.IsEmpty())
 				reaped << (format == Fmt::Csv ? CsvString(q) : q) << delimiter;
 		}
-		if(delimiter == ",")
-			reaped.TrimEnd(",");
-		s.Put(reaped);
-		s.PutCrLf();
+		if(!reaped.IsEmpty()) {
+			reaped.TrimEnd(delimiter);
+			s.Put(reaped);
+			s.PutCrLf();
+		}
 		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
 		return false;
 	});
@@ -527,6 +536,7 @@ Finder::Config::Config()
 , searchlimit(65536)
 , saveformat("txt")
 , savemode("map")
+, delimiter(",")
 , showall(false)
 {
 }
@@ -537,7 +547,8 @@ void Finder::Config::Jsonize(JsonIO& jio)
 	   ("SearchLimit",      searchlimit)
 	   ("ShowAll",          showall)
 	   ("HarvestingFormat", saveformat)
-	   ("HarvestingMode",   savemode);
+	   ("HarvestingMode",   savemode)
+	   ("HarveserDelimiter", delimiter);
 }
 
 FinderSetup::FinderSetup()
