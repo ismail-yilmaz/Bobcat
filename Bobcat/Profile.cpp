@@ -80,8 +80,6 @@ Profile::Profile()
 , erasechar("delete")
 , functionkeystyle("pc")
 , overridetracking("K_SHIFT_CTRL")
-, searchmode("sensitive")
-, searchsaveformat("txt")
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
@@ -141,15 +139,13 @@ void Profile::Jsonize(JsonIO& jio)
 	("AutoHideMouseCursor",  autohidemouse)
 	("HistoryBuffer",		 history)
 	("HistorySize",			 historysize)
-	("SearchMode",           searchmode)
-	("SearchShowsAll",       searchshowall)
-	("SearchSaveFormat",     searchsaveformat)
 	("BufferedRefresh",      delayedrefresh)
 	("LazyPageResize",       lazyresize)
 	("ShowSizeHint",         sizehint)
 	("FilterCtrlBytes",      filterctrl)
 	("OnExit",               onexit)
-	("Palette",              palette);
+	("Palette",              palette)
+	("Finder",               finder);
 	
 	if(jio.IsLoading() && !IsNull(name)) {
 		auto& m = GetHyperlinkPatterns();
@@ -201,6 +197,7 @@ Profiles::Setup::Setup()
 	tabs.Add(general.SizePos(), t_("Environment"));
 	tabs.Add(visuals.SizePos(), t_("Appearance"));
 	tabs.Add(emulation.SizePos(), t_("Emulation"));
+	tabs.Add(finder.SizePos(), t_("Finder"));
 	tabs.Add(linkifier.SizePos(), t_("Linkifier"));
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
@@ -216,10 +213,6 @@ Profiles::Setup::Setup()
 	emulation.erasechar.Add("delete", t_("Delete [^?]"));
 	emulation.erasechar.Add("backspace", t_("Backspace [^H]"));
 	emulation.erasechar.SetIndex(0);
-	emulation.searchmode.Add("sensitive",   t_("Case sensitive"));
-	emulation.searchmode.Add("insensitive", t_("Case insensitive"));
-	emulation.searchmode.Add("regex",       t_("Regex"));
-	emulation.erasechar.SetIndex(0);
 	emulation.overridetracking.Add("K_SHIFT", "Shift");
 	emulation.overridetracking.Add("K_ALT",  "Alt");
 	emulation.overridetracking.Add("K_CTRL",  "Ctrl");
@@ -228,11 +221,7 @@ Profiles::Setup::Setup()
 	emulation.overridetracking.Add("K_SHIFT_ALT", "Shift+Alt");
 	emulation.overridetracking.Add("K_SHIFT_CTRL_ALT", "Shift+Ctrl+Alt");
 	emulation.overridetracking.SetIndex(4);
-	emulation.searchsaveformat.Add("txt", t_("Plain text"));
-	emulation.searchsaveformat.Add("csv", "Csv");
-//	emulation.searchsaveformat.Add("json", "Json");
-	emulation.searchsaveformat.SetIndex(0);
-	
+
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : emulation) c.WhenAction << [this] { Sync(); };
@@ -285,9 +274,10 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.lazyresize,     p.lazyresize)
      (emulation.filter,         p.filterctrl)
      (emulation.overridetracking, p.overridetracking)
-     (emulation.searchmode,     p.searchmode)
-     (emulation.showall,        p.searchshowall)
-     (emulation.searchsaveformat, p.searchsaveformat)
+     (finder.searchmode,        p.finder.searchmode)
+     (finder.saveformat,        p.finder.saveformat)
+     (finder.savemode,          p.finder.savemode)
+     (finder.showall,           p.finder.showall)
      (linkifier,                dummy);
 }
 

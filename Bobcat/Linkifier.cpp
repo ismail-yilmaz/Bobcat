@@ -146,7 +146,7 @@ bool Linkifier::OnSearch(const VectorMap<int, WString>& m, const WString& /* NIL
 		text << s;
 
 	if(text.IsEmpty())
-		return true;
+		return false;
 		
 	int offset = m.GetKey(0);
 

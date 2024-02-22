@@ -156,3 +156,16 @@ LAYOUT(FinderLayout, 526, 24)
 	ITEM(ToolButton, close, RightPosZ(4, 12).VCenterPosZ(12, 0))
 END_LAYOUT
 
+LAYOUT(FinderProfileLayout, 659, 299)
+	ITEM(Upp::DropList, searchmode, LeftPosZ(209, 178).TopPosZ(6, 20))
+	ITEM(Upp::Option, showall, SetLabel(t_("Show all ")).LeftPosZ(396, 110).TopPosZ(8, 16))
+	ITEM(Upp::EditIntSpin, maxsearch, Min(1).Max(256000).NotNull(true).LeftPosZ(209, 178).TopPosZ(31, 20))
+	ITEM(Upp::DropList, saveformat, LeftPosZ(209, 178).TopPosZ(65, 20))
+	ITEM(Upp::DropList, savemode, LeftPosZ(209, 178).TopPosZ(90, 20))
+	ITEM(Upp::Label, dv___5, SetLabel(t_("Default search mode")).LeftPosZ(12, 191).TopPosZ(8, 16))
+	ITEM(Upp::Label, dv___6, SetLabel(t_("Search limit")).LeftPosZ(12, 191).TopPosZ(33, 16))
+	ITEM(Upp::Label, dv___7, SetLabel(t_("Harvesting mode")).LeftPosZ(12, 191).TopPosZ(92, 16))
+	ITEM(Upp::Label, dv___8, SetLabel(t_("Harvesting format")).LeftPosZ(12, 191).TopPosZ(67, 16))
+	ITEM(Upp::Label, dv___9, SetLabel(t_("items")).LeftPosZ(396, 110).TopPosZ(31, 19))
+END_LAYOUT
+

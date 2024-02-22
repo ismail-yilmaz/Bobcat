@@ -251,9 +251,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
 	Hyperlinks(p.hyperlinks);
-	finder.SetSearchMode(p.searchmode);
-	finder.showall = p.searchshowall;
-	finder.SaveFormat(p.searchsaveformat);
+	finder.SetConfig(p.finder);
 	return *this;
 }
 

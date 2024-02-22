@@ -48,12 +48,23 @@ public:
     void        Search();
     void        Update();
 
-    void        SaveFormat(const String& fmt);
     void        SaveToFile();
     void        SaveToClipboard();
 
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
+
+	struct Config {
+		Config();
+		String  searchmode;
+		int     searchlimit;
+		String  saveformat;
+		String  savemode;
+		bool    showall;
+		void    Jsonize(JsonIO& jio);
+	};
+
+	void        SetConfig(const Finder::Config& cfg);
 
 private:
     bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
@@ -90,16 +101,31 @@ private:
         typedef SearchField CLASSNAME;
         SearchField();
         void SearchBar(Bar& menu);
-        bool Key(dword key, int count) override;
+        bool Key(dword key, int count) final;
     };
 
     int           index = 0;
+    int           limit = 0;
     Terminal&     term;
     Value         data;
     SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> mode;
     FrameRight<DisplayCtrl> counter;
+};
+
+class FinderSetup : public WithFinderProfileLayout<ParentCtrl> {
+public:
+    typedef LinkifierSetup CLASSNAME;
+    
+    FinderSetup();
+
+    void        Sync();
+    void        ContextMenu(Bar& bar);
+
+private:
+    ToolBar     toolbar;
+    EditStringNotNull edit;
 };
 
 #endif

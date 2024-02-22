@@ -51,11 +51,9 @@ struct Profile : Moveable<Profile> {
     String      overridetracking;
     String      onexit;
     bool        filterctrl;
-    String      searchmode;
-    bool        searchshowall;
-    String      searchsaveformat;
     bool        sizehint;
     int         order;
+    Finder::Config finder;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);
@@ -90,6 +88,7 @@ private:
         mutable         WithGeneralProfileLayout<ParentCtrl>   general;
         mutable         WithVisualProfileLayout<ParentCtrl>    visuals;
         mutable         WithEmulationProfileLayout<ParentCtrl> emulation;
+        mutable         FinderSetup                            finder;
         mutable         LinkifierSetup                         linkifier;
         mutable         Palettes                               palettes;
     };

@@ -16,6 +16,8 @@ namespace Upp {
 
 using namespace FinderKeys;
 
+constexpr const int SEARCH_MAX = 256000;
+
 static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 {
 	int cx = max(GetStdFont().GetMonoWidth() * 2, GetTextSize(txt, GetStdFont()).cx);
@@ -25,6 +27,7 @@ static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 Finder::Finder(Terminal& t)
 : term(t)
 , index(0)
+, limit(SEARCH_MAX)
 , harvester(*this)
 , searchtype(Search::CaseSensitive)
 {
@@ -255,11 +258,6 @@ void Finder::Update()
 		Search();
 }
 
-void Finder::SaveFormat(const String& fmt)
-{
-	harvester.Format(fmt);
-}
-
 void Finder::SaveToFile()
 {
 	harvester.SaveToFile();
@@ -274,13 +272,13 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
 	int offset = m.GetKey(0);
-
+	
 	LTIMING("TrivialSearch");
-
+	
 	// Notes: 1) We are using this for search, because it is faster than using WString::Find() here.
 	//        2) m.GetCount() > 1 == text is wrapped.
-
-	auto ScanText = [&](Vector<TextAnchor>& v, bool tolower) {
+	
+	auto ScanText = [&](Vector<TextAnchor>& v, int limit, bool tolower) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
 			for(int col = 0; col < m[row].GetLength(); col++, i++) {
 				int a = m[row][col], b = s[0];
@@ -314,14 +312,16 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 						a.pos.y = offset;
 						a.pos.x = i;
 						a.length = slen;
+						if(v.GetCount() == limit)
+							return true;
 					}
 				}
 			}
 		}
 		return false;
 	};
-
-	return ScanText(foundtext, IsCaseInsensitive());
+	
+	return ScanText(foundtext, limit, IsCaseInsensitive());
 }
 
 bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -329,15 +329,15 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	LTIMING("RegexSearch");
 
 	int offset = m.GetKey(0);
-
+	
 	WString q;
 	for(const WString& ss : m)
 		q << ss;
 
 	if(q.IsEmpty())
 		return false;
-
-	auto ScanText = [&](Vector<TextAnchor>& v) {
+	
+	auto ScanText = [&](Vector<TextAnchor>& v, int limit) {
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
 		while(r.GlobalMatch(ln)) {
@@ -346,11 +346,13 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 			a.pos.y = offset;
 			a.pos.x = Utf32Len(~ln, o);
 			a.length = Utf32Len(~ln + o, r.GetLength());
+			if(v.GetCount() == limit)
+				return true;
 		}
 		return false;
 	};
-
-	return ScanText(foundtext);
+	
+	return ScanText(foundtext, limit);
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -396,6 +398,14 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 		}
 }
 
+void Finder::SetConfig(const Finder::Config& cfg)
+{
+	SetSearchMode(cfg.searchmode);
+	limit = clamp(cfg.searchlimit, 1, SEARCH_MAX);
+	showall = cfg.showall;
+	harvester.Format(cfg.saveformat).Mode(cfg.savemode);
+}
+
 Finder::Harvester::Harvester(Finder& f)
 : finder(f)
 , format(Fmt::Csv)
@@ -437,13 +447,10 @@ bool Finder::Harvester::Reap(Stream& s)
 			if(!q.IsEmpty())
 				reaped << (format == Fmt::Csv ? CsvString(q) : q) << delimiter;
 		}
-		if(delimiter == ",") {
+		if(delimiter == ",")
 			reaped.TrimEnd(",");
-			s << reaped << "\r\n";
-		}
-		else {
-			s << reaped;
-		}
+		s.Put(reaped);
+		s.PutCrLf();
 		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
 		return false;
 	});
@@ -515,4 +522,49 @@ bool Finder::SearchField::Key(dword key, int count)
 	return EditField::Key(key, count);
 }
 
+Finder::Config::Config()
+: searchmode("sensitive")
+, searchlimit(65536)
+, saveformat("txt")
+, savemode("map")
+, showall(false)
+{
 }
+
+void Finder::Config::Jsonize(JsonIO& jio)
+{
+	jio("SearchMode",       searchmode)
+	   ("SearchLimit",      searchlimit)
+	   ("ShowAll",          showall)
+	   ("HarvestingFormat", saveformat)
+	   ("HarvestingMode",   savemode);
+}
+
+FinderSetup::FinderSetup()
+{
+	CtrlLayout(*this);
+	searchmode.Add("sensitive",   t_("Case sensitive"));
+	searchmode.Add("insensitive", t_("Case insensitive"));
+	searchmode.Add("regex",       t_("Regex"));
+	searchmode.SetIndex(0);
+	saveformat.Add("txt", t_("Plain text"));
+	saveformat.Add("csv", "Csv");
+	saveformat.SetIndex(0);
+	savemode.Add("map",  t_("Map"));
+	savemode.Add("list", t_("List"));
+	savemode.SetIndex(0);
+	maxsearch <<= 65536;
+	showall = false;
+}
+void FinderSetup::Sync()
+{
+	// TODO
+}
+
+void FinderSetup::ContextMenu(Bar& bar)
+{
+	// TODO
+}
+
+}
+
