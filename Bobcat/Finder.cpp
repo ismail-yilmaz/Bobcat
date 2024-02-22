@@ -548,7 +548,7 @@ void Finder::Config::Jsonize(JsonIO& jio)
 	   ("ShowAll",          showall)
 	   ("HarvestingFormat", saveformat)
 	   ("HarvestingMode",   savemode)
-	   ("HarveserDelimiter", delimiter);
+	   ("Delimiter",        delimiter);
 }
 
 FinderSetup::FinderSetup()
