@@ -28,6 +28,7 @@ void PrintHelp()
 		"       --hide-titlebar            Hide the title bar.\n"
 		"\n"
 		"Environment options:\n"
+		"   -r, --restart                  Restart the command on exit.\n"
 		"   -k, --keep                     Don't close the terminal on exit.\n"
 		"   -K, --dont-keep                Close the terminal on exit.\n"
 		"   -n, --no-environment           Don't inherit the environment.\n"
@@ -123,6 +124,10 @@ GUI_APP_MAIN
 		else
 		if(findarg(s, "--hide-titlebar") != -1) {
 			app.settings.showtitle = false;
+		}
+		else
+		if(findarg(s, "-r", "--restart") != -1) {
+			p.onexit = "restart";
 		}
 		else
 		if(findarg(s, "-k", "--keep") != -1) {
