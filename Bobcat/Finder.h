@@ -107,7 +107,7 @@ private:
     };
 
     int           index = 0;
-    int           limit = 0;
+    int           limit;
     Terminal&     term;
     Value         data;
     SearchField   text;

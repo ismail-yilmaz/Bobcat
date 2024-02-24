@@ -261,22 +261,4 @@ void LoadGuiFont(Bobcat& ctx)
 {
 	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
 }
-
-bool CustomWordSelectionFilter(const VTCell& cell)
-{
-	if(cell.IsImage())
-		return false;
-	if(IsLeNum(cell))
-		return true;
-	if(auto ctx = GetContext(); ctx && ctx->GetActiveTerminal()) {
-		const String& s = ctx->GetActiveTerminal()->wordselchars;
-		if(s.IsEmpty())
-			return findarg(cell, '_', '-') >= 0;
-		for(auto c : s)
-			if(cell == c)
-				return true;
-	}
-	return false;
-}
-
 }

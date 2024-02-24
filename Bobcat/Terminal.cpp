@@ -34,8 +34,6 @@ Terminal::Terminal(Bobcat& ctx_)
     titlebar.close   << [this] { Stop(); };
     titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
-
-	SetWordSelectionFilter(&CustomWordSelectionFilter);
 	
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
     WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
@@ -221,7 +219,6 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	profilename = p.name;
 	bell = p.bell;
 	filter = p.filterctrl;
-	wordselchars = p.wordselchars;
 	WindowActions(p.windowactions);
 	WindowReports(p.windowreports);
 	History(p.history);
@@ -254,6 +251,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
 	Hyperlinks(p.hyperlinks);
+	SetWordSelectionFilter(p.wordselchars);
 	finder.SetConfig(p.finder);
 	return *this;
 }
@@ -359,6 +357,14 @@ Terminal& Terminal::SetFontZoom(int n)
 Terminal& Terminal::SetLineSpacing(int n)
 {
 	SetPadding(Size(0,  decode(n, 0, 0, GetPadding().cy + n)));
+	return *this;
+}
+
+Terminal& Terminal::SetWordSelectionFilter(const String& s)
+{
+	TerminalCtrl::SetWordSelectionFilter([s = clone(s)](const VTCell& cell) {
+		return !cell.IsImage() && (IsLeNum(cell) || FindIndex(s, cell.chr) >= 0);
+	});
 	return *this;
 }
 
