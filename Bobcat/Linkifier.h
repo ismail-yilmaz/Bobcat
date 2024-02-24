@@ -75,5 +75,16 @@ private:
     EditStringNotNull edit;
 };
 
+// Hyperlink pattern info
 
+struct PatternInfo : Moveable<PatternInfo> {
+    String      cmd;
+    String      pattern;
+    void        Jsonize(JsonIO& jio);
+    String      ToString() const;
+};
+
+// Global functions
+
+VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns();
 #endif

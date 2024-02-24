@@ -99,6 +99,7 @@ struct Terminal : TerminalCtrl {
     bool         filter:1;
     ExitMode     exitmode;
     String       profilename;
+    String       wordselchars;
     Value        data;
     Finder       finder;
     Linkifier    linkifier;
@@ -127,6 +128,7 @@ struct Terminal : TerminalCtrl {
 // Global functions
 Terminal& AsTerminal(Ctrl& c);
 void      InsertUnicodeCodePoint(Terminal& term);
+bool      CustomWordSelectionFilter(const VTCell& cell);
 
 // Operators
 

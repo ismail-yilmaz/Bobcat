@@ -8,7 +8,8 @@
 #define LTIMING(x) // RTIMING(x)
 
 namespace Upp {
-	
+
+
 Linkifier::Linkifier(Terminal& t)
 : term(t)
 , cursor(-1)
@@ -266,6 +267,22 @@ Value LinkifierSetup::GetData() const
 {
 	Store();
 	return name;
+}
+
+VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()
+{
+	return Single<VectorMap<String, Vector<PatternInfo>>>();
+}
+
+void PatternInfo::Jsonize(JsonIO& jio)
+{
+    jio("Command", cmd)
+       ("Pattern", pattern);
+}
+
+String PatternInfo::ToString() const
+{
+	return "Command: " << cmd << ", Pattern: " << pattern;
 }
 
 }

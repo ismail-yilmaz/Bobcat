@@ -50,6 +50,7 @@ struct Profile : Moveable<Profile> {
     int         linespacing;
     String      overridetracking;
     String      onexit;
+    String      wordselchars;
     bool        filterctrl;
     bool        sizehint;
     int         order;
@@ -99,17 +100,6 @@ private:
 public:
     Setup       setup;
 };
-
-struct PatternInfo : Moveable<PatternInfo> {
-    String      cmd;
-    String      pattern;
-    void        Jsonize(JsonIO& jio) { jio("Command", cmd)("Pattern", pattern); }
-    String      ToString() const     { return "Command: " << cmd << ", Pattern: " << pattern; }
-};
-
-// Global functions
-
-VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns();
 
 dword          GetModifierKey(String s);
 String         GetModifierKeyDesc(dword keyflags);

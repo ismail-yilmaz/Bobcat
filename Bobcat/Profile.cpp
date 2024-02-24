@@ -36,11 +36,6 @@ const Display& ProfileNameDisplay()       { return Single<ProfileNameDisplayCls>
 const Display& FontProfileDisplay()       { return Single<FontProfileDisplayCls>(); }
 const Display& GuiFontProfileDisplay()    { return Single<FontProfileDisplayCls>(); }
 
-VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()
-{
-	return Single<VectorMap<String, Vector<PatternInfo>>>();
-}
-
 Profile::Profile()
 : name(String::GetVoid())
 , bell(false)
@@ -80,6 +75,7 @@ Profile::Profile()
 , erasechar("delete")
 , functionkeystyle("pc")
 , overridetracking("K_SHIFT_CTRL")
+, wordselchars("_-")
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
@@ -142,6 +138,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("BufferedRefresh",      delayedrefresh)
 	("LazyPageResize",       lazyresize)
 	("ShowSizeHint",         sizehint)
+	("WordSelectionExtras",  wordselchars)
 	("FilterCtrlBytes",      filterctrl)
 	("OnExit",               onexit)
 	("Palette",              palette)
@@ -272,6 +269,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.alternatescroll,p.alternatescroll)
      (emulation.delayedrefresh, p.delayedrefresh)
      (emulation.lazyresize,     p.lazyresize)
+     (emulation.wordselchars,   p.wordselchars)
      (emulation.filter,         p.filterctrl)
      (emulation.overridetracking, p.overridetracking)
      (finder.searchmode,        p.finder.searchmode)

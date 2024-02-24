@@ -35,6 +35,8 @@ Terminal::Terminal(Bobcat& ctx_)
     titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 
+	SetWordSelectionFilter(&CustomWordSelectionFilter);
+	
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
     WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
     WhenResize  = [this]()                     { pty.SetSize(GetPageSize());      };
@@ -219,6 +221,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	profilename = p.name;
 	bell = p.bell;
 	filter = p.filterctrl;
+	wordselchars = p.wordselchars;
 	WindowActions(p.windowactions);
 	WindowReports(p.windowreports);
 	History(p.history);
