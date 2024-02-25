@@ -3,15 +3,16 @@ topic "Keyboard Shortcuts";
 [{_} 
 [s0; [* Keyboard Shortcuts]&]
 [s0;C+75 &]
-[s0; [C+75 Bobcat predefines three groups of configurable keyboard 
+[s0; [C+75 Bobcat predefines several groups of configurable keyboard 
 shortcuts: ][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75 gl
 obal][/C+75  ][C+75 and ][/C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
-erminal][C+75 , and ][C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
-inder][C+75  specific. Terminal and finder specific shortcuts can 
-only be called in the active terminal and only affect the active 
-terminal, while the global shortcuts are valid across the application. 
-All of the predefined and undefined keys can be configured via 
-the keyboard configuration manager.]&]
+erminal][C+75 , ][C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
+inder][C+75 , and ][C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#selector`_shortcuts^+75 S
+elector][C+75  specific. Terminal and finder specific shortcuts 
+can only be called in the active terminal and only affect the 
+active terminal, while the global shortcuts are valid across 
+the application. All of the predefined and undefined keys can 
+be configured via the keyboard configuration manager.]&]
 [s0;C+75 &]
 [s0;:global`_shortcuts: [* Global Shortcuts]&]
 [s0;* &]
@@ -175,7 +176,13 @@ ctor][C1  mode.]]}}&]
 :: [s0; [*C1 Ctrl`+D]]
 :: [s0; [/C1 SearchBox][C1 : Select all.]]
 :: [s0; [*C1 Ctrl`+H]]
-:: [s0; [/C1 Harvest found text and export them.]]}}&]
+:: [s0; [/C1 Harvester: Save selected items to file.]]
+:: [s0; [*C1 Alt`+H]]
+:: [s0; [/C1 Harvester: Save selected items to clipboard.]]
+:: [s0; [*C1 Alt`+L]]
+:: [s0; [/C1 Harvester: Activate list mode.]]
+:: [s0; [*C1 Alt`+M]]
+:: [s0; [/C1 Harvester: Activate map mode.]]}}&]
 [s0; &]
 [s0;:selector`_shortcuts: [* Selector Mode Specific Shortcuts]&]
 [s0; &]
@@ -183,12 +190,16 @@ ctor][C1  mode.]]}}&]
 :: [s0; [C1 Exit selector mode.]]
 :: [s0; [*C1 Return]]
 :: [s0; [C1 Start selection.]]
+:: [s0; [*C1 Backspace]]
+:: [s0; [C1 Cancel selection.]]
+:: [s0; [*C1 Ctrl`+C]]
+:: [s0; [C1 Copy selection.]]
 :: [s0; [*C1 Ctrl`+T]]
-:: [s0; [C1 Select text.]]
+:: [s0; [C1 Text selection mode.]]
 :: [s0; [*C1 Ctrl`+W]]
-:: [s0; [C1 Select word.]]
+:: [s0; [C1 Word selection mode.]]
 :: [s0; [*C1 Ctrl`+R]]
-:: [s0; [C1 Select rectangle.]]
+:: [s0; [C1 Rectangle selection mode.]]
 :: [s0; [*C1 Up `[Arrow key`]]]
 :: [s0; [C1 Move 1 row up.]]
 :: [s0; [*C1 Down `[Arrow key`]]]
@@ -206,7 +217,7 @@ ctor][C1  mode.]]}}&]
 :: [s0; [*C1 End]]
 :: [s0; [C1 Move to the end of the buffer.]]
 :: [s0; [*C1 Page up]]
-:: [s0; [C1 Move one page up.]]
+:: [s0; [C1 Move 1 page up.]]
 :: [s0; [*C1 Page down]]
-:: [s0; [C1 Move one page down.]]}}&]
+:: [s0; [C1 Move 1 page down.]]}}&]
 [s0; ]]
