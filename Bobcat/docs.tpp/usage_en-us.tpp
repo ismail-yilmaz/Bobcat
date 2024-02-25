@@ -5,7 +5,7 @@ topic "Command Line Options";
 [s0;%- [* Usage]&]
 [s0;%- [C@3   bobcat `[OPTIONS`] `-`- `[COMMAND`]]&]
 [s0;%- &]
-[s0;%- [* General Options]&]
+[s0;%- [* General options]&]
 [s0;%- [C1   ][C@3;1 `-h, `-`-help][C1                Show help.]&]
 [s0;%- [C1   ][C@3;1 `-l, `-`-list ][C1               List available profiles.]&]
 [s0;%- [C1   ][C@3;1 `-p, `-`-profile PROFILE][C1     Run with the given 

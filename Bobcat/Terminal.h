@@ -18,7 +18,7 @@ struct Terminal : TerminalCtrl {
     void        MouseMove(Point pt, dword keyflags) override;
     void        LeftDouble(Point pt, dword keyflags) override;
     Image       CursorImage(Point pt, dword keyflags) override;
-
+    
     bool        StartPty(const Profile& profile);
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);
@@ -59,6 +59,8 @@ struct Terminal : TerminalCtrl {
     void        ShowFinder(bool b);
     void        HideFinder();
     bool        HasFinder() const;
+    
+    bool        IsEditable();
     
     void        CopyImage();
     void        OpenImage();
@@ -105,7 +107,7 @@ struct Terminal : TerminalCtrl {
     Linkifier    linkifier;
     Color        highlight[4];
     TimeCallback timer;
-   
+    
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
@@ -123,7 +125,6 @@ struct Terminal : TerminalCtrl {
         Value       data;
     }  titlebar;
 };
-
 
 // Global functions
 Terminal& AsTerminal(Ctrl& c);

@@ -420,6 +420,11 @@ bool Terminal::HasFinder() const
 	return finder.IsChild();
 }
 
+bool Terminal::IsEditable()
+{
+	return TerminalCtrl::IsEditable() && !TerminalCtrl::IsSelectorMode();
+}
+
 void Terminal::CopyImage()
 {
 	if(Image img = GetInlineImage(); !IsNull(img))
@@ -540,10 +545,10 @@ void Terminal::EditMenu(Bar& menu)
 			menu.Add(IsEditable(),  AK_CODEPOINT, Images::InsertUnicode(),  [this] { InsertUnicodeCodePoint(*this); });
 		menu.Separator();
 		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
-
 	}
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { ShowFinder(true); });
+	menu.AddKey(AK_SELECTOR_BEGIN, [this] { BeginSelectorMode(); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
