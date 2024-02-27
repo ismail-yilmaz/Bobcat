@@ -125,6 +125,7 @@ bool Terminal::Start(const String& profile_name)
 
 void Terminal::Restart()
 {
+	SoftReset();
 	StartPty(LoadProfile(profilename));
 }
 
