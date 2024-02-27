@@ -4,6 +4,19 @@
 #ifndef _Bobcat_Linkifier_h_
 #define _Bobcat_Linkifier_h_
 
+// Hyperlink pattern info
+
+struct PatternInfo : Moveable<PatternInfo> {
+    String      cmd;
+    String      pattern;
+    void        Jsonize(JsonIO& jio);
+    String      ToString() const;
+};
+
+// Global functions
+
+VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns();
+
 struct LinkInfo : Moveable<LinkInfo> {
     Point pos  = { 0, 0 };
     int length = 0;
@@ -16,6 +29,8 @@ public:
     
     Linkifier(Terminal& t);
 
+    void        SetConfig(const Profile& p);
+    
     Linkifier&  Enable(bool b = true);
     Linkifier&  Disable();
     bool        IsEnabled() const;
@@ -32,10 +47,10 @@ public:
     LinkInfo&   operator[](int i);
 
     const LinkInfo& GetCurrentLinkInfo() const;
-    
+   
     void        Clear();
     bool        Sync();
-
+    
     void        Search();
     void        Update();
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
@@ -46,6 +61,12 @@ public:
     const LinkInfo* end() const;
     LinkInfo*       end();
     
+    struct Config {
+        Config();
+        void Jsonize(JsonIO& jio);
+        WithDeepCopy<Vector<PatternInfo>> patterns;
+    };
+
 private:
     Terminal&   term;
     int         cursor;
@@ -63,11 +84,8 @@ public:
     void        Sync();
     void        ContextMenu(Bar& bar);
 
-    void        Load();
-    void        Store() const;
-
-    void        SetData(const Value& data) override;
-    Value       GetData() const override;
+    void        Load(const Profile& p);
+    void        Store(Profile& p) const;
 
 private:
     String      name;
@@ -75,16 +93,4 @@ private:
     EditStringNotNull edit;
 };
 
-// Hyperlink pattern info
-
-struct PatternInfo : Moveable<PatternInfo> {
-    String      cmd;
-    String      pattern;
-    void        Jsonize(JsonIO& jio);
-    String      ToString() const;
-};
-
-// Global functions
-
-VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns();
 #endif

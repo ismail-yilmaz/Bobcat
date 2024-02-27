@@ -26,6 +26,7 @@ namespace Upp {
 // Forward declaration
 struct Bobcat;
 struct Terminal;
+struct Profile;
 
 // Global context
 Ptr<Bobcat> GetContext();

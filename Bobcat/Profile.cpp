@@ -142,28 +142,8 @@ void Profile::Jsonize(JsonIO& jio)
 	("FilterCtrlBytes",      filterctrl)
 	("OnExit",               onexit)
 	("Palette",              palette)
-	("Finder",               finder);
-	
-	if(jio.IsLoading() && !IsNull(name)) {
-		auto& m = GetHyperlinkPatterns();
-		INTERLOCKED
-		{
-			if(int i = m.FindAdd(name); i >= 0) {
-				m[i].Clear();
-				jio("Linkifier", m[i]);
-			}
-		}
-	}
-	else
-	if(jio.IsStoring() && !IsNull(name)) {
-		auto& m = GetHyperlinkPatterns();
-		INTERLOCKED
-		{
-			if(int i = m.Find(name); i >= 0 && m[i].GetCount()) {
-				jio("Linkifier", m[i]);
-			}
-		}
-	}
+	("Finder",               finder)
+	("Linkifier",            linkifier);
 }
 
 Profiles::Setup::Setup()
@@ -228,8 +208,6 @@ Profiles::Setup::Setup()
 
 void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
 {
-	String dummy = name; // Don't modify the current profile name in linkifier.
-	
     m(general.cmd,              p.command)
      (general.dir,              p.address)
      (general.env,              p.env)
@@ -276,8 +254,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (finder.saveformat,        p.finder.saveformat)
      (finder.savemode,          p.finder.savemode)
      (finder.showall,           p.finder.showall)
-     (finder.delimiter,         p.finder.delimiter)
-     (linkifier,                dummy);
+     (finder.delimiter,         p.finder.delimiter);
 }
 
 void Profiles::Setup::SetData(const Value& data)
@@ -287,12 +264,14 @@ void Profiles::Setup::SetData(const Value& data)
 	Profile p = data.To<Profile>();
 	name = p.name;
 	MapData(CtrlMapper().ToCtrls(), p);
+	linkifier.Load(p);
 }
 
 Value Profiles::Setup::GetData() const
 {
 	Profile p(name);
 	MapData(CtrlMapper().ToValues(), p);
+	linkifier.Store(p);
 	return RawToValue(p);
 }
 

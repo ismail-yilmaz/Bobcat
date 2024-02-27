@@ -55,6 +55,7 @@ struct Profile : Moveable<Profile> {
     bool        sizehint;
     int         order;
     Finder::Config finder;
+    Linkifier::Config linkifier;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);

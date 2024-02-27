@@ -18,6 +18,14 @@ Linkifier::Linkifier(Terminal& t)
 {
 }
 
+void Linkifier::SetConfig(const Profile& p)
+{
+	// Acquire the patterns only once.
+	if(auto& m = GetHyperlinkPatterns(); !IsNull(p.name) && m.Find(p.name) < 0) {
+		m.Add(p.name).Append(p.linkifier.patterns);
+	}
+}
+
 Linkifier& Linkifier::Enable(bool b)
 {
 	if(enabled = b; !enabled)
@@ -198,6 +206,15 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 		}
 }
 
+Linkifier::Config::Config()
+{
+}
+
+void Linkifier::Config::Jsonize(JsonIO& jio)
+{
+	jio("Patterns", patterns);
+}
+
 LinkifierSetup::LinkifierSetup()
 {
 	CtrlLayout(*this);
@@ -231,42 +248,20 @@ void LinkifierSetup::ContextMenu(Bar& bar)
 	bar.Add(list.GetCount() > 0, tt_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
 }
 
-void LinkifierSetup::Load()
+void LinkifierSetup::Load(const Profile& p)
 {
-	if(IsNull(name))
-		return;
 	list.Clear();
-	auto& m = GetHyperlinkPatterns();
-	if(int i = m.FindAdd(name); i >= 0) {
-		for(const PatternInfo& pi : m[i])
-			list.Add(pi.pattern);
-		list.SetCursor(0);
-	}
+	for(const PatternInfo& s : p.linkifier.patterns)
+		list.Add(s.pattern);
+	list.SetCursor(0);
 }
 
-void LinkifierSetup::Store() const
+void LinkifierSetup::Store(Profile& p) const
 {
-	if(IsNull(name))
+	if(IsNull(p.name))
 		return;
-	auto& m = GetHyperlinkPatterns();
-	if(int i = m.FindAdd(name); i >= 0) {
-		m[i].Clear();
-		for(int j = 0; j < list.GetCount(); j++) {
-			m[i].Add().pattern = list.Get(j, 0);
-		}
-	}
-}
-
-void LinkifierSetup::SetData(const Value& data)
-{
-	name = data;
-	Load();
-}
-
-Value LinkifierSetup::GetData() const
-{
-	Store();
-	return name;
+	for(int i = 0; i < list.GetCount(); i++)
+		p.linkifier.patterns.Add().pattern = list.Get(i, 0);
 }
 
 VectorMap<String, Vector<PatternInfo>>& GetHyperlinkPatterns()

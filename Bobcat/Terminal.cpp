@@ -255,6 +255,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	Hyperlinks(p.hyperlinks);
 	SetWordSelectionFilter(p.wordselchars);
 	finder.SetConfig(p.finder);
+	linkifier.SetConfig(p);
 	return *this;
 }
 
@@ -297,7 +298,6 @@ Image Terminal::CursorImage(Point pt, dword keyflags)
 
 Terminal& Terminal::SetPalette(const Palette& p)
 {
-	int i = 0;
 	for(int i = 0, j = 0; i < Palette::MAX_COLOR_COUNT; i++) {
 		if(i < TerminalCtrl::MAX_COLOR_COUNT)
 			SetColor(i, p.table[i]);

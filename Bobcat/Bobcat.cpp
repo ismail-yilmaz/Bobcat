@@ -221,6 +221,7 @@ void Bobcat::Settings()
 			cr.Retrieve();
 			profiles.Store();
 			SaveConfig(*this);
+			GetHyperlinkPatterns().Clear(); // Drop all patterns. Terminals will reacquire them.
 			if(window.IsOpen()) {
 				Sync();
 				SyncTerminalProfiles();
