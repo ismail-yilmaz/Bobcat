@@ -165,5 +165,6 @@ LAYOUT(FinderProfileLayout, 659, 299)
 	ITEM(Upp::Label, dv___9, SetLabel(t_("Harvesting format")).LeftPosZ(12, 191).TopPosZ(67, 16))
 	ITEM(Upp::Label, dv___10, SetLabel(t_("items")).LeftPosZ(396, 110).TopPosZ(31, 19))
 	ITEM(Upp::EditString, delimiter, MaxLen(4).TrimLeft(true).TrimRight(true).NotNull(true).MaxChars(4).LeftPosZ(210, 64).TopPosZ(115, 20))
+	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).HSizePosZ(1, 2).VSizePosZ(140, 3))
 END_LAYOUT
 

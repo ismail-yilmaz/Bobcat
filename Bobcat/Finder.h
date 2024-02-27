@@ -12,6 +12,8 @@ public:
     Finder(Terminal& t);
     virtual ~Finder();
 
+    void        SetConfig(const Profile& p);
+    
     void        SetData(const Value& v) override;
     Value       GetData() const override;
     void        FrameLayout(Rect& r) override;
@@ -42,7 +44,7 @@ public:
     bool        IsCaseSensitive() const;
     bool        IsCaseInsensitive() const;
     bool        IsRegex() const;
-
+  
     void        Sync();
 
     void        Search();
@@ -54,25 +56,24 @@ public:
     bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(VectorMap<int, VTLine>& hl);
 
-	struct Config {
-		Config();
-		String  searchmode;
-		int     searchlimit;
-		String  saveformat;
-		String  savemode;
-		String  delimiter;
-		bool    showall;
-		void    Jsonize(JsonIO& jio);
-	};
-
-	void        SetConfig(const Finder::Config& cfg);
+    struct Config {
+        Config();
+        void    Jsonize(JsonIO& jio);
+        String  searchmode;
+        int     searchlimit;
+        String  saveformat;
+        String  savemode;
+        String  delimiter;
+        bool    showall;
+        WithDeepCopy<Vector<String>> patterns;
+    };
 
 private:
     bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
 
     struct TextAnchor : Moveable<TextAnchor> {
-        Point   pos = {0, 0};
+        Point   pos    = {0, 0};
         int     length = 0;
     };
 
@@ -85,28 +86,28 @@ private:
     }   searchtype;
 
     struct Harvester {
-        enum class Fmt  { Txt, Csv, Json, Xml };
-        Finder& finder;
-        Fmt     format;
-        String  delimiter;
         Harvester(Finder& f);
         Harvester& Format(const String& fmt);
         Harvester& Mode(const String& mode);
         Harvester& Delimiter(const String& delim);
-        void SaveToClipboard();
-        void SaveToFile();
-        bool Reap(Stream& s);
-        bool IsReady() const;
+        void       SaveToClipboard();
+        void       SaveToFile();
+        bool       Reap(Stream& s);
+        bool       IsReady() const;
+        enum class Fmt  { Txt, Csv };
+        Finder&    finder;
+        Fmt        format;
+        String     delimiter;
     } harvester;
 
-    struct SearchField : EditString {
+    struct SearchField : WithDropChoice<EditString> {
         typedef SearchField CLASSNAME;
         SearchField();
         void SearchBar(Bar& menu);
         bool Key(dword key, int count) final;
     };
 
-    int           index = 0;
+    int           index;
     int           limit;
     Terminal&     term;
     Value         data;
@@ -117,12 +118,15 @@ private:
 
 class FinderSetup : public WithFinderProfileLayout<ParentCtrl> {
 public:
-    typedef LinkifierSetup CLASSNAME;
+    typedef FinderSetup CLASSNAME;
     
     FinderSetup();
 
     void        Sync();
     void        ContextMenu(Bar& bar);
+
+    void        Load(const Profile& p);
+    void        Store(Profile& p) const;
 
 private:
     ToolBar     toolbar;

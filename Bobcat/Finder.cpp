@@ -59,6 +59,19 @@ Finder::~Finder()
 {
 }
 
+void Finder::SetConfig(const Profile& p)
+{
+	SetSearchMode(p.finder.searchmode);
+	limit = clamp(p.finder.searchlimit, 1, SEARCH_MAX);
+	showall = p.finder.showall;
+	harvester.Format(p.finder.saveformat);
+	harvester.Delimiter(p.finder.delimiter);
+	harvester.Mode(p.finder.savemode);
+	text.ClearList();
+	for(const String& s: p.finder.patterns)
+		text.AddList(s);
+}
+
 void Finder::SetData(const Value& v)
 {
 	data = v;
@@ -395,14 +408,6 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 		}
 }
 
-void Finder::SetConfig(const Finder::Config& cfg)
-{
-	SetSearchMode(cfg.searchmode);
-	limit = clamp(cfg.searchlimit, 1, SEARCH_MAX);
-	showall = cfg.showall;
-	harvester.Format(cfg.saveformat).Delimiter(cfg.delimiter).Mode(cfg.savemode);
-}
-
 Finder::Harvester::Harvester(Finder& f)
 : finder(f)
 , format(Fmt::Csv)
@@ -525,7 +530,7 @@ bool Finder::SearchField::Key(dword key, int count)
 {
 	if(MenuBar::Scan(WhenBar, key))
 		return true;
-	return EditField::Key(key, count);
+	return WithDropChoice<EditString>::Key(key, count);
 }
 
 Finder::Config::Config()
@@ -540,12 +545,13 @@ Finder::Config::Config()
 
 void Finder::Config::Jsonize(JsonIO& jio)
 {
-	jio("SearchMode",       searchmode)
-	   ("SearchLimit",      searchlimit)
-	   ("ShowAll",          showall)
-	   ("HarvestingFormat", saveformat)
-	   ("HarvestingMode",   savemode)
-	   ("Delimiter",        delimiter);
+	jio("SearchMode",        searchmode)
+	   ("SearchLimit",       searchlimit)
+	   ("ShowAll",           showall)
+	   ("HarvestingFormat",  saveformat)
+	   ("HarvestingMode",    savemode)
+	   ("Delimiter",         delimiter)
+	   ("Patterns",          patterns);
 }
 
 FinderSetup::FinderSetup()
@@ -563,16 +569,60 @@ FinderSetup::FinderSetup()
 	savemode.SetIndex(0);
 	maxsearch <<= 65536;
 	showall = false;
+	list.InsertFrame(0, toolbar);
+	list.AddColumn(t_("Predefined search patterns")).Edit(edit);
+	list.WhenBar = THISFN(ContextMenu);
+	list.WhenSel = THISFN(Sync);
+	Sync();
+
 }
 void FinderSetup::Sync()
 {
-	// TODO
+	toolbar.Set(THISFN(ContextMenu));
 }
 
 void FinderSetup::ContextMenu(Bar& bar)
 {
-	// TODO
+	bool e = list.IsEditable();
+	bool c = !list.IsEdit() && e;
+	bool d = c && list.IsCursor();
+	bool q = list.GetCursor() >= 0 && list.GetCursor() < list.GetCount() - 1;
+
+	bool b = list.IsCursor();
+	bar.Add(c, tt_("Add pattern"), Images::Add(), [this]() { list.DoAppend(); }).Key(K_INSERT);
+	bar.Add(d, tt_("Edit pattern"), Images::Edit(), [this]() { list.DoEdit(); }).Key(K_SPACE);
+	bar.Add(d, tt_("Remove pattern"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);
+	bar.Separator();
+	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
+	bar.Separator();
+	bar.Add(list.GetCount() > 0, tt_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
 }
 
+void FinderSetup::Load(const Profile& p)
+{
+	list.Clear();
+	searchmode <<= p.finder.searchmode;
+	maxsearch  <<= p.finder.searchlimit;
+	showall    <<= p.finder.showall;
+	saveformat <<= p.finder.saveformat;
+	savemode   <<= p.finder.savemode;
+	delimiter  <<= p.finder.delimiter;
+	for(const String& s : p.finder.patterns)
+		list.Add(s);
+	list.SetCursor(0);
+}
+
+void FinderSetup::Store(Profile& p) const
+{
+	p.finder.searchmode  = ~searchmode;
+	p.finder.searchlimit = ~maxsearch;
+	p.finder.showall     = ~showall;
+	p.finder.saveformat  = ~saveformat;
+	p.finder.savemode    = ~savemode;
+	p.finder.delimiter   = ~delimiter;
+	for(int i = 0; i < list.GetCount(); i++)
+		p.finder.patterns.Add(list.Get(i, 0));
+}
 }
 

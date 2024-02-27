@@ -123,6 +123,11 @@ bool Terminal::Start(const String& profile_name)
 	return Start(p);
 }
 
+void Terminal::Restart()
+{
+	StartPty(LoadProfile(profilename));
+}
+
 void Terminal::Stop()
 {
 	exitmode = ExitMode::Exit;
@@ -142,11 +147,6 @@ int Terminal::Do()
 	if(ShouldRestart())
 		Restart();
 	return 0;
-}
-
-void Terminal::Restart()
-{
-	StartPty(LoadProfile(profilename));
 }
 
 void Terminal::Reset()
@@ -254,7 +254,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	OverrideTracking(GetModifierKey(p.overridetracking));
 	Hyperlinks(p.hyperlinks);
 	SetWordSelectionFilter(p.wordselchars);
-	finder.SetConfig(p.finder);
+	finder.SetConfig(p);
 	linkifier.SetConfig(p);
 	return *this;
 }

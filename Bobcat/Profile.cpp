@@ -249,12 +249,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.lazyresize,     p.lazyresize)
      (emulation.wordselchars,   p.wordselchars)
      (emulation.filter,         p.filterctrl)
-     (emulation.overridetracking, p.overridetracking)
-     (finder.searchmode,        p.finder.searchmode)
-     (finder.saveformat,        p.finder.saveformat)
-     (finder.savemode,          p.finder.savemode)
-     (finder.showall,           p.finder.showall)
-     (finder.delimiter,         p.finder.delimiter);
+     (emulation.overridetracking, p.overridetracking);
 }
 
 void Profiles::Setup::SetData(const Value& data)
@@ -264,6 +259,7 @@ void Profiles::Setup::SetData(const Value& data)
 	Profile p = data.To<Profile>();
 	name = p.name;
 	MapData(CtrlMapper().ToCtrls(), p);
+	finder.Load(p);
 	linkifier.Load(p);
 }
 
@@ -271,6 +267,7 @@ Value Profiles::Setup::GetData() const
 {
 	Profile p(name);
 	MapData(CtrlMapper().ToValues(), p);
+	finder.Store(p);
 	linkifier.Store(p);
 	return RawToValue(p);
 }
