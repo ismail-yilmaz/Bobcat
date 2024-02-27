@@ -97,12 +97,14 @@ bool Terminal::StartPty(const Profile& p)
 		}
 	}
 	
+	MakeTitle(profilename);
+	if(ctx.stack.Find(*this) < 0)
+		ctx.stack.Add(*this);
 	if(pty.Start(p.command, vv, p.address)) {
-		MakeTitle(profilename);
-		if(ctx.stack.Find(*this) < 0)
-			ctx.stack.Add(*this);
+		pty.SetSize(GetPageSize());
 		return true;
 	}
+	
 	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
 	ErrorOK(Format(txt, p.name, p.command, pty.GetExitCode()));
 	return false;

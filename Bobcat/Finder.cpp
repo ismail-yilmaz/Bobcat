@@ -51,7 +51,7 @@ Finder::Finder(Terminal& t)
 	text.WhenAction << THISFN(Search);
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
-	display.SetDisplay(StdRightDisplay());
+	display.SetDisplay(StdCenterDisplay());
 	Sync();
 }
 
