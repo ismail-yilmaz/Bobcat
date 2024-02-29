@@ -27,9 +27,8 @@ struct Terminal : TerminalCtrl {
     void        Restart();
     void        Reset();
     
-    bool        ShouldExit() const;
-    bool        ShouldKeep() const;
-    bool        ShouldRestart() const;
+    bool        ShouldExit(bool failed) const;
+    bool        ShouldRestart(bool failed) const;
     
     hash_t      GetHashValue() const;
     
@@ -93,6 +92,7 @@ struct Terminal : TerminalCtrl {
     enum class ExitMode {
         Keep,
         Restart,
+        RestartFailed,
         Exit
     };
 

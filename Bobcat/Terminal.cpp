@@ -137,9 +137,10 @@ int Terminal::Do()
 	Write(s, IsUtf8Mode());
 	if(pty.IsRunning())
 		return s.GetLength();
-	if(ShouldExit())
-		return  -1;
-	if(ShouldRestart())
+	bool failed = pty.GetExitCode() != 0;
+	if(ShouldExit(failed))
+		return -1;
+	if(ShouldRestart(failed))
 		Restart();
 	return 0;
 }
@@ -154,19 +155,14 @@ void Terminal::Reset()
 	HardReset();
 }
 
-bool Terminal::ShouldExit() const
+bool Terminal::ShouldExit(bool failed) const
 {
-	return exitmode == ExitMode::Exit;
+	return exitmode == ExitMode::Exit || (!failed && exitmode == ExitMode::RestartFailed);
 }
 
-bool Terminal::ShouldKeep() const
+bool Terminal::ShouldRestart(bool failed) const
 {
-	return exitmode == ExitMode::Keep;
-}
-
-bool Terminal::ShouldRestart() const
-{
-	return exitmode == ExitMode::Restart;
+	return exitmode == ExitMode::Restart || (failed && exitmode == ExitMode::RestartFailed);
 }
 
 hash_t Terminal::GetHashValue() const
@@ -310,9 +306,10 @@ Terminal& Terminal::SetPalette(const Palette& p)
 Terminal& Terminal::SetExitMode(const String& s)
 {
 	exitmode = decode(s,
-        "restart", ExitMode::Restart,
-        "keep",    ExitMode::Keep,
-     /* "exit" */  ExitMode::Exit);
+        "restart",        ExitMode::Restart,
+        "restart_failed", ExitMode::RestartFailed,
+        "keep",           ExitMode::Keep,
+     /* "exit" */         ExitMode::Exit);
 	return *this;
 }
 
