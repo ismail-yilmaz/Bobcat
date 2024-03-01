@@ -23,6 +23,8 @@ title bar.]&]
 [s0; [* Environment options]&]
 [s0; [C1   ][C@3;1 `-r, `-`-restart ][C1            Restart the command 
 on exit.]&]
+[s0; [C1   ][C@3;1 `-R, `-`-restart`-failed][C1      Restart the command 
+when it fails.]&]
 [s0; [C1   ][C@3;1 `-k, `-`-keep ][C1               Don`'t close the terminal 
 on exit.]&]
 [s0; [C1   ][C@3;1 `-K, `-`-dont`-keep][C1           Close the terminal 

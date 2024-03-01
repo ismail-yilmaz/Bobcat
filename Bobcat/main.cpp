@@ -130,6 +130,10 @@ GUI_APP_MAIN
 			p.onexit = "restart";
 		}
 		else
+		if(findarg(s, "-R", "--restart-failed") != -1) {
+			p.onexit = "restart";
+		}
+		else
 		if(findarg(s, "-k", "--keep") != -1) {
 			p.onexit = "keep";
 		}
