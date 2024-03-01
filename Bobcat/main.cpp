@@ -29,6 +29,7 @@ void PrintHelp()
 		"\n"
 		"Environment options:\n"
 		"   -r, --restart                  Restart the command on exit.\n"
+		"   -R, --restart-failed           Restart the command when it fails.\n"
 		"   -k, --keep                     Don't close the terminal on exit.\n"
 		"   -K, --dont-keep                Close the terminal on exit.\n"
 		"   -n, --no-environment           Don't inherit the environment.\n"
