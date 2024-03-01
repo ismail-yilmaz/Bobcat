@@ -385,12 +385,12 @@ void Bobcat::SyncTerminalProfiles()
 
 void Bobcat::MainMenu(Bar& menu)
 {
-	menu.Sub(t_("File"),  [this](Bar& menu) { FileMenu(menu);  });
-	menu.Sub(t_("Edit"),  [this](Bar& menu) { EditMenu(menu);  });
-	menu.Sub(t_("View"),  [this](Bar& menu) { ViewMenu(menu);  });
-	menu.Sub(t_("List"),  [this](Bar& menu) { ListMenu(menu);  });
-	menu.Sub(t_("Setup"), [this](Bar& menu) { SetupMenu(menu); });
-	menu.Sub(t_("Help"),  [this](Bar& menu) { HelpMenu(menu);  });
+	menu.Sub(t_("File"),     [this](Bar& menu) { FileMenu(menu);  });
+	menu.Sub(t_("Edit"),     [this](Bar& menu) { EditMenu(menu);  });
+	menu.Sub(t_("View"),     [this](Bar& menu) { ViewMenu(menu);  });
+	menu.Sub(t_("List"),     [this](Bar& menu) { ListMenu(menu);  });
+	menu.Sub(t_("Setup"),    [this](Bar& menu) { SetupMenu(menu); });
+	menu.Sub(t_("Help"),     [this](Bar& menu) { HelpMenu(menu);  });
 }
 
 void Bobcat::FileMenu(Bar& menu)

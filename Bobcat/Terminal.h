@@ -68,7 +68,8 @@ struct Terminal : TerminalCtrl {
     String      GetLink();
     void        CopyLink();
     void        OpenLink();
-
+    void        OnLink(const String& s);
+    
     void        Hyperlinks(bool b);
     bool        HasHyperlinks() const;
     bool        HasLinkifier() const;
@@ -86,7 +87,7 @@ struct Terminal : TerminalCtrl {
     void        EditMenu(Bar& menu);
     void        ViewMenu(Bar& menu);
     void        ContextMenu(Bar& menu);
-
+    
     int         GetExitCode()                   { return pty.GetExitCode();     }
     String      GetExitMessage()                { return pty.GetExitMessage();  }
  

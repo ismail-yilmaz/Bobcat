@@ -41,7 +41,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenScroll  = [this]()                     { Update();                        };
     WhenOutput  = [this](String s)             { pty.Write(s);                    };
     WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
-    WhenLink    = [this](const String& s)      { LaunchWebBrowser(s);             };
+    WhenLink    = [this](const String& s)      { OnLink(s);                       };
     WhenSetSize = [this](Size sz)              { ctx.Resize(sz);                  };
     WhenClip    = [this](PasteClip& dnd)       { return filter;                   };
     WhenWindowMinimize       = [this](bool b)  { ctx.Minimize(b);                 };
@@ -104,7 +104,6 @@ bool Terminal::StartPty(const Profile& p)
 		pty.SetSize(GetPageSize());
 		return true;
 	}
-	
 	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
 	ErrorOK(Format(txt, p.name, p.command, pty.GetExitCode()));
 	return false;
@@ -232,9 +231,10 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	IntensifyBoldText(p.intensify);
 	DynamicColors(p.dynamiccolors);
 	BlinkingText(p.blinktext);
-	LockCursor(p.lockcursor);
+	UnlockCursor();
 	SetCursorStyle(p.cursorstyle);
 	BlinkingCursor(p.blinkcursor);
+	LockCursor(p.lockcursor);
 	PermitClipboardRead(p.clipboardread);
 	PermitClipboardWrite(p.clipboardwrite);
 	MouseWheelStep(p.mousewheelstep);
@@ -495,8 +495,13 @@ void Terminal::CopyLink()
 void Terminal::OpenLink()
 {
 	if(String uri = GetLink(); !IsNull(uri))
-		WhenLink(uri);
+		OnLink(uri);
 	linkifier.ClearCursor();
+}
+
+void Terminal::OnLink(const String& s)
+{
+	LaunchWebBrowser(s);
 }
 
 int Terminal::GetPosAsIndex(Point pt)
