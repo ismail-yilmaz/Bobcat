@@ -223,6 +223,7 @@ void Bobcat::Settings()
 			SaveConfig(*this);
 			if(window.IsOpen()) {
 				GetHyperlinkPatterns().Clear(); // Drop all patterns. Terminals will reacquire them.
+				GetWordSelectionPatterns().Clear(); // Drop all patterns.
 				Sync();
 				SyncTerminalProfiles();
 			}

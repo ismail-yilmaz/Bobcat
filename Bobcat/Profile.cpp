@@ -75,7 +75,9 @@ Profile::Profile()
 , erasechar("delete")
 , functionkeystyle("pc")
 , overridetracking("K_SHIFT_CTRL")
+, wordselmode("plain")
 , wordselchars("_-")
+, wordselpattern("")
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
@@ -138,7 +140,9 @@ void Profile::Jsonize(JsonIO& jio)
 	("BufferedRefresh",      delayedrefresh)
 	("LazyPageResize",       lazyresize)
 	("ShowSizeHint",         sizehint)
+	("WordSelectionMode",    wordselmode)
 	("WordSelectionExtras",  wordselchars)
+	("WordSelectionPattern", wordselpattern)
 	("FilterCtrlBytes",      filterctrl)
 	("OnExit",               onexit)
 	("Palette",              palette)
@@ -179,7 +183,6 @@ Profiles::Setup::Setup()
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	general.cmdexit.Add("restart", t_("Restart command"));
-	general.cmdexit.Add("restart_failed", t_("Restart command on failure"));
 	visuals.cursorstyle.Add("block", t_("Block"));
 	visuals.cursorstyle.Add("beam", t_("Beam"));
 	visuals.cursorstyle.Add("underline", t_("Underline")).SetIndex(0);
@@ -199,6 +202,9 @@ Profiles::Setup::Setup()
 	emulation.overridetracking.Add("K_SHIFT_ALT", "Shift+Alt");
 	emulation.overridetracking.Add("K_SHIFT_CTRL_ALT", "Shift+Ctrl+Alt");
 	emulation.overridetracking.SetIndex(4);
+	emulation.wordselmode.Add("plain", t_("Plain"));
+	emulation.wordselmode.Add("smart", t_("Smart"));
+	emulation.wordselmode.SetIndex(0);
 
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
@@ -248,7 +254,9 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.alternatescroll,p.alternatescroll)
      (emulation.delayedrefresh, p.delayedrefresh)
      (emulation.lazyresize,     p.lazyresize)
+     (emulation.wordselmode,    p.wordselmode)
      (emulation.wordselchars,   p.wordselchars)
+     (emulation.wordselpattern, p.wordselpattern)
      (emulation.filter,         p.filterctrl)
      (emulation.overridetracking, p.overridetracking);
 }

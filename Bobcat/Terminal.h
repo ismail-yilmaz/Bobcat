@@ -47,6 +47,7 @@ struct Terminal : TerminalCtrl {
     Terminal&   SetFontZoom(int n);
     Terminal&   SetLineSpacing(int n);
     Terminal&   SetWordSelectionFilter(const String& s);
+    Terminal&   SetWordSelectionPattern(const String& s);
     
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
@@ -76,11 +77,14 @@ struct Terminal : TerminalCtrl {
     bool        IsMouseOverImplicitHyperlink();
     bool        IsMouseOverLink();
     
-    int         GetPosAsIndex(Point pt);
-    int         GetMousePosAsIndex();
+    int         GetPosAsIndex(Point pt) const;
+    int         GetMousePosAsIndex() const;
     
     void        OnHighlight(VectorMap<int, VTLine>& hl);
-    
+
+    bool        GetWordSelection(const Point& pt, Point& pl, Point& ph) const override;
+    bool        GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) const;
+     
     void        EmulationMenu(Bar& menu);
     void        FileMenu(Bar& menu);
     void        EditMenu(Bar& menu);
@@ -101,6 +105,7 @@ struct Terminal : TerminalCtrl {
     PtyProcess   pty;
     bool         bell:1;
     bool         filter:1;
+    bool         smartwordsel:1;
     ExitMode     exitmode;
     String       profilename;
     Value        data;
@@ -128,8 +133,9 @@ struct Terminal : TerminalCtrl {
 };
 
 // Global functions
-Terminal& AsTerminal(Ctrl& c);
-void      InsertUnicodeCodePoint(Terminal& term);
+Terminal&                  AsTerminal(Ctrl& c);
+VectorMap<String, String>& GetWordSelectionPatterns();
+void                       InsertUnicodeCodePoint(Terminal& term);
 
 // Operators
 

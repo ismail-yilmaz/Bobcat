@@ -50,7 +50,9 @@ struct Profile : Moveable<Profile> {
     int         linespacing;
     String      overridetracking;
     String      onexit;
+    String      wordselmode;
     String      wordselchars;
+    String      wordselpattern;
     bool        filterctrl;
     bool        sizehint;
     int         order;
