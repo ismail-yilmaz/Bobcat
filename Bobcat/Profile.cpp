@@ -288,6 +288,7 @@ void Profiles::Setup::Sync()
 	visuals.cursorstyle.Enable(!~visuals.lockcursor);
 	visuals.blinkcursor.Enable(!~visuals.lockcursor);
 	emulation.historysize.Enable(~emulation.history);
+	emulation.wordselpattern.Enable(~emulation.wordselmode == "smart");
 	Update();
 }
 

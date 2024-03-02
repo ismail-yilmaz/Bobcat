@@ -577,15 +577,14 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 						pl.y = ln.GetKey(row);
 					}
 					else
-					if(col == begin + count) { // selection
-						ph.x = j;
+					if(col == begin + count - 1) { // selection
+						ph.x = j + 1;
 						ph.y = ln.GetKey(row);
 						return true;
 					}
 				}
 		}
 	}
-	
 	return false;
 }
 
