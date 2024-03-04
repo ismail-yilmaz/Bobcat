@@ -8,12 +8,12 @@
 
 namespace Upp {
 
-#define KEYGROUPNAME "Terminal"
-#define KEYNAMESPACE TermKeys
+#define KEYGROUPNAME TERMINALCTRL_KEYGROUPNAME
+#define KEYNAMESPACE TerminalCtrlKeys
 #define KEYFILE <Bobcat/Terminal.key>
 #include <CtrlLib/key_source.h>
 
-using namespace TermKeys;
+using namespace TerminalCtrlKeys;
 
 Terminal::Terminal(Bobcat& ctx_)
 : ctx(ctx_)
@@ -609,8 +609,8 @@ void Terminal::EditMenu(Bar& menu)
 	}
 	else {
 		menu.Separator();
-		menu.Add(IsSelection(), AK_COPYTEXT,  Images::Copy(), [this] { Copy();  });
-		menu.Add(IsEditable(),  AK_PASTETEXT, Images::Paste(),[this] { Paste(); });
+		menu.Add(IsSelection(), AK_COPY,  Images::Copy(), [this] { Copy();  });
+		menu.Add(IsEditable(),  AK_PASTE, Images::Paste(),[this] { Paste(); });
 		if(ctx.settings.custominputmethod)
 			menu.Add(IsEditable(),  AK_CODEPOINT, Images::InsertUnicode(),  [this] { InsertUnicodeCodePoint(*this); });
 		menu.Separator();
@@ -618,7 +618,7 @@ void Terminal::EditMenu(Bar& menu)
 	}
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { ShowFinder(true); });
-	menu.AddKey(AK_SELECTOR_BEGIN, [this] { BeginSelectorMode(); });
+	menu.AddKey(AK_SELECTOR_START,      [this] { BeginSelectorMode(); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
@@ -634,22 +634,22 @@ void Terminal::ViewMenu(Bar& menu)
 
 void Terminal::EmulationMenu(Bar& menu)
 {
-	menu.Add(AK_PCFUNCTIONKEYS, [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
+	menu.Add(AK_VTFUNCTIONKEYS, [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
 	menu.Add(AK_KEYNAVIGATION,  [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
 	menu.Add(AK_SCROLLBAR,      [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());
-	menu.Add(AK_NOSCROLL,       [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());
+	menu.Add(AK_AUTOSCROLL,     [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());
 	menu.Add(AK_ALTERNATESCROLL,[this] { AlternateScroll(!HasAlternateScroll()); }).Check(HasAlternateScroll());
 	menu.Add(AK_HIDEMOUSE,	    [this] { AutoHideMouseCursor(!IsMouseCursorAutoHidden()); }).Check(IsMouseCursorAutoHidden());
 	menu.Add(AK_REVERSEWRAP,    [this] { ReverseWrap(!HasReverseWrap()); }).Check(HasReverseWrap());
 	menu.Add(AK_DYNAMICCOLORS,  [this] { DynamicColors(!HasDynamicColors()); }).Check(HasDynamicColors());
 	menu.Add(AK_BRIGHTCOLORS,   [this] { LightColors(!HasLightColors()); }).Check(HasLightColors());
-	menu.Add(AK_ADJUSTTODARK,   [this] { AdjustColors(!HasAdjustedColors()); }).Check(HasAdjustedColors());
+	menu.Add(AK_ADJUSTCOLORS,   [this] { AdjustColors(!HasAdjustedColors()); }).Check(HasAdjustedColors());
 	menu.Add(AK_BLINKINGTEXT,   [this] { BlinkingText(!HasBlinkingText()); }).Check(HasBlinkingText());
 	menu.Add(AK_BELL,           [this] { bell = !bell; }).Check(bell);
 	menu.Add(AK_INLINEIMAGES,   [this] { InlineImages(!HasInlineImages()); }).Check(HasInlineImages());
 	menu.Add(AK_HYPERLINKS,     [this] { Hyperlinks(!HasHyperlinks()); }).Check(HasHyperlinks());
 	menu.Add(AK_SIZEHINT,       [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
-	menu.Add(AK_DELAYEDREFRESH, [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
+	menu.Add(AK_BUFFEREDREFRESH,[this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
 	menu.Add(AK_LAZYRESIZE,     [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
 }
 
