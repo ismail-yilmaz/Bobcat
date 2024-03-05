@@ -618,7 +618,7 @@ void Terminal::EditMenu(Bar& menu)
 	}
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { ShowFinder(true); });
-	menu.AddKey(AK_SELECTOR_START,      [this] { BeginSelectorMode(); });
+	menu.AddKey(AK_SELECTOR_ENTER,      [this] { BeginSelectorMode(); });
 }
 
 void Terminal::ViewMenu(Bar& menu)
