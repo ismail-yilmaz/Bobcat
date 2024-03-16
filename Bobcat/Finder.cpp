@@ -278,6 +278,20 @@ void Finder::SaveToClipboard()
 	harvester.SaveToClipboard();
 }
 
+int Finder::AdjustLineOffset(const Vector<int>& in, Vector<int>& out)
+{
+	int i = 0, dx = 0;
+	auto range = term.GetPageRange();
+	if(out = clone(in), i = out[0]; i == range.a) {
+		if(auto span = term.GetPage().GetLineSpan(i); i > span.a && i <= span.b) {
+			dx = GetLength(term.GetPage(), span.a, i);
+			for(int j = 0; j < out.GetCount(); j++)
+				out[j] = span.a + j;
+		}
+	}
+	return dx;
+}
+
 bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
@@ -381,11 +395,13 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 
 	LTIMING("Finder::OnHighlight");
 
+	Vector<int> rows;
+	int dx = AdjustLineOffset(hl.GetKeys(), rows);
+	
 	for(const TextAnchor& a : foundtext)
-		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
-			if(hl.GetKey(row) != a.pos.y)
+		for(int row = 0, col = 0, offset = -dx; row < hl.GetCount(); row++) {
+			if(rows[row] != a.pos.y)
 				continue;
-			int offset = 0;
 			for(VTLine& l : hl) {
 				for(VTCell& c : l) {
 					offset += c == 1; // Double width char, second half.

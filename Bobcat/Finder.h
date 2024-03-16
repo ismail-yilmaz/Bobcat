@@ -69,9 +69,10 @@ public:
     };
 
 private:
+    int         AdjustLineOffset(const Vector<int>& in, Vector<int>& out);
     bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
-
+   
     struct TextAnchor : Moveable<TextAnchor> {
         Point   pos    = {0, 0};
         int     length = 0;

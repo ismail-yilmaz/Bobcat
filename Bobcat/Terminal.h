@@ -77,7 +77,8 @@ struct Terminal : TerminalCtrl {
     bool        IsMouseOverImplicitHyperlink();
     bool        IsMouseOverLink();
     
-    int         GetPosAsIndex(Point pt) const;
+    const VTPage& GetPage();
+    int         GetPosAsIndex(Point pt, bool relative = false) const;
     int         GetMousePosAsIndex() const;
     
     void        OnHighlight(VectorMap<int, VTLine>& hl);

@@ -50,10 +50,11 @@ public:
    
     void        Clear();
     bool        Sync();
+    void        Scan();
     
     void        Search();
     void        Update();
-    bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
+
     void        OnHighlight(VectorMap<int, VTLine>& hl);
     
     const LinkInfo* begin() const;

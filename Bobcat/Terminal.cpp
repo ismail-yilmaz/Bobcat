@@ -228,6 +228,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	IntensifyBoldText(p.intensify);
 	DynamicColors(p.dynamiccolors);
 	BlinkingText(p.blinktext);
+	BlinkInterval(p.blinkinterval);
 	UnlockCursor();
 	SetCursorStyle(p.cursorstyle);
 	BlinkingCursor(p.blinkcursor);
@@ -513,20 +514,21 @@ void Terminal::OnLink(const String& s)
 	LaunchWebBrowser(s);
 }
 
-int Terminal::GetPosAsIndex(Point pt) const
+const VTPage& Terminal::GetPage()
 {
-	if(const VTPage& p = GetPage(); pt.y >= 0 && pt.y < p.GetLineCount()) {
-		int i = 0, n = 0;
-		while(i < pt.y)
-			n += p.FetchLine(i++).GetCount();
-		return n + pt.x;
-	}
-	return -1;
+	return TerminalCtrl::GetPage();
+}
+
+int Terminal::GetPosAsIndex(Point pt, bool relative) const
+{
+	const VTPage& page = TerminalCtrl::GetPage();
+	int n = GetLength(page, relative ? GetSbPos() : 0, pt.y);
+	return n + pt.x + GetLength(page.FetchLine(pt.y), 0, pt.x);
 }
 
 int Terminal::GetMousePosAsIndex() const
 {
-	return GetPosAsIndex(GetMousePagePos());
+	return GetPosAsIndex(GetMousePagePos(), true);
 }
 
 void Terminal::OnHighlight(VectorMap<int, VTLine>& hl)
@@ -549,43 +551,46 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		return false;
 
 	pl = ph = pt;
+	int i = GetPosAsIndex(pt, true);
 
-	VectorMap<int, WString> ln;
-	GetPage().FetchLine(pt.y, ln);
+	auto ScanPattern = [&](VectorMap<int, VTLine>& m) {
+		WString q;
+		for(const VTLine& l : m)
+			q << l.ToWString();
 
-	WString q;
-	for(const WString& s : ln)
-		q << s;
-	
-	if(q.IsEmpty())
-		return false;
-	
-	int i = GetPosAsIndex(pt);
-
-	RegExp r(sp);
-	String l = ToUtf8(q);
-	while(r.GlobalMatch(l)) {
-		int o = r.GetOffset();
-		int begin = Utf32Len(~l, o);
-		int count = Utf32Len(~l + o, r.GetLength());
-		int ii = GetPosAsIndex(Point(begin, ln.GetKey(0)));
-		if(i >= ii && i < ii + count) {
-			for(int col = 0, row = 0; row < ln.GetCount(); row++)
-				for(int j = 0; j < ln[row].GetLength(); j++, col++) {
-					if(col == begin) { // anchor
-						pl.x = j;
-						pl.y = ln.GetKey(row);
-					}
-					else
-					if(col == begin + count - 1) { // selection
-						ph.x = j + 1;
-						ph.y = ln.GetKey(row);
-						return true;
+		if(q.IsEmpty())
+			return false;
+		
+		RegExp r(sp);
+		String l = ToUtf8(q);
+		while(r.GlobalMatch(l)) {
+			int o = r.GetOffset();
+			int begin = Utf32Len(~l, o);
+			int count = Utf32Len(~l + o, r.GetLength());
+			int ii = GetPosAsIndex(Point(begin, m.GetKey(0)), true);
+			if(i >= ii && i < ii + count) {
+				for(int col = 0, row = 0, offset = 0; row < m.GetCount(); row++) {
+					const VTLine& l = m[row];
+					for(int j = 0; j < l.GetCount(); j++, col++) {
+						offset += l[j] == 1;
+						if(col == begin + offset) { // anchor
+							pl.x = j;
+							pl.y = m.GetKey(row);
+						}
+						else
+						if(col == begin + count - 1 + offset) { // selection
+							ph.x = 1 + j;
+							ph.y = m.GetKey(row);
+							return true;
+						}
 					}
 				}
+			}
 		}
-	}
-	return false;
+		return false;
+	};
+	
+	return TerminalCtrl::GetPage().FetchRange(GetPageRange(), ScanPattern);
 }
 
 void Terminal::FileMenu(Bar& menu)
