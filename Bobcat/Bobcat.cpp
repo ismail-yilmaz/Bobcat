@@ -33,7 +33,7 @@ FileSel& BobcatFs()
 }
 
 Bobcat::Bobcat()
-: navigator(stack)
+: navigator(*this)
 {
 	SetContext(*this);
 	SyncTitle();
@@ -61,6 +61,13 @@ bool Bobcat::AddTerminal(const String& key)
 bool Bobcat::AddTerminal(const Profile& profile)
 {
 	bool ok = terminals.Create(*this).Start(profile);
+	if(ok) Sync();
+	return ok;
+}
+
+bool Bobcat::NewTerminalFromActiveProfile()
+{
+	bool ok = terminals.Create(*this).Start(GetActiveTerminal());
 	if(ok) Sync();
 	return ok;
 }
@@ -447,7 +454,7 @@ void Bobcat::HelpMenu(Bar& menu)
 void Bobcat::TermMenu(Bar& menu)
 {
 	Vector<String> pnames = GetProfileNames();
-	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { AddTerminal(GetActiveProfile()); });
+	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { NewTerminalFromActiveProfile(); });
 	if(!pnames.GetCount())
 		return;
 	

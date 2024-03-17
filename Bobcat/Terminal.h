@@ -22,6 +22,7 @@ struct Terminal : TerminalCtrl {
     bool        StartPty(const Profile& profile);
     bool        Start(const String& profile_name);
     bool        Start(const Profile& profile);
+    bool        Start(Terminal *term);
     void        Stop();
     int         Do();
     void        Restart();
@@ -48,6 +49,7 @@ struct Terminal : TerminalCtrl {
     Terminal&   SetLineSpacing(int n);
     Terminal&   SetWordSelectionFilter(const String& s);
     Terminal&   SetWordSelectionPattern(const String& s);
+    void        SetWorkingDirectory(const String& s);
     
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
@@ -107,8 +109,10 @@ struct Terminal : TerminalCtrl {
     bool         bell:1;
     bool         filter:1;
     bool         smartwordsel:1;
+    bool         shellintegration:1;
     ExitMode     exitmode;
     String       profilename;
+    String       workingdir;
     Value        data;
     Finder       finder;
     Linkifier    linkifier;

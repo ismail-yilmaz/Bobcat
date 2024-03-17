@@ -48,6 +48,7 @@ struct Bobcat : Pte<Bobcat> {
 
     bool        AddTerminal(const String& key = Null);
     bool        AddTerminal(const Profile& profile);
+    bool        NewTerminalFromActiveProfile();
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();

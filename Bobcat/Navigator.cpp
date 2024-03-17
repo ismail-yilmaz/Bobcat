@@ -83,8 +83,8 @@ Rect Navigator::Item::GetCloseButtonRect()
 	return RectC(r.right - 20, r.top + 4, 16, 16);
 }
 
-Navigator::Navigator(StackCtrl& sctrl)
-: stack(sctrl)
+Navigator::Navigator(Bobcat& ctx_)
+: ctx(ctx_)
 , columns(4)
 {
 	Hide();
@@ -92,8 +92,13 @@ Navigator::Navigator(StackCtrl& sctrl)
 	sb.AutoHide();
 	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
 	CtrlLayout(searchbar);
+	icon.SetDisplay(StdCenterDisplay());
+	icon <<= Images::Find();
+	searchbar.search.AddFrame(icon);
 	searchbar.search.WantFocus();
-	AddFrame(searchbar.Height(Zy(28)));
+	AddFrame(searchbar.Height(Zy(22)));
+	searchbar.newterm.Image(Images::Add());
+	searchbar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
 	searchbar.search.NullText(t_("Search terminal (Ctrl+S)..."));
 	searchbar.search << [this] { SyncItemLayout(); Refresh();  };
 	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
@@ -135,7 +140,7 @@ bool Navigator::FilterItem(const Item& item)
 
 void Navigator::SyncItemLayout()
 {
-	int cnt = stack.GetCount();
+	int cnt = ctx.stack.GetCount();
 	if(!cnt)
 		return;
 	int  tcy = searchbar.GetHeight();
@@ -162,7 +167,7 @@ void Navigator::Sync()
 {
 	auto ScheduledSync = [this]
 	{
-		int cnt = stack.GetCount();
+		int cnt = ctx.stack.GetCount();
 		if(!cnt || !IsVisible())
 			return;
 		items.SetCount(cnt);
@@ -170,7 +175,7 @@ void Navigator::Sync()
 		Size fsz = GetStdFontSize();
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
-			m.ctrl  = &stack[i];
+			m.ctrl  = &ctx.stack[i];
 			Size csz = max(Size(1, 1), m.ctrl->GetSize());
 			Size isz = max(Size(1, 1), m.GetSize());
 			ImageDraw w(csz);
@@ -179,7 +184,7 @@ void Navigator::Sync()
 			if(!m.IsChild())
 				Add(m);
 			m.WantFocus();
-			if(stack.GetActiveCtrl() == m.ctrl)
+			if(ctx.stack.GetActiveCtrl() == m.ctrl)
 				m.SetFocus();
 			m.WhenItem = WhenGotoItem;
 			m.WhenClose = WhenRemoveItem;

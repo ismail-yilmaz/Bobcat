@@ -20,6 +20,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , bell(true)
 , filter(false)
 , smartwordsel(false)
+, shellintegration(false)
 , finder(*this)
 , linkifier(*this)
 , titlebar(*this)
@@ -49,6 +50,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
     WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
+    WhenDirectoryChange      = THISFN(SetWorkingDirectory);
     WhenHighlight = THISFN(OnHighlight);
 }
 
@@ -120,6 +122,18 @@ bool Terminal::Start(const Profile& p)
 bool Terminal::Start(const String& profile_name)
 {
 	Profile p = LoadProfile(profile_name);
+	return Start(p);
+}
+
+bool Terminal::Start(Terminal *term)
+{
+	Profile p;
+	if(term) {
+		p = LoadProfile(term->profilename);
+		if(term->shellintegration && !IsNull(term->workingdir)) {
+			p.address = term->workingdir;
+		}
+	}
 	return Start(p);
 }
 
@@ -216,6 +230,8 @@ void Terminal::Layout()
 Terminal& Terminal::SetProfile(const Profile& p)
 {
 	profilename = p.name;
+	workingdir  = p.address;
+	shellintegration = p.shellintegration;
 	bell = p.bell;
 	filter = p.filterctrl;
 	WindowActions(p.windowactions);
@@ -379,6 +395,14 @@ Terminal& Terminal::SetWordSelectionPattern(const String& s)
 		m.Add(profilename) = s;
 	}
 	return *this;
+}
+
+void Terminal::SetWorkingDirectory(const String& s)
+{
+	if(shellintegration && !IsNull(s)) {
+		if(UrlInfo url(s); url.scheme == "file" && !IsNull(url.path))
+			workingdir = url.path;
+	}
 }
 
 void Terminal::MakeTitle(const String& s)
@@ -639,23 +663,24 @@ void Terminal::ViewMenu(Bar& menu)
 
 void Terminal::EmulationMenu(Bar& menu)
 {
-	menu.Add(AK_VTFUNCTIONKEYS, [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
-	menu.Add(AK_KEYNAVIGATION,  [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
-	menu.Add(AK_SCROLLBAR,      [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());
-	menu.Add(AK_AUTOSCROLL,     [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());
-	menu.Add(AK_ALTERNATESCROLL,[this] { AlternateScroll(!HasAlternateScroll()); }).Check(HasAlternateScroll());
-	menu.Add(AK_HIDEMOUSE,	    [this] { AutoHideMouseCursor(!IsMouseCursorAutoHidden()); }).Check(IsMouseCursorAutoHidden());
-	menu.Add(AK_REVERSEWRAP,    [this] { ReverseWrap(!HasReverseWrap()); }).Check(HasReverseWrap());
-	menu.Add(AK_DYNAMICCOLORS,  [this] { DynamicColors(!HasDynamicColors()); }).Check(HasDynamicColors());
-	menu.Add(AK_BRIGHTCOLORS,   [this] { LightColors(!HasLightColors()); }).Check(HasLightColors());
-	menu.Add(AK_ADJUSTCOLORS,   [this] { AdjustColors(!HasAdjustedColors()); }).Check(HasAdjustedColors());
-	menu.Add(AK_BLINKINGTEXT,   [this] { BlinkingText(!HasBlinkingText()); }).Check(HasBlinkingText());
-	menu.Add(AK_BELL,           [this] { bell = !bell; }).Check(bell);
-	menu.Add(AK_INLINEIMAGES,   [this] { InlineImages(!HasInlineImages()); }).Check(HasInlineImages());
-	menu.Add(AK_HYPERLINKS,     [this] { Hyperlinks(!HasHyperlinks()); }).Check(HasHyperlinks());
-	menu.Add(AK_SIZEHINT,       [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
-	menu.Add(AK_BUFFEREDREFRESH,[this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
-	menu.Add(AK_LAZYRESIZE,     [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
+	menu.Add(AK_SHELLINTEGRATION, [this] { shellintegration = !shellintegration; }).Check(shellintegration);
+	menu.Add(AK_VTFUNCTIONKEYS,   [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
+	menu.Add(AK_KEYNAVIGATION,    [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
+	menu.Add(AK_SCROLLBAR,        [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());
+	menu.Add(AK_AUTOSCROLL,       [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());
+	menu.Add(AK_ALTERNATESCROLL,  [this] { AlternateScroll(!HasAlternateScroll()); }).Check(HasAlternateScroll());
+	menu.Add(AK_HIDEMOUSE,	      [this] { AutoHideMouseCursor(!IsMouseCursorAutoHidden()); }).Check(IsMouseCursorAutoHidden());
+	menu.Add(AK_REVERSEWRAP,      [this] { ReverseWrap(!HasReverseWrap()); }).Check(HasReverseWrap());
+	menu.Add(AK_DYNAMICCOLORS,    [this] { DynamicColors(!HasDynamicColors()); }).Check(HasDynamicColors());
+	menu.Add(AK_BRIGHTCOLORS,     [this] { LightColors(!HasLightColors()); }).Check(HasLightColors());
+	menu.Add(AK_ADJUSTCOLORS,     [this] { AdjustColors(!HasAdjustedColors()); }).Check(HasAdjustedColors());
+	menu.Add(AK_BLINKINGTEXT,     [this] { BlinkingText(!HasBlinkingText()); }).Check(HasBlinkingText());
+	menu.Add(AK_BELL,             [this] { bell = !bell; }).Check(bell);
+	menu.Add(AK_INLINEIMAGES,     [this] { InlineImages(!HasInlineImages()); }).Check(HasInlineImages());
+	menu.Add(AK_HYPERLINKS,       [this] { Hyperlinks(!HasHyperlinks()); }).Check(HasHyperlinks());
+	menu.Add(AK_SIZEHINT,         [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
+	menu.Add(AK_BUFFEREDREFRESH,  [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
+	menu.Add(AK_LAZYRESIZE,       [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
 }
 
 void Terminal::ContextMenu(Bar& menu)

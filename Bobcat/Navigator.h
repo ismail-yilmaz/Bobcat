@@ -5,7 +5,7 @@
 #define _Bobcat_Navigator_h_
 
 struct Navigator : ParentCtrl {
-    Navigator(StackCtrl& sctrl);
+    Navigator(Bobcat& ctx);
     ~Navigator();
 
     Navigator&    Show(bool ok = true);
@@ -56,11 +56,11 @@ struct Navigator : ParentCtrl {
 
 	bool		  FilterItem(const Item& item);
 	
-    StackCtrl&  stack;
+    Bobcat&     ctx;
     int         columns;
     VScrollBar  sb;
-    Button      newterm;
     Array<Item> items;
+    FrameLeft<DisplayCtrl> icon;
     FrameTop<WithNavigatorLayout<ParentCtrl>> searchbar;
 };
 
