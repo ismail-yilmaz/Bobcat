@@ -514,7 +514,7 @@ void Terminal::OnLink(const String& s)
 	LaunchWebBrowser(s);
 }
 
-const VTPage& Terminal::GetPage()
+const VTPage& Terminal::GetPage() const
 {
 	return TerminalCtrl::GetPage();
 }

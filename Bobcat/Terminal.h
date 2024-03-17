@@ -77,7 +77,7 @@ struct Terminal : TerminalCtrl {
     bool        IsMouseOverImplicitHyperlink();
     bool        IsMouseOverLink();
     
-    const VTPage& GetPage();
+    const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
     int         GetMousePosAsIndex() const;
     
