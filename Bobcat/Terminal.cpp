@@ -575,24 +575,35 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		return false;
 
 	pl = ph = pt;
-	int i = GetMousePosAsIndex();
 
-	auto ScanPattern = [&](VectorMap<int, VTLine>& m) {
+	const VTPage& page = TerminalCtrl::GetPage();
+	int linespan = 0, maxlinespan = max(1, (2048 / GetPageSize().cx) / 2);
+
+	while(linespan < maxlinespan) {
+		VectorMap<int, VTLine> m;
+		auto fn = [&](int n, const VTLine& l) {
+			m.Add(n, clone(l));
+			return false;
+		};
+		page.FetchLine(pt.y, fn, ++linespan);
+
 		WString q;
 		for(const VTLine& l : m)
 			q << l.ToWString();
 
 		if(q.IsEmpty())
 			return false;
+
+		int pos = GetLength(page, m.GetKey(0), pt.y);
+		pos += pt.x - GetOffset(page.FetchLine(pt.y), 0, pt.x);
 		
 		RegExp r(sp);
 		String l = ToUtf8(q);
 		while(r.GlobalMatch(l)) {
 			int o = r.GetOffset();
 			int begin = Utf32Len(~l, o);
-			int count = Utf32Len(~l + o, r.GetLength());
-			int ii = GetPosAsIndex(Point(begin, m.GetKey(0)), true);
-			if(i >= ii && i < ii + count) {
+			int end   = begin + Utf32Len(~l + o, r.GetLength());
+			if(pos >= begin && pos < end) {
 				for(int col = 0, row = 0, offset = 0; row < m.GetCount(); row++) {
 					const VTLine& l = m[row];
 					for(int j = 0; j < l.GetCount(); j++, col++) {
@@ -602,7 +613,7 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 							pl.y = m.GetKey(row);
 						}
 						else
-						if(col == begin + count - 1 + offset) { // selection
+						if(col == end - 1 + offset) { // selection
 							ph.x = 1 + j;
 							ph.y = m.GetKey(row);
 							return true;
@@ -611,10 +622,9 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 				}
 			}
 		}
-		return false;
-	};
+	}
 	
-	return TerminalCtrl::GetPage().FetchRange(GetPageRange(), ScanPattern);
+	return false;
 }
 
 void Terminal::FileMenu(Bar& menu)
