@@ -547,7 +547,7 @@ int Terminal::GetPosAsIndex(Point pt, bool relative) const
 {
 	const VTPage& page = TerminalCtrl::GetPage();
 	int n = GetLength(page, relative ? GetSbPos() : 0, pt.y);
-	return n + pt.x + GetLength(page.FetchLine(pt.y), 0, pt.x);
+	return n + pt.x - GetOffset(page.FetchLine(pt.y), 0, pt.x);
 }
 
 int Terminal::GetMousePosAsIndex() const
@@ -575,7 +575,7 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		return false;
 
 	pl = ph = pt;
-	int i = GetPosAsIndex(pt, true);
+	int i = GetMousePosAsIndex();
 
 	auto ScanPattern = [&](VectorMap<int, VTLine>& m) {
 		WString q;

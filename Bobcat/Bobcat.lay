@@ -150,12 +150,12 @@ LAYOUT(NavigatorLayout, 593, 22)
 END_LAYOUT
 
 LAYOUT(FinderLayout, 526, 22)
-	ITEM(ToolButton, prev, RightPosZ(175, 19).VSizePosZ(3, 4))
-	ITEM(ToolButton, next, RightPosZ(155, 19).VSizePosZ(3, 4))
-	ITEM(ToolButton, begin, RightPosZ(135, 19).VSizePosZ(3, 4))
-	ITEM(ToolButton, end, RightPosZ(115, 19).VSizePosZ(3, 4))
+	ITEM(ToolButton, prev, RightPosZ(178, 16).VSizePosZ(3, 3))
+	ITEM(ToolButton, next, RightPosZ(158, 16).VSizePosZ(3, 3))
+	ITEM(ToolButton, begin, RightPosZ(138, 16).VSizePosZ(3, 3))
+	ITEM(ToolButton, end, RightPosZ(118, 16).VSizePosZ(3, 3))
 	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).RightPosZ(23, 87).VSizePosZ(3, 4))
-	ITEM(ToolButton, close, RightPosZ(4, 12).VSizePosZ(3, 4))
+	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(3, 3))
 END_LAYOUT
 
 LAYOUT(FinderProfileLayout, 659, 299)
