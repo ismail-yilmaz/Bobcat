@@ -52,6 +52,7 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
     WhenDirectoryChange      = THISFN(SetWorkingDirectory);
     WhenHighlight = THISFN(OnHighlight);
+    WhenAnnotation = THISFN(OnAnnotation);
 }
 
 void Terminal::SetData(const Value& v)
@@ -73,7 +74,7 @@ void Terminal::PostParse()
 bool Terminal::StartPty(const Profile& p)
 {
 	#ifdef PLATFORM_POSIX
-	pty.WhenAttrs = [=, &p](termios& t) -> bool
+	pty.WhenAttrs = [this, &p](termios& t) -> bool
 	{
 		t.c_iflag |= IXANY;
 		#ifdef IUTF8
@@ -268,6 +269,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	ScrollToEnd(!p.dontscrolltoend);
 	OverrideTracking(GetModifierKey(p.overridetracking));
 	Hyperlinks(p.hyperlinks);
+	Annotations(p.annotations);
 	SetWordSelectionFilter(p.wordselchars);
 	SetWordSelectionPattern(p.wordselpattern);
 	smartwordsel = p.wordselmode == "smart";
@@ -519,23 +521,43 @@ String Terminal::GetLink()
 	return Null;
 }
 
+void Terminal::CopyLink(const String& s)
+{
+	Copy(s.ToWString());
+	linkifier.ClearCursor();
+}
+
 void Terminal::CopyLink()
 {
 	if(String uri = GetLink(); !IsNull(uri))
-		Copy(uri.ToWString());
+		CopyLink(uri);
+}
+
+void Terminal::OpenLink(const String& s)
+{
+	OnLink(s);
 	linkifier.ClearCursor();
 }
 
 void Terminal::OpenLink()
 {
 	if(String uri = GetLink(); !IsNull(uri))
-		OnLink(uri);
-	linkifier.ClearCursor();
+		OpenLink(uri);
 }
 
 void Terminal::OnLink(const String& s)
 {
 	LaunchWebBrowser(s);
+}
+
+void Terminal::CopyAnnotation(const String& s)
+{
+	Copy(s.ToWString());
+}
+
+bool Terminal::OnAnnotation(Point pt, String& s)
+{
+	return AnnotationEditor(s, t_("Annotation"));
 }
 
 const VTPage& Terminal::GetPage() const
@@ -641,17 +663,30 @@ void Terminal::EditMenu(Bar& menu)
 		menu.Add(AK_OPENIMAGE, CtrlImg::open(), [this] { OpenImage(); });
 	}
 	else
-	if(IsMouseOverLink()) {
+	if(HasHyperlinks() && IsMouseOverLink()) {
 		menu.Separator();
-		menu.Add(AK_COPYLINK, Images::Copy(),  [this] { CopyLink(); });
-		menu.Add(AK_OPENLINK, CtrlImg::open(), [this] { OpenLink(); });
+		String lnk = GetLink();
+		menu.Add(AK_COPYLINK, Images::Copy(),  [this, lnk = pick(lnk)] { CopyLink(lnk); });
+		menu.Add(AK_OPENLINK, CtrlImg::open(), [this, lnk = pick(lnk)] { OpenLink(lnk); });
+	}
+	else
+	if(HasAnnotations() && IsMouseOverAnnotation()) {
+		menu.Separator();
+		String txt = GetAnnotationText();
+		menu.Add(AK_COPYANNOTATION, Images::Copy(),     [this, txt = pick(txt)] { CopyAnnotation(txt); });
+		menu.Add(AK_EDITANNOTATION, Images::Edit(),     [this]   { EditAnnotation();    });
+		menu.Add(AK_DELETEANNOTATION, Images::Delete(), [this]   { DeleteAnnotation();  });
 	}
 	else {
 		menu.Separator();
 		menu.Add(IsSelection(), AK_COPY,  Images::Copy(), [this] { Copy();  });
 		menu.Add(IsEditable(),  AK_PASTE, Images::Paste(),[this] { Paste(); });
-		if(ctx.settings.custominputmethod)
+		if(ctx.settings.custominputmethod) {
 			menu.Add(IsEditable(),  AK_CODEPOINT, Images::InsertUnicode(),  [this] { InsertUnicodeCodePoint(*this); });
+		}
+		if(HasAnnotations()) {
+			menu.Add(IsSelection() && !IsSelectorMode(), AK_ANNOTATE, [=] { AddAnnotation(); });
+		}
 		menu.Separator();
 		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
 	}
@@ -688,6 +723,7 @@ void Terminal::EmulationMenu(Bar& menu)
 	menu.Add(AK_BELL,             [this] { bell = !bell; }).Check(bell);
 	menu.Add(AK_INLINEIMAGES,     [this] { InlineImages(!HasInlineImages()); }).Check(HasInlineImages());
 	menu.Add(AK_HYPERLINKS,       [this] { Hyperlinks(!HasHyperlinks()); }).Check(HasHyperlinks());
+	menu.Add(AK_ANNOTATIONS,      [this] { Annotations(!HasAnnotations()); }).Check(HasAnnotations());
 	menu.Add(AK_SIZEHINT,         [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
 	menu.Add(AK_BUFFEREDREFRESH,  [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
 	menu.Add(AK_LAZYRESIZE,       [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());

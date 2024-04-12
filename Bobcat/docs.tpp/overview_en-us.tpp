@@ -31,7 +31,11 @@ and modern image formats (png, jpg, bmp, tiff) for inline image
 display, and recognizes sixel, iterm2 `& jexer protocols.]&]
 [s0;l32;C+75 &]
 [s0;l32;i150;O0; [*C+75 OSC Extensions][C+75 : Implements newer OSC extensions, 
-including hyperlinks, clipboard manipulation protocol, etc.]&]
+including hyperlinks, clipboard manipulation protocol, annotations, 
+etc.]&]
+[s0;C+75 &]
+[s0;l32;i150;O0; [*C+75 Annotations:][C+75  Supports plain and rich text 
+annotations.]&]
 [s0;l32;C+75 &]
 [s0;l32;i150;O0; [*C+75 Versatile Copy/Paste][C+75 : Supports copy/paste/drag`-and`-drop 
 operations on texts, links, and inline`-images.]&]

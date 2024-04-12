@@ -25,6 +25,7 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 - **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC) sequences, ensuring high VT (DEC/ANSI) and xterm compatibility. (By default Bobcat emulates a DEC VT420 with various extensions)
 - **Image Support:** Supports both legacy (sixel) and modern image formats (png, jpg, bmp, tiff) for inline image display, and recognizes sixel, iterm2 & jexer protocols.
 - **OSC Extensions:** Implements newer OSC extensions, including hyperlinks, clipboard manipulation protocol, etc.
+- **Annotations:** Supports plain and rich text annotations, both programatically and via user input.
 - **Versatile Copy/Paste:** Supports copy/paste/drag-and-drop operations on texts, links, and inline-images.
 - **Multiple Profiles:** Supports multiple terminal and color profiles.
 - **Configurable UI:** Offers a configurable user interface, allowing for a bare-bone terminal or fully-fledged GUI.

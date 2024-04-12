@@ -139,6 +139,19 @@ void InsertUnicodeCodePoint(Terminal& t)
 	}
 }
 
+bool AnnotationEditor(String& s, const char *title)
+{
+	WithAnnotationEditorLayout<TopWindow> dlg;
+	CtrlLayoutOKCancel(dlg, title);
+	dlg.text <<= s.ToWString();
+	dlg.text.SetFilter(CharFilterUnicode);
+	if(dlg.Sizeable().ExecuteOK()) {
+		s = ~dlg.text;
+		return true;
+	}
+	return false;
+}
+
 static const Tuple<dword, const char*> mod_keys[] = {
     { K_SHIFT,              "K_SHIFT" },
     { K_ALT,                "K_ALT"   },

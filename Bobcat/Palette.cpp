@@ -61,6 +61,7 @@ static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
 		{ SColorHighlightText,   "SelectionInk", t_("Selection Ink") },
 		{ SColorPaper,           "Paper"       , t_("Paper") },
 		{ SColorHighlight,       "SelectionPaper", t_("Selection Paper") },
+		{ SYellow,               "AnnotationUnderline", t_("Annotation Underline") },
 		{ LtRed(),               "HighlightInk", t_("Highlight Ink") },
 		{ SColorHighlightText,   "HighlightCursorInk", t_("Highlight Cursor Ink") },
 		{ Yellow(),              "HighlightPaper", t_("Highlight Paper") },

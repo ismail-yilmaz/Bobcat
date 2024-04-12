@@ -68,7 +68,9 @@ struct Terminal : TerminalCtrl {
     void        OpenImage();
 
     String      GetLink();
+    void        CopyLink(const String& s);
     void        CopyLink();
+    void        OpenLink(const String& s);
     void        OpenLink();
     void        OnLink(const String& s);
     
@@ -78,6 +80,9 @@ struct Terminal : TerminalCtrl {
     bool        IsMouseOverExplicitHyperlink();
     bool        IsMouseOverImplicitHyperlink();
     bool        IsMouseOverLink();
+    
+    void        CopyAnnotation(const String& s);
+    bool        OnAnnotation(Point pt, String& s);
     
     const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
@@ -141,6 +146,7 @@ struct Terminal : TerminalCtrl {
 Terminal&                  AsTerminal(Ctrl& c);
 VectorMap<String, String>& GetWordSelectionPatterns();
 void                       InsertUnicodeCodePoint(Terminal& term);
+bool                       AnnotationEditor(String& s, const char *title);
 
 // Operators
 
