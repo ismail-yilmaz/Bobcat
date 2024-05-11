@@ -402,7 +402,7 @@ Terminal& Terminal::SetWordSelectionPattern(const String& s)
 void Terminal::SetWorkingDirectory(const String& s)
 {
 	if(shellintegration && !IsNull(s)) {
-		if(UrlInfo url(s); url.scheme == "file" && !IsNull(url.path))
+		if(UrlInfo url(s); url.scheme == "file" && !IsNull(url.path) && DirectoryExists(url.path))
 			workingdir = url.path;
 	}
 }
