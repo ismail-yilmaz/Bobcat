@@ -241,7 +241,22 @@ void Finder::Sync()
 	index = clamp(index, 0, max(0, cnt - 1));
 	String s;
 	s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
-	s << decode(searchtype, Search::Regex, "R", Search::CaseInsensitive, "I", "C") << " ";
+	switch(searchtype) {
+	case Search::CaseSensitive:
+		s << "C ";
+		display.Tip(t_("Case sensitive mode"));
+		break;
+	case Search::CaseInsensitive:
+		s << "I ";
+		display.Tip(t_("Case insensitive mode"));
+		break;
+	case Search::Regex:
+		s << "R ";
+		display.Tip(t_("Regex mode"));
+		break;
+	default:
+		break;
+	}
 	sWriteToDisplay(display, s);
 	bool a = !term.IsSearching() && cnt > 0 && index > 0;
 	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
