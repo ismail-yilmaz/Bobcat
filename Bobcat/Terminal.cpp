@@ -685,7 +685,7 @@ void Terminal::EditMenu(Bar& menu)
 			menu.Add(IsEditable(),  AK_CODEPOINT, Images::InsertUnicode(),  [this] { InsertUnicodeCodePoint(*this); });
 		}
 		if(HasAnnotations()) {
-			menu.Add(IsSelection() && !IsSelectorMode(), AK_ANNOTATE, [=] { AddAnnotation(); });
+			menu.Add(IsSelection() && !IsSelectorMode(), AK_ANNOTATE, Images::Annotate(), [=] { AddAnnotation(); });
 		}
 		menu.Separator();
 		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
