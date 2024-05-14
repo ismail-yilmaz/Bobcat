@@ -115,6 +115,7 @@ private:
     SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
+    FrameRight<ToolButton> fsave, csave;
 };
 
 class FinderSetup : public WithFinderProfileLayout<ParentCtrl> {

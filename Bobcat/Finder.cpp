@@ -49,6 +49,12 @@ Finder::Finder(Terminal& t)
 	text.AddFrame(menu);
 	text.WhenBar << THISFN(StdKeys);
 	text.WhenAction << THISFN(Search);
+	fsave.Image(Images::Reap());
+	fsave.Tip(t_("Save to file"));
+	fsave << [=] { SaveToFile(); };
+	csave.Image(Images::Paste());
+	csave.Tip(t_("Save to clipboard"));
+	csave << [=] { SaveToClipboard(); };
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
 	display.SetDisplay(StdCenterDisplay());
@@ -258,6 +264,19 @@ void Finder::Sync()
 		break;
 	}
 	sWriteToDisplay(display, s);
+	if(cnt && searchtype == Search::Regex) {
+		if(!fsave.IsChild())
+			text.InsertFrame(2, fsave); // FIXME: Yes, ugly...
+		if(!csave.IsChild())
+			text.InsertFrame(2, csave);
+	}
+	else {
+		if(fsave.IsChild())
+			text.RemoveFrame(fsave);
+		if(csave.IsChild())
+			text.RemoveFrame(csave);
+	}
+	
 	bool a = !term.IsSearching() && cnt > 0 && index > 0;
 	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
 	prev.Enable(a);
