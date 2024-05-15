@@ -118,13 +118,26 @@ struct Bobcat : Pte<Bobcat> {
         bool        showmenu;
         bool        showtitle;
         bool        serializeplacement;
+        bool        backgroundimage;
+        String      backgroundimagepath;
+        String      backgroundimagemode;
+        int         backgroundimageblur;
         void        Jsonize(JsonIO& jio);
+    };
+    
+    struct ViewCtrl : ParentCtrl {
+        ViewCtrl();
+        void        SetData(const Value& v) final;
+        Value       GetData() const final;
+        void        Paint(Draw& w) final;
+        Value       data;
+        String      mode;
     };
     
     TopWindow  window;
     MenuBar    menubar;
     Navigator  navigator;
-    ParentCtrl view;
+    ViewCtrl   view;
     StackCtrl  stack;
     Config     settings;
     Array<Terminal> terminals;
@@ -136,6 +149,10 @@ void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
 String GetBuildInfo();
+
+const Display& StdBackgroundDisplay();
+const Display& NormalImageDisplay();
+const Display& TiledImageDisplay();
 
 void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);

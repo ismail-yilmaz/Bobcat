@@ -37,7 +37,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 - **Emoji Support:** Can display color emojis (depending on the font).
 - **Colorful Experience:** Supports 16, 256, and 24-Bit colors, xterm's dynamic colors feature, and even recognizes CMY and CMYK color spec formats.
 - **Powerful search engine:** Bobcat has a powerful search & highlight engine called `Finder`. It can do case sensitive/insensitive and regexp based searchs in both visible page and scrollaback buffer. It can navigate the found strings in both directions. Furthermore, it has a [harvester](#bobcat-finder-harvester) that lets the user harvest the found text in regexp search mode and export them as a `csv` files. So, for example if you need to search for url patterns in the terminal's buffer, you can simply pass your url regexp pattern to `Finder` and let it "reap" and export the matched patterns to a file. Wait, there is more! While doing this, `Finder` can keep the horizontal order intact; namely it can "map" the found strings as/is. This can come in handy, say, if you need to reap a table, or an output that has a certain line pattern.
-- **Linkify anything:** Bobcat has a module called `Linkifier` that let's you convert any text into clickable hyperlinks, using a regexp pattern match. Each terminal profile can have its own linkifier configuration and each can scan for more than one pattern. 
+- **Linkify anything:** Bobcat has a module called `Linkifier` that let's you convert any text into clickable hyperlinks, using a regexp pattern match. Each terminal profile can have its own linkifier configuration and each can scan for more than one pattern.
+- **Smart text selection:** Bobcat let's user configure their own text (word) selection pattern(s). Once again, the setting is per-profile and multiple patterns can be defined at once.
 
 - **Performance:** Reasonably fast and less memory-hungry.
 
@@ -81,6 +82,11 @@ Bobcat on Linux
 Bobcat on Windows
 
 ![bobcat-windows](resources/bobcat-about-windows.png)
+
+
+Bobcat, running zellij, with a background image of well..., a bobcat!
+
+![bobcat-zellij](resources/bobcat-zellij-background-linux.png)
 
 Multiple terminal profile support (linux, btop)
 

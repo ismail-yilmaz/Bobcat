@@ -181,7 +181,13 @@ void Bobcat::Settings()
 	
 	settingspane.direction.Add("horizontal", tt_("Horizontal"));
 	settingspane.direction.Add("vertical", tt_("Vertical"));
-	settingspane.direction.GoEnd();
+	settingspane.direction.GoBegin();
+	
+	settingspane.imagemode.Add("normal", tt_("Normal"));
+	settingspane.imagemode.Add("centered", tt_("Centered"));
+	settingspane.imagemode.Add("stretched", tt_("Stretched"));
+	settingspane.imagemode.Add("tiled", tt_("Tiled"));
+	settingspane.direction.GoBegin();
 	
 	for(auto& ch : GetAllGuiThemes()) {
 		settingspane.chstyle.Add(ch.b, ch.c);
@@ -197,6 +203,12 @@ void Bobcat::Settings()
 		settingspane.guifont.Action();
 	};
 	
+	FileSelButton filesel;
+	filesel.Types("*.jpg *.png *.bmp");
+	filesel.Attach(settingspane.imagepath);
+
+	settingspane.imageblur.MinMax(0, 20).Step(1) <<= 0;
+	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
 	cr(settingspane.finderpos, settings.finderalignment);
@@ -210,7 +222,10 @@ void Bobcat::Settings()
 	cr(settingspane.pagesizes, settings.custompagesizes);
 	cr(settingspane.chstyle, settings.guitheme);
 	cr(settingspane.guifont, settings.guifont);
-	
+	cr(settingspane.backgroundimage, settings.backgroundimage);
+	cr(settingspane.imagemode, settings.backgroundimagemode);
+	cr(settingspane.imagepath, settings.backgroundimagepath);
+	cr(settingspane.imageblur, settings.backgroundimageblur);
 	cr.Set();
 
 	profiles.Load();
@@ -229,8 +244,9 @@ void Bobcat::Settings()
 			profiles.Store();
 			SaveConfig(*this);
 			if(window.IsOpen()) {
-				GetHyperlinkPatterns().Clear(); // Drop all patterns. Terminals will reacquire them.
+				GetHyperlinkPatterns().Clear();     // Drop all patterns. Terminals will reacquire them.
 				GetWordSelectionPatterns().Clear(); // Drop all patterns.
+				view <<= Null;                      // Drop any existing background image.
 				Sync();
 				SyncTerminalProfiles();
 			}
@@ -362,9 +378,22 @@ void Bobcat::Sync()
 	settings.stackdirection == "horizontal"	? stack.Horz() : stack.Vert();
 	stack.Wheel(settings.stackwheel);
 	stack.Animation(settings.stackanimation);
+	bool bkimg = settings.backgroundimage;
+	if(bkimg) {
+		bkimg &= FileExists(settings.backgroundimagepath);
+		if(bkimg && IsNull(view.data)) {
+			view.mode = settings.backgroundimagemode;
+			int n = clamp(settings.backgroundimageblur, 0, 20);
+			Image img = StreamRaster::LoadFileAny(settings.backgroundimagepath);
+			view <<= n ? GaussianBlur(img, n) : img;
+		}
+	}
+	if(!bkimg)
+		view <<= Null;
+	stack.Transparent(bkimg);
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = AsTerminal(stack[i]);
-		t.Sync();
+		t.Sync().NoBackground(bkimg);
 	}
 	SyncTitle();
 	navigator.Sync();
@@ -572,6 +601,41 @@ void Bobcat::Help()
 	}
 }
 
+Bobcat::ViewCtrl::ViewCtrl()
+{
+}
+
+void Bobcat::ViewCtrl::SetData(const Value& v)
+{
+	data = v;
+}
+
+Value Bobcat::ViewCtrl::GetData() const
+{
+	return data;
+}
+
+void Bobcat::ViewCtrl::Paint(Draw& w)
+{
+	Rect r = GetRect();
+	
+	if(IsNull(data))
+		w.DrawRect(r, SColorFace);
+	else {
+		if(mode == "normal")
+			NormalImageDisplay().Paint(w, r, data, SColorText, SColorPaper, 0);
+		else
+		if(mode == "centered")
+			CenteredImageDisplay().Paint(w, r, data, SColorText, SColorPaper, 0);
+		else
+		if(mode == "stretched")
+			ImageDisplay().Paint(w, r, data, SColorText, SColorPaper, 0);
+		else
+		if(mode == "tiled")
+			TiledImageDisplay().Paint(w, r, data, SColorText, SColorPaper, 0);
+	}
+}
+
 Bobcat::Config::Config()
 : guitheme("host")
 , guifont(GetStdFont())
@@ -585,6 +649,9 @@ Bobcat::Config::Config()
 , savescreenshot(false)
 , custominputmethod(false)
 , serializeplacement(false)
+, backgroundimage(false)
+, backgroundimagemode("normal")
+, backgroundimageblur(0)
 {
 }
 
@@ -601,6 +668,10 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("SaveScreenshot", savescreenshot)
 	   ("CustomInputMethod", custominputmethod)
 	   ("CustomPageSizes", custompagesizes)
+	   ("BackgroundImage", backgroundimage)
+	   ("BackgroundImagePath", backgroundimagepath)
+	   ("BackgroundImageMode", backgroundimagemode)
+	   ("BackgroundImageBlur", backgroundimageblur)
 	   ("GuiTheme", guitheme)
 	   ("GuiFont", guifont);
 }

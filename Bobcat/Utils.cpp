@@ -22,7 +22,34 @@ struct FontListDisplayCls : Display
 	}
 };
 
-const Display& FontListDisplay()    { return Single<FontListDisplayCls>(); }
+struct StdBackgroundDisplayCls : Display
+{
+	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
+	{
+		w.DrawRect(r, SColorPaper);
+	}
+};
+
+struct NormalImageDisplayCls : Display
+{
+	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
+	{
+		w.DrawImage(0, 0, q);
+	}
+};
+
+struct TiledImageDisplayCls : Display
+{
+	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
+	{
+		DrawTiles(w, r, q);
+	}
+};
+
+const Display& StdBackgroundDisplay()   { return Single<StdBackgroundDisplayCls>(); }
+const Display& NormalImageDisplay()     { return Single<NormalImageDisplayCls>(); }
+const Display& TiledImageDisplay()      { return Single<TiledImageDisplayCls>(); }
+const Display& FontListDisplay()        { return Single<FontListDisplayCls>(); }
 
 Font SelectFont(Font f, dword type)
 {
