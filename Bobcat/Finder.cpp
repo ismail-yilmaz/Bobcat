@@ -50,10 +50,8 @@ Finder::Finder(Terminal& t)
 	text.WhenBar << THISFN(StdKeys);
 	text.WhenAction << THISFN(Search);
 	fsave.Image(Images::Reap());
-	fsave.Tip(t_("Save to file"));
 	fsave << [=] { SaveToFile(); };
 	csave.Image(Images::Paste());
-	csave.Tip(t_("Save to clipboard"));
 	csave << [=] { SaveToClipboard(); };
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
@@ -264,6 +262,13 @@ void Finder::Sync()
 		break;
 	}
 	sWriteToDisplay(display, s);
+	
+	String k;
+	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
+	fsave.Tip(t_("Save to file") + k);
+	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_CLIP().key[0]) + ") ";
+	csave.Tip(t_("Copy to clipboard") + k);
+	
 	if(cnt && searchtype == Search::Regex) {
 		if(!fsave.IsChild())
 			text.InsertFrame(2, fsave); // FIXME: Yes, ugly...
