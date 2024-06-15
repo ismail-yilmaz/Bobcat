@@ -98,11 +98,21 @@ Navigator::Navigator(Bobcat& ctx_)
 	searchbar.search.WantFocus();
 	AddFrame(searchbar.Height(Zy(22)));
 	searchbar.newterm.Image(Images::Add());
+	searchbar.newterm.Tip(t_("Open new terminal"));
 	searchbar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
 	searchbar.search.NullText(t_("Search terminal (Ctrl+S)..."));
 	searchbar.search << [this] { SyncItemLayout(); Refresh();  };
 	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
 	searchbar.close  << [this] { WhenClose(); };
+	searchbar.profiles.Image(CtrlImg::down_arrow());
+	searchbar.profiles.Tip(t_("Open new terminal from..."));
+	searchbar.profiles << [this] {
+		Vector<String> pnames = GetProfileNames();
+		if(pnames.GetCount())
+		    MenuBar::Execute([this, &pnames](Bar& bar) {
+				ctx.TermSubmenu(bar, pnames);
+			});
+	};
 }
 
 Navigator::~Navigator()

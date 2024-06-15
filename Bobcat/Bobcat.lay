@@ -153,7 +153,8 @@ END_LAYOUT
 
 LAYOUT(NavigatorLayout, 593, 22)
 	ITEM(ToolButton, newterm, LeftPosZ(4, 12).VCenterPosZ(12, 0))
-	ITEM(Upp::EditString, search, HSizePosZ(121, 136).VSizePosZ(2, 1))
+	ITEM(ToolButton, profiles, LeftPosZ(18, 12).VCenterPosZ(12, 0))
+	ITEM(Upp::EditString, search, HSizePosZ(128, 129).VSizePosZ(2, 1))
 	ITEM(ToolButton, close, RightPosZ(4, 12).VCenterPosZ(12, 0))
 END_LAYOUT
 
