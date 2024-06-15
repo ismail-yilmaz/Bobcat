@@ -33,8 +33,16 @@ Terminal::Terminal(Bobcat& ctx_)
 	}
 {
     titlebar.newterm << [this] { ctx.AddTerminal(ctx.GetActiveProfile()); };
+    titlebar.navlist << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
     titlebar.close   << [this] { Stop(); };
-    titlebar.menu    << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
+    titlebar.menu    << [this] {
+		Vector<String> pnames = GetProfileNames();
+		if(pnames.GetCount())
+		    MenuBar::Execute([this, &pnames](Bar& bar) {
+				ctx.TermSubmenu(bar, pnames);
+			});
+    };
+
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
@@ -212,8 +220,9 @@ void Terminal::SyncHighlight()
 Terminal& Terminal::Sync()
 {
 	bool b = ctx.stack.GetCount() > 1;
-	titlebar.menu.Show(!ctx.HasMenuBar() && b);
+	titlebar.menu.Show(!ctx.HasMenuBar());
 	titlebar.newterm.Show(!ctx.HasMenuBar());
+	titlebar.navlist.Show(!ctx.HasMenuBar() && b);
 	titlebar.close.Show(b || ctx.window.IsFullScreen());
 	ShowTitleBar(ctx.settings.showtitle);
 	titlebar <<= ctx.settings.titlealignment;
@@ -754,10 +763,12 @@ Terminal::TitleBar::TitleBar(Terminal& ctx_)
 	Add(title.VSizePosZ(0, 0).HSizePosZ(24, 24));
 	Add(newterm.LeftPosZ(4, 12).VCenterPosZ(12, 0));
 	Add(menu.LeftPosZ(18, 12).VCenterPosZ(12, 0));
+	Add(navlist.RightPos(24, 12).VCenterPosZ(12, 0));
 	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
 	newterm.Image(Images::Add()).Tip(t_("Open new terminal"));
+	navlist.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
 	close.Image(Images::Delete()).Tip(t_("Close terminal"));
-	menu.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
+	menu.Image(CtrlImg::down_arrow()).Tip(t_("Open new terminal from..."));
 }
 
 void Terminal::TitleBar::SetData(const Value& v)

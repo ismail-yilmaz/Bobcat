@@ -482,31 +482,34 @@ void Bobcat::HelpMenu(Bar& menu)
 
 void Bobcat::TermMenu(Bar& menu)
 {
-	Vector<String> pnames = GetProfileNames();
 	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { NewTerminalFromActiveProfile(); });
+
+	Vector<String> pnames = GetProfileNames();
 	if(!pnames.GetCount())
 		return;
-	
-	menu.Sub(t_("New terminal from"), [this, pnames = pick(pnames)](Bar& menu) {
-		for(int i = 0; i < pnames.GetCount(); i++) {
-			const String& name = pnames[i];
-			auto& item = menu.Add(name, Images::Terminal(), [this, name] { AddTerminal(name); });
-			if(i < 10) { // Set up the accelerator keys for the first ten profiles.
-				item.Key(decode(i,
-					0, (KeyInfo& (*)()) AK_PROFILE1,
-					1, (KeyInfo& (*)()) AK_PROFILE2,
-					2, (KeyInfo& (*)()) AK_PROFILE3,
-					3, (KeyInfo& (*)()) AK_PROFILE4,
-					4, (KeyInfo& (*)()) AK_PROFILE5,
-					5, (KeyInfo& (*)()) AK_PROFILE6,
-					6, (KeyInfo& (*)()) AK_PROFILE7,
-					7, (KeyInfo& (*)()) AK_PROFILE8,
-					8, (KeyInfo& (*)()) AK_PROFILE9,
-					(KeyInfo& (*)()) AK_PROFILE10));
-			}
-		}
-	});
+	menu.Sub(t_("New terminal from"), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
 	menu.AddKey(AK_NAVIGATOR, [this, &menu] { ToggleNavigator(); });
+}
+
+void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
+{
+	for(int i = 0; i < list.GetCount(); i++) {
+		const String& name = list[i];
+		auto& item = menu.Add(name, Images::Terminal(), [this, name] { AddTerminal(name); });
+		if(i < 10) { // Set up the accelerator keys for the first ten profiles.
+			item.Key(decode(i,
+				0, (KeyInfo& (*)()) AK_PROFILE1,
+				1, (KeyInfo& (*)()) AK_PROFILE2,
+				2, (KeyInfo& (*)()) AK_PROFILE3,
+				3, (KeyInfo& (*)()) AK_PROFILE4,
+				4, (KeyInfo& (*)()) AK_PROFILE5,
+				5, (KeyInfo& (*)()) AK_PROFILE6,
+				6, (KeyInfo& (*)()) AK_PROFILE7,
+				7, (KeyInfo& (*)()) AK_PROFILE8,
+				8, (KeyInfo& (*)()) AK_PROFILE9,
+				(KeyInfo& (*)()) AK_PROFILE10));
+		}
+	}
 }
 
 void Bobcat::ListMenu(Bar& menu)

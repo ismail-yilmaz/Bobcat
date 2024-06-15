@@ -137,6 +137,7 @@ struct Terminal : TerminalCtrl {
         ToolButton  close;
         ToolButton  menu;
         ToolButton  newterm;
+        ToolButton  navlist;
         StaticText  title;
         Value       data;
     }  titlebar;

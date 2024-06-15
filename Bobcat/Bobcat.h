@@ -93,6 +93,7 @@ struct Bobcat : Pte<Bobcat> {
     void        SetupMenu(Bar& menu);
     void        HelpMenu(Bar& menu);
     void        TermMenu(Bar& menu);
+    void        TermSubmenu(Bar& menu, const Vector<String>& list);
     void        ListMenu(Bar& menu);
     void        SizeMenu(Bar& menu);
     
