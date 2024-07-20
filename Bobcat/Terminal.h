@@ -84,6 +84,8 @@ struct Terminal : TerminalCtrl {
     void        CopyAnnotation(const String& s);
     bool        OnAnnotation(Point pt, String& s);
     
+    void        OnNotification(const String& text);
+    
     const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
     int         GetMousePosAsIndex() const;

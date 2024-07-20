@@ -59,8 +59,9 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
     WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
     WhenDirectoryChange      = THISFN(SetWorkingDirectory);
-    WhenHighlight = THISFN(OnHighlight);
+    WhenHighlight  = THISFN(OnHighlight);
     WhenAnnotation = THISFN(OnAnnotation);
+    WhenMessage    = THISFN(OnNotification);
 }
 
 void Terminal::SetData(const Value& v)
@@ -423,8 +424,8 @@ void Terminal::MakeTitle(const String& s)
 		title << profilename;
 	if(!s.IsEmpty() && s != profilename)
 		title << " :: " << s;
-	titlebar.title.SetText("\1[g= " << DeQtf(title) << " ]");
 	SetData(title);
+	titlebar.title.SetText("\1[g= " << DeQtf(title) << " ]");
 	ctx.SyncTitle();
 }
 
@@ -567,6 +568,11 @@ void Terminal::CopyAnnotation(const String& s)
 bool Terminal::OnAnnotation(Point pt, String& s)
 {
 	return AnnotationEditor(s, t_("Annotation"));
+}
+
+void Terminal::OnNotification(const String& text)
+{
+	NotifyDesktop("Bobcat (" + Nvl(profilename, t_("_default_")) + ")", text);
 }
 
 const VTPage& Terminal::GetPage() const

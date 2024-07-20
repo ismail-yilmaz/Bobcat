@@ -301,4 +301,26 @@ void LoadGuiFont(Bobcat& ctx)
 {
 	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
 }
+
+void NotifyDesktop(const String& title, const String& text, int timeout)
+{
+	// TODO: This should be implemented across the supported platforms (GTK, WINDOWS, X11)
+	
+#ifdef GUI_GTK
+	if(!notify_is_initted() && !notify_init(title))
+		return;
+	GError *error = nullptr;
+	NotifyNotification *notification = notify_notification_new (
+					~title,
+					~text,
+					"gtk-dialog-info" // TODO: Support all types (warning, error, etc.)
+					#ifndef NOTIFY_VERSION_GT_0_7_0
+					, nullptr
+					#endif
+					);
+	notify_notification_set_timeout(notification, timeout * 1000);
+	notify_notification_show(notification, &error);
+	notify_uninit();
+#endif
+}
 }
