@@ -167,6 +167,6 @@ const Display& TiledImageDisplay();
 void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
-void NotifyDesktop(const String& title, const String& text, int timeout = 5000);
+void NotifyDesktop(const String& title, const String& text, int timeout = 5);
 }
 #endif

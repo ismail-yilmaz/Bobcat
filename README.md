@@ -12,8 +12,9 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
  3. [Installation](#Installation)
  4. [To Do](#ToDo)
  5. [Screenshots](#Screenshots)
- 6. [Acknowledgements](#Acknowledgements)
- 7. [License](#License)
+ 6. [Videos](#Videos)
+ 7. [Acknowledgements](#Acknowledgements)
+ 8. [License](#License)
 
 ## [Features](#Features)
 
@@ -41,6 +42,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 - **Smart text selection:** Bobcat let's user configure their own text (word) selection pattern(s). Once again, the setting is per-profile and multiple patterns can be defined at once.
 
 - **Performance:** Reasonably fast and less memory-hungry.
+
+- **Can run doom!**
 
 
 ## [Requirements](#Requirements)
@@ -113,6 +116,14 @@ Settings windows (linux)
 Far manager running on Bobcat (Windows 10)
 
 ![bobcat-far-manager](resources/bobcat-far-manager-windows.png)
+
+Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mochadoom) (Linux)
+
+![bobcat-mochadoom](resources/bobcat-mochadoom.jpg)
+
+## [Videos]
+
+[A very short demonstration of Bobcat, (running Doom!)](https://vimeo.com/999236026)
 
 ## [Acknowledgements](#Acknowledgements)
 
