@@ -121,9 +121,9 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 
 ![bobcat-mochadoom](resources/bobcat-mochadoom.jpg)
 
-## [Videos]
+## [Videos](#Videos)
 
-[A very short demonstration of Bobcat, (running Doom!)](https://vimeo.com/999236026)
+A very short [demonstration](https://vimeo.com/999236026) of Bobcat, running DOOM!
 
 ## [Acknowledgements](#Acknowledgements)
 
