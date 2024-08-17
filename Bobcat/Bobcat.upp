@@ -36,6 +36,7 @@ file
 	Finder.key,
 	Bobcat.iml,
 	Bobcat.lay,
+	Locale.t,
 	Docs readonly separator,
 	docs.tpp,
 	Info readonly separator,
