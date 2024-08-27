@@ -125,6 +125,8 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 
 A very short [demonstration](https://vimeo.com/999236026) of Bobcat, running DOOM!
 
+A very short [demonstration](https://vimeo.com/1003353669?share=copy) of finder/harvester and unicode character (emoji) input.
+
 ## [Acknowledgements](#Acknowledgements)
 
 To be written...
