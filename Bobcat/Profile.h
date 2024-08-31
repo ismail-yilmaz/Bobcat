@@ -55,6 +55,7 @@ struct Profile : Moveable<Profile> {
     String      wordselmode;
     String      wordselchars;
     String      wordselpattern;
+    String      answerbackmsg;
     bool        filterctrl;
     bool        sizehint;
     int         order;

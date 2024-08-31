@@ -282,6 +282,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	Annotations(p.annotations);
 	SetWordSelectionFilter(p.wordselchars);
 	SetWordSelectionPattern(p.wordselpattern);
+	AnswerBackMessage(p.answerbackmsg);
 	smartwordsel = p.wordselmode == "smart";
 	finder.SetConfig(p);
 	linkifier.SetConfig(p);
