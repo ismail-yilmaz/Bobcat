@@ -68,7 +68,7 @@ void PrintProfileList()
 #endif
 }
 
-GUI_APP_MAIN
+void BobcatAppMain()
 {
 	StdLogSetup(LOG_FILE);
 	
@@ -231,3 +231,44 @@ GUI_APP_MAIN
 	app.Run(p, page_size, fullscreen);
 	SaveShortcutKeys();
 }
+
+#ifdef flagWEBGUI
+CONSOLE_APP_MAIN
+{
+#ifdef _DEBUG
+	TurtleServer::DebugMode();
+#endif
+
+	String host  = "localhost";
+	int port     = 8888;
+	int maxconn  = 15;
+	int maxmemkb = 100000000;
+	
+	UrlInfo url;
+	TurtleServer guiserver;
+	const Vector<String>& cmd = CommandLine();
+
+	if(int n = FindIndex(cmd, "--url"); n >= 0) {
+		url.Parse(cmd[n]);
+		if(!IsNull(url.host))
+			host = url.host;
+		if(!IsNull(url.port))
+			port = StrInt(url.port);
+		if(int q = url.array_parameters.Find("max_connection"); q >= 0)
+			maxconn = StrInt(url.parameters[q]);
+		if(int q = url.array_parameters.Find("memory_limit"); q >= 0)
+			maxmemkb = StrInt(url.parameters[q]);
+	}
+
+	MemoryLimitKb(maxmemkb); // Can aid preventing DDoS attacks.
+	guiserver.Host(host);
+	guiserver.HtmlPort(port);
+	guiserver.MaxConnections(maxconn);
+	RunTurtleGui(guiserver, BobcatAppMain);
+}
+#else
+GUI_APP_MAIN
+{
+	BobcatAppMain();
+}
+#endif

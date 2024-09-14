@@ -1,4 +1,7 @@
-description "Yet another terminal emulator with modern goodies\377";
+description "A multi-profile, cross-platform terminal emulator with modern features.\377";
+
+acceptflags
+	WEBGUI;
 
 uses
 	CtrlLib,
@@ -6,6 +9,8 @@ uses
 	PtyProcess,
 	StackCtrl,
 	plugin/pcre;
+
+uses(WEBGUI) Turtle;
 
 file
 	Bobcat.h,
@@ -43,6 +48,7 @@ file
 	Copying;
 
 mainconfig
+	"" = "WEBGUI",
 	"" = "GUI",
 	"" = "GUI NOGTK",
 	"" = "GUI WIN10";

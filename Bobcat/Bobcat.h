@@ -9,6 +9,10 @@
 #include <PtyProcess/PtyProcess.h>
 #include <plugin/pcre/Pcre.h>
 
+#ifdef flagWEBGUI
+#include <Turtle/Turtle.h>
+#endif
+
 #ifdef GUI_GTK
  #include <libnotify/notify.h>
  #ifdef NOTIFY_CHECK_VERSION
