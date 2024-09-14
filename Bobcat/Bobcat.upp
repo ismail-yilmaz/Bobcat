@@ -48,8 +48,8 @@ file
 	Copying;
 
 mainconfig
-	"" = "WEBGUI",
 	"" = "GUI",
 	"" = "GUI NOGTK",
-	"" = "GUI WIN10";
+	"" = "GUI WIN10",
+	"" = "WEBGUI";
 

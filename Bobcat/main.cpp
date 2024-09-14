@@ -244,12 +244,11 @@ CONSOLE_APP_MAIN
 	int maxconn  = 15;
 	int maxmemkb = 100000000;
 	
-	UrlInfo url;
 	TurtleServer guiserver;
 	const Vector<String>& cmd = CommandLine();
 
-	if(int n = FindIndex(cmd, "--url"); n >= 0) {
-		url.Parse(cmd[n]);
+	if(int n = FindIndex(cmd, "--url"); n >= 0 && ++n < cmd.GetCount()) {
+		UrlInfo url(cmd[n]);
 		if(!IsNull(url.host))
 			host = url.host;
 		if(!IsNull(url.port))
