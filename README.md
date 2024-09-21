@@ -120,9 +120,13 @@ Far manager running on Bobcat (Windows 10)
 ![bobcat-far-manager](resources/bobcat-far-manager-windows.png)
 
 
-Bobcat deployed as a simple web server with access from web browsers
+Bobcat deployed as a simple web server with access from web browsers (Linux)
 
-![bobcat-webgui](resources/bobcat-webgui-linux.png)
+![bobcat-webgui1](resources/bobcat-webgui-linux.png)
+
+Bobcat deployed as a simple web server with access from web browsers (Windows)
+
+![bobcat-webgui2](resources/bobcat-webgui-windows.png)
 
 
 Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mochadoom) (Linux)
