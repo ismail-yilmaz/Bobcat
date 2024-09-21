@@ -4,14 +4,15 @@
 #ifndef _Bobcat_Bobcat_h
 #define _Bobcat_Bobcat_h
 
-#include <StackCtrl/StackCtrl.h>
-#include <Terminal/Terminal.h>
-#include <PtyProcess/PtyProcess.h>
-#include <plugin/pcre/Pcre.h>
-
 #ifdef flagWEBGUI
 #include <Turtle/Turtle.h>
 #endif
+
+#include <plugin/pcre/Pcre.h> // WebGui Windows compilation fix: This has to be above the other include files.
+
+#include <StackCtrl/StackCtrl.h>
+#include <Terminal/Terminal.h>
+#include <PtyProcess/PtyProcess.h>
 
 #ifdef GUI_GTK
  #include <libnotify/notify.h>

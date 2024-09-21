@@ -51,5 +51,6 @@ mainconfig
 	"" = "GUI",
 	"" = "GUI NOGTK",
 	"" = "GUI WIN10",
-	"" = "WEBGUI";
+	"" = "WEBGUI",
+	"" = "WEBGUI WIN10";
 
