@@ -261,6 +261,10 @@ String GetBuildInfo()
 
 #ifdef GUI_GTK
 	h << " (Gtk)";
+#elif  flagWEBGUI
+	h << " (Turtle)";
+#elif  flagSDLGUI
+	h << " (SDL2-GL)";
 #endif
 	h << '\n';
 #ifdef bmTIME

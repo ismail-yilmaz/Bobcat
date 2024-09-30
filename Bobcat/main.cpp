@@ -244,7 +244,6 @@ CONSOLE_APP_MAIN
 	int maxconn  = 15;
 	int maxmemkb = 100000000;
 	
-	TurtleServer guiserver;
 	const Vector<String>& cmd = CommandLine();
 
 	if(int n = FindIndex(cmd, "--url"); n >= 0 && ++n < cmd.GetCount()) {
@@ -260,10 +259,33 @@ CONSOLE_APP_MAIN
 	}
 
 	MemoryLimitKb(maxmemkb); // Can aid preventing DDoS attacks.
+
+	TurtleServer guiserver;
 	guiserver.Host(host);
 	guiserver.HtmlPort(port);
 	guiserver.MaxConnections(maxconn);
 	RunTurtleGui(guiserver, BobcatAppMain);
+}
+#elif flagSDLGUI
+CONSOLE_APP_MAIN
+{
+	Rect screen(0, 0, 1024, 768);
+
+	const Vector<String>& cmd = CommandLine();
+	
+	if(int n = FindIndex(cmd, "--sdl-screen-size"); n >= 0 && ++n < cmd.GetCount()) {
+		String cx, cy;
+		if(SplitTo(cmd[n], 'x', cx, cy)) {
+			screen.SetSize(
+				clamp(StrInt(cx), 1024, 4096),
+				clamp(StrInt(cx), 768,  4096)
+			);
+		}
+	}
+
+	SDL2GUI gui;
+	gui.Create(screen, t_("Bobcat [SDL2-GUI]"));
+	RunVirtualGui(gui,BobcatAppMain);
 }
 #else
 GUI_APP_MAIN

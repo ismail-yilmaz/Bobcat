@@ -45,6 +45,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 - **Web support:** Bobcat can run on any web browser that has HTML5 and canvas support, remotely. Deploy it on your server, access it anywhere! (**!!! EXPERIMENTAL !!!**)
 
+- **Headless UI support** Bobcat can be compiled to run on SDL2-GL backend, without requiring a fully-fledged desktop environment. (**!!! EXPERIMENTAL !!!**)
+
 - **Can run doom!**
 
 
@@ -66,7 +68,7 @@ There are three ways to install the source code of Bobcat:
 2. On linux, the provided makefile can also be used to compile Bobcat. This makefile downloads umk (U++ make) *in binary form* to speed up the compilation process. Steps to download, build and run the Bobcat via this method are:
 
 	1. `make download`
-	2. `make build` or `make build-web`
+	2. `make build` or `make build-web` or 'make build-headless'
 	3. `make run`
 
 3.  Or you can manually clone or download this repository and set it up as an U++ _assembly_ or _nest_. You can find more information on U++ packages, assemblies and nests, [here](https://www.ultimatepp.org/app$ide$PackagesAssembliesAndNests$en-us.html).
@@ -127,6 +129,10 @@ Bobcat deployed as a simple web server with access from web browsers (Linux)
 Bobcat deployed as a simple web server with access from web browsers (Windows)
 
 ![bobcat-webgui2](resources/bobcat-webgui-windows.png)
+
+Bobcat running "headless" on SDL2 (GL) backend (Linux)
+
+![bobcat-headless](resources/bobcat-sdlgui-linux.png)
 
 
 Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mochadoom) (Linux)

@@ -10,6 +10,8 @@ uses
 	StackCtrl,
 	plugin/pcre;
 
+uses(SDLGUI) VirtualGui/SDL2GL;
+
 uses(WEBGUI) Turtle;
 
 file
@@ -52,5 +54,7 @@ mainconfig
 	"" = "GUI NOGTK",
 	"" = "GUI WIN10",
 	"" = "WEBGUI",
-	"" = "WEBGUI WIN10";
+	"" = "WEBGUI WIN10",
+	"" = "SDLGUI",
+	"" = "SDLGUI WIN10";
 

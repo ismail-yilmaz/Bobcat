@@ -6,6 +6,8 @@
 
 #ifdef flagWEBGUI
 #include <Turtle/Turtle.h>
+#elif  flagSDLGUI
+#include <VirtualGui/SDL2GL/SDL2GL.h>
 #endif
 
 #include <plugin/pcre/Pcre.h> // WebGui Windows compilation fix: This has to be above the other include files.
