@@ -378,23 +378,7 @@ void Bobcat::Sync()
 	settings.stackdirection == "horizontal"	? stack.Horz() : stack.Vert();
 	stack.Wheel(settings.stackwheel);
 	stack.Animation(settings.stackanimation);
-	bool bkimg = settings.backgroundimage;
-	if(bkimg) {
-		bkimg &= FileExists(settings.backgroundimagepath);
-		if(bkimg && IsNull(view.data)) {
-			view.mode = settings.backgroundimagemode;
-			int n = clamp(settings.backgroundimageblur, 0, 20);
-			Image img = StreamRaster::LoadFileAny(settings.backgroundimagepath);
-			view <<= n ? GaussianBlur(img, n) : img;
-		}
-	}
-	if(!bkimg)
-		view <<= Null;
-	stack.Transparent(bkimg);
-	for(int i = 0; i < stack.GetCount(); i++) {
-		Terminal& t = AsTerminal(stack[i]);
-		t.Sync().NoBackground(bkimg);
-	}
+	SyncBackground();
 	SyncTitle();
 	navigator.Sync();
 }
@@ -405,6 +389,30 @@ void Bobcat::SyncTitle()
 	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t)
 		s << " [" << t->GetData() << "]";
 	window.Title(s);
+}
+
+void Bobcat::SyncBackground()
+{
+	bool bkimg = settings.backgroundimage;
+
+	if(bkimg) {
+		bkimg &= FileExists(settings.backgroundimagepath);
+		if(bkimg && IsNull(view.data)) {
+			view.mode = settings.backgroundimagemode;
+			int n = clamp(settings.backgroundimageblur, 0, 20);
+			Image img = StreamRaster::LoadFileAny(settings.backgroundimagepath);
+			view <<= n ? GaussianBlur(img, n) : img;
+		}
+	}
+	else
+		view <<= Null;
+	
+	stack.Transparent(bkimg);
+	for(int i = 0; i < stack.GetCount(); i++) {
+		Terminal& t = AsTerminal(stack[i]);
+		t.Sync().NoBackground(bkimg);
+	}
+
 }
 
 void Bobcat::SyncTerminalProfiles()

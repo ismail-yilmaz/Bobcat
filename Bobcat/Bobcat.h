@@ -100,6 +100,7 @@ struct Bobcat : Pte<Bobcat> {
 
     void        Sync();
     void        SyncTitle();
+    void        SyncBackground();
     void        SyncTerminalProfiles();
     
     void        MainMenu(Bar& menu);
