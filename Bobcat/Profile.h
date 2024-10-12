@@ -16,6 +16,7 @@ struct Profile : Moveable<Profile> {
     String      env;
     bool        noenv;
     bool        shellintegration;
+    String      ptybackend;
     Font        font;
     bool        bell;
     bool        blinktext;

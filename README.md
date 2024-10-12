@@ -32,7 +32,7 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 - **Configurable UI:** Offers a configurable user interface, allowing for a bare-bone terminal or fully-fledged GUI.
 - **Stacked Interface:** Uses a stacked interface to reduce UI clutter, including a terminal manager called Navigator to navigate between open/stacked terminals.
 - **Simple Configuration:** Uses a simple JSON format for configuration files.
-- **Multiple Pty Support on Windows:** Can use ConPty or WinPty (compile-time feature, with plans to make it runtime) on Windows. WinPty backend is statically linked and *does not* require msys2 or cygwin environments but can be also used with them.
+- **Multiple Pty Support on Windows:** Each profile can use ConPty or WinPty (via a runtime switch) on Windows. WinPty backend is statically linked and *does not* require msys2 or cygwin environments but can be also used with them.
 - **Mouse Events:** Supports mouse events for almost all protocols.
 - **Configurable Keys:** Supports configurable keyboard shortcuts for a personalized experience.
 - **Emoji Support:** Can display color emojis (depending on the font).

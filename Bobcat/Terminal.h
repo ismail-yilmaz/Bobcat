@@ -101,8 +101,8 @@ struct Terminal : TerminalCtrl {
     void        ViewMenu(Bar& menu);
     void        ContextMenu(Bar& menu);
     
-    int         GetExitCode()                   { return pty.GetExitCode();     }
-    String      GetExitMessage()                { return pty.GetExitMessage();  }
+    int         GetExitCode()                   { return pty->GetExitCode();     }
+    String      GetExitMessage()                { return pty->GetExitMessage();  }
  
     enum class ExitMode {
         Keep,
@@ -111,8 +111,8 @@ struct Terminal : TerminalCtrl {
         Exit
     };
 
-    Bobcat&      ctx;
-    PtyProcess   pty;
+    Bobcat&          ctx;
+    One<APtyProcess> pty;
     bool         bell:1;
     bool         filter:1;
     bool         smartwordsel:1;

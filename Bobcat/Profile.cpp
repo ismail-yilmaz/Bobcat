@@ -85,12 +85,17 @@ Profile::Profile()
 , user(GetUserName())
 , address(GetHomeDirectory())
 {
-#ifdef PLATFORM_POSIX
+#if defined(PLATFORM_POSIX)
 	command = Nvl(GetEnv("SHELL"), "/bin/sh");
 	env << "TERM=" << Nvl(GetEnv("TERM"), "xterm-256color") << "\n"
 		<< "COLORTERM=" << Nvl(GetEnv("COLORTERM"), "truecolor") << "\n";
-#else
+#elif defined(PLATFORM_WIN32)
 	command = Nvl(GetEnv("ComSpec"), "cmd.exe");
+	#if(defined(flagWIN10))
+		ptybackend = "conpty";
+	#else
+		ptybackend = "winpty";
+	#endif
 #endif
 }
 
@@ -111,6 +116,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("DontInheritEnv",       noenv)
 	("ShellIntegration",     shellintegration)
 	("Encoding",             encoding)
+	("WindowsPtyBackend",    ptybackend)
 	("Font",				 font)
 	("LineSpacing",          linespacing)
 	("Bell",				 bell)
@@ -189,7 +195,7 @@ Profiles::Setup::Setup()
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	general.cmdexit.Add("restart", t_("Restart command"));
-	general.cmdexit.Add("restart_failed", t_("Restart command on failure"));
+	general.cmdexit.Add("restart_failed", t_("Restart command on failure")).SetIndex(0);
 	visuals.cursorstyle.Add("block", t_("Block"));
 	visuals.cursorstyle.Add("beam", t_("Beam"));
 	visuals.cursorstyle.Add("underline", t_("Underline")).SetIndex(0);
@@ -213,6 +219,16 @@ Profiles::Setup::Setup()
 	emulation.wordselmode.Add("smart", t_("Smart"));
 	emulation.wordselmode.SetIndex(0);
 
+#ifdef PLATFORM_WIN32
+	#if defined(flagWIN10)
+		general.pty.Add("conpty", t_("ConPty"));
+	#endif
+	general.pty.Add("winpty", t_("Winpty")).SetIndex(0);
+#else
+	general.pty.Hide();
+	general.ptylabel.Hide();
+#endif
+
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : emulation) c.WhenAction << [this] { Sync(); };
@@ -229,6 +245,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (general.noenv,            p.noenv)
      (general.cmdexit,          p.onexit)
      (general.answerback,       p.answerbackmsg)
+     (general.pty,              p.ptybackend)
      (visuals.font,             p.font)
      (visuals.linespacing,      p.linespacing)
      (visuals.cursorstyle,      p.cursorstyle)

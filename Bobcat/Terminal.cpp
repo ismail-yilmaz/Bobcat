@@ -47,9 +47,9 @@ Terminal::Terminal(Bobcat& ctx_)
 	
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
     WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
-    WhenResize  = [this]()                     { pty.SetSize(GetPageSize());      };
+    WhenResize  = [this]()                     { pty->SetSize(GetPageSize());     };
     WhenScroll  = [this]()                     { Update();                        };
-    WhenOutput  = [this](String s)             { pty.Write(s);                    };
+    WhenOutput  = [this](String s)             { pty->Write(s);                   };
     WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
     WhenLink    = [this](const String& s)      { OnLink(s);                       };
     WhenSetSize = [this](Size sz)              { ctx.Resize(sz);                  };
@@ -83,7 +83,7 @@ void Terminal::PostParse()
 bool Terminal::StartPty(const Profile& p)
 {
 	#ifdef PLATFORM_POSIX
-	pty.WhenAttrs = [this, &p](termios& t) -> bool
+	pty.Create<PosixPtyProcess>().WhenAttrs = [this, &p](termios& t) -> bool
 	{
 		t.c_iflag |= IXANY;
 		#ifdef IUTF8
@@ -97,6 +97,15 @@ bool Terminal::StartPty(const Profile& p)
 		Echo(Format("\033[?67%[1:h;l]s", chr == 0x08));
 		return true;
 	};
+	#elif PLATFORM_WIN32
+		#if defined(flagWIN10)
+			if(p.ptybackend == "conpty")
+				pty.Create<ConPtyProcess>();
+			else
+				pty.Create<WinPtyProcess>();
+		#else
+			pty.Create<WinPtyProcess>();
+		#endif
 	#endif
 
 	VectorMap<String, String> vv;
@@ -113,12 +122,12 @@ bool Terminal::StartPty(const Profile& p)
 	MakeTitle(profilename);
 	if(ctx.stack.Find(*this) < 0)
 		ctx.stack.Add(*this);
-	if(pty.Start(p.command, vv, p.address)) {
-		pty.SetSize(GetPageSize());
+	if(pty->Start(p.command, vv, p.address)) {
+		pty->SetSize(GetPageSize());
 		return true;
 	}
 	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
-	ErrorOK(Format(txt, p.name, p.command, pty.GetExitCode()));
+	ErrorOK(Format(txt, p.name, p.command, pty->GetExitCode()));
 	return false;
 }
 
@@ -156,18 +165,18 @@ void Terminal::Restart()
 void Terminal::Stop()
 {
 	exitmode = ExitMode::Exit;
-	if(!pty.IsRunning())
+	if(!pty->IsRunning())
 		return;
-	pty.Kill();
+	pty->Kill();
 }
 
 int Terminal::Do()
 {
-	String s = pty.Get();
+	String s = pty->Get();
 	Write(s, IsUtf8Mode());
-	if(pty.IsRunning())
+	if(pty->IsRunning())
 		return s.GetLength();
-	bool failed = pty.GetExitCode() != 0;
+	bool failed = pty->GetExitCode() != 0;
 	if(ShouldExit(failed))
 		return -1;
 	if(ShouldRestart(failed))
@@ -358,9 +367,9 @@ Terminal& Terminal::SetEraseKey(const String& s)
 	Echo(Format("\033[?67%[1:h;l]s", s == "backspace"));
 #ifdef PLATFORM_POSIX
 	termios tio;
-	if(pty.GetAttrs(tio)) {
+	if(auto& q = pty->To<PosixPtyProcess>(); q.GetAttrs(tio)) {
 		tio.c_cc[VERASE] = decode(s, "backspace", 0x08, 0x7f);
-		pty.SetAttrs(tio);
+		q.SetAttrs(tio);
 	}
 #endif
 	return *this;

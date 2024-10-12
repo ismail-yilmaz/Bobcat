@@ -74,7 +74,7 @@ bool Bobcat::NewTerminalFromActiveProfile()
 
 void Bobcat::RemoveTerminal(Terminal& t)
 {
-	if(t.pty.IsRunning())
+	if(t.pty && t.pty->IsRunning())
 		t.Stop();
 	stack.Remove(t);
 	terminals.RemoveIf([this, &t](int i) { return &t == &terminals[i]; });
