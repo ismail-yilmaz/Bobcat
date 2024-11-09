@@ -221,7 +221,7 @@ String GetVersion()
 #ifdef bmGIT_REVCOUNT
 	return AsString(atoi(bmGIT_REVCOUNT) + Date(23, 12, 19).Get());
 #endif
-	return "(pre-alpha)";
+	return "(beta)";
 }
 
 String GetBuildInfo()
