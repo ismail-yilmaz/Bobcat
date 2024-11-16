@@ -579,6 +579,7 @@ void Bobcat::About()
 	String atxt =  GetTopic("topic://Bobcat/docs/about_en-us");
 	atxt.Replace("$(BUILD)", DeQtf(GetBuildInfo()));
 	about.txt.SetQTF(atxt);
+	about.txt.NoLazy();
 	contributors.txt.SetQTF(GetTopic("topic://Bobcat/docs/contributors_en-us"));
 	licenses.txt.SetQTF(GetTopic("topic://Bobcat/docs/licenses_en-us"));
 	licenses.txt.SetZoom(Zoom(1200, 1800));

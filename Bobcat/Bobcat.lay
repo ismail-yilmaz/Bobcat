@@ -15,7 +15,7 @@ LAYOUT(GeneralProfileLayout, 577, 345)
 	ITEM(Upp::Label, dv___9, SetLabel(t_("Starting directory")).LeftPosZ(8, 96).TopPosZ(27, 19))
 	ITEM(Upp::Label, dv___10, SetLabel(t_("Answerback message")).RightPosZ(154, 126).TopPosZ(53, 19))
 	ITEM(Upp::Label, dv___11, SetLabel(t_("Command line")).LeftPosZ(7, 96).TopPosZ(4, 19))
-	ITEM(Upp::Label, dv___12,  SetLabel(t_("On exit")).LeftPosZ(7, 96).BottomPosZ(14, 19))
+	ITEM(Upp::Label, dv___12, SetLabel(t_("On exit")).LeftPosZ(7, 96).BottomPosZ(14, 19))
 	ITEM(Upp::Label, ptylabel, SetLabel(t_("Pty backend")).LeftPosZ(346, 96).BottomPosZ(14, 19))
 END_LAYOUT
 
@@ -151,7 +151,7 @@ LAYOUT(ColorPaletteLayout, 400, 334)
 	ITEM(Upp::Button, reset, SetLabel(t_("Restore defaults")).LeftPosZ(4, 160).BottomPosZ(4, 24))
 END_LAYOUT
 
-LAYOUT(AboutLayout, 400, 200)
+LAYOUT(AboutLayout, 447, 256)
 	ITEM(Upp::RichTextCtrl, txt, HSizePosZ(0, 1).VSizePosZ(1, 1))
 END_LAYOUT
 
