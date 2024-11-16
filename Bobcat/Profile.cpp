@@ -373,11 +373,7 @@ void Profiles::Clone()
 			Profile source = list.Get(1).To<Profile>();
 			Profile p(source);
 			p.name = s;
-			auto& m = GetHyperlinkPatterns();
-			if(int i = m.Find(source.name); i >= 0) {
-				m.Add(p.name, clone(m[i]));
-			}
-			list.Add(s, RawToValue(p));
+			list.Add(p.name, RawToValue(p));
 			list.GoEnd();
 		}
 	}
@@ -389,7 +385,8 @@ void Profiles::Rename()
 	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Profile"), t_("New name"))) {
 		if(list.Find(s) >= 0) {
 			Exclamation("Profile named \"" + s + "\" already exists.");
-		} else {
+		}
+		else {
 			Profile p = list.Get(1).To<Profile>();
 			String f = ProfileFile(p.name);
 			if(FileExists(f))
@@ -399,11 +396,6 @@ void Profiles::Rename()
 				SaveConfig(ctx);
 			}
 			p.name = s;
-			auto& m = GetHyperlinkPatterns();
-			if(int i = m.Find(p.name); i >= 0) {
-				m.Add(p.name, pick(m[i]));
-				m.Remove(i);
-			}
 			list.Set(0, p.name);
 			list.Set(1, RawToValue(p));
 		}
@@ -422,9 +414,6 @@ void Profiles::Remove()
 		if(FileExists(f))
 			DeleteFile(f);
 		list.Remove(list.GetCursor());
-		auto& m = GetHyperlinkPatterns();
-		if(int i = m.Find(s); i >= 0)
-			m.Remove(i);
 		Sync();
 	}
 }
