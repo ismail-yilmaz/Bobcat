@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Bobcat
+GenericName=Bobcat
+Comment=A cross-platform terminal emulator
+Exec=bobcat
+Icon=bobcat
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;
+StartupNotify=false
+
