@@ -25,30 +25,47 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 *For a full range of supported VT sequences, modes and control commands, see the [technical specifications document](https://github.com/ismail-yilmaz/Terminal/blob/master/Terminal/Specs.md) of TerminalCtrl.*
 
-- **Cross-Platform:** Bobcat can basically run on any OS that U++ can be compiled on: Linux, Windows, MacOS, and BSD.
-- **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC) sequences, ensuring high VT (DEC/ANSI) and xterm compatibility. (By default Bobcat emulates a DEC VT420 with various extensions)
-- **Image Support:** Supports both legacy (sixel) and modern image formats (png, jpg, bmp, tiff) for inline image display, and recognizes sixel, iterm2 & jexer protocols.
-- **OSC Extensions:** Implements newer OSC extensions, including hyperlinks, clipboard manipulation protocol, etc.
-- **Annotations:** Supports plain and rich text annotations, both programatically and via user input.
-- **Versatile Copy/Paste:** Supports copy/paste/drag-and-drop operations on texts, links, and inline-images.
-- **Multiple Profiles:** Supports multiple terminal and color profiles.
-- **Configurable UI:** Offers a configurable user interface, allowing for a bare-bone terminal or fully-fledged GUI.
-- **Stacked Interface:** Uses a stacked interface to reduce UI clutter, including a terminal manager called Navigator to navigate between open/stacked terminals.
-- **Simple Configuration:** Uses a simple JSON format for configuration files.
-- **Multiple Pty Support on Windows:** Each profile can use ConPty or WinPty (via a runtime switch) on Windows. WinPty backend is statically linked and *does not* require msys2 or cygwin environments but can be also used with them.
-- **Mouse Events:** Supports mouse events for almost all protocols.
-- **Configurable Keys:** Supports configurable keyboard shortcuts for a personalized experience.
-- **Emoji Support:** Can display color emojis (depending on the font).
-- **Colorful Experience:** Supports 16, 256, and 24-Bit colors, xterm's dynamic colors feature, and even recognizes CMY and CMYK color spec formats.
-- **Powerful search engine:** Bobcat has a powerful search & highlight engine called `Finder`. It can do case sensitive/insensitive and regexp based searchs in both visible page and scrollaback buffer. It can navigate the found strings in both directions. Furthermore, it has a [harvester](#bobcat-finder-harvester) that lets the user harvest the found text in regexp search mode and export them as a `csv` files. So, for example if you need to search for url patterns in the terminal's buffer, you can simply pass your url regexp pattern to `Finder` and let it "reap" and export the matched patterns to a file. Wait, there is more! While doing this, `Finder` can keep the horizontal order intact; namely it can "map" the found strings as/is. This can come in handy, say, if you need to reap a table, or an output that has a certain line pattern.
-- **Linkify anything:** Bobcat has a module called `Linkifier` that let's you convert any text into clickable hyperlinks, using a regexp pattern match. Each terminal profile can have its own linkifier configuration and each can scan for more than one pattern.
-- **Smart text selection:** Bobcat let's user configure their own text (word) selection pattern(s). Once again, the setting is per-profile and multiple patterns can be defined at once.
+- **Cross-Platform Compatibility:** Bobcat runs seamlessly on any operating system that supports **U++ compilation**, including **Linux**, **Windows**, **MacOS**, and **BSD**.  
 
-- **Performance:** Reasonably fast and less memory-hungry.
+- **High Compatibility:** Recognizes and supports a wide range of terminal sequences (ESC, CSI, DCS, OSC, APC), ensuring **VT (DEC/ANSI)** and **xterm** compatibility. By default, Bobcat emulates a **DEC VT420** terminal with various extensions, providing reliable performance across diverse environments.  
 
-- **Web support:** Bobcat can run on any web browser that has HTML5 and canvas support, remotely. Deploy it on your server, access it anywhere! (**!!! EXPERIMENTAL !!!**)
+- **Image Support:** Displays images inline with support for both legacy (**Sixel**) and modern formats (**PNG, JPG, BMP, TIFF**). Compatible with sixel, iTerm2, and Jexer protocols for maximum versatility.  
 
-- **Headless UI support** Bobcat can be compiled to run on SDL2-GL backend, without requiring a fully-fledged desktop environment. (**!!! EXPERIMENTAL !!!**)
+- **OSC Extensions:** Implements advanced **OSC (Operating System Command)** extensions, including **hyperlinks**, **clipboard manipulation**, and more, bringing modern functionality to your terminal.  
+
+- **Annotations:** Supports **plain** and **rich text annotations**, which can be added programmatically or via user input, enhancing workflow documentation.  
+
+- **Versatile Copy/Paste:** Facilitates **copy, paste, and drag-and-drop** operations for text, links, and even inline images, making interaction seamless and intuitive.  
+
+- **Multiple Profiles:** Allows users to create and manage **multiple terminal and color profiles**, adapting to varied tasks and environments effortlessly.  
+
+- **Configurable UI:** Customize Bobcat’s interface to suit your needs—opt for a minimal bare-bones terminal or a **fully-featured GUI**.  
+
+- **Stacked Interface:** Reduces UI clutter with a **stacked interface**, including a **Navigator** terminal manager for easy navigation between open terminals.  
+
+- **Simple Configuration:** Uses a straightforward **JSON format** for configuration files, ensuring quick setup and easy management.  
+
+- **Multiple Pty Support on Windows:** Supports **ConPty** and **WinPty** backends on Windows, with a runtime switch for flexibility. The **WinPty backend** is statically linked, eliminating the need for external environments like **msys2** or **cygwin**, while remaining compatible with them if desired.  
+
+- **Mouse Events:** Fully supports mouse events across nearly all protocols, enhancing interactivity and enabling seamless navigation.
+
+- **Configurable Keys:** Allows users to define custom keyboard shortcuts, providing a personalized and efficient terminal experience.
+
+- **Emoji Support:** Displays color emojis, bringing modern visual expression to your terminal (font-dependent).
+
+- **Colorful Experience:** Supports 16, 256, and 24-bit colors, along with xterm's dynamic color features. Additionally, Bobcat recognizes advanced color specifications like CMY and CMYK, offering a vivid and versatile visual environment.
+
+- **Powerful Search Engine:** Bobcat features a robust and versatile search and highlight engine called **Finder**, designed to streamline text navigation and data extraction. Finder supports both **case-sensitive** and **case-insensitive** searches, as well as **regular expression (regexp)** based queries, operating seamlessly across the visible page and the scrollback buffer. Users can easily navigate through the found strings in either direction, ensuring swift and precise access to relevant information. But that’s not all—Finder includes a powerful **Harvester** mode. This functionality allows users to extract (or "reap") matched text when using regexp search, exporting the results into a **CSV file** for further analysis or use. For instance, if you need to find URL patterns in the terminal’s buffer, simply provide your regexp pattern to Finder, and it will harvest and export the matched URLs effortlessly. Finder also offers an advanced feature to **maintain horizontal order** during harvesting. This means the extracted strings are "mapped" exactly as they appear in the original context, preserving their positional integrity. This capability is especially useful for extracting structured data, such as tables or outputs with consistent line patterns.
+
+- **Linkify Anything: Bobcat Linkifier**: Bobcat includes a powerful feature called **Linkifier**, which allows you to transform any text into clickable hyperlinks using customizable **regular expression (regexp)** patterns. With this module, you can dynamically linkify specific text, making it interactive and more functional. Each terminal profile in Bobcat can have its own **unique Linkifier configuration**, enabling tailored setups for different workflows or contexts. Moreover, a single profile can be configured to scan for **multiple patterns** simultaneously, offering unparalleled flexibility and efficiency in managing links. Whether you’re working with log files, code outputs, or other textual data, Linkifier ensures that relevant information becomes instantly accessible with a simple click, streamlining navigation and productivity.
+
+- **Smart Text Selection: Customizable Patterns**: Bobcat empowers users with **Smart Text Selection**, allowing complete control over how text is selected. Users can define their own **custom selection patterns** to match specific words, phrases, or structures using **regular expressions**. This feature is fully **profile-specific**, enabling different terminal profiles to have tailored selection rules for various tasks or environments. Additionally, Bobcat supports defining **multiple patterns simultaneously**, ensuring seamless adaptability to diverse text formats or workflows. With Smart Text Selection, navigating and highlighting the exact text you need becomes faster, smarter, and perfectly suited to your unique requirements.
+
+- **Web Support: Access Anywhere**: Bobcat offers **experimental web support**, enabling it to run on any modern web browser with **HTML5** and **Canvas** support. Deploy Bobcat on your server, and you can access it remotely from anywhere—no local installation required.  
+
+- **Headless UI Support:** Bobcat also features **experimental Headless UI support**, allowing it to be compiled to run on an **SDL2-GL backend**. This eliminates the need for a full desktop environment, making it an excellent choice for minimal setups or resource-constrained systems.  
+
+**Note:** Both features are experimental, so try them out and explore their potential!
 
 - **Can run doom!**
 
