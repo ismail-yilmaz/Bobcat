@@ -84,13 +84,12 @@ Profile::Profile()
 , encoding(CharsetName(CHARSET_UTF8))
 , user(GetUserName())
 , address(GetHomeDirectory())
+, command(GetDefaultShell())
 {
 #if defined(PLATFORM_POSIX)
-	command = Nvl(GetEnv("SHELL"), "/bin/sh");
 	env << "TERM=" << Nvl(GetEnv("TERM"), "xterm-256color") << "\n"
 		<< "COLORTERM=" << Nvl(GetEnv("COLORTERM"), "truecolor") << "\n";
 #elif defined(PLATFORM_WIN32)
-	command = Nvl(GetEnv("ComSpec"), "cmd.exe");
 	#if(defined(flagWIN10))
 		ptybackend = "conpty";
 	#else

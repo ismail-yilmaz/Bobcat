@@ -293,9 +293,9 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
 
 void LoadGuiTheme(Bobcat& ctx)
 {
-	for(const auto& ch : GetAllGuiThemes()) {
-		if(ctx.settings.guitheme == ch.b) {
-			Ctrl::SetSkin(ch.a);
+	for(const auto& [skin, id, text] : GetAllGuiThemes()) {
+		if(ctx.settings.guitheme == id) {
+			Ctrl::SetSkin(skin);
 			return;
 		}
 	}
@@ -327,4 +327,14 @@ void NotifyDesktop(const String& title, const String& text, int timeout)
 	notify_uninit();
 #endif
 }
+
+String GetDefaultShell()
+{
+#if defined(PLATFORM_POSIX)
+	return Nvl(GetEnv("SHELL"), "/bin/sh");
+#elif defined(PLATFORM_WIN32)
+	return Nvl(GetEnv("ComSpec"), "cmd.exe");
+#endif
+}
+
 }

@@ -166,6 +166,7 @@ FileSel& BobcatFs();
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
+String GetDefaultShell();
 String GetBuildInfo();
 
 const Display& StdBackgroundDisplay();

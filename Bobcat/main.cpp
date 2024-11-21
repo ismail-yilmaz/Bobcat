@@ -211,6 +211,10 @@ void BobcatAppMain()
 			p.inlineimages = false;
 		}
 		else
+		if(findarg(s, "--sdl-screen-size") != 1) {
+			// NOOP
+		}
+		else
 		if(s.IsEqual("--"))	{
 			String s;
 			for(int j = ++i; j < n; j++)
@@ -272,16 +276,15 @@ CONSOLE_APP_MAIN
 	Rect screen(0, 0, 1024, 768);
 
 	const Vector<String>& cmd = CommandLine();
-	
+
 	if(int n = FindIndex(cmd, "--sdl-screen-size"); n >= 0 && ++n < cmd.GetCount()) {
 		if(String cx, cy; SplitTo(cmd[n], 'x', cx, cy)) {
 			screen.SetSize(
 				clamp(StrInt(cx), 1024, 4096),
-				clamp(StrInt(cx), 768,  4096)
+				clamp(StrInt(cy), 768,  4096)
 			);
 		}
 	}
-
 	SDL2GUI gui;
 	gui.Create(screen, t_("Bobcat [SDL2-GUI]"));
 	RunVirtualGui(gui,BobcatAppMain);
