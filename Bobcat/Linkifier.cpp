@@ -192,7 +192,7 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 			for(VTLine& l : hl)
 				for(VTCell& c : l) {
 					offset += c == 1; // Double width char, second half.
-					if(!c.IsHyperlink() && pt.pos.x + offset <= col && col < pt.pos.x + pt.length + offset) { // First, check if the cell isn't already a hyperlink.
+					if(!c.IsHypertext() && pt.pos.x + offset <= col && col < pt.pos.x + pt.length + offset) { // First, check if the cell isn't already a hypertext.
 						if(pos >= ipos && pos < ipos + pt.length) {
 							c.Hyperlink();
 							c.data = 0;
