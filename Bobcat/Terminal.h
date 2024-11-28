@@ -28,6 +28,9 @@ struct Terminal : TerminalCtrl {
     void        Restart();
     void        Reset();
     
+    void        ScheduleExit();
+    void        ScheduleRestart();
+
     bool        ShouldExit(bool failed) const;
     bool        ShouldRestart(bool failed) const;
     

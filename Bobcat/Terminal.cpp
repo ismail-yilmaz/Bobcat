@@ -189,6 +189,16 @@ void Terminal::Reset()
 	HardReset();
 }
 
+void Terminal::ScheduleRestart()
+{
+	exitmode = ExitMode::Exit;
+}
+
+void Terminal::ScheduleExit()
+{
+	exitmode = ExitMode::Restart;
+}
+
 bool Terminal::ShouldExit(bool failed) const
 {
 	return exitmode == ExitMode::Exit || (!failed && exitmode == ExitMode::RestartFailed);
