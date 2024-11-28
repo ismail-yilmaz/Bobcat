@@ -306,26 +306,51 @@ void LoadGuiFont(Bobcat& ctx)
 	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
 }
 
-void NotifyDesktop(const String& title, const String& text, int timeout)
+MessageCtrl& GetNotificationDaemon()
 {
-	// TODO: This should be implemented across the supported platforms (GTK, WINDOWS, X11)
-	
-#ifdef GUI_GTK
-	if(!notify_is_initted() && !notify_init(title))
-		return;
-	GError *error = nullptr;
-	NotifyNotification *notification = notify_notification_new (
-					~title,
-					~text,
-					"gtk-dialog-info" // TODO: Support all types (warning, error, etc.)
-					#ifndef NOTIFY_VERSION_GT_0_7_0
-					, nullptr
-					#endif
-					);
-	notify_notification_set_timeout(notification, timeout * 1000);
-	notify_notification_show(notification, &error);
-	notify_uninit();
-#endif
+	return Single<MessageCtrl>();
+}
+
+void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no, MessageBox::Type type, const Event<int>& action)
+{
+	auto& m = GetNotificationDaemon();
+	auto& c = m.Create();
+	c.MessageType(type);
+	c.ButtonL(IDYES, yes);
+	c.ButtonR(IDNO, no);
+	c.UseIcon(false);
+	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), 0);
+	c.WhenAction = action;
+}
+
+void AskRestartExitError(Terminal& t)
+{
+	t.DontExit();
+	Ptr<Terminal> q = &t;
+	Profile p = LoadProfile(t.profilename);
+	const char *txt = t_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d");
+	String text = Format(txt, p.name, p.command, t.pty->GetExitCode());
+	AskYesNo(t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [q](int id) {
+		if(q) id == IDYES ? q->ScheduleRestart() : q->ScheduleExit();
+	});
+}
+
+void AskRestartExitOK(Terminal& t)
+{
+	t.DontExit();
+	Ptr<Terminal> q = &t;
+	Profile p = LoadProfile(t.profilename);
+	const char *txt = t_("Command exited.&Profile: %s&Command: %s&Exit code: %d");
+	String text = Format(txt, p.name, p.command, t.pty->GetExitCode());
+	AskYesNo(t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [q](int id) {
+		if(!q) return;
+		if(id == IDYES) {
+			q->ScheduleRestart();
+			q->Reset();
+		}
+		else
+			q->ScheduleExit();
+	});
 }
 
 String GetDefaultShell()

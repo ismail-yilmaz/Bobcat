@@ -77,7 +77,8 @@ Requirements are not heavy.  Below are the tools you need to compile Bobcat.
 - CLANG/GCC with at least C++17.
 - [U++](https://www.ultimatepp.org) framework.
 - [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal)
-- [StackCtrl](https://github.com/ismail-yilmaz/StackCtrl)  
+- [StackCtrl](https://github.com/ismail-yilmaz/StackCtrl)
+- [MessageCtrl](https://github.com/ismail-yilmaz/MessageCtrl)  
 
 ## [Installation](#Installation)
 

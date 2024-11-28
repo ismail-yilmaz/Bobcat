@@ -8,6 +8,7 @@ struct Terminal : TerminalCtrl {
     typedef Terminal CLASSNAME;
 
     Terminal(Bobcat& ctx);
+    ~Terminal();
 
     void        PostParse() override;
     void        SetData(const Value& data) override;
@@ -28,11 +29,15 @@ struct Terminal : TerminalCtrl {
     void        Restart();
     void        Reset();
     
+    void        DontExit();
     void        ScheduleExit();
     void        ScheduleRestart();
-
+    
+    bool        ShouldAsk() const;
     bool        ShouldExit(bool failed) const;
     bool        ShouldRestart(bool failed) const;
+
+    void        AskRestartExit();
     
     hash_t      GetHashValue() const;
     
@@ -111,6 +116,7 @@ struct Terminal : TerminalCtrl {
         Keep,
         Restart,
         RestartFailed,
+        Ask,
         Exit
     };
 
@@ -153,6 +159,10 @@ Terminal&                  AsTerminal(Ctrl& c);
 VectorMap<String, String>& GetWordSelectionPatterns();
 void                       InsertUnicodeCodePoint(Terminal& term);
 bool                       AnnotationEditor(String& s, const char *title);
+
+// Terminal specific notifications
+void AskRestartExitOK(Terminal& t);
+void AskRestartExitError(Terminal& t);
 
 // Operators
 

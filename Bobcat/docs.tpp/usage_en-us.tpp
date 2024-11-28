@@ -29,6 +29,7 @@ when it fails.]&]
 on exit.]&]
 [s0; [C1   ][C@3;1 `-K, `-`-dont`-keep][C1           Close the terminal 
 on exit.]&]
+[s0; [C1   ][C@3;1 `-y, `-`-ask  ][C1               Ask what to do on exit.]&]
 [s0; [C1   ][C@3;1 `-n, `-`-no`-environment][C1      Don`'t inherit the 
 environment.]&]
 [s0; [C1   ][C@3;1 `-d, `-`-working`-dir PATH][C1    Set the working directory 

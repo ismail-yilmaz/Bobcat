@@ -194,7 +194,8 @@ Profiles::Setup::Setup()
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	general.cmdexit.Add("restart", t_("Restart command"));
-	general.cmdexit.Add("restart_failed", t_("Restart command on failure")).SetIndex(0);
+	general.cmdexit.Add("restart_failed", t_("Restart command on failure"));
+	general.cmdexit.Add("ask", t_("Ask what to do")).SetIndex(0);
 	visuals.cursorstyle.Add("block", t_("Block"));
 	visuals.cursorstyle.Add("beam", t_("Beam"));
 	visuals.cursorstyle.Add("underline", t_("Underline")).SetIndex(0);

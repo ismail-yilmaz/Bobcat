@@ -64,6 +64,11 @@ Terminal::Terminal(Bobcat& ctx_)
     WhenMessage    = THISFN(OnNotification);
 }
 
+Terminal::~Terminal()
+{
+	GetNotificationDaemon().Clear(this);
+}
+
 void Terminal::SetData(const Value& v)
 {
 	data = v;
@@ -126,8 +131,7 @@ bool Terminal::StartPty(const Profile& p)
 		pty->SetSize(GetPageSize());
 		return true;
 	}
-	const char *txt = t_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d");
-	ErrorOK(Format(txt, p.name, p.command, pty->GetExitCode()));
+	AskRestartExitError(*this);
 	return false;
 }
 
@@ -159,7 +163,9 @@ bool Terminal::Start(Terminal *term)
 void Terminal::Restart()
 {
 	SoftReset();
-	StartPty(LoadProfile(profilename));
+	Profile p = LoadProfile(profilename);
+	SetExitMode(p.onexit);
+	StartPty(p);
 }
 
 void Terminal::Stop()
@@ -177,6 +183,10 @@ int Terminal::Do()
 	if(pty->IsRunning())
 		return s.GetLength();
 	bool failed = pty->GetExitCode() != 0;
+	if(ShouldAsk()) {
+		AskRestartExit();
+		return 0;
+	}
 	if(ShouldExit(failed))
 		return -1;
 	if(ShouldRestart(failed))
@@ -189,24 +199,41 @@ void Terminal::Reset()
 	HardReset();
 }
 
-void Terminal::ScheduleRestart()
+void Terminal::DontExit()
 {
-	exitmode = ExitMode::Exit;
+	exitmode = ExitMode::Keep;
 }
 
-void Terminal::ScheduleExit()
+void Terminal::ScheduleRestart()
 {
 	exitmode = ExitMode::Restart;
 }
 
+void Terminal::ScheduleExit()
+{
+	exitmode = ExitMode::Exit;
+}
+
+bool Terminal::ShouldAsk() const
+{
+	return exitmode == ExitMode::Ask;
+}
+
 bool Terminal::ShouldExit(bool failed) const
 {
-	return exitmode == ExitMode::Exit || (!failed && exitmode == ExitMode::RestartFailed);
+	return (exitmode != ExitMode::Ask)
+		&& (exitmode == ExitMode::Exit || (!failed && exitmode == ExitMode::RestartFailed));
 }
 
 bool Terminal::ShouldRestart(bool failed) const
 {
-	return exitmode == ExitMode::Restart || (failed && exitmode == ExitMode::RestartFailed);
+	return (exitmode != ExitMode::Ask)
+		&& (exitmode == ExitMode::Restart || (failed && exitmode == ExitMode::RestartFailed));
+}
+
+void Terminal::AskRestartExit()
+{
+	AskRestartExitOK(*this);
 }
 
 hash_t Terminal::GetHashValue() const
@@ -362,6 +389,7 @@ Terminal& Terminal::SetExitMode(const String& s)
         "restart",        ExitMode::Restart,
         "restart_failed", ExitMode::RestartFailed,
         "keep",           ExitMode::Keep,
+        "ask",            ExitMode::Ask,
      /* "exit" */         ExitMode::Exit);
 	return *this;
 }
@@ -592,7 +620,7 @@ bool Terminal::OnAnnotation(Point pt, String& s)
 
 void Terminal::OnNotification(const String& text)
 {
-	NotifyDesktop("Bobcat (" + Nvl(profilename, t_("_default_")) + ")", text);
+	GetNotificationDaemon().NoIcon().Top().Information(*this, text);
 }
 
 const VTPage& Terminal::GetPage() const

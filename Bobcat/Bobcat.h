@@ -12,6 +12,7 @@
 
 #include <plugin/pcre/Pcre.h> // WebGui Windows compilation fix: This has to be above the other include files.
 
+#include <MessageCtrl/MessageCtrl.h>
 #include <StackCtrl/StackCtrl.h>
 #include <Terminal/Terminal.h>
 #include <PtyProcess/PtyProcess.h>
@@ -176,6 +177,11 @@ const Display& TiledImageDisplay();
 void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
-void NotifyDesktop(const String& title, const String& text, int timeout = 5);
+
+MessageCtrl& GetNotificationDaemon();
+
+void AskYesNo(Ctrl& c, const String& text, const String& yes, const String& no,
+							MessageBox::Type type, const Event<int>& action);
+
 }
 #endif

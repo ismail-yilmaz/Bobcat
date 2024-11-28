@@ -49,6 +49,7 @@ Bobcat::Bobcat()
 	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
 	stack.WhenAction         = [this]()          { Sync(); };
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
+    GetNotificationDaemon().NoIcon().Top().Append().Animation();
 }
 
 bool Bobcat::AddTerminal(const String& key)
@@ -208,6 +209,15 @@ void Bobcat::Settings()
 	filesel.Attach(settingspane.imagepath);
 
 	settingspane.imageblur.MinMax(0, 20).Step(1) <<= 0;
+	
+	settingspane.backgroundimage.WhenAction = [&] {
+		bool b = ~settingspane.backgroundimage;
+		settingspane.imagemode.Enable(b);
+		settingspane.imageblur.Enable(b);
+		settingspane.imagepath.Enable(b);
+	};
+	
+	settingspane.backgroundimage.WhenAction();
 	
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);

@@ -32,6 +32,7 @@ void PrintHelp()
 		"   -R, --restart-failed           Restart the command when it fails.\n"
 		"   -k, --keep                     Don't close the terminal on exit.\n"
 		"   -K, --dont-keep                Close the terminal on exit.\n"
+		"   -y, --ask                      Ask what to do on exit.\n"
 		"   -n, --no-environment           Don't inherit the environment.\n"
 		"   -d, --working-dir PATH         Set the working directory to PATH.\n"
 		"   -f, --fullscreen               Full screen mode.\n"
@@ -141,6 +142,10 @@ void BobcatAppMain()
 		else
 		if(findarg(s, "-K", "--dont-keep") != -1) {
 			p.onexit = "exit";
+		}
+		else
+		if(findarg(s, "-y", "--ask") != -1) {
+			p.onexit = "ask";
 		}
 		else
 		if(findarg(s, "-n", "--no-environment") != -1) {
