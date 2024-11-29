@@ -33,17 +33,6 @@ Terminal::Terminal(Bobcat& ctx_)
 	SColorHighlight
 	}
 {
-    titlebar.newterm << [this] { ctx.AddTerminal(ctx.GetActiveProfile()); };
-    titlebar.navlist << [this] { MenuBar::Execute([this](Bar& bar) { ctx.ListMenu(bar); }); };
-    titlebar.close   << [this] { Stop(); };
-    titlebar.menu    << [this] {
-		Vector<String> pnames = GetProfileNames();
-		if(pnames.GetCount())
-		    MenuBar::Execute([this, &pnames](Bar& bar) {
-				ctx.TermSubmenu(bar, pnames);
-			});
-    };
-
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
     WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
@@ -827,8 +816,8 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 
-Terminal::TitleBar::TitleBar(Terminal& ctx_)
-: ctx(ctx_)
+Terminal::TitleBar::TitleBar(Terminal& ctx)
+: term(ctx)
 {
 	SetData("top");
 	Add(title.VSizePosZ(0, 0).HSizePosZ(24, 24));
@@ -840,12 +829,17 @@ Terminal::TitleBar::TitleBar(Terminal& ctx_)
 	navlist.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
 	close.Image(Images::Delete()).Tip(t_("Close terminal"));
 	menu.Image(CtrlImg::down_arrow()).Tip(t_("Open new terminal from..."));
+	
+    newterm << [this] { term.ctx.AddTerminal(term.ctx.GetActiveProfile()); };
+    navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
+    close   << [this] { term.Stop(); };
+	menu    << [this] { Menu(); };
 }
 
 void Terminal::TitleBar::SetData(const Value& v)
 {
 	data = v;
-	ctx.RefreshLayout();
+	term.RefreshLayout();
 }
 
 Value Terminal::TitleBar::GetData() const
@@ -862,19 +856,26 @@ void Terminal::TitleBar::FrameLayout(Rect& r)
 
 void Terminal::TitleBar::Show()
 {
-	bool b = ctx.HasSizeHint();
-	ctx.HideSizeHint();
-	ctx.InsertFrame(0, Height(StdFont().GetCy() + Zy(4)));
-	ctx.ShowSizeHint(b);
+	bool b = term.HasSizeHint();
+	term.HideSizeHint();
+	term.InsertFrame(0, Height(StdFont().GetCy() + Zy(4)));
+	term.ShowSizeHint(b);
 }
 
 void Terminal::TitleBar::Hide()
 {
-	bool b = ctx.HasSizeHint();
-	ctx.HideSizeHint();
-	ctx.RemoveFrame(*this);
-	ctx.ShowSizeHint(b);
-	ctx.SetFocus();
+	bool b = term.HasSizeHint();
+	term.HideSizeHint();
+	term.RemoveFrame(*this);
+	term.ShowSizeHint(b);
+	term.SetFocus();
+}
+
+void Terminal::TitleBar::Menu()
+{
+	if(Vector<String> pnames = GetProfileNames(); pnames.GetCount()) {
+		MenuBar::Execute([this, &pnames](Bar& menu) { term.ctx.TermSubmenu(menu, pnames);});
+	}
 }
 
 Terminal& AsTerminal(Ctrl& c)

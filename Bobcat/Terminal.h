@@ -148,8 +148,9 @@ struct Terminal : TerminalCtrl {
  
         void        Show();
         void        Hide();
+        void        Menu();
 
-        Terminal&   ctx;
+        Terminal&   term;
         ToolButton  close;
         ToolButton  menu;
         ToolButton  newterm;
