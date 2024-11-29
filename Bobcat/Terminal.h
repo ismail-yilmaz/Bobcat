@@ -62,9 +62,13 @@ struct Terminal : TerminalCtrl {
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
 
-    void        ShowTitleBar(bool b);
+    void        ShowTitleBar(bool b = true);
     void        HideTitleBar();
     bool        HasTitleBar() const;
+    
+    void        EnableResize(bool b = true);
+    void        DisableResize();
+    bool        CanResize() const;
     
     void        ShowFinder(bool b);
     void        HideFinder();
@@ -124,6 +128,7 @@ struct Terminal : TerminalCtrl {
     One<APtyProcess> pty;
     bool         bell:1;
     bool         filter:1;
+    bool         canresize:1;
     bool         smartwordsel:1;
     bool         shellintegration:1;
     ExitMode     exitmode;
@@ -161,8 +166,8 @@ void                       InsertUnicodeCodePoint(Terminal& term);
 bool                       AnnotationEditor(String& s, const char *title);
 
 // Terminal specific notifications
-void AskRestartExitOK(Terminal& t);
-void AskRestartExitError(Terminal& t);
+void AskRestartExitOK(Ptr<Terminal> t);
+void AskRestartExitError(Ptr<Terminal> t);
 
 // Operators
 

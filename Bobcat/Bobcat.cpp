@@ -49,7 +49,7 @@ Bobcat::Bobcat()
 	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
 	stack.WhenAction         = [this]()          { Sync(); };
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
-    GetNotificationDaemon().NoIcon().Top().Append().Animation();
+	GetNotificationDaemon().NoIcon().Top().Append().Animation();
 }
 
 bool Bobcat::AddTerminal(const String& key)

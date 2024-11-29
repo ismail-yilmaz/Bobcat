@@ -323,33 +323,31 @@ void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& n
 	c.WhenAction = action;
 }
 
-void AskRestartExitError(Terminal& t)
+void AskRestartExitError(Ptr<Terminal> t)
 {
-	t.DontExit();
-	Ptr<Terminal> q = &t;
-	Profile p = LoadProfile(t.profilename);
+	t->DontExit();
+	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d");
-	String text = Format(txt, p.name, p.command, t.pty->GetExitCode());
-	AskYesNo(t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [q](int id) {
-		if(q) id == IDYES ? q->ScheduleRestart() : q->ScheduleExit();
+	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
+	AskYesNo(*t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [t](int id) {
+		if(t) id == IDYES ? t->ScheduleRestart() : t->ScheduleExit();
 	});
 }
 
-void AskRestartExitOK(Terminal& t)
+void AskRestartExitOK(Ptr<Terminal> t)
 {
-	t.DontExit();
-	Ptr<Terminal> q = &t;
-	Profile p = LoadProfile(t.profilename);
+	t->DontExit();
+	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command exited.&Profile: %s&Command: %s&Exit code: %d");
-	String text = Format(txt, p.name, p.command, t.pty->GetExitCode());
-	AskYesNo(t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [q](int id) {
-		if(!q) return;
+	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
+	AskYesNo(*t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [t](int id) {
+		if(!t) return;
 		if(id == IDYES) {
-			q->ScheduleRestart();
-			q->Reset();
+			t->ScheduleRestart();
+			t->Reset();
 		}
 		else
-			q->ScheduleExit();
+			t->ScheduleExit();
 	});
 }
 

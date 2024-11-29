@@ -19,6 +19,7 @@ Terminal::Terminal(Bobcat& ctx_)
 : ctx(ctx_)
 , bell(true)
 , filter(false)
+, canresize(true)
 , smartwordsel(false)
 , shellintegration(false)
 , finder(*this)
@@ -45,19 +46,19 @@ Terminal::Terminal(Bobcat& ctx_)
 
     InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
-    WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                };
-    WhenBell    = [this]()                     { if(bell) BeepExclamation();      };
-    WhenResize  = [this]()                     { pty->SetSize(GetPageSize());     };
-    WhenScroll  = [this]()                     { Update();                        };
-    WhenOutput  = [this](String s)             { pty->Write(s);                   };
-    WhenTitle   = [this](const String& s)      { MakeTitle(s);                    };
-    WhenLink    = [this](const String& s)      { OnLink(s);                       };
-    WhenSetSize = [this](Size sz)              { ctx.Resize(sz);                  };
-    WhenClip    = [this](PasteClip& dnd)       { return filter;                   };
-    WhenWindowMinimize       = [this](bool b)  { ctx.Minimize(b);                 };
-    WhenWindowMaximize       = [this](bool b)  { ctx.Maximize(b);                 };
-    WhenWindowFullScreen     = [this](int i)   { ctx.FullScreen(i);               };
-    WhenWindowGeometryChange = [this](Rect r)  { ctx.SetRect(r);                  };
+    WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
+    WhenBell    = [this]()                     { if(bell) BeepExclamation();       };
+    WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
+    WhenScroll  = [this]()                     { Update();                         };
+    WhenOutput  = [this](String s)             { pty->Write(s);                    };
+    WhenTitle   = [this](const String& s)      { MakeTitle(s);                     };
+    WhenLink    = [this](const String& s)      { OnLink(s);                        };
+    WhenClip    = [this](PasteClip& dnd)       { return filter;                    };
+    WhenSetSize = [this](Size sz)              { if(CanResize()) ctx.Resize(sz);   };
+    WhenWindowMinimize       = [this](bool b)  { if(CanResize()) ctx.Minimize(b);  };
+    WhenWindowMaximize       = [this](bool b)  { if(CanResize()) ctx.Maximize(b);  };
+    WhenWindowFullScreen     = [this](int i)   { if(CanResize()) ctx.FullScreen(i);};
+    WhenWindowGeometryChange = [this](Rect r)  { if(CanResize()) ctx.SetRect(r);   };
     WhenDirectoryChange      = THISFN(SetWorkingDirectory);
     WhenHighlight  = THISFN(OnHighlight);
     WhenAnnotation = THISFN(OnAnnotation);
@@ -131,7 +132,7 @@ bool Terminal::StartPty(const Profile& p)
 		pty->SetSize(GetPageSize());
 		return true;
 	}
-	AskRestartExitError(*this);
+	AskRestartExitError(this);
 	return false;
 }
 
@@ -233,7 +234,7 @@ bool Terminal::ShouldRestart(bool failed) const
 
 void Terminal::AskRestartExit()
 {
-	AskRestartExitOK(*this);
+	AskRestartExitOK(this);
 }
 
 hash_t Terminal::GetHashValue() const
@@ -500,6 +501,22 @@ void Terminal::HideTitleBar()
 bool Terminal::HasTitleBar() const
 {
 	return titlebar.IsChild();
+}
+
+void Terminal::EnableResize(bool b)
+{
+	canresize = b;
+}
+
+void Terminal::DisableResize()
+{
+	EnableResize(false);
+}
+
+bool Terminal::CanResize() const
+{
+	// Only the user or the active terminal is allowed to change the geometry.
+	return canresize && ctx.GetActiveTerminal() == this;
 }
 
 void Terminal::ShowFinder(bool b)
