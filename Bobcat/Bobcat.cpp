@@ -367,6 +367,14 @@ bool Bobcat::HasMenuBar() const
 	return menubar.IsChild();
 }
 
+Bobcat& Bobcat::ToggleBars()
+{
+	settings.showmenu  ^= 1;
+	settings.showtitle ^= 1;
+	Sync();
+	return *this;
+}
+
 Bobcat& Bobcat::ToggleNavigator()
 {
 	if(view.IsShown()) {
@@ -473,6 +481,7 @@ void Bobcat::ViewMenu(Bar& menu)
 	
 	menu.Add(AK_MENUBAR,       [this] { settings.showmenu  ^= 1; Sync(); }).Check(settings.showmenu);
 	menu.Add(AK_TITLEBAR,      [this] { settings.showtitle ^= 1; Sync(); }).Check(settings.showtitle);
+	menu.AddKey(AK_TOGGLEBARS, [this] { ToggleBars(); });
 	menu.Add(AK_FULLSCREEN,    [this] { FullScreen(0); }).Check(window.IsFullScreen());
 	menu.AddKey(AK_MAXIMIZE,   [this] { Maximize(!window.IsMaximized()); });
 	menu.AddKey(AK_MINIMIZE,   [this] { Minimize(!window.IsMinimized()); });

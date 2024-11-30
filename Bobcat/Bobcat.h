@@ -97,6 +97,7 @@ struct Bobcat : Pte<Bobcat> {
     Bobcat&     HideMenuBar();
     bool        HasMenuBar() const;
     
+    Bobcat&     ToggleBars();
     Bobcat&     ToggleNavigator();
 
     void        Sync();
@@ -181,7 +182,7 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 MessageCtrl& GetNotificationDaemon();
 
 void AskYesNo(Ctrl& c, const String& text, const String& yes, const String& no,
-							MessageBox::Type type, const Event<int>& action);
+                            MessageBox::Type type, const Event<int>& action);
 
 }
 #endif
