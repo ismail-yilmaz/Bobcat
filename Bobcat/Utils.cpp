@@ -293,9 +293,9 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
 
 void LoadGuiTheme(Bobcat& ctx)
 {
-	for(const auto& [skin, id, text] : GetAllGuiThemes()) {
-		if(ctx.settings.guitheme == id) {
-			Ctrl::SetSkin(skin);
+	for(const auto& q : GetAllGuiThemes()) {
+		if(ctx.settings.guitheme == q.b) {
+			Ctrl::SetSkin(q.a);
 			return;
 		}
 	}
