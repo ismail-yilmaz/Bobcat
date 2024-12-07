@@ -25,18 +25,22 @@ struct Terminal : TerminalCtrl {
     bool        Start(const Profile& profile);
     bool        Start(Terminal *term);
     void        Stop();
-    int         Do();
+    bool        Do();
     void        Restart();
     void        Reset();
+    
+    bool        IsRunning();
+    bool        IsFailure();
+    bool        IsSuccess();
     
     void        DontExit();
     void        ScheduleExit();
     void        ScheduleRestart();
     
-    bool        ShouldAsk() const;
-    bool        ShouldExit(bool failed) const;
-    bool        ShouldRestart(bool failed) const;
-
+    bool        ShouldAsk();
+    bool        ShouldExit();
+    bool        ShouldRestart();
+ 
     void        AskRestartExit();
     
     hash_t      GetHashValue() const;

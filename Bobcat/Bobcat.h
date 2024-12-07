@@ -26,6 +26,10 @@
  #endif
 #endif
 
+#ifdef PLATFORM_POSIX
+#include <poll.h>
+#endif
+
 namespace Upp {
 
 #define TOPICFILE <Bobcat/docs.tpp/all.i>
@@ -120,6 +124,7 @@ struct Bobcat : Pte<Bobcat> {
     void        About();
     void        Help();
 
+    void        Wait(int timeout);
     void        ProcessEvents();
     
     struct  Config {

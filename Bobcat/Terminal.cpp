@@ -166,27 +166,41 @@ void Terminal::Stop()
 	pty->Kill();
 }
 
-int Terminal::Do()
+bool Terminal::Do()
 {
-	String s = pty->Get();
-	Write(s, IsUtf8Mode());
-	if(pty->IsRunning())
-		return s.GetLength();
-	bool failed = pty->GetExitCode() != 0;
-	if(ShouldAsk()) {
-		AskRestartExit();
-		return 0;
+	if(pty->IsRunning()) {
+		Write(pty->Get(), IsUtf8Mode());
+		return true;
 	}
-	if(ShouldExit(failed))
-		return -1;
-	if(ShouldRestart(failed))
+	if(ShouldExit())
+		return false;
+	else
+	if(ShouldRestart())
 		Restart();
-	return 0;
+	else
+	if(ShouldAsk())
+		AskRestartExit();
+	return true;
 }
 
 void Terminal::Reset()
 {
 	HardReset();
+}
+
+bool Terminal::IsRunning()
+{
+	return pty && pty->IsRunning();
+}
+
+bool Terminal::IsFailure()
+{
+	return !IsRunning() && pty->GetExitCode() != 0;
+}
+
+bool Terminal::IsSuccess()
+{
+	return !IsRunning() && pty->GetExitCode() == 0;
 }
 
 void Terminal::DontExit()
@@ -204,21 +218,19 @@ void Terminal::ScheduleExit()
 	exitmode = ExitMode::Exit;
 }
 
-bool Terminal::ShouldAsk() const
+bool Terminal::ShouldAsk()
 {
 	return exitmode == ExitMode::Ask;
 }
 
-bool Terminal::ShouldExit(bool failed) const
+bool Terminal::ShouldExit()
 {
-	return (exitmode != ExitMode::Ask)
-		&& (exitmode == ExitMode::Exit || (!failed && exitmode == ExitMode::RestartFailed));
+	return exitmode == ExitMode::Exit || (IsSuccess() && exitmode == ExitMode::RestartFailed);
 }
 
-bool Terminal::ShouldRestart(bool failed) const
+bool Terminal::ShouldRestart()
 {
-	return (exitmode != ExitMode::Ask)
-		&& (exitmode == ExitMode::Restart || (failed && exitmode == ExitMode::RestartFailed));
+	return exitmode == ExitMode::Restart || (IsFailure() && exitmode == ExitMode::RestartFailed);
 }
 
 void Terminal::AskRestartExit()

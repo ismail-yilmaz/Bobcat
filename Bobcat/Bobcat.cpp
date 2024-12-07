@@ -116,20 +116,45 @@ Vector<Terminal*> Bobcat::GetTerminalGroup(const Profile& p)
 	return GetTerminalGroup(p.GetHashValue());
 }
 
+void Bobcat::Wait(int timeout)
+{
+	// Waits only for an event. (generic)
+	// We don't really need to iterate each terminal for specific events here.
+	
+#ifdef PLATFORM_POSIX
+	Vector<pollfd> slots;
+	for(Terminal& t : terminals)
+		if(t.IsRunning()) {
+			pollfd& q = slots.Add();
+			q.fd = static_cast<PosixPtyProcess&>(*(t.pty)).GetSocket();
+			q.events = POLLIN;
+		}
+	(void) poll(slots, slots.GetCount(), timeout);
+#elif PLATFORM_WIN32
+	// Use IO completion port instead of WaitForMultipleObject()
+	HANDLE cport = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
+	if(!cport) {
+		LLOG("Warning: Unable to create completion port.");
+		Sleep(timeout);
+		return;
+	}
+	for(Terminal& t : terminals)
+		if(t.IsRunning()) {
+			HANDLE h = static_cast<WindowsPtyProcess&>(*(t.pty)).GetProcessHandle();
+			CreateIoCompletionPort(h, cport, reinterpret_cast<ULONG_PTR>(h), 0);
+		}
+	(void) WaitForSingleObjectEx(cport, timeout, TRUE);
+	CloseHandle(cport);
+#endif
+}
+
 void Bobcat::ProcessEvents()
 {
-	int l = 10;
 	window.ProcessEvents();
-	for(int i = 0; i < terminals.GetCount(); i++) {
-		Terminal& t = terminals[i];
-		if(int n = t.Do(); n < 0) {
+	Wait(10);
+	for(Terminal& t : terminals)
+		if(!t.Do())
 			RemoveTerminal(t);
-			break;
-		}
-		else
-			l = max(l, n);
-	}
-	Sleep(l >= 1024 ? 1024 * 10 / l : 10);
 }
 
 void Bobcat::Run(const Profile& profile, Size size, bool fullscreen)
