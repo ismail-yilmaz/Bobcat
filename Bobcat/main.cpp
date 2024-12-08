@@ -216,7 +216,7 @@ void BobcatAppMain()
 			p.inlineimages = false;
 		}
 		else
-		if(findarg(s, "--sdl-screen-size") != 1) {
+		if(findarg(s, "--sdl-screen-size") != -1) {
 			// NOOP
 		}
 		else
