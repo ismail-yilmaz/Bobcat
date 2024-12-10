@@ -556,7 +556,8 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 {
 	for(int i = 0; i < list.GetCount(); i++) {
 		const String& name = list[i];
-		auto& item = menu.Add(name, Images::Terminal(), [this, name] { AddTerminal(name); });
+		auto& item = menu.Add(name, [this, name] { AddTerminal(name); });
+		item.Image(name == settings.defaultprofile ? Images::DefaultTerminal() : Images::Terminal());
 		if(i < 10) { // Set up the accelerator keys for the first ten profiles.
 			item.Key(decode(i,
 				0, (KeyInfo& (*)()) AK_PROFILE1,
