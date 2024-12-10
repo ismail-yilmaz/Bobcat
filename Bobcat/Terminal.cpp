@@ -638,7 +638,7 @@ bool Terminal::OnAnnotation(Point pt, String& s)
 
 void Terminal::OnNotification(const String& text)
 {
-	GetNotificationDaemon().NoIcon().Top().Information(*this, text);
+	GetNotificationDaemon().NoIcon().Information(*this, text);
 }
 
 const VTPage& Terminal::GetPage() const

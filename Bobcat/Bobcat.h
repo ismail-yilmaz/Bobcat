@@ -133,6 +133,8 @@ struct Bobcat : Pte<Bobcat> {
         Font        guifont;
         String      defaultprofile;
         String      titlealignment;
+        String      notificationalignment;
+        bool        notificationanimation;
         String      finderalignment;
         String      stackdirection;
         int         stackanimation;

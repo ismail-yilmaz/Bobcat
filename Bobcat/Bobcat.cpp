@@ -49,7 +49,7 @@ Bobcat::Bobcat()
 	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
 	stack.WhenAction         = [this]()          { Sync(); };
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
-	GetNotificationDaemon().NoIcon().Top().Append().Animation();
+	GetNotificationDaemon().NoIcon().Append().Animation();
 }
 
 bool Bobcat::AddTerminal(const String& key)
@@ -205,6 +205,10 @@ void Bobcat::Settings()
 	settingspane.finderpos.Add("bottom", sb);
 	settingspane.finderpos.GoBegin();
 	
+	settingspane.notifierpos.Add("top", st);
+	settingspane.notifierpos.Add("bottom", sb);
+	settingspane.notifierpos.GoBegin();
+	
 	settingspane.direction.Add("horizontal", tt_("Horizontal"));
 	settingspane.direction.Add("vertical", tt_("Vertical"));
 	settingspane.direction.GoBegin();
@@ -247,6 +251,8 @@ void Bobcat::Settings()
 	CtrlRetriever cr;
 	cr(settingspane.titlepos, settings.titlealignment);
 	cr(settingspane.finderpos, settings.finderalignment);
+	cr(settingspane.notifierpos, settings.notificationalignment);
+	cr(settingspane.notifieranimation, settings.notificationanimation);
 	cr(settingspane.direction, settings.stackdirection);
 	cr(settingspane.animation, settings.stackanimation);
 	cr(settingspane.wheel, settings.stackwheel);
@@ -419,6 +425,9 @@ void Bobcat::Sync()
 {
 	ShowMenuBar(settings.showmenu);
 	settings.stackdirection == "horizontal"	? stack.Horz() : stack.Vert();
+	auto& m = GetNotificationDaemon();
+	settings.notificationalignment == "top" ? m.Top() : m.Bottom();
+	m.Animation(settings.notificationanimation);
 	stack.Wheel(settings.stackwheel);
 	stack.Animation(settings.stackanimation);
 	SyncBackground();
@@ -697,6 +706,8 @@ Bobcat::Config::Config()
 , guifont(GetStdFont())
 , titlealignment("top")
 , finderalignment("bottom")
+, notificationalignment("top")
+, notificationanimation(true)
 , stackdirection("horizontal")
 , stackanimation(150)
 , stackwheel(true)
@@ -716,6 +727,8 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	jio("DefaultProfile", defaultprofile)
 	   ("TitleBarAlignment", titlealignment)
 	   ("FinderBarAlignment", finderalignment)
+	   ("NotificationAlignment", notificationalignment)
+	   ("NotificationAnimation", notificationanimation)
 	   ("StackAnimationDirection", stackdirection)
 	   ("StackAnimationDuration", stackanimation)
 	   ("StackWheelMode", stackwheel)

@@ -316,6 +316,7 @@ void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& n
 	auto& m = GetNotificationDaemon();
 	auto& c = m.Create();
 	c.MessageType(type);
+	c.Placement(m.GetPlacement());
 	c.ButtonL(IDYES, yes);
 	c.ButtonR(IDNO, no);
 	c.UseIcon(false);
