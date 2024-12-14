@@ -129,7 +129,7 @@ void Bobcat::Wait(int timeout)
 			q.fd = static_cast<PosixPtyProcess&>(*(t.pty)).GetSocket();
 			q.events = POLLIN;
 		}
-	(void) poll(slots, slots.GetCount(), timeout);
+	(void) poll((pollfd*) slots.begin(), slots.GetCount(), timeout);
 #elif PLATFORM_WIN32
 	// Use IO completion port instead of WaitForMultipleObject()
 	HANDLE cport = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);

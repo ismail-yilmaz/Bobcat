@@ -28,6 +28,8 @@
 
 #ifdef PLATFORM_POSIX
 #include <poll.h>
+template <>
+inline constexpr bool Upp::is_upp_guest<pollfd> = true;
 #endif
 
 namespace Upp {
