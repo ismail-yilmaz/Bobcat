@@ -6,13 +6,13 @@ topic "Keyboard Shortcuts";
 [s0; [+75 Bobcat predefines several groups of configurable keyboard 
 shortcuts: ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75 glo
 bal][/+75  ][+75 and ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
-erminal][+75 , ][^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
-inder][+75 , and s][^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#selector`_shortcuts^+75 e
-lector][+75  specific. Terminal and finder specific shortcuts can 
-only be called in the active terminal and only affect the active 
-terminal, while the global shortcuts are valid across the application. 
-All of the predefined and undefined keys can be configured via 
-the keyboard configuration manager.]&]
+erminal][+75 , ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
+inder][+75 , and ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#selector`_shortcuts^+75 s
+elector][/+75  ][+75 specific. Terminal and finder specific shortcuts 
+can only be called in the active terminal and only affect the 
+active terminal, while the global shortcuts are valid across 
+the application. All of the predefined and undefined keys can 
+be configured via the keyboard configuration manager.]&]
 [s0;C+75 &]
 [s0;:global`_shortcuts: [* Global Shortcuts]&]
 [s0;* &]

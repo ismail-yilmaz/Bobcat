@@ -89,7 +89,7 @@ There are three ways to install the source code of Bobcat:
 2. On linux, the provided makefile can also be used to compile Bobcat. This makefile downloads umk (U++ make) *in binary form* to speed up the compilation process. Steps to download, build and run the Bobcat via this method are:
 
 	1. `make download`
-	2. `make build` or `make build-web` or 'make build-headless'
+	2. `make build` or `make build-web` or `make build-headless`
 	3. `make run`
 
 3.  Or you can manually clone or download this repository and set it up as an U++ _assembly_ or _nest_. You can find more information on U++ packages, assemblies and nests, [here](https://www.ultimatepp.org/app$ide$PackagesAssembliesAndNests$en-us.html).
@@ -172,7 +172,7 @@ To be written...
 
 ## [License](#License)
 
-Copyright (c) 2023-2024, İsmail Yılmaz
+Copyright (c) 2023-2025, İsmail Yılmaz
 
 Bobcat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

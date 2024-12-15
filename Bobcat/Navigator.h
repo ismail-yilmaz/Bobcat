@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright 2023-2024, İsmail Yılmaz
+// Copyright 2023-2025, İsmail Yılmaz
 
 #ifndef _Bobcat_Navigator_h_
 #define _Bobcat_Navigator_h_
@@ -12,6 +12,7 @@ struct Navigator : ParentCtrl {
     Navigator&    Hide();
     void          SyncItemLayout();
     void          Sync();
+    void          Animate();
     void          Layout() override;
 
     void          Paint(Draw& w) override;

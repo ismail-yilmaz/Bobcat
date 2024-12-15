@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright 2023-2024, İsmail Yılmaz
+// Copyright 2023-2025, İsmail Yılmaz
 
 #include "Bobcat.h"
 
@@ -219,7 +219,7 @@ String GetModifierKeyDesc(dword key)
 String GetVersion()
 {
 #ifdef bmGIT_REVCOUNT
-	return AsString(atoi(bmGIT_REVCOUNT) + Date(23, 12, 19).Get());
+	return Format("%d.%d (r%d)", 0, 9, atoi(bmGIT_REVCOUNT));
 #endif
 	return "(beta)";
 }
@@ -264,7 +264,7 @@ String GetBuildInfo()
 #elif  flagWEBGUI
 	h << " (Turtle)";
 #elif  flagSDLGUI
-	h << " (SDL2-GL)";
+	h << " (SDL2-GL)";;
 #endif
 	h << '\n';
 #ifdef bmTIME

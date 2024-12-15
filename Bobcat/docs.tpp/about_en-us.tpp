@@ -9,7 +9,7 @@ topic "About  Bobcat";
 [s0;=C@(28.127.255)+59 &]
 [s0;= [1 A cross`-platform terminal emulator.]&]
 [s0;=2 &]
-[s0;=%- [%%0 Copyright ][0 © 2023`-2024 ][^https`:`/`/github`.com`/ismail`-yilmaz^0 İsmai
+[s0;=%- [%%0 Copyright ][0 © 2023`-2025 ][^https`:`/`/github`.com`/ismail`-yilmaz^0 İsmai
 l Yılmaz]&]
 [s0;=2%- &]
 [s0;= [0 `$(BUILD)]&]

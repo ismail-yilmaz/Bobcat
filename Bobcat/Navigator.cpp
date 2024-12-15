@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright 2023-2024, İsmail Yılmaz
+// Copyright 2023-2025, İsmail Yılmaz
 
 #include "Bobcat.h"
 
@@ -182,7 +182,7 @@ void Navigator::SyncItemLayout()
     
 	Size totalsize = gridsize * cellsize + (gridsize + 1) * margins;
        
-    Point offset = max({0, 8}, Rect(viewsize).CenterRect(totalsize).TopLeft());
+    Point offset = max({8, 8}, Rect(viewsize).CenterRect(totalsize).TopLeft());
     
     sb.SetTotal(totalsize.cy);
     sb.SetPage(viewsize.cy);
@@ -218,9 +218,8 @@ void Navigator::Sync()
 			ImageDraw w(csz);
 			m.ctrl->Paint(w);
 			m.img = Rescale(w, max(1, isz.cx - 4), max(1, isz.cy - fsz.cy));
-			if(!m.ctrl->IsRunning()) {
+			if(!m.ctrl->IsRunning())
 				blinking++;
-			}
 			if(!m.IsChild())
 				Add(m);
 			m.WantFocus();
@@ -239,21 +238,21 @@ void Navigator::Sync()
 			m.Update();
 		}
 		if(blinking)
-			KillSetTimeCallback(-500, [this]
-			{
-				for(Item& m : items) {
-					if(m.ctrl && !m.ctrl->IsRunning()) {
-						m.blinking ^= 1;
-						m.Refresh();
-					}
-				}
-		
-			}, Navigator::TIMEID_BLINK);
+			KillSetTimeCallback(-500, [this] { Animate(); }, Navigator::TIMEID_BLINK);
 
 		Refresh();
 	};
 
 	SetTimeCallback(100, ScheduledSync, TIMEID_SYNC);
+}
+
+void Navigator::Animate()
+{
+	for(Item& m : items)
+		if(m.ctrl && !m.ctrl->IsRunning()) {
+			m.blinking ^= 1;
+			m.Refresh();
+		}
 }
 
 void Navigator::Layout()
