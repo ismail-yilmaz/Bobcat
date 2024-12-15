@@ -8,11 +8,6 @@
 
 namespace Upp {
 
-Size ScaleDown(Size r, double factor)
-{
-	return Size(double(r.cx), double(r.cy)) * min(max(factor, 0.0), 1.0);
-}
-
 Navigator::Item::Item()
 {
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
@@ -20,6 +15,7 @@ Navigator::Item::Item()
 
 void Navigator::Item::GotFocus()
 {
+	WhenFocus(GetRect());
 	Refresh();
 }
 
@@ -33,7 +29,7 @@ void Navigator::Item::Paint(Draw& w)
 	if(Rect q = GetView(); q.Width() - 16 >= 1 && q.GetHeight() - 16 >= 1) {
 		Rect r = GetCloseButtonRect();
 		w.Clip(q);
-		w.DrawRect(q, SColorPaper);
+		w.DrawRect(q, SColorFace);
 		w.DrawImage(q.Deflated(8), img);
 		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL2() : Images::DeleteHL());
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
@@ -85,12 +81,8 @@ Rect Navigator::Item::GetCloseButtonRect()
 
 Navigator::Navigator(Bobcat& ctx_)
 : ctx(ctx_)
-, columns(4)
 {
 	Hide();
-	AddFrame(sb);
-	sb.AutoHide();
-	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
 	CtrlLayout(searchbar);
 	icon.SetDisplay(StdCenterDisplay());
 	icon <<= Images::Find();
@@ -113,6 +105,9 @@ Navigator::Navigator(Bobcat& ctx_)
 				ctx.TermSubmenu(bar, pnames);
 			});
 	};
+	AddFrame(sb);
+	sb.AutoHide();
+	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
 }
 
 Navigator::~Navigator()
@@ -150,27 +145,40 @@ bool Navigator::FilterItem(const Item& item)
 
 void Navigator::SyncItemLayout()
 {
-	int cnt = ctx.stack.GetCount();
-	if(!cnt)
-		return;
-	int  tcy = searchbar.GetHeight();
-	Size wsz = GetSize() + Size(0, tcy);
-	Size tsz = ScaleDown(wsz, 1.0 / max(1, columns));
-	for(auto& m : items)
-		m.Hide();
-	int row = 0, col = 0, fcy = GetStdFontSize().cy;
-	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
-	cnt = max(v.GetCount(), 1);
-	for(Item& m : v) {
-		Rect r = RectC(col * tsz.cx, row * (tsz.cy + fcy), tsz.cx, tsz.cy);
-		m.SetRect(r.Deflated(4).OffsetedVert(-sb));
-		m.Show();
-		if(++col == columns) {
-			col = 0;
-			row++;
-		}
-	}
-	sb.Set(sb.Get(), wsz.cy - tcy, (tsz.cy + fcy) * (cnt / columns + (cnt % columns != 0)));
+    for(auto& m : items)
+        m.Hide();
+    
+    auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
+ 
+    int cnt = max(v.GetCount(), 1);
+    int fcy = GetStdFontSize().cy;
+
+    Point margins = { 16, fcy * 2};
+    
+    Size viewsize = GetSize() + Size(0, searchbar.GetHeight());
+    Size cellsize = GetRatioSize(viewsize, 200, 0);
+    
+    Size gridsize;
+    gridsize.cx = min(max(1, viewsize.cx / (cellsize.cx + margins.x)), min(4, cnt));
+    gridsize.cy = (cnt + gridsize.cx - 1) / gridsize.cx;
+    
+	Size totalsize = gridsize * cellsize + (gridsize + 1) * margins;
+       
+    Point offset = max({0, 8}, Rect(viewsize).CenterRect(totalsize).TopLeft());
+    
+    sb.SetTotal(totalsize.cy);
+    sb.SetPage(viewsize.cy);
+    
+    int row = 0, col = 0;
+    for(Item& m : v) {
+        Rect r(offset + Point(col, row) * (cellsize + margins), cellsize);
+        m.SetRect(r.OffsetedVert(-sb));
+        m.Show();
+        if(++col >= gridsize.cx) {
+            col = 0;
+            row++;
+        }
+    }
 }
 
 void Navigator::Sync()
@@ -198,6 +206,14 @@ void Navigator::Sync()
 				m.SetFocus();
 			m.WhenItem = WhenGotoItem;
 			m.WhenClose = WhenRemoveItem;
+			m.WhenFocus = [&](Rect r) {
+				Rect rr = GetRect();
+				if(r.top < rr.top)
+					sb.Set(r.TopLeft().y);
+				else
+				if(r.bottom > rr.bottom)
+					sb.Set(r.BottomLeft().y);
+			};
 			m.Update();
 		}
 		Refresh();
@@ -216,12 +232,11 @@ void Navigator::Paint(Draw& w)
 {
 	Size sz = GetSize(), fsz = GetStdFontSize();
 	w.Clip(sz);
-	w.DrawRect(GetSize(), SColorPaper);
 	for(const Item& m : items) {
 		if(m.ctrl && m.IsVisible()) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorPaper, 0);
+			StdDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorFace, 0);
 		}
 	}
 	w.End();

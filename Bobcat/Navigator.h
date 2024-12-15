@@ -29,6 +29,7 @@ struct Navigator : ParentCtrl {
     public:
         Item();
         Event<Ctrl&> WhenItem;
+        Event<Rect>  WhenFocus;
         Event<Ctrl&> WhenClose;
 
         Rect         GetCloseButtonRect();
@@ -57,7 +58,6 @@ struct Navigator : ParentCtrl {
 	bool		  FilterItem(const Item& item);
 	
     Bobcat&     ctx;
-    int         columns;
     VScrollBar  sb;
     Array<Item> items;
     FrameLeft<DisplayCtrl> icon;

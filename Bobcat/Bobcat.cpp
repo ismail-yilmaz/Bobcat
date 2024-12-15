@@ -41,6 +41,7 @@ Bobcat::Bobcat()
 	window.WhenClose = [this]() { Close(); };
 	window.Add(view.SizePos());
 	window.Add(navigator.SizePos());
+	window.Icon(Images::Icon);
 	view.AddFrame(menubar);
 	view.Add(stack.Animation().Wheel().Horz().SizePos());
 	navigator.WhenBar        = [this](Bar& menu) { TermMenu(menu); };
