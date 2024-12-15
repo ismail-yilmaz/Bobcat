@@ -326,7 +326,7 @@ void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& n
 
 void AskRestartExitError(Ptr<Terminal> t)
 {
-	t->DontExit();
+	t->KeepAsking();
 	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
@@ -337,7 +337,7 @@ void AskRestartExitError(Ptr<Terminal> t)
 
 void AskRestartExitOK(Ptr<Terminal> t)
 {
-	t->DontExit();
+	t->KeepAsking();
 	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command exited.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());

@@ -9,6 +9,7 @@
 namespace Upp {
 
 Navigator::Item::Item()
+: blinking(false)
 {
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
 }
@@ -32,6 +33,22 @@ void Navigator::Item::Paint(Draw& w)
 		w.DrawRect(q, SColorFace);
 		w.DrawImage(q.Deflated(8), img);
 		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL2() : Images::DeleteHL());
+		if(ctrl && !ctrl->IsRunning() && blinking) {
+			Image ico;
+			if(ctrl->IsFailure()) {
+				if(ctrl->IsAsking())
+					ico = Images::Exclamation();
+				else
+					ico = Images::Error();
+			}
+			else
+			if(ctrl->IsAsking())
+				ico = Images::Question();
+			else
+			if(ctrl->IsSuccess())
+				ico = Images::OK();
+			w.DrawImage(q.CenterRect(Size(24, 24)), ico);
+		}
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
 		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
 		DrawFrame(w, q.Deflated(1), c);
@@ -113,6 +130,7 @@ Navigator::Navigator(Bobcat& ctx_)
 Navigator::~Navigator()
 {
 	KillTimeCallback(TIMEID_SYNC);
+	KillTimeCallback(TIMEID_BLINK);
 }
 
 Navigator& Navigator::Show(bool ok)
@@ -191,14 +209,18 @@ void Navigator::Sync()
 		items.SetCount(cnt);
 		SyncItemLayout();
 		Size fsz = GetStdFontSize();
+		int blinking = 0;
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
-			m.ctrl  = &ctx.stack[i];
+			m.ctrl  = &AsTerminal(ctx.stack[i]);
 			Size csz = max(Size(1, 1), m.ctrl->GetSize());
 			Size isz = max(Size(1, 1), m.GetSize());
 			ImageDraw w(csz);
 			m.ctrl->Paint(w);
 			m.img = Rescale(w, max(1, isz.cx - 4), max(1, isz.cy - fsz.cy));
+			if(!m.ctrl->IsRunning()) {
+				blinking++;
+			}
 			if(!m.IsChild())
 				Add(m);
 			m.WantFocus();
@@ -216,6 +238,18 @@ void Navigator::Sync()
 			};
 			m.Update();
 		}
+		if(blinking)
+			KillSetTimeCallback(-500, [this]
+			{
+				for(Item& m : items) {
+					if(m.ctrl && !m.ctrl->IsRunning()) {
+						m.blinking ^= 1;
+						m.Refresh();
+					}
+				}
+		
+			}, Navigator::TIMEID_BLINK);
+
 		Refresh();
 	};
 
@@ -236,7 +270,7 @@ void Navigator::Paint(Draw& w)
 		if(m.ctrl && m.IsVisible()) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-			StdDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorFace, 0);
+			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorFace, 0);
 		}
 	}
 	w.End();

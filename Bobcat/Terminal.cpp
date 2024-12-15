@@ -205,12 +205,17 @@ bool Terminal::IsSuccess()
 
 bool Terminal::IsAsking()
 {
-	return !IsRunning() && ShouldAsk();
+	return !IsRunning() && exitmode == ExitMode::KeepAsking;
 }
 
 void Terminal::DontExit()
 {
 	exitmode = ExitMode::Keep;
+}
+
+void Terminal::KeepAsking()
+{
+	exitmode = ExitMode::KeepAsking;
 }
 
 void Terminal::ScheduleRestart()

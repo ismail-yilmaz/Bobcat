@@ -35,6 +35,7 @@ struct Terminal : TerminalCtrl {
     bool        IsAsking();
     
     void        DontExit();
+    void        KeepAsking();
     void        ScheduleExit();
     void        ScheduleRestart();
     
@@ -123,6 +124,7 @@ struct Terminal : TerminalCtrl {
  
     enum class ExitMode {
         Keep,
+        KeepAsking,
         Restart,
         RestartFailed,
         Ask,
