@@ -32,6 +32,7 @@ struct Terminal : TerminalCtrl {
     bool        IsRunning();
     bool        IsFailure();
     bool        IsSuccess();
+    bool        IsAsking();
     
     void        DontExit();
     void        ScheduleExit();

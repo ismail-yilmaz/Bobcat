@@ -203,6 +203,11 @@ bool Terminal::IsSuccess()
 	return !IsRunning() && pty->GetExitCode() == 0;
 }
 
+bool Terminal::IsAsking()
+{
+	return !IsRunning() && ShouldAsk();
+}
+
 void Terminal::DontExit()
 {
 	exitmode = ExitMode::Keep;
