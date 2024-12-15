@@ -1,4 +1,4 @@
-name: Build Bobcat - A cross-platform terminal emulator
+name: Fast-Build
 
 on:
   push:
