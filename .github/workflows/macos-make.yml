@@ -1,0 +1,45 @@
+name: MacOS
+
+on:
+  push:
+    branches: [ macos_build ]
+  pull_request:
+    branches: [ macos_build ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-latest
+            cpu_count: 4
+    
+    runs-on: ${{ matrix.runner }}
+    
+    steps:
+    - name: Checkout Bobcat repository
+      uses: actions/checkout@v3
+      with:
+        path: Bobcat
+
+    - name: Install dependencies (macOS)
+      if: matrix.runner == 'macos-latest'
+      run: brew update  
+
+    - name: Checkout U++ repository
+      uses: actions/checkout@v3
+      with:
+        repository: ultimatepp/ultimatepp
+        path: upp-source
+    
+    - name: Configure and Build U++
+      working-directory: upp-source
+      run: |
+        ./configure
+        make -f ./umkMakefile -j 4
+
+    - name: Build Bobcat
+      working-directory: Bobcat
+      run: |
+        ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brvh +GUI,SHARED build/Bobcat
+
