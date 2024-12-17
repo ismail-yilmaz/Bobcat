@@ -32,4 +32,4 @@ jobs:
       working-directory: Bobcat
       run: |
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath .\,"..\upp-source\uppsrc" Bobcat MSVC.bm -brvh +GUI,SHARED build\Bobcat
+        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANG.bm -brvh +GUI,WIN10,SHARED build\Bobcat
