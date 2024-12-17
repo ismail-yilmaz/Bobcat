@@ -8,13 +8,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - runner: ubuntu-latest
-            cpu_count: 4
-    
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout Bobcat repository
