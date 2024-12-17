@@ -24,7 +24,12 @@ jobs:
       run: |
         7z x upp-win.7z -oupp-source
 
+    - name: List U++ directory contents
+      run: |
+        Get-ChildItem -Path upp-source -Recurse | Where-Object {$_.Name -eq 'umk.exe'}
+
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
-        ..\upp-source\umk.exe .\,"..\upp-source\uppsrc" Bobcat MSVC.bm -brvh +GUI,SHARED build\Bobcat
+        $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
+        & $umkPath .\,"..\upp-source\uppsrc" Bobcat MSVC.bm -brvh +GUI,SHARED build\Bobcat
