@@ -18,7 +18,7 @@ jobs:
 
     - name: Download U++ Windows Release
       run: |
-        Invoke-WebRequest -Uri "https://sourceforge.net/projects/upp/files/upp/2024.1/upp-win-17458.7z" -OutFile "upp-win.7z"
+        Invoke-WebRequest -Uri "https://www.ultimatepp.org/downloads/upp-win-17490.7z" -OutFile "upp-win.7z"
 
     - name: Extract U++ Release
       run: |
