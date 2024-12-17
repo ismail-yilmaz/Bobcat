@@ -24,14 +24,10 @@ jobs:
       run: |
         7z x upp-win.7z -oupp-source
 
-    - name: Add missing mingit path
-      working-directory: upp-source
-      run: |
-        $gitPath = Resolve-Path -Path ".\upp\bin\mingit\cmd" # Temporary workaround for umk's missing mingit path.
-        $env:PATH += $gitPath.path
-
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
+        $gitPath = Resolve-Path -Path "..\upp-source\upp\bin\mingit\cmd" # Temporary workaround for umk's missing mingit path.
+        $env:PATH += $gitPath.path
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
         & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -brh +GUI,WIN64, WIN10 bobcat
