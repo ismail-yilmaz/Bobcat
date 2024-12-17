@@ -27,6 +27,7 @@ jobs:
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
-        $env:PATH += "..\upp-source\bin\mingit\cmd"
+        $gitPath = Resolve-Path -Path ".\bin\mingit\cmd" # Workaround for umk's missing mingit path.
+        $env:PATH += $gitPath.path
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANG.bm -brh +GUI,WIN10 bobcat
+        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -brh +GUI,WIN64, WIN10 bobcat
