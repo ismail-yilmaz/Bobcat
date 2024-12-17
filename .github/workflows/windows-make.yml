@@ -27,6 +27,7 @@ jobs:
     - name: List U++ directory contents
       run: |
         Get-ChildItem -Path upp-source -Recurse | Where-Object {$_.Name -eq 'umk.exe'}
+        ls -l
 
     - name: Build Bobcat
       working-directory: Bobcat
