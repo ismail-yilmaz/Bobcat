@@ -1,0 +1,30 @@
+name: Windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout Bobcat repository
+      uses: actions/checkout@v3
+      with:
+        path: Bobcat
+
+    - name: Download U++ Windows Release
+      run: |
+        Invoke-WebRequest -Uri "https://www.ultimatepp.org/downloads/upp-win-17490.7z" -OutFile "upp-win.7z"
+
+    - name: Extract U++ Release
+      run: |
+        7z x upp-win.7z -oupp-source
+
+    - name: Build Bobcat
+      working-directory: Bobcat
+      run: |
+        ..\upp-source\umk.exe .\,"..\upp-source\uppsrc" Bobcat MSVC.bm -brvh +GUI,SHARED build\Bobcat
