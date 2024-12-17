@@ -25,9 +25,7 @@ jobs:
         7z x upp-win.7z -oupp-source
 
     - name: List U++ directory contents
-      run: |
-        Get-ChildItem -Path upp-source -Recurse | Where-Object {$_.Name -eq 'umk.exe'}
-        ls -l
+      run: dir
 
     - name: Build Bobcat
       working-directory: Bobcat
