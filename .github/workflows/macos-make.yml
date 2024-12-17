@@ -2,19 +2,13 @@ name: MacOS
 
 on:
   push:
-    branches: [ macos_build ]
+    branches: [ main ]
   pull_request:
-    branches: [ macos_build ]
+    branches: [ main ]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - runner: macos-latest
-            cpu_count: 4
-    
-    runs-on: ${{ matrix.runner }}
+    runs-on: macos-latest
     
     steps:
     - name: Checkout Bobcat repository
@@ -23,7 +17,6 @@ jobs:
         path: Bobcat
 
     - name: Install dependencies (macOS)
-      if: matrix.runner == 'macos-latest'
       run: brew update  
 
     - name: Checkout U++ repository
@@ -31,8 +24,8 @@ jobs:
       with:
         repository: ultimatepp/ultimatepp
         path: upp-source
-    
-    - name: Configure and Build U++
+
+    - name: Configure and build U++
       working-directory: upp-source
       run: |
         ./configure
@@ -42,4 +35,3 @@ jobs:
       working-directory: Bobcat
       run: |
         ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brvh +GUI,SHARED build/Bobcat
-
