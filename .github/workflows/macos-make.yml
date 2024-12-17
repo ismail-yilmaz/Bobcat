@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    /home/maldoror/Geliştirme/upp/.config/u++/theide/UppHub/Bobcat/.github/workflows/linux-make.yml
+
     steps:
     - name: Checkout Bobcat repository
       uses: actions/checkout@v3
