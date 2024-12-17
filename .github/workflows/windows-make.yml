@@ -27,6 +27,7 @@ jobs:
     - name: Add missing mingit path
       working-directory: upp-source
       run: |
+        ls # to debug...
         $gitPath = Resolve-Path -Path ".\bin\mingit\cmd" # Temporary workaround for umk's missing mingit path.
         $env:PATH += $gitPath.path
 
