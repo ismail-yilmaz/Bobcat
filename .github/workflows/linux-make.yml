@@ -41,4 +41,4 @@ jobs:
 
     - name: Build Bobcat
       working-directory: Bobcat
-      run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED build/Bobcat
+      run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED Bobcat
