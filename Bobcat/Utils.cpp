@@ -179,21 +179,21 @@ bool AnnotationEditor(String& s, const char *title)
 	return false;
 }
 
-static const Tuple<dword, const char*> mod_keys[] = {
+static const Vector<Tuple<dword, const char*>> mod_keys = {
     { K_SHIFT,              "K_SHIFT" },
     { K_ALT,                "K_ALT"   },
     { K_CTRL,               "K_CTRL"  },
     { K_CTRL|K_ALT,         "K_CTRL_ALT" },
     { K_SHIFT|K_CTRL,       "K_SHIFT_CTRL" },
     { K_SHIFT|K_ALT,        "K_SHIFT_ALT"  },
-    { K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT" }
+    { K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT" },
 #ifdef PLATFORM_COCOA
     { K_OPTION,                      "K_OPTION"      },
     { K_OPTION|K_SHIFT,              "K_SHIFT_OPTION " },
     { K_OPTION|K_ALT,                "K_ALT_OPTION " },
     { K_OPTION|K_CTRL,               "K_CTRL_OPTION" },
-    { K_OPTION|K_CTRL|K_ALT          "K_CTRL_ALT_OPTION " },
-    { K_OPTION|K_SHIFT|K_ALT         "K_SHIFT_ALT_OPTION " },
+    { K_OPTION|K_CTRL|K_ALT,         "K_CTRL_ALT_OPTION " },
+    { K_OPTION|K_SHIFT|K_ALT,        "K_SHIFT_ALT_OPTION " },
     { K_OPTION|K_ALT,                "K_SHIFT_CTRL_OPTION " },
     { K_OPTION|K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT_OPTION" },
 #endif
@@ -201,18 +201,18 @@ static const Tuple<dword, const char*> mod_keys[] = {
 
 dword GetModifierKey(String s)
 {
-	for(int i = 0; i < __countof(mod_keys); i++)
-		if(mod_keys[i].b == s)
-			return mod_keys[i].a;
+	for(const auto& t : mod_keys)
+		if(t.b == s)
+			return t.a;
 	return 0;
 }
 
 String GetModifierKeyDesc(dword key)
 {
 	key &= (K_SHIFT|K_CTRL|K_ALT);
-	for(int i = 0; i < __countof(mod_keys); i++)
-		if(mod_keys[i].a == key)
-			return mod_keys[i].b;
+	for(const auto& t : mod_keys)
+		if(t.a == key)
+			return t.b;
 	return String::GetVoid();
 }
 

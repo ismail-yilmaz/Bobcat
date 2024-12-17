@@ -533,7 +533,7 @@ void Bobcat::ViewMenu(Bar& menu)
 void Bobcat::SetupMenu(Bar& menu)
 {
 	menu.Add(AK_SETTINGS,  [this] { Settings(); });
-	menu.Add(AK_KEYCONFIG, [this] { EditKeys(); SaveShortcutKeys(); });
+	menu.Add(AK_KEYCONFIG, [] { EditKeys(); SaveShortcutKeys(); });
 }
 
 void Bobcat::HelpMenu(Bar& menu)
@@ -550,7 +550,7 @@ void Bobcat::TermMenu(Bar& menu)
 	if(!pnames.GetCount())
 		return;
 	menu.Sub(t_("New terminal from"), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
-	menu.AddKey(AK_NAVIGATOR, [this, &menu] { ToggleNavigator(); });
+	menu.AddKey(AK_NAVIGATOR, [this] { ToggleNavigator(); });
 }
 
 void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
@@ -577,7 +577,7 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 
 void Bobcat::ListMenu(Bar& menu)
 {
-	menu.Add(AK_NAVIGATOR, Images::Navigator(), [this, &menu] { ToggleNavigator(); });
+	menu.Add(AK_NAVIGATOR, Images::Navigator(), [this] { ToggleNavigator(); });
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = (Terminal &) stack[i];
