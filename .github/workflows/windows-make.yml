@@ -28,28 +28,28 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/Terminal
-        path: upp-source/UppHub/TerminalCtrl
+        path: upp-source/upp/UppHub/TerminalCtrl
 
     - name: Checkout StackCtrl repository
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/StackCtrl
-        path: upp-source/UppHub/StackCtrl
+        path: upp-source/upp/UppHub/StackCtrl
        
     - name: Checkout Turtle repository
       uses: actions/checkout@v3
       with:
         repository: mirek-fidler/Turtle
-        path: upp-source/UppHub/Turtle
+        path: upp-source/upp/UppHub/Turtle
 
     - name: Checkout MessageCtrl repository
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/MessageCtrl
-        path: upp-source/UppHub/MessageCtrl
+        path: upp-source/upp/UppHub/MessageCtrl
 
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath .\,"..\upp-source\UppHub","..\upp-source\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
+        & $umkPath .\,"..\upp-source\upp\UppHub","..\upp-source\upp\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
