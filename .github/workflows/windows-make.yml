@@ -29,4 +29,4 @@ jobs:
       working-directory: upp-source/upp
       run: |
         $umkPath = Get-ChildItem -Path .\ -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath reference SshBasics CLANG -ab +GUI,SHARED bombs
+        & $umkPath reference uppsrc SshBasics CLANG -ab +GUI,SHARED bombs
