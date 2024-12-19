@@ -23,33 +23,10 @@ jobs:
     - name: Extract U++ Release
       run: |
         7z x upp-win.7z -oupp-source
-        
-    - name: Checkout TerminalCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/Terminal
-        path: upp-source/upp/UppHub/Terminal
-
-    - name: Checkout StackCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/StackCtrl
-        path: upp-source/upp/UppHub/StackCtrl
-       
-    - name: Checkout Turtle repository
-      uses: actions/checkout@v3
-      with:
-        repository: mirek-fidler/Turtle
-        path: upp-source/upp/UppHub/Turtle
-
-    - name: Checkout MessageCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/MessageCtrl
-        path: upp-source/upp/UppHub/MessageCtrl
-
+    
+   
     - name: Build Bobcat
-      working-directory: Bobcat
+      working-directory: upp-source
       run: |
-        $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath ./,"../upp-source/upp/UppHub","../upp-source/upp/uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
+        $umkPath = Get-ChildItem -Path .\ -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
+        & $umkPath examples Bombs GCC -ab +GUI,SHARED bombs
