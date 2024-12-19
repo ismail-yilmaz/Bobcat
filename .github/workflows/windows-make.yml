@@ -1,9 +1,11 @@
 name: Windows
+
 on:
   push:
     branches: [ windows_build ]
   pull_request:
     branches: [ windows_build ]
+
 jobs:
   build:
     runs-on: windows-latest
@@ -14,13 +16,6 @@ jobs:
       with:
         path: Bobcat
 
-    - name: Configure Git Network Settings
-      run: |
-        git config --global core.longpaths true
-        git config --global http.postBuffer 524288000
-        git config --global core.compression 0
-        git config --global advice.detachedHead false
-
     - name: Download U++ Windows Release
       run: |
         Invoke-WebRequest -Uri "https://www.ultimatepp.org/downloads/upp-win-17490.7z" -OutFile "upp-win.7z"
@@ -28,46 +23,33 @@ jobs:
     - name: Extract U++ Release
       run: |
         7z x upp-win.7z -oupp-source
-
+        
     - name: Checkout TerminalCtrl repository
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/Terminal
         path: upp-source/upp/UppHub/TerminalCtrl
-        # Increase fetch depth to prevent shallow clone issues
-        fetch-depth: 0
 
     - name: Checkout StackCtrl repository
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/StackCtrl
         path: upp-source/upp/UppHub/StackCtrl
-        fetch-depth: 0
-
+       
     - name: Checkout Turtle repository
       uses: actions/checkout@v3
       with:
         repository: mirek-fidler/Turtle
         path: upp-source/upp/UppHub/Turtle
-        fetch-depth: 0
 
     - name: Checkout MessageCtrl repository
       uses: actions/checkout@v3
       with:
         repository: ismail-yilmaz/MessageCtrl
         path: upp-source/upp/UppHub/MessageCtrl
-        fetch-depth: 0
 
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
-        # Set additional environment variables to support network operations
-        $env:GIT_TRACE = "1"
-        $env:GIT_CURL_VERBOSE = "1"
-        $env:GITHUB_ACTIONS_DISABLE_PROXY = "true"
-
-        # Find umk.exe and build Bobcat
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        
-        # Add verbose logging and network troubleshooting flags
         & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
