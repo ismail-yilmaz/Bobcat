@@ -4,6 +4,7 @@
 ![Fast Make Status](https://github.com/ismail-yilmaz/Bobcat/actions/workflows/fast-make.yml/badge.svg)
 ![Linux Build Status](https://github.com/ismail-yilmaz/Bobcat/actions/workflows/linux-make.yml/badge.svg)
 ![MacOS Build Status](https://github.com/ismail-yilmaz/Bobcat/actions/workflows/macos-make.yml/badge.svg)
+![Windows Build Status](https://github.com/ismail-yilmaz/Bobcat/actions/workflows/windows-make.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-GPL_3-orange.svg)](https://opensource.org/licenses/GPL-3)
 
 
