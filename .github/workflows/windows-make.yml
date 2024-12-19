@@ -52,4 +52,4 @@ jobs:
       working-directory: Bobcat
       run: |
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
+        & $umkPath .\,"..\upp-source\upp\UppHub","..\upp-source\upp\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
