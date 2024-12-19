@@ -70,4 +70,4 @@ jobs:
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
         
         # Add verbose logging and network troubleshooting flags
-        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -brvh +GUI,WIN64,WIN10 bobcat
+        & $umkPath .\,"..\upp-source\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
