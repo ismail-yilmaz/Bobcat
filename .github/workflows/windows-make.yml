@@ -26,7 +26,7 @@ jobs:
     
    
     - name: Build Bobcat
-      working-directory: upp-source
+      working-directory: upp-source/upp
       run: |
         $umkPath = Get-ChildItem -Path .\ -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath examples Bombs GCC -ab +GUI,SHARED bombs
+        & $umkPath reference SshBasics CLANG -ab +GUI,SHARED bombs
