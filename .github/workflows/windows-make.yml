@@ -52,5 +52,6 @@ jobs:
       working-directory: Bobcat
       run: |
         ls "..\upp-source\upp"
+        ls "..\upp-source\upp\UppHub"
         $umkPath = Get-ChildItem -Path ..\upp-source -Recurse -Filter 'umk.exe' | Select-Object -First 1 -ExpandProperty FullName
-        & $umkPath "..\upp-source\upp\reference","..\upp-source\upp\uppsrc" BasicAlgo CLANGx64.bm -br +GUI,WIN64,WIN10 test
+        & $umkPath .\,"..\upp-source\upp\UppHub","..\upp-source\upp\uppsrc" Bobcat CLANGx64.bm -br +GUI,WIN64,WIN10 bobcat
