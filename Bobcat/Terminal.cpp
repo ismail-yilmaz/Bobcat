@@ -301,6 +301,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	profilename = p.name;
 	workingdir  = p.address;
 	shellintegration = p.shellintegration;
+	findselectedtext = p.findselectedtext;
 	bell = p.bell;
 	filter = p.filterctrl;
 	WindowActions(p.windowactions);
@@ -740,6 +741,19 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 	return false;
 }
 
+void Terminal::FindText(const WString& text)
+{
+	finder.SearchText(text);
+	ShowFinder(true);
+}
+
+void Terminal::OpenFinder()
+{
+	if(findselectedtext && IsSelection())
+		finder.SearchText(GetSelectedText());
+	ShowFinder(true);
+}
+
 void Terminal::FileMenu(Bar& menu)
 {
 }
@@ -782,7 +796,7 @@ void Terminal::EditMenu(Bar& menu)
 		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
 	}
 	menu.Separator();
-	menu.Add(AK_FINDER, Images::Find(), [this] { ShowFinder(true); });
+	menu.Add(AK_FINDER, Images::Find(), [this] { OpenFinder(); });
 	menu.AddKey(AK_SELECTOR_ENTER,      [this] { BeginSelectorMode(); });
 }
 

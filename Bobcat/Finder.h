@@ -48,6 +48,7 @@ public:
     void        Sync();
 
     void        Search();
+    void		SearchText(const WString& text);
     void        Update();
 
     void        SaveToFile();

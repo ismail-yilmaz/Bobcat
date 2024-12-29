@@ -56,6 +56,7 @@ Profile::Profile()
 , windowreports(true)
 , clipboardread(false)
 , clipboardwrite(false)
+, findselectedtext(false)
 , mousewheelstep(GUI_WheelScrollLines())
 , alternatescroll(false)
 , dontscrolltoend(false)
@@ -135,6 +136,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("WindowReports",		 windowreports)
 	("ClipboardReadAccess",  clipboardread)
 	("ClipboardWriteAccess", clipboardwrite)
+	("FindSelectedText",     findselectedtext)
 	("BackspaceKeySends",    erasechar)
 	("FunctionKeyStyle",     functionkeystyle)
 	("AltEscapesKeys",       altescapeskeys)
@@ -285,6 +287,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.wordselchars,   p.wordselchars)
      (emulation.wordselpattern, p.wordselpattern)
      (emulation.filter,         p.filterctrl)
+     (emulation.findselectedtext, p.findselectedtext)
      (emulation.overridetracking, p.overridetracking);
 }
 

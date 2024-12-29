@@ -104,6 +104,9 @@ struct Terminal : TerminalCtrl {
     
     void        OnNotification(const String& text);
     
+    void        FindText(const WString& txt);
+    void        OpenFinder();
+    
     const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
     int         GetMousePosAsIndex() const;
@@ -138,6 +141,7 @@ struct Terminal : TerminalCtrl {
     bool         canresize:1;
     bool         smartwordsel:1;
     bool         shellintegration:1;
+    bool         findselectedtext:1;
     ExitMode     exitmode;
     String       profilename;
     String       workingdir;

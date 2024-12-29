@@ -36,6 +36,7 @@ struct Profile : Moveable<Profile> {
     bool        windowreports;
     bool        clipboardread;
     bool        clipboardwrite;
+    bool        findselectedtext;
     String      functionkeystyle;
     bool        altescapeskeys;
     bool        altshiftskeys;

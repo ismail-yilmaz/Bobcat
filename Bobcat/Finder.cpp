@@ -292,6 +292,11 @@ void Finder::Sync()
 	term.Refresh();
 }
 
+void Finder::SearchText(const WString& txt)
+{
+	text <<= (text.GetLength() <= 256 ? txt : txt.Mid(0, 256));
+}
+
 void Finder::Search()
 {
 	if(term.IsSearching())
