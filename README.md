@@ -41,6 +41,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 - **Annotations:** Supports **plain** and **rich text annotations**, which can be added programmatically or via user input, enhancing workflow documentation.  
 
+- **Shell Integration:** Bobcat supports shell integration and can track the working directory if the appropriate shell script is set up. This enables opening a new terminal in the current working directory and, additionally, opening the working directory in the default file manager via a menu item or user-defined keyboard shortcut.
+
 - **Versatile Copy/Paste:** Facilitates **copy, paste, and drag-and-drop** operations for text, links, and even inline images, making interaction seamless and intuitive.  
 
 - **Multiple Profiles:** Allows users to create and manage **multiple terminal and color profiles**, adapting to varied tasks and environments effortlessly.  
@@ -49,7 +51,7 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 - **Stacked Interface:** Reduces UI clutter with a **stacked interface**, including a **Navigator** terminal manager for easy navigation between open terminals.  
 
-- **Simple Configuration:** Uses a straightforward **JSON format** for configuration files, ensuring quick setup and easy management.  
+- **Simple Configuration:** Uses a straightforward **JSON format** for configuration files, ensuring quick setup and easy management. However, dealing with config files is optional, since nearly all options are accessible through the settings dialog, with most changes taking effect immediately.
 
 - **Multiple Pty Support on Windows:** Supports **ConPty** and **WinPty** backends on Windows, with a runtime switch for flexibility. The **WinPty backend** is statically linked, eliminating the need for external environments like **msys2** or **cygwin**, while remaining compatible with them if desired.  
 
