@@ -259,6 +259,7 @@ void Bobcat::Settings()
 	cr(settingspane.wheel, settings.stackwheel);
 	cr(settingspane.showmenu, settings.showmenu);
 	cr(settingspane.showtitle, settings.showtitle);
+	cr(settingspane.frameless, settings.frameless);
 	cr(settingspane.savescreenshot, settings.savescreenshot);
 	cr(settingspane.custominput, settings.custominputmethod);
 	cr(settingspane.pagesizes, settings.custompagesizes);
@@ -425,6 +426,7 @@ Bobcat& Bobcat::ToggleNavigator()
 void Bobcat::Sync()
 {
 	ShowMenuBar(settings.showmenu);
+	window.FrameLess(settings.frameless);
 	settings.stackdirection == "horizontal"	? stack.Horz() : stack.Vert();
 	auto& m = GetNotificationDaemon();
 	settings.notificationalignment == "top" ? m.Top() : m.Bottom();
@@ -514,6 +516,7 @@ void Bobcat::ViewMenu(Bar& menu)
 {
 	bool enable = stack.GetCount() > 1;
 	
+	menu.Add(AK_FRAMELESS,     [this] { settings.frameless ^= 1; Sync(); }).Check(settings.frameless);
 	menu.Add(AK_MENUBAR,       [this] { settings.showmenu  ^= 1; Sync(); }).Check(settings.showmenu);
 	menu.Add(AK_TITLEBAR,      [this] { settings.showtitle ^= 1; Sync(); }).Check(settings.showtitle);
 	menu.AddKey(AK_TOGGLEBARS, [this] { ToggleBars(); });
@@ -715,6 +718,7 @@ Bobcat::Config::Config()
 , stackwheel(true)
 , showmenu(true)
 , showtitle(false)
+, frameless(false)
 , savescreenshot(false)
 , custominputmethod(false)
 , serializeplacement(false)
@@ -736,6 +740,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("StackWheelMode", stackwheel)
 	   ("ShowMenuBar", showmenu)
 	   ("ShowTitleBar", showtitle)
+	   ("FramelessWindow", frameless)
 	   ("SaveScreenshot", savescreenshot)
 	   ("CustomInputMethod", custominputmethod)
 	   ("CustomPageSizes", custompagesizes)

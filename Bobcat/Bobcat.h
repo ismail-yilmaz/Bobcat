@@ -146,6 +146,7 @@ struct Bobcat : Pte<Bobcat> {
         String      custompagesizes;
         bool        showmenu;
         bool        showtitle;
+        bool        frameless;
         bool        serializeplacement;
         bool        backgroundimage;
         String      backgroundimagepath;
