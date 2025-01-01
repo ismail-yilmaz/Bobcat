@@ -478,6 +478,11 @@ void Terminal::SetWorkingDirectory(const String& s)
 	}
 }
 
+String Terminal::GetWorkingDirectory() const
+{
+	return DirectoryExists(workingdir) ? workingdir : GetHomeDirectory();
+}
+
 void Terminal::MakeTitle(const String& s)
 {
 	String title;
@@ -846,6 +851,10 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Separator();
 	menu.Sub(t_("View"), [this](Bar& menu) { ctx.ViewMenu(menu); });
 	menu.Separator();
+	if(shellintegration) {
+		menu.Add(AK_OPENDIR, Images::Directory(), [this] { LaunchWebBrowser(GetWorkingDirectory()); });
+		menu.Separator();
+	}
 	ctx.SetupMenu(menu);
 	ctx.HelpMenu(menu);
 	menu.AddKey(AK_CLOSE, [this] { Stop(); });

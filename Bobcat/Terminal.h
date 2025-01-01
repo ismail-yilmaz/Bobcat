@@ -65,6 +65,9 @@ struct Terminal : TerminalCtrl {
     Terminal&   SetWordSelectionPattern(const String& s);
     void        SetWorkingDirectory(const String& s);
     
+    String      GetWorkingDirectory() const;
+    void        OpenWorkingDirectory();
+    
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
 
