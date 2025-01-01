@@ -45,6 +45,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 - **Versatile Copy/Paste:** Facilitates **copy, paste, and drag-and-drop** operations for text, links, and even inline images, making interaction seamless and intuitive.  
 
+- **Selector Mode:** Bobcat features a "selector mode" that allows users to move the cursor freely and select text (including regular, rectangular, line, and word selections) using only keyboard navigation.
+
 - **Multiple Profiles:** Allows users to create and manage **multiple terminal and color profiles**, adapting to varied tasks and environments effortlessly.  
 
 - **Configurable UI:** Customize Bobcat’s interface to suit your needs—opt for a minimal bare-bones terminal or a **fully-featured GUI**.  
