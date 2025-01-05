@@ -78,8 +78,7 @@ void Navigator::Item::MouseLeave()
 
 void Navigator::Item::MouseMove(Point pt, dword keyflags)
 {
-	Rect r = GetCloseButtonRect();
-	if(r.Contains(pt)) {
+	if(Rect r = GetCloseButtonRect(); r.Contains(pt)) {
 		pos = pt;
 		Refresh(r);
 	}
@@ -171,7 +170,7 @@ void Navigator::SyncItemLayout()
     int cnt = max(v.GetCount(), 1);
     int fcy = GetStdFontSize().cy;
 
-    Point margins = { 16, fcy * 2};
+    Point margins = { 16, fcy * 2 };
     
     Size viewsize = GetSize() + Size(0, searchbar.GetHeight());
     Size cellsize = GetRatioSize(viewsize, 200, 0);
@@ -182,7 +181,7 @@ void Navigator::SyncItemLayout()
     
 	Size totalsize = gridsize * cellsize + (gridsize + 1) * margins;
        
-    Point offset = max({8, 8}, Rect(viewsize).CenterRect(totalsize).TopLeft());
+    Point offset = max({ 8, 8 }, Rect(viewsize).CenterRect(totalsize).TopLeft());
     
     sb.SetTotal(totalsize.cy);
     sb.SetPage(viewsize.cy);
@@ -201,6 +200,9 @@ void Navigator::SyncItemLayout()
 
 void Navigator::Sync()
 {
+	if(!IsShown())
+		return;
+	
 	auto ScheduledSync = [this]
 	{
 		int cnt = ctx.stack.GetCount();
@@ -261,6 +263,37 @@ void Navigator::Layout()
 		Sync();
 }
 
+int Navigator::GetCursor()
+{
+	return FindMatch(items, [](const Item& m) { return m.HasFocus(); });
+}
+
+void Navigator::SwapPrev()
+{
+	if(int i = GetCursor(); i > 0) {
+		Item& a = items[i];
+		Item& b = items[i - 1];
+		ctx.stack.Swap(*a.ctrl, *b.ctrl);
+		Swap(a.ctrl, b.ctrl);
+		Swap(a.img, b.img);
+		b.SetFocus();
+		Refresh();
+	}
+}
+
+void Navigator::SwapNext()
+{
+	if(int i = GetCursor(); i >= 0 && i + 1 < items.GetCount()) {
+		Item& a = items[i];
+		Item& b = items[i + 1];
+		ctx.stack.Swap(*a.ctrl, *b.ctrl);
+		Swap(a.ctrl, b.ctrl);
+		Swap(a.img, b.img);
+		b.SetFocus();
+		Refresh();
+	}
+}
+
 void Navigator::Paint(Draw& w)
 {
 	Size sz = GetSize(), fsz = GetStdFontSize();
@@ -297,6 +330,12 @@ bool Navigator::Key(dword key, int count)
 		return true;
 	case K_CTRL_S:
 		searchbar.search.SetFocus();
+		return true;
+	case K_CTRL_LEFT:
+		SwapPrev();
+		return true;
+	case K_CTRL_RIGHT:
+		SwapNext();
 		return true;
 	default:
 		if(MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key))

@@ -21,6 +21,10 @@ struct Navigator : ParentCtrl {
     void          MouseWheel(Point pt, int zdelta, dword keyflags) override;
     bool          Key(dword key, int count) override;
 
+    int           GetCursor();
+    void          SwapPrev();
+    void          SwapNext();
+    
     Event<Bar&>   WhenBar;
     Event<>       WhenClose;
     Event<Ctrl&>  WhenGotoItem;
@@ -42,7 +46,7 @@ struct Navigator : ParentCtrl {
         void         MouseEnter(Point pt, dword keyflags) override;
         void         MouseLeave() override;
         void         MouseMove(Point pt, dword keyflags) override;
-
+        
         Ptr<Terminal> ctrl;
         Image         img;
         bool          blinking;
@@ -62,6 +66,7 @@ struct Navigator : ParentCtrl {
     
     Bobcat&     ctx;
     VScrollBar  sb;
+    int         cursor;
     Array<Item> items;
     FrameLeft<DisplayCtrl> icon;
     FrameTop<WithNavigatorLayout<ParentCtrl>> searchbar;
