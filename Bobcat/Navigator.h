@@ -46,6 +46,7 @@ struct Navigator : ParentCtrl {
         void         MouseEnter(Point pt, dword keyflags) override;
         void         MouseLeave() override;
         void         MouseMove(Point pt, dword keyflags) override;
+        void         DragAndDrop(Point pt, PasteClip& d) override;
         
         Ptr<Terminal> ctrl;
         Image         img;

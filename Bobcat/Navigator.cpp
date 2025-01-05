@@ -96,6 +96,12 @@ void Navigator::Item::MouseMove(Point pt, dword keyflags)
 	}
 }
 
+void Navigator::Item::DragAndDrop(Point pt, PasteClip& d)
+{
+	if(ctrl)
+		ctrl->DragAndDrop(pt, d);
+}
+
 Rect Navigator::Item::GetCloseButtonRect()
 {
 	Rect r = GetView();
