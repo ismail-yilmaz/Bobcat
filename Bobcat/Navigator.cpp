@@ -8,6 +8,13 @@
 
 namespace Upp {
 
+#define KEYGROUPNAME "Navigator"
+#define KEYNAMESPACE NavigatorKeys
+#define KEYFILE <Bobcat/Navigator.key>
+#include <CtrlLib/key_source.h>
+
+using namespace NavigatorKeys;
+
 Navigator::Item::Item()
 : blinking(false)
 {
@@ -108,7 +115,6 @@ Navigator::Navigator(Bobcat& ctx_)
 	searchbar.newterm.Image(Images::Add());
 	searchbar.newterm.Tip(t_("Open new terminal"));
 	searchbar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
-	searchbar.search.NullText(t_("Search terminal (Ctrl+S)..."));
 	searchbar.search << [this] { SyncItemLayout(); Refresh();  };
 	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
 	searchbar.close  << [this] { WhenClose(); };
@@ -121,6 +127,7 @@ Navigator::Navigator(Bobcat& ctx_)
 				ctx.TermSubmenu(bar, pnames);
 			});
 	};
+
 	AddFrame(sb);
 	sb.AutoHide();
 	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
@@ -245,6 +252,9 @@ void Navigator::Sync()
 		Refresh();
 	};
 
+	String k = " (" + GetKeyDesc(NavigatorKeys::AK_NAVSEARCH().key[0]) + ") ";
+	searchbar.search.NullText(t_("Search terminal") + k);
+
 	SetTimeCallback(100, ScheduledSync, TIMEID_SYNC);
 }
 
@@ -320,28 +330,31 @@ void Navigator::MouseWheel(Point pt, int zdelta, dword keyflags)
 
 bool Navigator::Key(dword key, int count)
 {
-	switch(key) {
-	case K_ESCAPE:
+	if(key == K_ESCAPE) {
 		WhenClose();
-		return true;
-	case K_RETURN:
+	}
+	else
+	if(key == K_RETURN) {
 		if(Ctrl *c = GetFocusCtrl(); c)
 			c->Action();
-		return true;
-	case K_CTRL_S:
-		searchbar.search.SetFocus();
-		return true;
-	case K_CTRL_LEFT:
-		SwapPrev();
-		return true;
-	case K_CTRL_RIGHT:
-		SwapNext();
-		return true;
-	default:
-		if(MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key))
-			return true;
 	}
-	return Ctrl::Key(key, count);
+	else
+	if(Match(AK_SWAPPREV, key)) {
+		SwapPrev();
+	}
+	else
+	if(Match(AK_SWAPNEXT, key)) {
+		SwapNext();
+	}
+	else
+	if(Match(AK_NAVSEARCH, key)) {
+		searchbar.search.SetFocus();
+	}
+	else
+	if(!MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key))
+		return false;
+		
+	return true;
 }
 
 
