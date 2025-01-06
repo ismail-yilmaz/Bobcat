@@ -134,6 +134,7 @@ Rect Navigator::Item::GetCloseButtonRect()
 
 Navigator::Navigator(Bobcat& ctx_)
 : ctx(ctx_)
+, swapanim(false)
 {
 	Hide();
 	CtrlLayout(searchbar);
@@ -310,13 +311,51 @@ int Navigator::GetCursor()
 
 void Navigator::SwapItem(int i, int ii)
 {
+	if(swapanim)
+		return;
+	
+	swapanim = true;
+	
 	Item& a = items[i];
 	Item& b = items[ii];
 	ctx.stack.Swap(*a.ctrl, *b.ctrl);
+
+	Rect ra = a.GetRect();
+	Rect rb = b.GetRect();
+	
+	constexpr const int duration = 100;
+	
+	// TODO: Turn this into a generic animation function.
+	
+	for(int start = msecs();;) {
+		int elapsed = msecs(start);
+		if(elapsed > duration) {
+			a.SetRect(ra);
+			b.SetRect(rb);
+			swapanim = false;
+			break;
+		}
+		Rect r1 = ra, r2 = rb;
+		r1 += (rb - ra) * elapsed / duration;
+		r2 += (ra - rb) * elapsed / duration;
+		a.SetRect(r1);
+		b.SetRect(r2);
+#ifdef PLATFORM_POSIX
+		a.Sync();
+		b.Sync();
+#else
+		a.Refresh();
+		b.Refresh();
+#endif
+		Ctrl::ProcessEvents();
+		GuiSleep(0);
+	}
+	
 	Swap(a.ctrl, b.ctrl);
 	Swap(a.img, b.img);
 	b.SetFocus();
 	Refresh();
+
 }
 
 void Navigator::SwapFirst()
@@ -348,7 +387,7 @@ void Navigator::Paint(Draw& w)
 	Size sz = GetSize(), fsz = GetStdFontSize();
 	w.Clip(sz);
 	for(const Item& m : items) {
-		if(m.ctrl && m.IsVisible()) {
+		if(m.ctrl && m.IsVisible() && !swapanim) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
 			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorFace, 0);

@@ -74,6 +74,7 @@ struct Navigator : ParentCtrl {
     
     Bobcat&     ctx;
     VScrollBar  sb;
+    bool        swapanim:1;
     int         cursor;
     Array<Item> items;
     FrameLeft<DisplayCtrl> icon;
