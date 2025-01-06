@@ -126,7 +126,6 @@ void Navigator::Item::DragLeave()
 	CancelMode();
 }
 
-
 Rect Navigator::Item::GetCloseButtonRect()
 {
 	Rect r = GetView();
