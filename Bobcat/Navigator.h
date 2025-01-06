@@ -51,13 +51,16 @@ struct Navigator : ParentCtrl {
         void         MouseLeave() override;
         void         MouseMove(Point pt, dword keyflags) override;
         void         DragAndDrop(Point pt, PasteClip& d) override;
+        void         CancelMode() override;
+        void         DragLeave() override;
         
         Ptr<Terminal> ctrl;
         Image         img;
-        bool          blinking;
+        bool          blinking:1;
         
     private:
-        Point        pos = {0, 0};
+        Point         pos = {0, 0};
+        bool          dnd:1;
     };
 
     enum TimerId

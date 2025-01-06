@@ -17,6 +17,7 @@ using namespace NavigatorKeys;
 
 Navigator::Item::Item()
 : blinking(false)
+, dnd(false)
 {
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
 }
@@ -40,21 +41,29 @@ void Navigator::Item::Paint(Draw& w)
 		w.DrawRect(q, SColorFace);
 		w.DrawImage(q.Deflated(8), img);
 		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL2() : Images::DeleteHL());
-		if(ctrl && !ctrl->IsRunning() && blinking) {
-			Image ico;
-			if(ctrl->IsFailure()) {
-				if(ctrl->IsAsking())
-					ico = Images::Exclamation();
-				else
-					ico = Images::Error();
+		if(ctrl) {
+			if(ctrl->IsRunning() && dnd) {
+				const Image& ico = Images::DropClipHD();
+				w.DrawRect(q, SColorHighlight);
+				w.DrawImage(q.CenterRect(ico.GetSize()), ico);
 			}
 			else
-			if(ctrl->IsAsking())
-				ico = Images::Question();
-			else
-			if(ctrl->IsSuccess())
-				ico = Images::OK();
-			w.DrawImage(q.CenterRect(Size(24, 24)), ico);
+			if(!ctrl->IsRunning() && blinking) {
+				Image ico;
+				if(ctrl->IsFailure()) {
+					if(ctrl->IsAsking())
+						ico = Images::Exclamation();
+					else
+						ico = Images::Error();
+				}
+				else
+				if(ctrl->IsAsking())
+					ico = Images::Question();
+				else
+				if(ctrl->IsSuccess())
+					ico = Images::OK();
+				w.DrawImage(q.CenterRect(Size(24, 24)), ico);
+			}
 		}
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
 		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
@@ -80,6 +89,7 @@ void Navigator::Item::MouseEnter(Point pt, dword keyflags)
 void Navigator::Item::MouseLeave()
 {
 	pos = Null;
+	dnd = false;
 	Refresh();
 }
 
@@ -98,9 +108,24 @@ void Navigator::Item::MouseMove(Point pt, dword keyflags)
 
 void Navigator::Item::DragAndDrop(Point pt, PasteClip& d)
 {
-	if(ctrl)
+	if(ctrl) {
 		ctrl->DragAndDrop(pt, d);
+		dnd = d.IsAccepted();
+		Refresh();
+	}
 }
+
+void Navigator::Item::CancelMode()
+{
+	dnd = false;
+	Refresh();
+}
+
+void Navigator::Item::DragLeave()
+{
+	CancelMode();
+}
+
 
 Rect Navigator::Item::GetCloseButtonRect()
 {
