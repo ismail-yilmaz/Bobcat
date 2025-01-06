@@ -284,30 +284,39 @@ int Navigator::GetCursor()
 	return FindMatch(items, [](const Item& m) { return m.HasFocus(); });
 }
 
+void Navigator::SwapItem(int i, int ii)
+{
+	Item& a = items[i];
+	Item& b = items[ii];
+	ctx.stack.Swap(*a.ctrl, *b.ctrl);
+	Swap(a.ctrl, b.ctrl);
+	Swap(a.img, b.img);
+	b.SetFocus();
+	Refresh();
+}
+
+void Navigator::SwapFirst()
+{
+	if(int i = GetCursor(); i > 0)
+		SwapItem(i, 0);
+}
+
+void Navigator::SwapLast()
+{
+	if(int i = GetCursor(); i >= 0 && i < items.GetCount() - 1)
+		SwapItem(i, items.GetCount() - 1);
+}
+
 void Navigator::SwapPrev()
 {
-	if(int i = GetCursor(); i > 0) {
-		Item& a = items[i];
-		Item& b = items[i - 1];
-		ctx.stack.Swap(*a.ctrl, *b.ctrl);
-		Swap(a.ctrl, b.ctrl);
-		Swap(a.img, b.img);
-		b.SetFocus();
-		Refresh();
-	}
+	if(int i = GetCursor(); i > 0)
+		SwapItem(i, i - 1);
 }
 
 void Navigator::SwapNext()
 {
-	if(int i = GetCursor(); i >= 0 && i + 1 < items.GetCount()) {
-		Item& a = items[i];
-		Item& b = items[i + 1];
-		ctx.stack.Swap(*a.ctrl, *b.ctrl);
-		Swap(a.ctrl, b.ctrl);
-		Swap(a.img, b.img);
-		b.SetFocus();
-		Refresh();
-	}
+	if(int i = GetCursor(); i >= 0 && i + 1 < items.GetCount())
+		SwapItem(i, i + 1);
 }
 
 void Navigator::Paint(Draw& w)
@@ -343,6 +352,14 @@ bool Navigator::Key(dword key, int count)
 	if(key == K_RETURN) {
 		if(Ctrl *c = GetFocusCtrl(); c)
 			c->Action();
+	}
+	else
+	if(Match(AK_SWAPFIRST, key)) {
+		SwapFirst();
+	}
+	else
+	if(Match(AK_SWAPLAST, key)) {
+		SwapLast();
 	}
 	else
 	if(Match(AK_SWAPPREV, key)) {

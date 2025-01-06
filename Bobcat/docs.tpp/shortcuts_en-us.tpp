@@ -8,7 +8,7 @@ shortcuts: ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75
 bal][/+75  ][+75 and ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
 erminal][+75 , ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#finder`_shortcuts^+75 f
 inder][+75 , ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#selector`_shortcuts^+75 s
-elector,][/+75  ][+75 and ][^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#navigator`_shortcuts^+75 n
+elector,][/+75  ][+75 and ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#navigator`_shortcuts^+75 n
 avigator][+75  specific. Terminal and finder specific shortcuts 
 can only be called in the active terminal and only affect the 
 active terminal, while the global shortcuts are valid across 
@@ -233,11 +233,15 @@ ctor][C1  mode.]]
 [s0;:navigator`_shortcuts: [* Navigator Specific Shortcuts]&]
 [s0; &]
 [ {{4070:5930 [s0; [*C1 Escape]]
-:: [s0; [C1 Exit navigator. (Fixed shortcut)]]
+:: [s0; [C1 Exit navigator.]]
 :: [s0; [*C1 Return]]
-:: [s0; [C1 Selects the current terminal and exit navigator. (Fixed shortcut)]]
+:: [s0; [C1 Selects the current terminal and exit navigator.]]
 :: [s0; [*C1 Ctrl`+S]]
 :: [s0; [C1 Search terminal.]]
+:: [s0; [*C1 Ctrl`+Home]]
+:: [s0; [C1 Swap the active terminal with the first one.]]
+:: [s0; [*C1 Ctrl`+End]]
+:: [s0; [C1 Swap the active terminal with the last one.]]
 :: [s0; [*C1 Ctrl`+Left `[Arrow key`]]]
 :: [s0; [C1 Swap the active terminal with the previous one.]]
 :: [s0; [*C1 Ctrl`+Right `[Arrow key`]]]

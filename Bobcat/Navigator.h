@@ -22,6 +22,10 @@ struct Navigator : ParentCtrl {
     bool          Key(dword key, int count) override;
 
     int           GetCursor();
+    
+    void          SwapItem(int i, int ii);
+    void          SwapFirst();
+    void          SwapLast();
     void          SwapPrev();
     void          SwapNext();
     
