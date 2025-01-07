@@ -91,4 +91,18 @@ jobs:
       working-directory: Bobcat
       run: |
         ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 bobcat
+        mkdir out
+        copy Bobcat\Bobcat.exe out\Bobcat.exe
 
+    - name: Build PtyAgent
+      working-directory: Bobcat
+      run: |
+        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +GUI,WIN64,WIN10 ptyagent
+        cp ptyagent.exe out\PtyAgent.exe
+
+    - name: Archive binaries
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: Bobcat-win32
+        path: Bobcat/out/*
