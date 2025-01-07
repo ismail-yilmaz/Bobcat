@@ -311,51 +311,16 @@ int Navigator::GetCursor()
 
 void Navigator::SwapItem(int i, int ii)
 {
-	if(swapanim)
+	if(AnimateSwap(i, ii))
 		return;
-	
-	swapanim = true;
-	
+
 	Item& a = items[i];
 	Item& b = items[ii];
 	ctx.stack.Swap(*a.ctrl, *b.ctrl);
-
-	Rect ra = a.GetRect();
-	Rect rb = b.GetRect();
-	
-	constexpr const int duration = 100;
-	
-	// TODO: Turn this into a generic animation function.
-	
-	for(int start = msecs();;) {
-		int elapsed = msecs(start);
-		if(elapsed > duration) {
-			a.SetRect(ra);
-			b.SetRect(rb);
-			swapanim = false;
-			break;
-		}
-		Rect r1 = ra, r2 = rb;
-		r1 += (rb - ra) * elapsed / duration;
-		r2 += (ra - rb) * elapsed / duration;
-		a.SetRect(r1);
-		b.SetRect(r2);
-#ifdef PLATFORM_POSIX
-		a.Sync();
-		b.Sync();
-#else
-		a.Refresh();
-		b.Refresh();
-#endif
-		Ctrl::ProcessEvents();
-		GuiSleep(0);
-	}
-	
 	Swap(a.ctrl, b.ctrl);
 	Swap(a.img, b.img);
 	b.SetFocus();
 	Refresh();
-
 }
 
 void Navigator::SwapFirst()
@@ -380,6 +345,47 @@ void Navigator::SwapNext()
 {
 	if(int i = GetCursor(); i >= 0 && i + 1 < items.GetCount())
 		SwapItem(i, i + 1);
+}
+
+bool Navigator::AnimateSwap(int i, int ii)
+{
+	if(swapanim)
+		return true;
+	
+	swapanim = true;
+	
+	Item& a = items[i];
+	Item& b = items[ii];
+	Rect ra = a.GetRect();
+	Rect rb = b.GetRect();
+	
+	constexpr const int duration = 100;
+	
+	for(int start = msecs();;) {
+		int elapsed = msecs(start);
+		if(elapsed > duration) {
+			a.SetRect(ra);
+			b.SetRect(rb);
+			break;
+		}
+		Rect r1 = ra, r2 = rb;
+		r1 += (rb - ra) * elapsed / duration;
+		r2 += (ra - rb) * elapsed / duration;
+		a.SetRect(r1);
+		b.SetRect(r2);
+#ifdef PLATFORM_POSIX
+		a.Sync();
+		b.Sync();
+#else
+		a.Refresh();
+		b.Refresh();
+#endif
+		Ctrl::ProcessEvents();
+		GuiSleep(0);
+	}
+	
+	swapanim = false;
+	return false;
 }
 
 void Navigator::Paint(Draw& w)
