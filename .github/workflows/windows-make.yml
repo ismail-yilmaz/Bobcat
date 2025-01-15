@@ -109,12 +109,12 @@ jobs:
       if: github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v4
       with:
-        name: bobcat-win32
+        name: bobcat-win64
         path: Bobcat/out/*
 
     - name: Push assets into release
       if: github.event_name == 'release' && github.event.action == 'published'
       working-directory: Bobcat
       run: |
-        Compress-Archive -Path out\* -DestinationPath bobcat-${{ github.event.release.tag_name }}-win32.zip
-        gh release upload ${{ github.event.release.tag_name }} bobcat-${{ github.event.release.tag_name }}-win32.zip
+        Compress-Archive -Path out\* -DestinationPath bobcat-${{ github.event.release.tag_name }}-win64.zip
+        gh release upload ${{ github.event.release.tag_name }} bobcat-${{ github.event.release.tag_name }}-win64.zip
