@@ -591,10 +591,10 @@ void Bobcat::ListMenu(Bar& menu)
 void Bobcat::SizeMenu(Bar& menu)
 {
 	menu.Separator();
-	menu.Add(AK_80X24,  [this] { SetPageSize(Size(80, 24));  });
-	menu.Add(AK_80X48,  [this] { SetPageSize(Size(80, 48));  });
-	menu.Add(AK_132X24, [this] { SetPageSize(Size(132, 24)); });
-	menu.Add(AK_132X48, [this] { SetPageSize(Size(132, 48)); });
+	menu.Add(AK_GEOM_80_24,  [this] { SetPageSize(Size(80, 24));  });
+	menu.Add(AK_GEOM_80_48,  [this] { SetPageSize(Size(80, 48));  });
+	menu.Add(AK_GEOM_132_24, [this] { SetPageSize(Size(132, 24)); });
+	menu.Add(AK_GEOM_132_48, [this] { SetPageSize(Size(132, 48)); });
 	StringStream ss(settings.custompagesizes);
 	while(!ss.IsEof()) {
 		String row, col;

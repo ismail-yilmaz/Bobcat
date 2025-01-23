@@ -896,8 +896,8 @@ Value Terminal::TitleBar::GetData() const
 void Terminal::TitleBar::FrameLayout(Rect& r)
 {
 	data == "bottom"
-		? LayoutFrameBottom(r, this, cy ? cy : r.Width())
-		: LayoutFrameTop(r, this, cy ? cy : r.Width()); // default
+		? LayoutFrameBottom(r, this, cy ? cy : r.Height())
+		: LayoutFrameTop(r, this, cy ? cy : r.Height()); // default
 }
 
 void Terminal::TitleBar::Show()
