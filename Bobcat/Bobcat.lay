@@ -94,7 +94,7 @@ LAYOUT(EmulationProfileLayout, 622, 394)
 END_LAYOUT
 
 LAYOUT(LinkifierProfileLayout, 400, 200)
-	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).MultiSelect(true).HSizePosZ(1, 2).VSizePosZ(2, 3))
+	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).HSizePosZ(1, 2).VSizePosZ(2, 3))
 END_LAYOUT
 
 LAYOUT(SettingsLayout, 708, 357)
