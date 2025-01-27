@@ -83,6 +83,7 @@ Profile::Profile()
 , wordselpattern("")
 , answerbackmsg("Bobcat")
 , encoding(CharsetName(CHARSET_UTF8))
+, ambiguoustowide(false)
 , user(GetUserName())
 , address(GetHomeDirectory())
 , command(GetDefaultShell())
@@ -116,6 +117,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("DontInheritEnv",       noenv)
 	("ShellIntegration",     shellintegration)
 	("Encoding",             encoding)
+	("TreatAmbiguousCharsAsWideChars", ambiguoustowide)
 	("WindowsPtyBackend",    ptybackend)
 	("Font",				 font)
 	("LineSpacing",          linespacing)
@@ -265,6 +267,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (visuals.sizehint,         p.sizehint)
      (visuals.noscroll,         p.dontscrolltoend)
      (emulation.charset,        p.encoding)
+     (emulation.widechars,      p.ambiguoustowide)
      (emulation.images,         p.inlineimages)
      (emulation.hyperlinks,     p.hyperlinks)
      (emulation.annotations,    p.annotations)
@@ -318,6 +321,7 @@ void Profiles::Setup::Sync()
 	visuals.blinkcursor.Enable(!~visuals.lockcursor);
 	emulation.historysize.Enable(~emulation.history);
 	emulation.wordselpattern.Enable(~emulation.wordselmode == "smart");
+	emulation.widechars.Enable(~emulation.charset == CharsetName(CHARSET_UTF8));
 	Update();
 }
 

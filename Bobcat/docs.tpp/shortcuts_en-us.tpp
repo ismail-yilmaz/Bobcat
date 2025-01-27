@@ -150,7 +150,10 @@ be configured via the keyboard configuration manager.]&]
 :: [s0; [C1 Enter ][C^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#selector`_shortcuts^1 sele
 ctor][C1  mode.]]
 :: [s0; [*C1 Shift`+Ctrl`+O]]
-:: [s0; [C1 Open working directory in file manager. (Requires shell integration.)]]}}&]
+:: [s0; [C1 Open working directory in file manager. (Requires shell integration.)]]
+:: [s0; [*C1 Shift`+Alt`+W]]
+:: [s0; [C1 Treat the spacing characters in Eastern Asian Ambiguous (A) 
+category as wide (double width)characters. Requires UTF`-8 charset.]]}}&]
 [s0; &]
 [s0;:finder`_shortcuts: [* Finder Specific Shortcuts]&]
 [s0; &]

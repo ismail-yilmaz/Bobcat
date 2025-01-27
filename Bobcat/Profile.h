@@ -50,6 +50,7 @@ struct Profile : Moveable<Profile> {
     bool        delayedrefresh;
     bool        lazyresize;
     String      encoding;
+    bool        ambiguoustowide;
     String      erasechar;
     int         linespacing;
     String      overridetracking;

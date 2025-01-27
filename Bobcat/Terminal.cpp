@@ -333,6 +333,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	LazyResize(p.lazyresize);
 	ShowSizeHint(p.sizehint);
 	SetLocale(p.encoding);
+	TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
 	SetPadding(Size(0, p.linespacing));
 	SetFont(p.font);
 	AlternateScroll(p.alternatescroll);
@@ -838,6 +839,7 @@ void Terminal::EmulationMenu(Bar& menu)
 	menu.Add(AK_SIZEHINT,         [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
 	menu.Add(AK_BUFFEREDREFRESH,  [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
 	menu.Add(AK_LAZYRESIZE,       [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
+	menu.Add(AK_WIDECHARS,        [this] { TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && !IsAmbiguousCharsWide()); }).Check(IsAmbiguousCharsWide()).Enable(IsUtf8Mode());
 }
 
 void Terminal::ContextMenu(Bar& menu)
