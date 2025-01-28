@@ -224,6 +224,8 @@ LinkifierSetup::LinkifierSetup()
 	list.AddColumn(tt_("Hyperlink patterns")).Edit(edit);
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
+	list.WhenDrag = THISFN(Drag);
+	list.WhenDropInsert = THISFN(DnDInsert);
 	Sync();
 }
 
@@ -248,6 +250,27 @@ void LinkifierSetup::ContextMenu(Bar& bar)
 	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	bar.Separator();
 	bar.Add(list.GetCount() > 0, tt_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
+}
+
+void LinkifierSetup::Drag()
+{
+	if(list.DoDragAndDrop(InternalClip(list, "linkifierpatternlist"), list.GetDragSample()) == DND_MOVE)
+		list.RemoveSelection();
+}
+
+void LinkifierSetup::DnDInsert(int line, Upp::PasteClip& d)
+{
+	if(AcceptInternal<ArrayCtrl>(d, "linkifierpatternlist")) {
+		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
+		bool self = &src == &list;
+		Vector<Vector<Value>> data;
+		for(int i = 0; i < src.GetCount(); i++)
+			if(src.IsSel(i)) {
+				data.Add().Add(src.Get(i, 0));
+			}
+		list.InsertDrop(line, data, d, self);
+		list.SetFocus();
+	}
 }
 
 void LinkifierSetup::Load(const Profile& p)
