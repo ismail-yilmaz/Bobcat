@@ -128,6 +128,9 @@ public:
     void        Sync();
     void        ContextMenu(Bar& bar);
 
+    void        Drag();
+    void        DnDInsert(int line, PasteClip& d);
+
     void        Load(const Profile& p);
     void        Store(Profile& p) const;
 

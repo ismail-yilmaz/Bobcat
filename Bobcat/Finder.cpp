@@ -634,6 +634,8 @@ FinderSetup::FinderSetup()
 	list.AddColumn(t_("Predefined search patterns")).Edit(edit);
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
+	list.WhenDrag = THISFN(Drag);
+	list.WhenDropInsert = THISFN(DnDInsert);
 	Sync();
 
 }
@@ -657,6 +659,27 @@ void FinderSetup::ContextMenu(Bar& bar)
 	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	bar.Separator();
 	bar.Add(list.GetCount() > 0, tt_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
+}
+
+void FinderSetup::Drag()
+{
+	if(list.DoDragAndDrop(InternalClip(list, "finderpatternlist"), list.GetDragSample()) == DND_MOVE)
+		list.RemoveSelection();
+}
+
+void FinderSetup::DnDInsert(int line, Upp::PasteClip& d)
+{
+	if(AcceptInternal<ArrayCtrl>(d, "finderpatternlist")) {
+		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
+		bool self = &src == &list;
+		Vector<Vector<Value>> data;
+		for(int i = 0; i < src.GetCount(); i++)
+			if(src.IsSel(i)) {
+				data.Add().Add(src.Get(i, 0));
+			}
+		list.InsertDrop(line, data, d, self);
+		list.SetFocus();
+	}
 }
 
 void FinderSetup::Load(const Profile& p)
