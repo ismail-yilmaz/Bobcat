@@ -112,6 +112,8 @@ Palettes::Palettes()
 	list.WhenLeftDouble = [this]() { Edit(); };
 	list.WhenSel        = [this]() { Sync(); Action(); };
 	list.WhenBar        = [this](Bar& bar) { ContextMenu(bar); };
+	list.WhenDrag = [this] { Drag(); };
+	list.WhenDropInsert = [=](int line, PasteClip& d) { DnDInsert(line, d); };
 	Load();
 	Sync();
 }
@@ -259,6 +261,31 @@ void Palettes::Sync()
 		list.SetDisplay(i, 0,  list.Get(i, 0) == data ? DefaultPaletteNameDisplay() : NormalPaletteNameDisplay());
 	}
 	Action();
+}
+
+void Palettes::Drag()
+{
+	if(list.DoDragAndDrop(InternalClip(list, "palettelist"), list.GetDragSample()) == DND_MOVE)
+		list.RemoveSelection();
+}
+
+void Palettes::DnDInsert(int line, Upp::PasteClip& d)
+{
+	if(AcceptInternal<ArrayCtrl>(d, "palettelist")) {
+		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
+		bool self = &src == &list;
+		Vector<Vector<Value>> data;
+		for(int i = 0; i < src.GetCount(); i++)
+			if(src.IsSel(i)) {
+				Value pname = src.Get(i, 0);
+				Value pbody = src.Get(i, 1);
+				auto& q = data.Add();
+				q.Add(pname);
+				q.Add(pbody);
+			}
+		list.InsertDrop(line, data, d, self);
+		list.SetFocus();
+	}
 }
 
 void Palettes::SetData(const Value& data_)

@@ -493,7 +493,6 @@ void Profiles::Drag()
 {
 	if(list.DoDragAndDrop(InternalClip(list, "profilelist"), list.GetDragSample()) == DND_MOVE)
 		list.RemoveSelection();
-
 }
 
 void Profiles::DnDInsert(int line, Upp::PasteClip& d)

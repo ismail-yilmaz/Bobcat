@@ -26,6 +26,9 @@ public:
     void        MakeActive();
     void        ContextMenu(Bar& bar);
 
+    void        Drag();
+    void        DnDInsert(int line, PasteClip& d);
+
     int         Load();
     void        Store() const;
 
