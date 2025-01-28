@@ -332,8 +332,10 @@ Profiles::Profiles(Bobcat& ctx)
 	Ctrl::Add(setup.HSizePosZ(141, 2).VSizePosZ(3, 3));
 	list.AddColumn(t_("Name"));
 	list.AddCtrl(setup);
-	list.WhenSel = [this] { Sync(); };
-	list.WhenBar = [this](Bar& bar) { ContextMenu(bar); };
+	list.WhenSel  = [this] { Sync(); };
+	list.WhenBar  = [this](Bar& bar) { ContextMenu(bar); };
+	list.WhenDrag = [this] { Drag(); };
+	list.WhenDropInsert = [=](int line, PasteClip& d) { DnDInsert(line, d); };
 	list.SetFrame(0, toolbar);
 	Sync();
 }
@@ -484,6 +486,32 @@ void Profiles::Store()
 	if(!hasDefault && list.GetCount()) {
 		ctx.settings.defaultprofile = list.Get(0, 0).To<String>();
 		SaveConfig(ctx);
+	}
+}
+
+void Profiles::Drag()
+{
+	if(list.DoDragAndDrop(InternalClip(list, "profilelist"), list.GetDragSample()) == DND_MOVE)
+		list.RemoveSelection();
+
+}
+
+void Profiles::DnDInsert(int line, Upp::PasteClip& d)
+{
+	if(AcceptInternal<ArrayCtrl>(d, "profilelist")) {
+		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
+		bool self = &src == &list;
+		Vector<Vector<Value>> data;
+		for(int i = 0; i < src.GetCount(); i++)
+			if(src.IsSel(i)) {
+				Value pname = src.Get(i, 0);
+				Value pbody = src.Get(i, 1);
+				auto& q = data.Add();
+				q.Add(pname);
+				q.Add(pbody);
+			}
+		list.InsertDrop(line, data, d, self);
+		list.SetFocus();
 	}
 }
 

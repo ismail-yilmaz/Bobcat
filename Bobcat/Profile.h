@@ -80,6 +80,9 @@ public:
     void        Sync();
     void        SetDefault();
     void        ContextMenu(Bar& bar);
+    
+    void        Drag();
+    void        DnDInsert(int line, PasteClip& d);
 
     int         Load();
     void        Store();
