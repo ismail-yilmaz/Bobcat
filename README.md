@@ -126,6 +126,10 @@ Bobcat, running zellij, with a background image of well..., a bobcat!
 
 ![bobcat-zellij](resources/bobcat-zellij-background-linux.png)
 
+Bobcat, running yazi, in borderless/frameless mode (best suitable for tiling window managers).
+
+![bobcat-yazi](resources/bobcat-yazi-borderless-linux.png)
+
 Multiple terminal profile support (linux, btop)
 
 ![bobcat-profiles](resources/bobcat-profiles-linux.png)
