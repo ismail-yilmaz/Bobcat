@@ -7,10 +7,11 @@
 struct Navigator : ParentCtrl {
     Navigator(Bobcat& ctx);
     ~Navigator();
-
+    
     Navigator&    Show(bool ok = true);
     Navigator&    Hide();
-    void          SyncItemLayout();
+    void          Search();
+    int           SyncItemLayout();
     void          Sync();
     void          Animate();
     void          Layout() override;

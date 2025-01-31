@@ -98,6 +98,7 @@ Font SelectFont(Font f, dword type)
 		dlg.font.Clear();
 		for(const String& face : FilterFonts())
 			dlg.font.Add(face);
+		dlg.search.Error(dlg.font.GetCount() == 0);
 		int i = dlg.font.Find(f.GetFaceName());
 		if(i >= 0) dlg.font.SetCursor(i);
 	};

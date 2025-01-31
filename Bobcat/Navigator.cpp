@@ -146,7 +146,7 @@ Navigator::Navigator(Bobcat& ctx_)
 	searchbar.newterm.Image(Images::Add());
 	searchbar.newterm.Tip(t_("Open new terminal"));
 	searchbar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
-	searchbar.search << [this] { SyncItemLayout(); Refresh();  };
+	searchbar.search << [this] { Search();  };
 	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
 	searchbar.close  << [this] { WhenClose(); };
 	searchbar.profiles.Image(CtrlImg::down_arrow());
@@ -161,7 +161,7 @@ Navigator::Navigator(Bobcat& ctx_)
 
 	AddFrame(sb);
 	sb.AutoHide();
-	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
+	sb.WhenScroll = [this] { (void) SyncItemLayout(); Refresh(); };
 }
 
 Navigator::~Navigator()
@@ -189,21 +189,31 @@ Navigator& Navigator::Hide()
 	return Show(false);
 }
 
+void Navigator::Search()
+{
+	int n = SyncItemLayout();
+	searchbar.search.Error(n == 0);
+	Refresh();
+}
+
 bool Navigator::FilterItem(const Item& item)
 {
 	if(item.ctrl) {
 		WString s = ~*item.ctrl;
-		return s.Find((const WString&) ~searchbar.search) >= 0;
+		WString q = ~searchbar.search;
+		return IsNull(q) || ToLower(s).Find(ToLower(q)) >= 0;
 	}
 	return true;
 }
 
-void Navigator::SyncItemLayout()
+int Navigator::SyncItemLayout()
 {
     for(auto& m : items)
         m.Hide();
     
     auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
+    if(!v.GetCount())
+		return v.GetCount();
  
     int cnt = max(v.GetCount(), 1);
     int fcy = GetStdFontSize().cy;
@@ -234,6 +244,7 @@ void Navigator::SyncItemLayout()
             row++;
         }
     }
+    return v.GetCount();
 }
 
 void Navigator::Sync()
