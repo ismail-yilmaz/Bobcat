@@ -56,6 +56,12 @@ Font SelectFont(Font f, dword type)
 	WithFontSelectorLayout<TopWindow> dlg;
 	CtrlLayoutOKCancel(dlg, tt_("Select Font"));
 
+	FrameLeft<DisplayCtrl> icon;
+	icon.SetDisplay(CenteredImageDisplay());
+	icon <<= Images::Find();
+	dlg.search.NullText(t_("Search font..."));
+	dlg.search.AddFrame(icon);
+
 	dlg.font.SetDisplay(FontListDisplay());
 	dlg.font.WhenSel = [&]
 	{
@@ -66,23 +72,40 @@ Font SelectFont(Font f, dword type)
 	dlg.slider.MinMax(6, 128).Step(1) <<= ~dlg.fontsize;
 	dlg.slider << [&] { dlg.fontsize  <<= ~dlg.slider; dlg.font.WhenSel(); };
 	
+	Vector<String> fontfaces;
+	
 	int h = Draw::GetStdFontSize().cy + 8;
 	for(int i = 0; i < Font::GetFaceCount(); i++) {
 		dword fi = Font::GetFaceInfo(i);
 		if(((type & Font::FIXEDPITCH) & fi) || ((type & Font::SCALEABLE) & fi)) {
-			String face = Font::GetFaceName(i);
-			if(dlg.font.Find(face) < 0)
-				dlg.font.Add(face);
+			fontfaces.Add(Font::GetFaceName(i));
 		}
 		h = max(Font().Face(i).GetCy(), h);
 	}
-
+	
 	dlg.font.ItemHeight(h);
 
-	int i = dlg.font.Find(f.GetFaceName());
-	if(i >= 0) dlg.font.SetCursor(i);
+	auto FilterFonts = [&]
+	{
+		return FilterRange(fontfaces, [&](const String& s) {
+			String q = ~dlg.search;
+			return q.IsEmpty() || ToLower(s).Find(ToLower(q)) >= 0;
+		});
+	};
 	
-	if(dlg.ExecuteOK())
+	dlg.search.WhenAction = [&]
+	{
+		dlg.font.Clear();
+		for(const String& face : FilterFonts())
+			dlg.font.Add(face);
+		int i = dlg.font.Find(f.GetFaceName());
+		if(i >= 0) dlg.font.SetCursor(i);
+	};
+	
+	// Init the list.
+	dlg.search.WhenAction();
+	
+	if(dlg.Sizeable().ExecuteOK() && !IsNull(~dlg.font))
 		f.FaceName(~dlg.font).Height(~dlg.fontsize);
 	return f;
 }

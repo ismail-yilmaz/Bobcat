@@ -134,15 +134,16 @@ LAYOUT(SettingsLayout, 708, 357)
 	ITEM(Upp::Label, dv___32, SetLabel(t_("GUI font")).RightPosZ(181, 70).TopPosZ(63, 19))
 END_LAYOUT
 
-LAYOUT(FontSelectorLayout, 340, 296)
-	ITEM(Upp::ColumnList, font, HSizePosZ(3, 3).VSizePosZ(4, 142))
+LAYOUT(FontSelectorLayout, 352, 348)
+	ITEM(Upp::EditString, search, HSizePosZ(3, 3).TopPosZ(4, 19))
+	ITEM(Upp::ColumnList, font, HSizePosZ(3, 3).VSizePosZ(28, 142))
 	ITEM(Upp::SliderCtrl, slider, HSizePosZ(64, 86).BottomPosZ(119, 20))
 	ITEM(Upp::EditIntSpin, fontsize, Min(6).Max(128).RightPosZ(3, 64).BottomPosZ(119, 20))
 	ITEM(Upp::Button, ok, SetLabel(t_("OK")).RightPosZ(5, 56).BottomPosZ(4, 24))
 	ITEM(Upp::Button, cancel, SetLabel(t_("Cancel")).RightPosZ(64, 56).BottomPosZ(4, 24))
 	ITEM(Upp::StaticText, preview, SetText(t_("The quick brown fox jumps over the lazy dog.")).SetAlign(Upp::ALIGN_CENTER).HSizePosZ(13, 14).BottomPosZ(46, 54))
-	ITEM(Upp::Label, dv___6, SetLabel(t_("Size")).LeftPosZ(8, 48).BottomPosZ(119, 20))
-	ITEM(Upp::LabelBox, dv___7, SetLabel(t_("Preview")).SetFont(Upp::StdFont().Bold()).HSizePosZ(3, 3).BottomPosZ(36, 80))
+	ITEM(Upp::Label, dv___7, SetLabel(t_("Size")).LeftPosZ(8, 48).BottomPosZ(119, 20))
+	ITEM(Upp::LabelBox, dv___8, SetLabel(t_("Preview")).SetFont(Upp::StdFont().Bold()).HSizePosZ(3, 3).BottomPosZ(36, 80))
 END_LAYOUT
 
 LAYOUT(PaletteListLayout, 400, 200)
