@@ -17,15 +17,6 @@
 #include <Terminal/Terminal.h>
 #include <PtyProcess/PtyProcess.h>
 
-#ifdef GUI_GTK
- #include <libnotify/notify.h>
- #ifdef NOTIFY_CHECK_VERSION
-     #if NOTIFY_CHECK_VERSION(0,7,0)
-         #define NOTIFY_VERSION_GT_0_7_0
-     #endif
- #endif
-#endif
-
 #ifdef PLATFORM_POSIX
 #include <poll.h>
 template <>
