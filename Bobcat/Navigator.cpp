@@ -191,8 +191,7 @@ Navigator& Navigator::Hide()
 
 void Navigator::Search()
 {
-	int n = SyncItemLayout();
-	searchbar.search.Error(n == 0);
+	searchbar.search.Error(SyncItemLayout() == 0);
 	Refresh();
 }
 
