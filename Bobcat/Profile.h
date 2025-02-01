@@ -64,6 +64,7 @@ struct Profile : Moveable<Profile> {
     int         order;
     Finder::Config finder;
     Linkifier::Config linkifier;
+    QuickText::Config quicktext;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);
@@ -103,6 +104,7 @@ private:
         mutable         WithEmulationProfileLayout<ParentCtrl> emulation;
         mutable         FinderSetup                            finder;
         mutable         LinkifierSetup                         linkifier;
+        mutable         QuickTextSetup                         quicktext;
         mutable         Palettes                               palettes;
     };
     

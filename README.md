@@ -71,6 +71,8 @@ Bobcat is a cross-platform terminal emulator built on the [U++](https://www.ulti
 
 - **Smart Text Selection: Customizable Patterns**: Bobcat empowers users with **Smart Text Selection**, allowing complete control over how text is selected. Users can define their own **custom selection patterns** to match specific words, phrases, or structures using **regular expressions**. This feature is fully **profile-specific**, enabling different terminal profiles to have tailored selection rules for various tasks or environments. Additionally, Bobcat supports defining **multiple patterns simultaneously**, ensuring seamless adaptability to diverse text formats or workflows. With Smart Text Selection, navigating and highlighting the exact text you need becomes faster, smarter, and perfectly suited to your unique requirements.
 
+- **QuickText:** Bobcat allows you to maintain a pop-up list of frequently used text (commands, plain text, etc.) and paste them into your terminal with a simple keyboard shortcut.
+
 - **Web Support: Access Anywhere**: Bobcat offers **experimental web support**, enabling it to run on any modern web browser with **HTML5** and **Canvas** support. Deploy Bobcat on your server, and you can access it remotely from anywhere—no local installation required.  
 
 - **Headless UI Support:** Bobcat also features **experimental Headless UI support**, allowing it to be compiled to run on an **SDL2-GL backend**. This eliminates the need for a full desktop environment, making it an excellent choice for minimal setups or resource-constrained systems.  

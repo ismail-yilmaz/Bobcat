@@ -24,6 +24,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , shellintegration(false)
 , finder(*this)
 , linkifier(*this)
+, quicktext(*this)
 , titlebar(*this)
 , exitmode(ExitMode::Exit)
 , highlight {
@@ -748,6 +749,12 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 	return false;
 }
 
+Terminal& Terminal::PutText(const Upp::WString& txt)
+{
+	TerminalCtrl::Put(txt);
+	return *this;
+}
+
 void Terminal::FindText(const WString& text)
 {
 	finder.SearchText(text);
@@ -805,6 +812,7 @@ void Terminal::EditMenu(Bar& menu)
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { OpenFinder(); });
 	menu.AddKey(AK_SELECTOR_ENTER,      [this] { BeginSelectorMode(); });
+	menu.AddKey(AK_QUICKTEXT,           [this] { quicktext.Popup(); });
 }
 
 void Terminal::ViewMenu(Bar& menu)

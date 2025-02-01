@@ -51,6 +51,7 @@ void SetContext(Bobcat& ctx);
 #define LAYOUTFILE <Bobcat/Bobcat.lay>
 #include <CtrlCore/lay.h>
 
+#include "QuickText.h"
 #include "Linkifier.h"
 #include "Finder.h"
 #include "Navigator.h"

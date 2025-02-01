@@ -106,6 +106,8 @@ struct Terminal : TerminalCtrl {
     
     void        OnNotification(const String& text);
     
+    Terminal&   PutText(const WString& txt);
+
     void        FindText(const WString& txt);
     void        OpenFinder();
     
@@ -150,6 +152,7 @@ struct Terminal : TerminalCtrl {
     Value        data;
     Finder       finder;
     Linkifier    linkifier;
+    QuickText    quicktext;
     Color        highlight[4];
     TimeCallback timer;
     

@@ -162,7 +162,8 @@ void Profile::Jsonize(JsonIO& jio)
 	("OnExit",               onexit)
 	("Palette",              palette)
 	("Finder",               finder)
-	("Linkifier",            linkifier);
+	("Linkifier",            linkifier)
+	("QuickText",            quicktext);
 }
 
 Profiles::Setup::Setup()
@@ -195,6 +196,7 @@ Profiles::Setup::Setup()
 	tabs.Add(emulation.SizePos(), t_("Emulation"));
 	tabs.Add(finder.SizePos(), t_("Finder"));
 	tabs.Add(linkifier.SizePos(), t_("Linkifier"));
+	tabs.Add(quicktext.SizePos(), t_("QuickText"));
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	general.cmdexit.Add("restart", t_("Restart command"));
@@ -303,6 +305,7 @@ void Profiles::Setup::SetData(const Value& data)
 	MapData(CtrlMapper().ToCtrls(), p);
 	finder.Load(p);
 	linkifier.Load(p);
+	quicktext.Load(p);
 }
 
 Value Profiles::Setup::GetData() const
@@ -311,6 +314,7 @@ Value Profiles::Setup::GetData() const
 	MapData(CtrlMapper().ToValues(), p);
 	finder.Store(p);
 	linkifier.Store(p);
+	quicktext.Store(p);
 	return RawToValue(p);
 }
 
