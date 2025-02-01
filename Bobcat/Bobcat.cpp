@@ -552,7 +552,7 @@ void Bobcat::TermMenu(Bar& menu)
 	Vector<String> pnames = GetProfileNames();
 	if(!pnames.GetCount())
 		return;
-	menu.Sub(t_("New terminal from"), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
+	menu.Sub(t_("New terminal from..."), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
 	menu.AddKey(AK_NAVIGATOR, [this] { ToggleNavigator(); });
 }
 
