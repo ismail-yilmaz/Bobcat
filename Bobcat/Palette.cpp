@@ -174,16 +174,19 @@ void Palettes::Clone()
 
 void Palettes::Rename()
 {
-	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Palette"), t_("New name"))) {
+	if(!list.IsCursor())
+		return;
+	if(String s = list.GetKey(); EditTextNotNull(s, t_("Rename Palette"), t_("New name"))) {
 		if(list.Find(s) >= 0) {
 			Exclamation("Palette named \"" + s + "\" already exists.");
 		} else {
-			Palette p = list.Get(0).To<Palette>();
+			Palette p = list.Get(1).To<Palette>();
 			String f = PaletteFile(p.name);
 			if(FileExists(f))
 				DeleteFile(f);
 			p.name = s;
-			list.Set(0, RawToValue(p));
+			list.Set(0, p.name);
+			list.Set(1, RawToValue(p));
 		}
 	}
 	Sync();

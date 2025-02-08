@@ -395,6 +395,9 @@ void Profiles::Clone()
 
 void Profiles::Rename()
 {
+	if(!list.IsCursor())
+		return;
+	
 	if(String s(list.Get(0)); EditTextNotNull(s, t_("Rename Profile"), t_("New name"))) {
 		if(list.Find(s) >= 0) {
 			Exclamation("Profile named \"" + s + "\" already exists.");
