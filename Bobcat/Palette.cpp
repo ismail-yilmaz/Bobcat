@@ -109,7 +109,7 @@ Palettes::Palettes()
 	list.AddColumn(tt_("Sample")).SetDisplay(NormalPaletteSampleDisplay()).HeaderTab().Fixed(cx);
 	list.Moving().Removing().Track().NoAskRemove().NoHeader().AutoHideSb();
 	list.VertGrid(false).HorzGrid(false).SetLineCy(24).SetFrame(0, toolbar);
-	list.WhenLeftDouble = [this]() { Edit(); };
+	list.WhenLeftDouble = [this]() { GetCtrl() ? MakeActive() : Edit(); };
 	list.WhenSel        = [this]() { Sync(); Action(); };
 	list.WhenBar        = [this](Bar& bar) { ContextMenu(bar); };
 	list.WhenDrag = [this] { Drag(); };
@@ -250,8 +250,10 @@ void Palettes::SetPalette()
 
 void Palettes::MakeActive()
 {
-	data = list.Get(list.GetCursor(), 0);
-	Sync();
+	if(int i = list.GetCursor(); i >= 0) {
+		data = list.Get(i, 0);
+		Sync();
+	}
 }
 
 void Palettes::Sync()
