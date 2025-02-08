@@ -337,6 +337,7 @@ Profiles::Profiles(Bobcat& ctx)
 	list.AddColumn(t_("Name"));
 	list.AddCtrl(setup);
 	list.WhenSel  = [this] { Sync(); };
+	list.WhenLeftDouble = [this] { if(GetCtrl()) SetDefault(); };
 	list.WhenBar  = [this](Bar& bar) { ContextMenu(bar); };
 	list.WhenDrag = [this] { Drag(); };
 	list.WhenDropInsert = [=](int line, PasteClip& d) { DnDInsert(line, d); };
@@ -430,10 +431,13 @@ void Profiles::Remove()
 	}
 }
 
-void Profiles::SetDefault() {
-	ctx.settings.defaultprofile = list.Get(0);
-	SaveConfig(ctx);
-	Sync();
+void Profiles::SetDefault()
+{
+	if(list.GetCount()) {
+		ctx.settings.defaultprofile = list.Get(0);
+		SaveConfig(ctx);
+		Sync();
+	}
 }
 
 void Profiles::Sync()
