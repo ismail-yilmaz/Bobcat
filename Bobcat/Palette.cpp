@@ -41,22 +41,22 @@ const Display& NormalPaletteSampleDisplay()  { return Single<NormalPaletteSample
 static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
 {
 	static Vector<Tuple<Color, const char*, const char*>> sColorTable = {
-		{ Black(),               "Color_1", t_("Color_1") },
-		{ Red(),                 "Color_2", t_("Color_2") },
-		{ Green(),               "Color_3", t_("Color_3") },
-		{ Yellow(),              "Color_4", t_("Color_4") },
-		{ Blue(),                "Color_5", t_("Color_5") },
-		{ Magenta(),             "Color_6", t_("Color_6") },
-		{ Cyan(),                "Color_7", t_("Color_7") },
-		{ White(),               "Color_8", t_("Color_8") },
-		{ Gray(),                "Color_9", t_("Color_9") },
-		{ LtRed(),               "Color_10", t_("Color_10") },
-		{ LtGreen(),             "Color_11", t_("Color_11") },
-		{ LtYellow(),            "Color_12", t_("Color_12") },
-		{ LtBlue(),              "Color_13", t_("Color_13") },
-		{ LtMagenta(),           "Color_14", t_("Color_14") },
-		{ LtCyan(),              "Color_15", t_("Color_15") },
-		{ White(),               "Color_16", t_("Color_16") },
+		{ Black(),               "Color_1", t_("Black") },
+		{ Red(),                 "Color_2", t_("Red") },
+		{ Green(),               "Color_3", t_("Green") },
+		{ Yellow(),              "Color_4", t_("Yellow") },
+		{ Blue(),                "Color_5", t_("Blue") },
+		{ Magenta(),             "Color_6", t_("Magenta") },
+		{ Cyan(),                "Color_7", t_("Cyan") },
+		{ White(),               "Color_8", t_("White") },
+		{ Gray(),                "Color_9", t_("Gray") },
+		{ LtRed(),               "Color_10", t_("Bright Red") },
+		{ LtGreen(),             "Color_11", t_("Bright Green") },
+		{ LtYellow(),            "Color_12", t_("Bright Yellow") },
+		{ LtBlue(),              "Color_13", t_("Bright Blue") },
+		{ LtMagenta(),           "Color_14", t_("Bright Magenta") },
+		{ LtCyan(),              "Color_15", t_("Bright Cyan") },
+		{ White(),               "Color_16", t_("Bright White") },
 		{ SColorText,            "Ink"     , t_("Ink") },
 		{ SColorHighlightText,   "SelectionInk", t_("Selection Ink") },
 		{ SColorPaper,           "Paper"       , t_("Paper") },
@@ -214,11 +214,11 @@ void Palettes::SetPalette()
 
 	WithColorPaletteLayout<TopWindow> dlg;
 	CtrlLayoutOKCancel(dlg, tt_("Color Profile"));
+	dlg.Sizeable();
 
 	dlg.colors.AddColumn(tt_("Description"));
 	dlg.colors.AddColumn(tt_("Color")).Ctrls<ColorPusher>();
 	dlg.colors.ColumnWidths("100 24");
-	dlg.colors.EvenRowColor();
 
 	Palette p = list.Get(list.GetCursor(), 1).To<Palette>();
 	
