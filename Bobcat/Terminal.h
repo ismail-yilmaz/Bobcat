@@ -64,7 +64,9 @@ struct Terminal : TerminalCtrl {
     Terminal&   SetWordSelectionFilter(const String& s);
     Terminal&   SetWordSelectionPattern(const String& s);
     void        SetWorkingDirectory(const String& s);
-    
+    Terminal&   SetPathTranslationMode(const String& s);
+    Terminal&   SetPathDelimiter(const String& s);
+        
     String      GetWorkingDirectory() const;
     
     void        MakeTitle(const String& txt);
@@ -105,6 +107,8 @@ struct Terminal : TerminalCtrl {
     bool        OnAnnotation(Point pt, String& s);
     
     void        OnNotification(const String& text);
+
+    void        DragAndDrop(Point pt, PasteClip& d) override;
     
     Terminal&   PutText(const WString& txt);
 
@@ -138,6 +142,12 @@ struct Terminal : TerminalCtrl {
         Exit
     };
 
+    enum class PathMode {
+        Native,
+        Unix,
+        Windows
+    };
+    
     Bobcat&          ctx;
     One<APtyProcess> pty;
     bool         bell:1;
@@ -149,6 +159,8 @@ struct Terminal : TerminalCtrl {
     ExitMode     exitmode;
     String       profilename;
     String       workingdir;
+    PathMode     pathmode;
+    String       pathdelimiter;
     Value        data;
     Finder       finder;
     Linkifier    linkifier;

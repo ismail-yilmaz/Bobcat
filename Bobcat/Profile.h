@@ -58,6 +58,8 @@ struct Profile : Moveable<Profile> {
     String      wordselmode;
     String      wordselchars;
     String      wordselpattern;
+    String      pathtranslation;
+    String      pathdelimiter;
     String      answerbackmsg;
     bool        filterctrl;
     bool        sizehint;
@@ -90,6 +92,12 @@ public:
     
 private:
     struct Setup : ParentCtrl {
+        struct EmulationProfileSetup : WithEmulationProfileLayout<ParentCtrl> {
+            EmulationProfileSetup();
+            WithSelectionLayout<ParentCtrl> selection;
+            WithPasteLayout<ParentCtrl>     paste;
+        };
+        
         Setup();
         void            SetData(const Value& data) override;
         Value           GetData() const override;
@@ -101,7 +109,7 @@ private:
         SelectDirButton dirsel;
         mutable         WithGeneralProfileLayout<ParentCtrl>   general;
         mutable         WithVisualProfileLayout<ParentCtrl>    visuals;
-        mutable         WithEmulationProfileLayout<ParentCtrl> emulation;
+        mutable         EmulationProfileSetup                  emulation;
         mutable         FinderSetup                            finder;
         mutable         LinkifierSetup                         linkifier;
         mutable         QuickTextSetup                         quicktext;

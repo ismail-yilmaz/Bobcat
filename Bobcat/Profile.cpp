@@ -81,6 +81,8 @@ Profile::Profile()
 , wordselmode("plain")
 , wordselchars("_-")
 , wordselpattern("")
+, pathtranslation("native")
+, pathdelimiter("\'")
 , answerbackmsg("Bobcat")
 , encoding(CharsetName(CHARSET_UTF8))
 , ambiguoustowide(false)
@@ -157,6 +159,8 @@ void Profile::Jsonize(JsonIO& jio)
 	("WordSelectionMode",    wordselmode)
 	("WordSelectionExtras",  wordselchars)
 	("WordSelectionPattern", wordselpattern)
+	("PathTranslationMode",  pathtranslation)
+	("PathDelimiter",        pathdelimiter)
 	("FilterCtrlBytes",      filterctrl)
     ("AnswerbackMessage",    answerbackmsg)
 	("OnExit",               onexit)
@@ -164,6 +168,21 @@ void Profile::Jsonize(JsonIO& jio)
 	("Finder",               finder)
 	("Linkifier",            linkifier)
 	("QuickText",            quicktext);
+}
+
+Profiles::Setup::EmulationProfileSetup::EmulationProfileSetup()
+{
+	CtrlLayout(selection);
+	CtrlLayout(paste);
+	tabs.Add(selection.SizePos(), t_("Selection"));
+	tabs.Add(paste.SizePos(), t_("Paste"));
+	selection.wordselmode.Add("plain", t_("Plain"));
+	selection.wordselmode.Add("smart", t_("Smart"));
+	selection.wordselmode.SetIndex(0);
+	paste.pathtranslation.Add("native", t_("Native"));
+	paste.pathtranslation.Add("unix", t_("Unix"));
+	paste.pathtranslation.Add("windows", t_("Windows"));
+	paste.pathtranslation.SetIndex(0);
 }
 
 Profiles::Setup::Setup()
@@ -221,9 +240,6 @@ Profiles::Setup::Setup()
 	emulation.overridetracking.Add("K_SHIFT_ALT", "Shift+Alt");
 	emulation.overridetracking.Add("K_SHIFT_CTRL_ALT", "Shift+Ctrl+Alt");
 	emulation.overridetracking.SetIndex(4);
-	emulation.wordselmode.Add("plain", t_("Plain"));
-	emulation.wordselmode.Add("smart", t_("Smart"));
-	emulation.wordselmode.SetIndex(0);
 
 #ifdef PLATFORM_WIN32
 	#if defined(flagWIN10)
@@ -238,7 +254,8 @@ Profiles::Setup::Setup()
 	for(Ctrl& c : general)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : visuals)   c.WhenAction << [this] { Sync(); };
 	for(Ctrl& c : emulation) c.WhenAction << [this] { Sync(); };
-	
+	for(Ctrl& c : emulation.selection) c.WhenAction << [this] { Sync(); };
+	for(Ctrl& c : emulation.paste)     c.WhenAction << [this] { Sync(); };
 	Sync();
 }
 
@@ -288,12 +305,13 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.alternatescroll,p.alternatescroll)
      (emulation.delayedrefresh, p.delayedrefresh)
      (emulation.lazyresize,     p.lazyresize)
-     (emulation.wordselmode,    p.wordselmode)
-     (emulation.wordselchars,   p.wordselchars)
-     (emulation.wordselpattern, p.wordselpattern)
-     (emulation.filter,         p.filterctrl)
-     (emulation.findselectedtext, p.findselectedtext)
-     (emulation.overridetracking, p.overridetracking);
+     (emulation.overridetracking, p.overridetracking)
+     (emulation.paste.pathtranslation, p.pathtranslation)
+     (emulation.paste.pathdelimiter,   p.pathdelimiter)
+     (emulation.paste.filter,          p.filterctrl)
+     (emulation.selection.wordselmode,      p.wordselmode)
+     (emulation.selection.findselectedtext, p.findselectedtext);
+
 }
 
 void Profiles::Setup::SetData(const Value& data)
@@ -320,11 +338,14 @@ Value Profiles::Setup::GetData() const
 
 void Profiles::Setup::Sync()
 {
+	bool smartsel = ~emulation.selection.wordselmode == "smart";
+	
 	visuals.blinkinterval.Enable(~visuals.blinktext);
 	visuals.cursorstyle.Enable(!~visuals.lockcursor);
 	visuals.blinkcursor.Enable(!~visuals.lockcursor);
 	emulation.historysize.Enable(~emulation.history);
-	emulation.wordselpattern.Enable(~emulation.wordselmode == "smart");
+	emulation.selection.wordselpattern.Enable(smartsel);
+	emulation.selection.wordselchars.Enable(!smartsel);
 	emulation.widechars.Enable(~emulation.charset == CharsetName(CHARSET_UTF8));
 	Update();
 }

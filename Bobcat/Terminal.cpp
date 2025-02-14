@@ -27,6 +27,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , quicktext(*this)
 , titlebar(*this)
 , exitmode(ExitMode::Exit)
+, pathmode(PathMode::Native)
 , highlight {
 	Yellow(),
 	SColorHighlightText,
@@ -35,25 +36,24 @@ Terminal::Terminal(Bobcat& ctx_)
 	}
 {
 	SetDeviceId("Bobcat");
-    InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
+	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
-    WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
-    WhenBell    = [this]()                     { if(bell) BeepExclamation();       };
-    WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
-    WhenScroll  = [this]()                     { Update();                         };
-    WhenOutput  = [this](String s)             { pty->Write(s);                    };
-    WhenTitle   = [this](const String& s)      { MakeTitle(s);                     };
-    WhenLink    = [this](const String& s)      { OnLink(s);                        };
-    WhenClip    = [this](PasteClip& dnd)       { return filter;                    };
-    WhenSetSize = [this](Size sz)              { if(CanResize()) ctx.Resize(sz);   };
-    WhenWindowMinimize       = [this](bool b)  { if(CanResize()) ctx.Minimize(b);  };
-    WhenWindowMaximize       = [this](bool b)  { if(CanResize()) ctx.Maximize(b);  };
-    WhenWindowFullScreen     = [this](int i)   { if(CanResize()) ctx.FullScreen(i);};
-    WhenWindowGeometryChange = [this](Rect r)  { if(CanResize()) ctx.SetRect(r);   };
-    WhenDirectoryChange      = THISFN(SetWorkingDirectory);
-    WhenHighlight  = THISFN(OnHighlight);
-    WhenAnnotation = THISFN(OnAnnotation);
-    WhenMessage    = THISFN(OnNotification);
+	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
+	WhenBell    = [this]()                     { if(bell) BeepExclamation();       };
+	WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
+	WhenScroll  = [this]()                     { Update();                         };
+	WhenOutput  = [this](String s)             { pty->Write(s);                    };
+	WhenTitle   = [this](const String& s)      { MakeTitle(s);                     };
+	WhenLink    = [this](const String& s)      { OnLink(s);                        };
+	WhenSetSize = [this](Size sz)              { if(CanResize()) ctx.Resize(sz);   };
+	WhenWindowMinimize       = [this](bool b)  { if(CanResize()) ctx.Minimize(b);  };
+	WhenWindowMaximize       = [this](bool b)  { if(CanResize()) ctx.Maximize(b);  };
+	WhenWindowFullScreen     = [this](int i)   { if(CanResize()) ctx.FullScreen(i);};
+	WhenWindowGeometryChange = [this](Rect r)  { if(CanResize()) ctx.SetRect(r);   };
+	WhenDirectoryChange      = THISFN(SetWorkingDirectory);
+	WhenHighlight  = THISFN(OnHighlight);
+	WhenAnnotation = THISFN(OnAnnotation);
+	WhenMessage    = THISFN(OnNotification);
 }
 
 Terminal::~Terminal()
@@ -344,6 +344,8 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	Annotations(p.annotations);
 	SetWordSelectionFilter(p.wordselchars);
 	SetWordSelectionPattern(p.wordselpattern);
+	SetPathTranslationMode(p.pathtranslation);
+	SetPathDelimiter(p.pathdelimiter);
 	AnswerBackMessage(p.answerbackmsg);
 	smartwordsel = p.wordselmode == "smart";
 	finder.SetConfig(p);
@@ -402,11 +404,11 @@ Terminal& Terminal::SetPalette(const Palette& p)
 Terminal& Terminal::SetExitMode(const String& s)
 {
 	exitmode = decode(s,
-        "restart",        ExitMode::Restart,
-        "restart_failed", ExitMode::RestartFailed,
-        "keep",           ExitMode::Keep,
-        "ask",            ExitMode::Ask,
-     /* "exit" */         ExitMode::Exit);
+		"restart",        ExitMode::Restart,
+		"restart_failed", ExitMode::RestartFailed,
+		"keep",           ExitMode::Keep,
+		"ask",            ExitMode::Ask,
+	/* "exit" */         ExitMode::Exit);
 	return *this;
 }
 
@@ -470,6 +472,18 @@ Terminal& Terminal::SetWordSelectionPattern(const String& s)
 	if(auto& m = GetWordSelectionPatterns(); !IsNull(profilename) && m.Find(profilename) < 0) {
 		m.Add(profilename) = s;
 	}
+	return *this;
+}
+
+Upp::Terminal& Terminal::SetPathTranslationMode(const String& s)
+{
+	pathmode = decode(s, "unix", PathMode::Unix, "windows", PathMode::Windows, PathMode::Native);
+	return *this;
+}
+
+Upp::Terminal& Terminal::SetPathDelimiter(const String& s)
+{
+	pathdelimiter = s;
 	return *this;
 }
 
@@ -658,6 +672,46 @@ bool Terminal::OnAnnotation(Point pt, String& s)
 void Terminal::OnNotification(const String& text)
 {
 	GetNotificationDaemon().NoIcon().Information(*this, text);
+}
+
+void Terminal::DragAndDrop(Point pt, PasteClip& d)
+{
+	if(IsReadOnly() || IsDragAndDropSource())
+		return;
+	
+	WString s;
+
+	if(AcceptFiles(d)) {
+		WString q = pathdelimiter.ToWString();
+		for(const auto& f : GetFiles(d)) {
+			s << q;
+			switch(pathmode) {
+			case PathMode::Unix:
+				s << UnixPath(f).ToWString();
+				break;
+			case PathMode::Windows:
+				s << WinPath(f).ToWString();
+				break;
+			case PathMode::Native:
+			default:
+				s << f.ToWString();
+				break;
+			}
+			s << q;
+		}
+		s = TrimRight(s);
+	}
+	
+	else
+	if(AcceptText(d))
+		s = GetWString(d);
+	else
+		return;
+
+	d.SetAction(DND_COPY);
+	
+	if(d.IsAccepted())
+		Paste(s, filter);
 }
 
 const VTPage& Terminal::GetPage() const
@@ -886,9 +940,9 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	close.Image(Images::Delete()).Tip(t_("Close terminal"));
 	menu.Image(CtrlImg::down_arrow()).Tip(t_("Open new terminal from..."));
 	
-    newterm << [this] { term.ctx.AddTerminal(term.ctx.GetActiveProfile()); };
-    navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
-    close   << [this] { term.Stop(); };
+	newterm << [this] { term.ctx.AddTerminal(term.ctx.GetActiveProfile()); };
+	navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
+	close   << [this] { term.Stop(); };
 	menu    << [this] { Menu(); };
 }
 
