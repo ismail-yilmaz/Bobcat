@@ -62,5 +62,6 @@ mainconfig
 	"" = "WEBGUI",
 	"" = "WEBGUI WIN10",
 	"" = "SDLGUI",
-	"" = "SDLGUI WIN10";
+	"" = "SDLGUI WIN10",
+	"Wayland Mode (experimental)" = "GUI WAYLAND";
 

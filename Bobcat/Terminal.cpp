@@ -408,7 +408,7 @@ Terminal& Terminal::SetExitMode(const String& s)
 		"restart_failed", ExitMode::RestartFailed,
 		"keep",           ExitMode::Keep,
 		"ask",            ExitMode::Ask,
-	/* "exit" */         ExitMode::Exit);
+	/* "exit" */          ExitMode::Exit);
 	return *this;
 }
 
