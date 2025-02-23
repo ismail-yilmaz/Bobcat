@@ -1193,6 +1193,44 @@ WAY OUT OF THE USE]&]
 DAMAGE.]&]
 [s0;C1 ]}}&]
 [s0; &]
+[s0; [^https`:`/`/github`.com`/rprichard`/winpty^ winpty] library, 
+included as a part of [^https`:`/`/github`.com`/ismail`-yilmaz`/Terminal^ PtyProces
+s] package, has an MIT license:&]
+[s0; &]
+[ {{10000@(255.255.192) [s0; [C1 The MIT License (MIT)]&]
+[s0;C1 &]
+[s0; [C1 Copyright (c) 2011`-2016 Ryan Prichard]&]
+[s0;C1 &]
+[s0; [C1 Permission is hereby granted, free of charge, to any person 
+obtaining a copy]&]
+[s0; [C1 of this software and associated documentation files (the `"Software`"), 
+to]&]
+[s0; [C1 deal in the Software without restriction, including without 
+limitation the]&]
+[s0; [C1 rights to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or]&]
+[s0; [C1 sell copies of the Software, and to permit persons to whom 
+the Software is]&]
+[s0; [C1 furnished to do so, subject to the following conditions:]&]
+[s0;C1 &]
+[s0; [C1 The above copyright notice and this permission notice shall 
+be included in]&]
+[s0; [C1 all copies or substantial portions of the Software.]&]
+[s0;C1 &]
+[s0; [C1 THE SOFTWARE IS PROVIDED `"AS IS`", WITHOUT WARRANTY OF ANY 
+KIND, EXPRESS OR]&]
+[s0; [C1 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,]&]
+[s0; [C1 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+EVENT SHALL THE]&]
+[s0; [C1 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES 
+OR OTHER]&]
+[s0; [C1 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING]&]
+[s0; [C1 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
+OR OTHER DEALINGS]&]
+[s0; [C1 IN THE SOFTWARE.]&]
+[s0;C1 ]}}&]
+[s0; &]
 [s0; [^https`:`/`/github`.com`/ismail`-yilmaz`/StackCtrl^ StackCtrl] 
 package has a BSD`-3 license:&]
 [s0; &]
