@@ -186,7 +186,7 @@ struct CmdArgList {
     String command;
     VectorMap<String, String> options;
     bool HasOption(const char *id) const;
-    const String& Get(const char *id, const char *defval = String());
+    const String& Get(const char *id, const String& defval = Null);
 };
 
 class CmdArgParser {

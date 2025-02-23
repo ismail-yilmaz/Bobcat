@@ -479,7 +479,7 @@ const char* GetCmdArgTypeName(CmdArgType cat)
     return t_("Other");
 }
 
-const String& CmdArgList::Get(const char *id, const char *defval)
+const String& CmdArgList::Get(const char *id, const String& defval)
 {
 	return options.Get(id, defval);
 }
