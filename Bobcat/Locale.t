@@ -4,1087 +4,919 @@
 // Bobcat.cpp
 
 T_("%d terminals are open.&Close them all and exit?")
-trTR("")
 
 T_("Top")
-trTR("")
 
 T_("Bottom")
-trTR("")
 
 T_("Horizontal")
-trTR("")
 
 T_("Vertical")
-trTR("")
 
 T_("Normal")
-trTR("")
 
 T_("Centered")
-trTR("")
 
 T_("Stretched")
-trTR("")
 
 T_("Tiled")
-trTR("")
 
 T_("Profiles")
-trTR("")
 
 T_("General")
-trTR("")
 
 T_("Settings")
-trTR("")
 
 T_("Bobcat")
-trTR("")
 
 T_("File")
-trTR("")
 
 T_("Edit")
-trTR("")
 
 T_("View")
-trTR("")
 
 T_("List")
-trTR("")
 
 T_("Setup")
-trTR("")
 
 T_("Help")
-trTR("")
 
 T_("Reset")
-trTR("")
 
 T_("Exit")
-trTR("")
 
 T_("About")
-trTR("")
 
-T_("New terminal from")
-trTR("")
+T_("New terminal from...")
 
 T_("Screenshot is copied to the clipboard.")
-trTR("")
 
 T_("PNG images (*.png)")
-trTR("")
 
 T_("Save Screenshot")
-trTR("")
 
 T_("Contributors")
-trTR("")
 
 T_("Licenses")
-trTR("")
 
 T_("Overview")
-trTR("")
 
 T_("Command line options")
-trTR("")
 
 T_("Keyboard shortcuts")
-trTR("")
 
 T_("Bobcat Help")
-trTR("")
 
 
 // main.cpp
 
-T_("Usage:\n   bobcat [OPTIONS] -- [COMMAND...]\n\nGeneral options:\n   -h, "
-     "--help                     Show help.\n   -l, --list                   "
-     "  List available profiles.\n   -p, --profile PROFILE          Run with "
-     "the given PROFILE (Names are case-sensitive).\n   -s, --settings       "
-     "          Open settings window.\n   -b, --show-bars                Show "
-     "the menu and title bar.\n   -B, --hide-bars                Hide the menu "
-     "and title bar.\n       --show-menubar             Show the menu bar.\n "
-     "      --hide-menubar             Hide the menu bar.\n       --show-titlebar "
-     "           Show the title bar.\n       --hide-titlebar            Hide "
-     "the title bar.\n\nEnvironment options:\n   -r, --restart               "
-     "   Restart the command on exit.\n   -R, --restart-failed           Restart "
-     "the command when it fails.\n   -k, --keep                     Don't close "
-     "the terminal on exit.\n   -K, --dont-keep                Close the terminal "
-     "on exit.\n   -n, --no-environment           Don't inherit the environment.\n"
-     "   -d, --working-dir PATH         Set the working directory to PATH.\n "
-     "  -f, --fullscreen               Full screen mode.\n   -m, --maximize  "
-     "               Maximize the window.\n   -g, --geometry GEOMETRY        "
-     "Set the initial window geometry. (E.g. 80x24, 132x24)\n\nEmulation options:\n"
-     "   -q, --vt-style-fkeys           Use VT-style function keys.\n   -Q, --pc-style-fkeys "
-     "          Use PC-style function keys.\n   -w, --window-reports         "
-     "  Enable window reports.\n   -W, --no-window-reports        Disable window "
-     "reports.\n   -a, --window-actions           Enable window actions.\n   "
-     "-A, --no-window-actions        Disable window actions.\n       --hyperlinks "
-     "              Enable hyperlink detection (OSC 52).\n       --no-hyperlinks "
-     "           Disable hyperlink detection.\n       --inline-images        "
-     "    Enable inline images support (sixel, iterm2, jexer).\n       --no-inline-images "
-     "        Disable inline images support.\n")
-trTR("")
+T_("Usage:")
+
+T_("OPTIONS")
+
+T_("COMMAND")
+
+T_("Profile Specific Options")
+
+T_("Command line error.")
+
+T_("Bobcat [SDL2-GUI]")
 
 
 // Utils.cpp
 
 T_("Select Font")
-trTR("")
+
+T_("Search font...")
+
+T_("Version")
+
+T_("Build flags")
+
+T_("Compiled")
+
+T_("Path")
 
 T_("Host platform")
-trTR("")
 
 T_("Classic")
-trTR("")
 
 T_("Standard")
-trTR("")
 
 T_("Gray")
-trTR("")
 
 T_("Dark")
-trTR("")
 
 T_("Flat")
-trTR("")
 
 T_("Flat Gray")
-trTR("")
 
 T_("Flat Dark")
-trTR("")
+
+T_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d")
+
+T_("Restart")
+
+T_("Command exited.&Profile: %s&Command: %s&Exit code: %d")
+
+T_("Close")
+
+T_("Show help.")
+
+T_("Show version information.")
+
+T_("List available terminal profiles.")
+
+T_("Run with the given terminal PROFILE. (Names are case-sensitive)")
+
+T_("Open settings window.")
+
+T_("List available color palettes.")
+
+T_("List available GUI themes.")
+
+T_("Set the GUI theme to THEME.")
+
+T_("Show the menu and title bar.")
+
+T_("Hide the menu and title bar.")
+
+T_("Show the menu bar.")
+
+T_("Hide the menu bar.")
+
+T_("Show the title bar.")
+
+T_("Hide the title bar.")
+
+T_("Show window borders.")
+
+T_("Hide window borders. (Frameless window mode)")
+
+T_("Full screen mode.")
+
+T_("Maximize the window.")
+
+T_("Set the initial window geometry. (E.g. 80x24, 132x24)")
+
+T_("Set the pseudoconsole backend to be used.")
+
+T_("Restart the command on exit.")
+
+T_("Restart the command when it fails.")
+
+T_("Don't close the terminal on exit.")
+
+T_("Close the terminal on exit.")
+
+T_("Ask what to do on exit.")
+
+T_("Don't inherit the environment.")
+
+T_("Set the working directory to PATH.")
+
+T_("Enable application clipboard access.")
+
+T_("Disable application clipboard access.")
+
+T_("Use VT-style function keys.")
+
+T_("Use PC-style function keys.")
+
+T_("Enable window reports.")
+
+T_("Disable window reports.")
+
+T_("Enable window actions.")
+
+T_("Disable window actions.")
+
+T_("Enable hyperlink detection. (OSC 52 + Linkifier)")
+
+T_("Disable hyperlink detection.")
+
+T_("Enable inline images support. (Sixel, iTerm2, Jexer)")
+
+T_("Disable inline images support.")
+
+T_("Enable rich-text annotations.")
+
+T_("Disable rich-text annotations.")
+
+T_("Set color palette to PALETTE.")
+
+T_("Enable notification bell.")
+
+T_("Disable notification bell.")
+
+T_("Environment")
+
+T_("Emulation")
+
+T_("Appearance")
+
+T_("Other")
+
+T_("Unknown option: %s")
+
+T_("Option '%s' requires a value")
 
 
 // Terminal.cpp
 
-T_("Command execution failed.&&Profile: %s&Command: %s&Exit code: %d")
-trTR("")
-
 T_("Annotation")
-trTR("")
-
-T_("_default_")
-trTR("")
 
 T_("Terminal list")
-trTR("")
-
-T_("Emulation")
-trTR("")
 
 T_("Open new terminal")
-trTR("")
 
 T_("Close terminal")
-trTR("")
 
 T_("Open new terminal from...")
-trTR("")
 
 
 // Profile.cpp
 
-T_("Environment")
-trTR("")
+T_("Selection")
 
-T_("Appearance")
-trTR("")
-
-T_("Finder")
-trTR("")
-
-T_("Linkifier")
-trTR("")
-
-T_("Close the terminal")
-trTR("")
-
-T_("Don't close the terminal")
-trTR("")
-
-T_("Restart command")
-trTR("")
-
-T_("Restart command on failure")
-trTR("")
-
-T_("Block")
-trTR("")
-
-T_("Beam")
-trTR("")
-
-T_("Underline")
-trTR("")
-
-T_("VT style")
-trTR("")
-
-T_("PC style")
-trTR("")
-
-T_("Delete [^?]")
-trTR("")
-
-T_("Backspace [^H]")
-trTR("")
+T_("Paste")
 
 T_("Plain")
-trTR("")
 
 T_("Smart")
-trTR("")
+
+T_("Native")
+
+T_("Unix")
+
+T_("Windows")
+
+T_("Finder")
+
+T_("Linkifier")
+
+T_("QuickText")
+
+T_("Close the terminal")
+
+T_("Don't close the terminal")
+
+T_("Restart command")
+
+T_("Restart command on failure")
+
+T_("Ask what to do")
+
+T_("Block")
+
+T_("Beam")
+
+T_("Underline")
+
+T_("VT style")
+
+T_("PC style")
+
+T_("Delete [^?]")
+
+T_("Backspace [^H]")
+
+T_("ConPty")
+
+T_("Winpty")
 
 T_("Name")
-trTR("")
 
 T_("Add profile")
-trTR("")
 
 T_("Clone profile")
-trTR("")
 
 T_("Rename profile")
-trTR("")
 
 T_("Remove profile")
-trTR("")
 
 T_("Move up")
-trTR("")
 
 T_("Move down")
-trTR("")
 
 T_("Set as default profile")
-trTR("")
 
 T_("Open profiles directory")
-trTR("")
 
 T_("New Profile")
-trTR("")
 
 T_("Clone Profile")
-trTR("")
 
 T_("Rename Profile")
-trTR("")
 
 T_("New name")
-trTR("")
 
 T_("Do you really want to delete profile '%s'?")
-trTR("")
 
 
 // Palette.cpp
 
-T_("Color_1")
-trTR("")
+T_("Black")
 
-T_("Color_2")
-trTR("")
+T_("Red")
 
-T_("Color_3")
-trTR("")
+T_("Green")
 
-T_("Color_4")
-trTR("")
+T_("Yellow")
 
-T_("Color_5")
-trTR("")
+T_("Blue")
 
-T_("Color_6")
-trTR("")
+T_("Magenta")
 
-T_("Color_7")
-trTR("")
+T_("Cyan")
 
-T_("Color_8")
-trTR("")
+T_("White")
 
-T_("Color_9")
-trTR("")
+T_("Bright Red")
 
-T_("Color_10")
-trTR("")
+T_("Bright Green")
 
-T_("Color_11")
-trTR("")
+T_("Bright Yellow")
 
-T_("Color_12")
-trTR("")
+T_("Bright Blue")
 
-T_("Color_13")
-trTR("")
+T_("Bright Magenta")
 
-T_("Color_14")
-trTR("")
+T_("Bright Cyan")
 
-T_("Color_15")
-trTR("")
-
-T_("Color_16")
-trTR("")
+T_("Bright White")
 
 T_("Ink")
-trTR("")
 
 T_("Selection Ink")
-trTR("")
 
 T_("Paper")
-trTR("")
 
 T_("Selection Paper")
-trTR("")
 
 T_("Annotation Underline")
-trTR("")
 
 T_("Highlight Ink")
-trTR("")
 
 T_("Highlight Cursor Ink")
-trTR("")
 
 T_("Highlight Paper")
-trTR("")
 
 T_("Highlight Cursor Paper")
-trTR("")
 
 T_("Sample")
-trTR("")
 
 T_("Add palette")
-trTR("")
 
 T_("Clone palette")
-trTR("")
 
 T_("Edit palette")
-trTR("")
 
 T_("Rename palette")
-trTR("")
 
 T_("Remove palette")
-trTR("")
 
 T_("Set as active palette")
-trTR("")
 
 T_("Open palettes directory")
-trTR("")
 
 T_("New Palette")
-trTR("")
 
 T_("Clone Palette")
-trTR("")
 
 T_("Rename Palette")
-trTR("")
 
 T_("Do you really want to delete palette '%s'?")
-trTR("")
 
 T_("Color Profile")
-trTR("")
 
 T_("Description")
-trTR("")
 
 T_("Color")
-trTR("")
 
 T_("Color Profile: %")
-trTR("")
 
 
 // Navigator.cpp
 
-T_("Search terminal (Ctrl+S)...")
-trTR("")
-
 T_("Close navigator")
-trTR("")
+
+T_("Search terminal")
 
 
 // Finder.cpp
 
 T_("Close finder")
-trTR("")
 
 T_("Type to search...")
-trTR("")
 
 T_("Case sensitive mode")
-trTR("")
 
 T_("Case insensitive mode")
-trTR("")
 
 T_("Regex mode")
-trTR("")
 
 T_("Save to file")
-trTR("")
 
 T_("Copy to clipboard")
-trTR("")
 
 T_("Harvester")
-trTR("")
 
 T_("Saved %d of %d item(s). [%s]")
-trTR("")
 
 T_("Nothing to harvest.")
-trTR("")
 
 T_("Cannot harvest.&Finder is not in regexp (R) mode.")
-trTR("")
 
 T_("Case sensitive")
-trTR("")
 
 T_("Case insensitive")
-trTR("")
 
 T_("Regex")
-trTR("")
 
 T_("Plain text")
-trTR("")
 
 T_("Map")
-trTR("")
 
 T_("Predefined search patterns")
-trTR("")
 
 T_("Add pattern")
-trTR("")
 
 T_("Edit pattern")
-trTR("")
 
 T_("Remove pattern")
-trTR("")
 
 T_("Select all")
-trTR("")
 
 
 // Linkifier.cpp
 
 T_("Hyperlink patterns")
-trTR("")
+
+
+// QuickText.cpp
+
+T_("Text")
+
+T_("Add text")
+
+T_("Edit text")
+
+T_("Remove text")
 
 
 // Application.key
 
 T_("New terminal")
-trTR("")
 
 T_("Screenshot")
-trTR("")
+
+T_("Hide window frames")
 
 T_("Show menu bar")
-trTR("")
 
 T_("Show title bar")
-trTR("")
+
+T_("Toggle menu & title bars")
 
 T_("Full screen")
-trTR("")
 
 T_("Maximize window")
-trTR("")
 
 T_("Minimize window")
-trTR("")
 
 T_("Prev")
-trTR("")
 
 T_("Next")
-trTR("")
 
 T_("Begin")
-trTR("")
 
 T_("End")
-trTR("")
 
 T_("Switch to navigator")
-trTR("")
 
 T_("New terminal from profile 1")
-trTR("")
 
 T_("New terminal from profile 2")
-trTR("")
 
 T_("New terminal from profile 3")
-trTR("")
 
 T_("New terminal from profile 4")
-trTR("")
 
 T_("New terminal from profile 5")
-trTR("")
 
 T_("New terminal from profile 6")
-trTR("")
 
 T_("New terminal from profile 7")
-trTR("")
 
 T_("New terminal from profile 8")
-trTR("")
 
 T_("New terminal from profile 9")
-trTR("")
 
 T_("New terminal from profile 10")
-trTR("")
 
 
 // Terminal.key
 
 T_("Shell integration")
-trTR("")
 
 T_("Find...")
-trTR("")
 
 T_("Increase line spacing")
-trTR("")
 
 T_("Decrease line spacing")
-trTR("")
 
 T_("Reset line spacing")
-trTR("")
 
 T_("Increase font size")
-trTR("")
 
 T_("Decrease font size")
-trTR("")
 
 T_("Reset font size")
-trTR("")
+
+T_("Open working directory")
+
+T_("Treat ambiguous width chars as wide chars")
+
+T_("Paste predefined text")
+
+
+// Navigator.key
+
+T_("Swap with first terminal")
+
+T_("Swap with last terminal")
+
+T_("Swap with next terminal")
+
+T_("Swap with prev terminal")
+
+T_("Search in terminal list")
 
 
 // Finder.key
 
 T_("Case sensitive search")
-trTR("")
 
 T_("Case insensitive search")
-trTR("")
 
 T_("Regex-based search")
-trTR("")
 
 T_("Find first")
-trTR("")
 
 T_("Find last")
-trTR("")
 
 T_("Find next")
-trTR("")
 
 T_("Find prev")
-trTR("")
 
 T_("Show current/all")
-trTR("")
 
 T_("Save to clipboard")
-trTR("")
 
 T_("List mode")
-trTR("")
 
 T_("Map mode")
-trTR("")
 
 T_("Undo")
-trTR("")
 
 T_("Cut")
-trTR("")
 
 T_("Copy")
-trTR("")
-
-T_("Paste")
-trTR("")
 
 T_("Select All")
-trTR("")
 
 
 // Bobcat.lay
 
 T_("Don't inherit the environment")
-trTR("")
+
+T_("Choose the pseudo-terminal backend. Note that winpty backend requires "
+     "the PtyAgent.exe file in the exe directory.")
 
 T_("Variables")
-trTR("")
 
 T_("Starting directory")
-trTR("")
+
+T_("Answerback message")
 
 T_("Command line")
-trTR("")
 
 T_("On exit")
-trTR("")
+
+T_("Pty backend")
 
 T_("Click to change font.")
-trTR("")
 
 T_("Adjust colors to dark themes")
-trTR("")
 
 T_("Force bright colors")
-trTR("")
 
 T_("Use bright colors with bold text")
-trTR("")
 
 T_("Dynamic colors")
-trTR("")
 
 T_("Blinking")
-trTR("")
 
 T_("Locked")
-trTR("")
 
 T_("Blinking Text")
-trTR("")
 
 T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
-trTR("")
 
 T_("Hide mouse cursor while typing")
-trTR("")
 
 T_("Bell notifications")
-trTR("")
 
 T_("Show size hint")
-trTR("")
 
 T_("Blink interval")
-trTR("")
 
 T_("Line spacing")
-trTR("")
 
 T_("Style")
-trTR("")
 
 T_("Font")
-trTR("")
 
 T_("Cursor")
-trTR("")
 
 T_("Color Profiles")
-trTR("")
 
 T_("Misc.")
-trTR("")
 
 T_("Don't scroll the page on new output")
-trTR("")
 
 T_("ms")
-trTR("")
 
 T_("px")
-trTR("")
+
+T_("Treat ambiguous width characters as wide characters")
 
 T_("Allow key navigation")
-trTR("")
 
 T_("ALT modifier escapes keys")
-trTR("")
 
 T_("ALT modifier shifts keys")
-trTR("")
 
 T_("Alternate scroll")
-trTR("")
-
-T_("Filter out control bytes when pasting.")
-trTR("")
 
 T_("Inline Images")
-trTR("")
 
 T_("Hyperlinks")
-trTR("")
 
 T_("Delayed display refresh")
-trTR("")
 
 T_("Lazy window resize")
-trTR("")
 
 T_("Reverse wrap")
-trTR("")
 
 T_("Annotations")
-trTR("")
 
 T_("History Buffer")
-trTR("")
 
 T_("Window  reports")
-trTR("")
 
 T_("Window  actions")
-trTR("")
 
-T_("Allow read acccess")
-trTR("")
+T_("Allow read access")
 
-T_("Allow write acccess")
-trTR("")
+T_("Allow write access")
 
 T_("Max. lines")
-trTR("")
-
-T_("Other")
-trTR("")
 
 T_("Window Operations")
-trTR("")
 
 T_("Application Clipboard Access")
-trTR("")
 
 T_("Function key behavior")
-trTR("")
 
 T_("Backspace key sends")
-trTR("")
 
 T_("Mouse wheel step")
-trTR("")
 
 T_("Override mouse tracking mode")
-trTR("")
 
 T_("Mouse")
-trTR("")
 
 T_("Keyboard")
-trTR("")
 
 T_("Encoding")
-trTR("")
 
 T_("lines")
-trTR("")
 
 T_("key")
-trTR("")
 
-T_("Select/Copy/Paste")
-trTR("")
-
-T_("Word selection extra chars")
-trTR("")
-
-T_("Word selection mode")
-trTR("")
-
-T_("Word selection pattern")
-trTR("")
-
-T_("Stack wheel mode")
-trTR("")
+T_("Wheel mode")
 
 T_("Setting  a lower than 100 ms will effectively disable the animation.")
-trTR("")
 
-T_("Save window geometry")
-trTR("")
+T_("\aHide window caption and frames")
+
+T_("Hides window caption and frames. (Suitable for tiling WMs)")
 
 T_("Use custom unicode input method")
-trTR("")
 
 T_("Enables the custom unicode input method for inserting unicode codepoints.")
-trTR("")
 
 T_("Save screenshot as a file")
-trTR("")
 
 T_("Saves screenshot as file instead of placing it in clipboard.")
-trTR("")
+
+T_("Animate")
 
 T_("Page size format is  COLUMNSxROWS. Valid size range is between 2 to 300 "
      "cells.")
-trTR("")
 
 T_("Background Image")
-trTR("")
 
 T_("Titlebar placement")
-trTR("")
+
+T_("Notifications placement")
 
 T_("Finder placement")
-trTR("")
 
 T_("Stack animation duration")
-trTR("")
 
 T_("Stack transition mode")
-trTR("")
 
 T_("Custom page sizes")
-trTR("")
 
 T_("GUI theme")
-trTR("")
 
 T_("Image path")
-trTR("")
 
 T_("Display mode")
-trTR("")
 
 T_("Blur")
-trTR("")
 
 T_("(Needs restart)")
-trTR("")
 
 T_("GUI font")
-trTR("")
 
 T_("OK")
-trTR("")
 
 T_("Cancel")
-trTR("")
 
 T_("The quick brown fox jumps over the lazy dog.")
-trTR("")
 
 T_("Size")
-trTR("")
 
 T_("Preview")
-trTR("")
 
 T_("Restore defaults")
-trTR("")
 
 T_("Show all")
-trTR("")
 
 T_("Show all ")
-trTR("")
 
 T_("Default search mode")
-trTR("")
 
 T_("Search limit")
-trTR("")
 
 T_("Harvesting mode")
-trTR("")
 
 T_("Delimiter")
-trTR("")
 
 T_("Harvesting format")
-trTR("")
 
 T_("items")
-trTR("")
+
+T_("Word selection extra chars")
+
+T_("Word selection mode")
+
+T_("Word selection pattern")
+
+T_("Copy selected text to finder")
+
+T_("Filter out control bytes")
+
+T_("Path delimiter")
+
+T_("Path translation")
 
 
-// PACKAGE 'Terminal' FILE 'Terminal.cpp'
+// Terminal.cpp
 
 T_("Options")
-trTR("")
 
 T_("Read only")
-trTR("")
 
 T_("Selector mode")
-trTR("")
 
 T_("Cursor style")
-trTR("")
 
 
-// PACKAGE 'Terminal' FILE 'Colors.cpp'
+// Colors.cpp
 
 T_("Bad hash color text format")
-trTR("")
 
 T_("Bad color value")
-trTR("")
 
 T_("Bad rgb/a color text format")
-trTR("")
 
 T_("Bad cmy/k color text format")
-trTR("")
 
 
-// PACKAGE 'Terminal' FILE 'Terminal.key'
+// Terminal.key
 
 T_("Insert")
-trTR("")
 
 T_("Annotate")
-trTR("")
 
 T_("Copy link to clipboard")
-trTR("")
 
 T_("Open link...")
-trTR("")
 
 T_("Copy annotation to clipboard")
-trTR("")
 
 T_("Edit annotation")
-trTR("")
 
 T_("Delete annotation")
-trTR("")
 
 T_("Copy image to clipboard")
-trTR("")
 
 T_("Open image...")
-trTR("")
 
 T_("Selector mode: Exit")
-trTR("")
 
 T_("Selector mode: Start selection")
-trTR("")
 
 T_("Selector mode: Cancel selection")
-trTR("")
 
 T_("Selector mode: Copy selection")
-trTR("")
 
 T_("Selector mode: Text selection mode")
-trTR("")
 
 T_("Selector mode: Line selection mode")
-trTR("")
 
 T_("Selector mode: Rectangle selection mode")
-trTR("")
 
 T_("Selector mode: Word selection mode")
-trTR("")
 
 T_("Selector mode: Move up")
-trTR("")
 
 T_("Selector mode: Move down")
-trTR("")
 
 T_("Selector mode: Move left")
-trTR("")
 
 T_("Selector mode: Move right")
-trTR("")
 
 T_("Selector mode: Move to the beginning of the row")
-trTR("")
 
 T_("Selector mode: Move to the end of the row")
-trTR("")
 
 T_("Selector mode: Move to the beginning of the buffer")
-trTR("")
 
 T_("Selector mode: Move to the end of the buffer")
-trTR("")
 
 T_("Selector mode: Move one page up")
-trTR("")
 
 T_("Selector mode: Move one page down")
-trTR("")
 
 T_("Show scroll bar")
-trTR("")
 
 T_("Auto scroll")
-trTR("")
 
 T_("VT-style function keys")
-trTR("")
 
 T_("Key navigation")
-trTR("")
 
 T_("Auto hide mouse cursor")
-trTR("")
 
 T_("Bright colors")
-trTR("")
 
 T_("Adjust to dark themes")
-trTR("")
 
 T_("Blinking text")
-trTR("")
 
 T_("Inline images")
-trTR("")
 
 T_("Buffered refresh")
-trTR("")
 
 T_("Lazy resize")
-trTR("")
 
 T_("Key navigation mode: Move one line up")
-trTR("")
 
 T_("Key navigation mode: Move one line down")
-trTR("")
 
 T_("Key navigation mode: Move one page up")
-trTR("")
 
 T_("Key navigation mode: Move one page down")
-trTR("")
 
 T_("Key navigation mode: Move to the beginning of the buffer")
-trTR("")
 
 T_("Key navigation mode: Move to the end of the buffer")
-trTR("")
+
+
+// MessageCtrl.cpp
+
+T_("No")
+
+T_("Yes")
+
+T_("Retry")
+
+T_("Abort")
+
+T_("Ignore")

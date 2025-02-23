@@ -242,22 +242,29 @@ String GetModifierKeyDesc(dword key)
 
 String GetVersion()
 {
+	String ver = Format("%d.%d", 0, 9);
+
 #ifdef bmGIT_REVCOUNT
-	return Format("%d.%d (r%d)", 0, 9, atoi(bmGIT_REVCOUNT));
-#endif
+	return ver + " (r" + bmGIT_REVCOUNT + ")";
+#else
 	return "(beta)";
+#endif
 }
 
 String GetBuildInfo()
 {
 	String h;
 	
-	h << "Version: " << GetVersion();
+	h << t_("Version") << ": " << GetVersion();
 	h << '\n';
+
+	h << t_("Build flags") << ": ";
+	
 	if(sizeof(void *) == 8)
 		h << "(64 bit)";
 	else
 		h << "(32 bit)";
+	
 #ifdef _MSC_VER
 	h << " (MSC)";
 #endif
@@ -294,11 +301,11 @@ String GetBuildInfo()
 #endif
 	h << '\n';
 #ifdef bmTIME
-	h << "Compiled: " << bmTIME;
+	h << t_("Compiled") << ": " << bmTIME;
 #endif
 
 	h << '\n';;
-	h << GetExeFilePath();
+	h << t_("Path") << ": " << GetExeFilePath();
 
 	return h;
 }
@@ -385,6 +392,175 @@ String GetDefaultShell()
 #elif defined(PLATFORM_WIN32)
 	return Nvl(GetEnv("ComSpec"), "cmd.exe");
 #endif
+}
+
+const Array<CmdArg>& GetCmdArgs()
+{
+	// TODO: Add more options.
+	
+	const static Array<CmdArg> sArgs = {
+		// General options
+		{ CmdArgType::General,     "h", "help",                   "",         t_("Show help.") },
+		{ CmdArgType::General,     "v", "version",                "",         t_("Show version information.") },
+		{ CmdArgType::General,     "l", "list",                   "",         t_("List available terminal profiles.") },
+		{ CmdArgType::General,     "p", "profile",                "PROFILE",  t_("Run with the given terminal PROFILE. (Names are case-sensitive)") },
+		{ CmdArgType::General,     "s", "settings",               "",         t_("Open settings window.") },
+		{ CmdArgType::General,     "" , "list-palettes",          "",         t_("List available color palettes.") },
+		{ CmdArgType::General,     "" , "list-gui-themes",        "",         t_("List available GUI themes.") },
+		{ CmdArgType::General,     "",  "gui-theme",              "THEME",    t_("Set the GUI theme to THEME.") },
+		{ CmdArgType::General,     "b", "show-bars",              "",         t_("Show the menu and title bar.") },
+		{ CmdArgType::General,     "B", "hide-bars",              "",         t_("Hide the menu and title bar.") },
+		{ CmdArgType::General,     "",  "show-menubar",           "",         t_("Show the menu bar.") },
+		{ CmdArgType::General,     "",  "hide-menubar",           "",         t_("Hide the menu bar.") },
+		{ CmdArgType::General,     "",  "show-titlebar",          "",         t_("Show the title bar.") },
+		{ CmdArgType::General,     "",  "hide-titlebar",          "",         t_("Hide the title bar.") },
+		{ CmdArgType::General,     "",  "show-borders",           "",         t_("Show window borders.") },
+		{ CmdArgType::General,     "",  "hide-borders",           "",         t_("Hide window borders. (Frameless window mode)") },
+		{ CmdArgType::General,     "f", "fullscreen",             "",         t_("Full screen mode.") },
+		{ CmdArgType::General,     "m", "maximize",               "",         t_("Maximize the window.") },
+		{ CmdArgType::General,     "g", "geometry",               "GEOMETRY", t_("Set the initial window geometry. (E.g. 80x24, 132x24)") },
+		
+		// Environment options
+#ifdef PLATFORM_WIN32
+		{ CmdArgType::Environment, "z", "pty-backend",            "PTY",      t_("Set the pseudoconsole backend to be used.") },
+#endif
+		{ CmdArgType::Environment, "r", "restart",                "",         t_("Restart the command on exit.") },
+		{ CmdArgType::Environment, "R", "restart-failed",         "",         t_("Restart the command when it fails.") },
+		{ CmdArgType::Environment, "k", "keep",                   "",         t_("Don't close the terminal on exit.") },
+		{ CmdArgType::Environment, "K", "dont-keep",              "",         t_("Close the terminal on exit.") },
+		{ CmdArgType::Environment, "y", "ask",                    "",         t_("Ask what to do on exit.") },
+		{ CmdArgType::Environment, "n", "environment",            "",         t_("Inherit the environment.") },
+		{ CmdArgType::Environment, "N", "no-environment",         "",         t_("Don't inherit the environment.") },
+		{ CmdArgType::Environment, "d", "working-dir",            "PATH",     t_("Set the working directory to PATH.") },
+		{ CmdArgType::Environment, "c", "clipboard-access",       "",         t_("Enable application clipboard access.") },
+		{ CmdArgType::Environment, "C", "no-clipboard-access",    "",         t_("Disable application clipboard access.") },
+
+		// Emulation options
+		{ CmdArgType::Emulation,   "q", "vt-style-fkeys",         "",         t_("Use VT-style function keys.") },
+		{ CmdArgType::Emulation,   "Q", "pc-style-fkeys",         "",         t_("Use PC-style function keys.") },
+		{ CmdArgType::Emulation,   "w", "window-reports",         "",         t_("Enable window reports.") },
+		{ CmdArgType::Emulation,   "W", "no-window-reports",      "",         t_("Disable window reports.") },
+		{ CmdArgType::Emulation,   "a", "window-actions",         "",         t_("Enable window actions.") },
+		{ CmdArgType::Emulation,   "A", "no-window-actions",      "",         t_("Disable window actions.") },
+		{ CmdArgType::Emulation,   "",  "hyperlinks",             "",         t_("Enable hyperlink detection. (OSC 52 + Linkifier)") },
+		{ CmdArgType::Emulation,   "",  "no-hyperlinks",          "",         t_("Disable hyperlink detection.") },
+		{ CmdArgType::Emulation,   "",  "inline-images",          "",         t_("Enable inline images support. (Sixel, iTerm2, Jexer)") },
+		{ CmdArgType::Emulation,   "",  "no-inline-images",       "",         t_("Disable inline images support.") },
+		{ CmdArgType::Emulation,   "",  "annotations",            "",         t_("Enable rich-text annotations.") },
+		{ CmdArgType::Emulation,   "",  "no-annotations",         "",         t_("Disable rich-text annotations.") },
+
+		// Appearance options
+		{ CmdArgType::Appearance,  "",  "palette",                "PALETTE",  t_("Set color palette to PALETTE.") },
+		{ CmdArgType::Appearance,  "",  "bell",                   "",         t_("Enable notification bell.") },
+		{ CmdArgType::Appearance,  "",  "no-bell",                "",         t_("Disable notification bell.") },
+	};
+
+	return sArgs;
+}
+
+Vector<const CmdArg*> FindCmdArgs(CmdArgType t)
+{
+	Vector<const CmdArg*> v;
+	for(const CmdArg& a : GetCmdArgs())
+		if(a.type == t)
+			v.Add(&a);
+	return v;
+}
+
+const char* GetCmdArgTypeName(CmdArgType cat)
+{
+    switch(cat) {
+    case CmdArgType::General:     return t_("General");
+    case CmdArgType::Environment: return t_("Environment");
+    case CmdArgType::Emulation:   return t_("Emulation");
+    case CmdArgType::Appearance:  return t_("Appearance");
+    default:  break;
+    }
+    return t_("Other");
+}
+
+const String& CmdArgList::Get(const char *id, const char *defval)
+{
+	return options.Get(id, defval);
+}
+
+bool CmdArgList::HasOption(const char *id) const
+{
+	return options.Find(id) >= 0;
+}
+
+CmdArgParser::CmdArgParser(const Array<CmdArg>& args)
+: args(args)
+{
+}
+
+bool CmdArgParser::Parse(const Vector<String>& cmdline, CmdArgList& list, String& error)
+{
+     list.options.Clear();
+     list.command.Clear();
+     bool cmdsep = false;
+     
+     for(int i = 0; i < cmdline.GetCount(); i++) {
+         const String& arg = cmdline[i];
+         
+         // Handle command after "--"
+         if(cmdsep) {
+             list.command = arg;
+             return true;
+         }
+         
+         if(arg == "--") {
+             cmdsep = true;
+             continue;
+         }
+         
+         // Parse options
+         if(arg[0] == '-') {
+             const CmdArg* opt = Find(arg);
+             if(!opt) {
+                 error = Format(t_("Unknown option: %s"), arg);
+                 return false;
+             }
+             
+             String value = String(opt->arg);
+             if(!value.IsEmpty()) {
+                 // Option requires a value
+                 if(i + 1 >= cmdline.GetCount()) {
+                     error = Format(t_("Option '%s' requires a value"), arg);
+                     return false;
+                 }
+                 value = cmdline[++i];
+             }
+             
+             // Store using the long option name for consistency
+             list.options.Add(opt->lopt, value);
+         }
+         else {
+             list.command = arg;
+         }
+     }
+     
+     return true;
+}
+
+const Upp::CmdArg *CmdArgParser::Find(const String& arg) const
+{
+	if(arg.GetCount() < 2 || arg[0] != '-')
+		return nullptr;
+      
+	bool islopt = arg[1] == '-';
+	
+	String s = arg.Mid(islopt ? 2 : 1);
+		
+	for(const auto& q : args) {
+		if(islopt){
+			if(q.lopt == s) return &q;
+		}
+		else {
+			if(q.sopt == s) return &q;
+		}
+	}
+	return nullptr;
 }
 
 }

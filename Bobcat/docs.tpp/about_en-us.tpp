@@ -7,15 +7,15 @@ topic "About  Bobcat";
 ]&]
 [s0;=i150;O9; [C@3+184 Bobcat]&]
 [s0;=C@(28.127.255)+59 &]
-[s0;= [1 A cross`-platform terminal emulator.]&]
-[s0;=2 &]
-[s0;=%- [%%0 Copyright ][0 © 2023`-2025 ][^https`:`/`/github`.com`/ismail`-yilmaz^0 İsmai
-l Yılmaz]&]
-[s0;=2%- &]
-[s0;= [0 `$(BUILD)]&]
-[s0;=0 &]
-[s0;= [^https`:`/`/github`.com`/ismail`-yilmaz`/Bobcat^0 Bobcat][0  is 
-using ][^https`:`/`/github`.com`/ismail`-yilmaz`/Terminal^0 TerminalCtrl][0 , 
-][^https`:`/`/www`.ultimatepp`.org`/index`.html^0 U`+`+][0   and 
+[s0;= [C1 A cross`-platform terminal emulator.]&]
+[s0;=C2 &]
+[s0;=%- [%%C0 Copyright ][C0 © 2023`-2025 ][C^https`:`/`/github`.com`/ismail`-yilmaz^0 İs
+mail Yılmaz]&]
+[s0;=C2%- &]
+[s0;= [C0 `$(BUILD)]&]
+[s0;=C0 &]
+[s0;= [C^https`:`/`/github`.com`/ismail`-yilmaz`/Bobcat^0 Bobcat][C0  
+is using ][C^https`:`/`/github`.com`/ismail`-yilmaz`/Terminal^0 TerminalCtrl][C0 , 
+][C^https`:`/`/www`.ultimatepp`.org`/index`.html^0 U`+`+][C0   and 
 several other technologies.]&]
-[s0;= [0 For more information, see the licenses section]]]
+[s0;= [C0 For more information, see the licenses section]]]

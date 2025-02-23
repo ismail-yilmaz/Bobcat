@@ -165,12 +165,53 @@ struct Bobcat : Pte<Bobcat> {
     Array<Terminal> terminals;
 };
 
+// Command line arguments/options parsing stuff
+
+enum class CmdArgType {
+    General,
+    Environment,
+    Emulation,
+    Appearance
+};
+
+struct CmdArg {
+    CmdArgType  type;
+    const char *sopt;
+    const char *lopt;
+    const char *arg;
+    const char *desc;
+};
+
+struct CmdArgList {
+    String command;
+    VectorMap<String, String> options;
+    bool HasOption(const char *id) const;
+    const String& Get(const char *id, const char *defval = String());
+};
+
+class CmdArgParser {
+public:
+    CmdArgParser(const Array<CmdArg>& args);
+    bool Parse(const Vector<String>& cmdline, CmdArgList& list, String& error);
+
+private:
+    const CmdArg *Find(const String &arg) const;
+    const Array<CmdArg>& args;
+};
+
+const Array<CmdArg>&  GetCmdArgs();
+Vector<const CmdArg*> FindCmdArgs(CmdArgType t);
+const char*           GetCmdArgTypeName(CmdArgType t);
+
+// Global functions.
+
 FileSel& BobcatFs();
 
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
 String GetDefaultShell();
+String GetVersion();
 String GetBuildInfo();
 
 const Display& StdBackgroundDisplay();

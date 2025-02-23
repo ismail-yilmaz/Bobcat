@@ -11,47 +11,45 @@ using namespace Upp;
 void PrintHelp()
 {
 #ifdef PLATFORM_POSIX
-	const String sHelpText = t_(
-		"Usage:\n"
-		"   bobcat [OPTIONS] -- [COMMAND...]"
-		"\n\n"
-		"General options:\n"
-		"   -h, --help                     Show help.\n"
-		"   -l, --list                     List available profiles.\n"
-		"   -p, --profile PROFILE          Run with the given PROFILE (Names are case-sensitive).\n"
-		"   -s, --settings                 Open settings window.\n"
-		"   -b, --show-bars                Show the menu and title bar.\n"
-		"   -B, --hide-bars                Hide the menu and title bar.\n"
-		"       --show-menubar             Show the menu bar.\n"
-		"       --hide-menubar             Hide the menu bar.\n"
-		"       --show-titlebar            Show the title bar.\n"
-		"       --hide-titlebar            Hide the title bar.\n"
-		"\n"
-		"Environment options:\n"
-		"   -r, --restart                  Restart the command on exit.\n"
-		"   -R, --restart-failed           Restart the command when it fails.\n"
-		"   -k, --keep                     Don't close the terminal on exit.\n"
-		"   -K, --dont-keep                Close the terminal on exit.\n"
-		"   -y, --ask                      Ask what to do on exit.\n"
-		"   -n, --no-environment           Don't inherit the environment.\n"
-		"   -d, --working-dir PATH         Set the working directory to PATH.\n"
-		"   -f, --fullscreen               Full screen mode.\n"
-		"   -m, --maximize                 Maximize the window.\n"
-		"   -g, --geometry GEOMETRY        Set the initial window geometry. (E.g. 80x24, 132x24)\n"
-		"\n"
-		"Emulation options:\n"
-		"   -q, --vt-style-fkeys           Use VT-style function keys.\n"
-		"   -Q, --pc-style-fkeys           Use PC-style function keys.\n"
-		"   -w, --window-reports           Enable window reports.\n"
-		"   -W, --no-window-reports        Disable window reports.\n"
-		"   -a, --window-actions           Enable window actions.\n"
-		"   -A, --no-window-actions        Disable window actions.\n"
-		"       --hyperlinks               Enable hyperlink detection (OSC 52).\n"
-		"       --no-hyperlinks            Disable hyperlink detection.\n"
-		"       --inline-images            Enable inline images support (sixel, iterm2, jexer).\n"
-		"       --no-inline-images         Disable inline images support.\n"
-	);
-	Cout() << sHelpText;
+
+	String txt;
+	txt << t_("Usage:") << "\n"
+		<< "\tbobcat [" << t_("OPTIONS") << "] -- [" << t_("COMMAND") << "...]\n";
+	
+	CmdArgType type = CmdArgType::General;
+	
+	for(auto t : { CmdArgType::General, CmdArgType::Environment, CmdArgType::Emulation, CmdArgType::Appearance }) {
+			if(type != t && type == CmdArgType::General) {
+				txt << "\n" << t_("Profile Specific Options") << "\n";
+				type = t;
+			}
+			txt << "\n" << GetCmdArgTypeName(t) << "\n";
+			for(const CmdArg *a : FindCmdArgs(t)) {
+				txt << "\t";
+				String sopt = a->sopt;
+				String lopt = a->lopt;
+				
+				if(!sopt.IsEmpty()) {
+					txt << "-" << sopt;
+					if(!lopt.IsEmpty())
+						txt << ", ";
+				}
+				else {
+					txt << "    ";
+				}
+				
+				if(!lopt.IsEmpty())
+					txt << "--" << lopt;
+				
+				if(!String(a->arg).IsEmpty())
+					txt << " " << a->arg;
+		
+		        int padding = 30 - (txt.GetLength() - txt.ReverseFind('\n') - 1);
+		        txt << String(' ', max(1, padding)) << a->desc << "\n";
+			}
+	}
+	Cout() << txt;
+	
 #else
 	PromptOK(GetTopic("Bobcat/docs/usage_en-us"));
 #endif
@@ -69,10 +67,32 @@ void PrintProfileList()
 #endif
 }
 
+void PrintPaletteList()
+{
+	String list;
+	for(const String& s : GetPaletteNames())
+		list << s << "\n";
+#ifdef PLATFORM_POSIX
+	Cout() << list;
+#else
+	PromptOK(DeQtf(list));
+#endif
+}
+
+void PrintGuiThemeList()
+{
+	String list;
+	for(const auto theme: GetAllGuiThemes())
+		list << theme.b << "\n";
+#ifdef PLATFORM_POSIX
+	Cout() << list;
+#else
+	PromptOK(DeQtf(list));
+#endif
+}
+
 void BobcatAppMain()
 {
-	StdLogSetup(LOG_FILE);
-	
 	Size page_size(80, 24);
 	bool fullscreen = false;
 	
@@ -82,155 +102,220 @@ void BobcatAppMain()
 	// Try loading the default profile, if any, and fallback to default configuration on failure.
 	Profile p = LoadProfile(app.settings.defaultprofile);
 	
-	const Vector<String>& cmd = CommandLine();
-
-	for(int i = 0, n = cmd.GetCount(); i < n; i++)
-	{
-		String s = cmd[i];
-		if(findarg(s, "-l", "--list") != -1) {
-			PrintProfileList();
-			return;
-		}
-		else
-		if(findarg(s, "-s", "--settings") != -1) {
-			app.Settings();
-			return;
-		}
-		else
-		if(findarg(s, "-p", "--profile") != -1) {
-			if(++i < n)
-				p = LoadProfile(cmd[i]);
-		}
-		else
-		if(findarg(s, "-b", "--show-bars") != -1) {
-			app.settings.showmenu = true;
-			app.settings.showtitle = true;
-		}
-		else
-		if(findarg(s, "-B", "--hide-bars") != -1) {
-			app.settings.showmenu = false;
-			app.settings.showtitle = false;
-		}
-		else
-		if(findarg(s, "--show-menubar") != -1) {
-			app.settings.showmenu = true;
-		}
-		else
-		if(findarg(s, "--hide-menubar") != -1) {
-			app.settings.showmenu = false;
-		}
-		else
-		if(findarg(s, "--show-titlebar") != -1) {
-			app.settings.showtitle = true;
-		}
-		else
-		if(findarg(s, "--hide-titlebar") != -1) {
-			app.settings.showtitle = false;
-		}
-		else
-		if(findarg(s, "-r", "--restart") != -1) {
-			p.onexit = "restart";
-		}
-		else
-		if(findarg(s, "-R", "--restart-failed") != -1) {
-			p.onexit = "restart";
-		}
-		else
-		if(findarg(s, "-k", "--keep") != -1) {
-			p.onexit = "keep";
-		}
-		else
-		if(findarg(s, "-K", "--dont-keep") != -1) {
-			p.onexit = "exit";
-		}
-		else
-		if(findarg(s, "-y", "--ask") != -1) {
-			p.onexit = "ask";
-		}
-		else
-		if(findarg(s, "-n", "--no-environment") != -1) {
-			p.noenv = true;
-		}
-		else
-		if(findarg(s, "-d", "--working-dir") != -1) {
-			if(++i < n)
-				p.address = cmd[i];
-		}
-		else
-		if(findarg(s, "-f", "--fullscreen") != -1) {
-			fullscreen = true;
-			app.Maximize(false);
-		}
-		else
-		if(findarg(s, "-m", "--maximize") != -1) {
-			app.Maximize();
-			fullscreen = false;
-		}
-		else
-		if(findarg(s, "-g", "--geometry") != -1) {
-			if(String r, c; ++i < n && SplitTo(ToLower(cmd[i]), "x", c, r)) {
-				page_size.cx = clamp(StrInt(c), 10, 300);
-				page_size.cy = clamp(StrInt(r), 10, 300);
+	if(const Vector<String>& cmd = CommandLine(); !cmd.IsEmpty()) {
+		CmdArgList arglist;
+		String cmdargerr;
+		if(CmdArgParser argparser(GetCmdArgs()); argparser.Parse(cmd, arglist, cmdargerr)) {
+			// Note that selected profile should be loaded before any profile related options.
+			if(arglist.HasOption("help"))
+			{
+				PrintHelp();
+				return;
+			}
+			if(arglist.HasOption("settings"))
+			{
+				app.Settings();
+				return;
+			}
+			if(arglist.HasOption("list"))
+			{
+				PrintProfileList();
+				return;
+			}
+			if(arglist.HasOption("version"))
+			{
+				Cout() << GetBuildInfo() << "\n";
+				return;
+			}
+			if(arglist.HasOption("list-palettes"))
+			{
+				PrintPaletteList();
+				return;
+			}
+			if(arglist.HasOption("list-gui-themes"))
+			{
+				PrintGuiThemeList();
+				return;
+			}
+			if(const String& q = arglist.Get("gui-theme"); !IsNull(q))
+			{
+				app.settings.guitheme = q;
+			}
+			if(arglist.HasOption("show-bars"))
+			{
+				app.settings.showmenu = true;
+				app.settings.showtitle = true;
+			}
+			if(arglist.HasOption("hide-bars"))
+			{
+				app.settings.showmenu = false;
+				app.settings.showtitle = false;
+			}
+			if(arglist.HasOption("show-menubar"))
+			{
+				app.settings.showmenu = true;
+			}
+			if(arglist.HasOption("hide-menubar"))
+			{
+				app.settings.showmenu = false;
+			}
+			if(arglist.HasOption("show-titlebar"))
+			{
+				app.settings.showtitle = true;
+			}
+			if(arglist.HasOption("hide-titlebar"))
+			{
+				app.settings.showtitle = false;
+			}
+			if(arglist.HasOption("show-borders"))
+			{
+				app.settings.frameless = false;
+			}
+			if(arglist.HasOption("hide-borders"))
+			{
+				app.settings.frameless = true;
+			}
+			if(arglist.HasOption("fullscreen"))
+			{
+				fullscreen = true;
 				app.Maximize(false);
+			}
+			if(arglist.HasOption("maximize"))
+			{
+				app.Maximize();
 				fullscreen = false;
 			}
-		}
-		else
-		if(findarg(s, "-q", "--vt-style-fkeys") != -1) {
-			p.functionkeystyle = "vt";
-		}
-		else
-		if(findarg(s, "-Q", "--pc-style-fkeys") != -1) {
-			p.functionkeystyle = "pc";
-		}
-		else
-		if(findarg(s, "-w", "--window-reports") != -1) {
-			p.windowreports = true;
-		}
-		else
-		if(findarg(s, "-W", "--no-window-reports") != -1) {
-			p.windowreports = false;
-		}
-		else
-		if(findarg(s, "-a", "--window-actions") != -1) {
-			p.windowactions = true;
-		}
-		else
-		if(findarg(s, "-A", "--no-window-actions") != -1) {
-			p.windowactions = false;
-		}
-		else
-		if(findarg(s, "--hyperlinks") != -1) {
-			p.hyperlinks = true;
-		}
-		else
-		if(findarg(s, "--no-hyperlinks") != -1) {
-			p.hyperlinks = false;
-		}
-		else
-		if(findarg(s, "--inline-images") != -1) {
-			p.inlineimages = true;
-		}
-		else
-		if(findarg(s, "--no-inline-images") != -1) {
-			p.inlineimages = false;
-		}
-		else
-		if(findarg(s, "--sdl-screen-size") != -1) {
-			// NOOP
-		}
-		else
-		if(s.IsEqual("--"))	{
-			String s;
-			for(int j = ++i; j < n; j++)
-				s << cmd[j] << ' ';
-			if(!s.IsEmpty())
-				p.command = TrimBoth(s);
-			break;
+			if(const String& q = arglist.Get("geometry"); !IsNull(q))
+			{
+				// Allow both COLxROW and COL:ROW formats.
+				auto sDelimFn = [](int c) { return decode(c, 'x', 1, ':', 1, 0); };
+				if(String r, c; SplitTo(ToLower(q), sDelimFn, c, r)) {
+					page_size.cx = clamp(StrInt(c), 10, 300);
+					page_size.cy = clamp(StrInt(r), 10, 300);
+					app.Maximize(false);
+					fullscreen = false;
+				}
+			}
+			if(const String& q = arglist.Get("profile"); !IsNull(q))
+			{
+				p = LoadProfile(q);
+			}
+#ifdef PLATFORM_WIN32
+			if(const String& q = arglist.Get("pty-backend"); !IsNull(q))
+			{
+				p.ptybackend = q;
+			}
+#endif
+			if(arglist.HasOption("restart"))
+			{
+				p.onexit = "restart";
+			}
+			if(arglist.HasOption("restart-failed"))
+			{
+				p.onexit = "restart_failed";
+			}
+			if(arglist.HasOption("keep"))
+			{
+				p.onexit = "keep";
+			}
+			if(arglist.HasOption("dont-keep"))
+			{
+				p.onexit = "exit";
+			}
+			if(arglist.HasOption("ask"))
+			{
+				p.onexit = "ask";
+			}
+			if(arglist.HasOption("environment"))
+			{
+				p.noenv = false;
+			}
+			if(arglist.HasOption("no-environment"))
+			{
+				p.noenv = true;
+			}
+			if(const String& q = arglist.Get("working-dir"); !IsNull(q))
+			{
+				p.address = q;
+			}
+			if(arglist.HasOption("vt-style-fkeys"))
+			{
+				p.functionkeystyle = "vt";
+			}
+			if(arglist.HasOption("pc-style-fkeys"))
+			{
+				p.functionkeystyle = "pc";
+			}
+			if(arglist.HasOption("window-reports"))
+			{
+				p.windowreports = true;
+			}
+			if(arglist.HasOption("no-window-reports"))
+			{
+				p.windowreports = false;
+			}
+			if(arglist.HasOption("window-actions"))
+			{
+				p.windowactions = true;
+			}
+			if(arglist.HasOption("no-window-actions"))
+			{
+				p.windowactions = false;
+			}
+			if(arglist.HasOption("hyperlinks"))
+			{
+				p.hyperlinks = true;
+			}
+			if(arglist.HasOption("no-hyperlinks"))
+			{
+				p.hyperlinks = false;
+			}
+			if(arglist.HasOption("inline-images"))
+			{
+				p.inlineimages = true;
+			}
+			if(arglist.HasOption("no-inline-images"))
+			{
+				p.inlineimages = false;
+			}
+			if(arglist.HasOption("annotations"))
+			{
+				p.annotations = true;
+			}
+			if(arglist.HasOption("no-annotations"))
+			{
+				p.annotations = false;
+			}
+			if(arglist.HasOption("clipboard-access"))
+			{
+				p.clipboardread = true;
+				p.clipboardwrite = true;
+			}
+			if(arglist.HasOption("no-clipboard-access"))
+			{
+				p.clipboardread = false;
+				p.clipboardwrite = false;
+			}
+			if(const String& q = arglist.Get("palette"); !IsNull(q))
+			{
+				p.palette = q;
+			}
+			if(arglist.HasOption("bell"))
+			{
+				p.bell = true;
+			}
+			if(arglist.HasOption("no-bell"))
+			{
+				p.bell = false;
+			}
 		}
 		else {
+			Cout() << t_("Command line error.");
+			if(!IsNull(cmdargerr)) {
+				Cout() << " [" << cmdargerr << "]\n\n";
+			}
 			PrintHelp();
-			return;
+			Exit();
 		}
 	}
 
