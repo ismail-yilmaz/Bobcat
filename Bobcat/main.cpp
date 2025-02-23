@@ -308,6 +308,10 @@ void BobcatAppMain()
 			{
 				p.bell = false;
 			}
+			if(!IsNull(arglist.command))
+			{
+				p.command = arglist.command;
+			}
 		}
 		else {
 			Cout() << t_("Command line error.");
