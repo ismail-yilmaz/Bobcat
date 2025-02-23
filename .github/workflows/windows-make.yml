@@ -102,7 +102,7 @@ jobs:
     - name: Build PtyAgent
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +GUI,WIN64,WIN10 ptyagent
+        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 ptyagent
         cp ptyagent.exe out\PtyAgent.exe
 
     - name: Archive binaries
