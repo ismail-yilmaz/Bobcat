@@ -440,8 +440,6 @@ const Array<CmdArg>& GetCmdArgs()
 		{ CmdArgType::Environment, "n", "environment",            "",         t_("Inherit the environment.") },
 		{ CmdArgType::Environment, "N", "no-environment",         "",         t_("Don't inherit the environment.") },
 		{ CmdArgType::Environment, "d", "working-dir",            "PATH",     t_("Set the working directory to PATH.") },
-		{ CmdArgType::Environment, "c", "clipboard-access",       "",         t_("Enable application clipboard access.") },
-		{ CmdArgType::Environment, "C", "no-clipboard-access",    "",         t_("Disable application clipboard access.") },
 
 		// Emulation options
 		{ CmdArgType::Emulation,   "q", "vt-style-fkeys",         "",         t_("Use VT-style function keys.") },
@@ -450,6 +448,8 @@ const Array<CmdArg>& GetCmdArgs()
 		{ CmdArgType::Emulation,   "W", "no-window-reports",      "",         t_("Disable window reports.") },
 		{ CmdArgType::Emulation,   "a", "window-actions",         "",         t_("Enable window actions.") },
 		{ CmdArgType::Emulation,   "A", "no-window-actions",      "",         t_("Disable window actions.") },
+		{ CmdArgType::Emulation,   "c", "clipboard-access",       "",         t_("Enable application clipboard access.") },
+		{ CmdArgType::Emulation,   "C", "no-clipboard-access",    "",         t_("Disable application clipboard access.") },
 		{ CmdArgType::Emulation,   "",  "hyperlinks",             "",         t_("Enable hyperlink detection. (OSC 52 + Linkifier)") },
 		{ CmdArgType::Emulation,   "",  "no-hyperlinks",          "",         t_("Disable hyperlink detection.") },
 		{ CmdArgType::Emulation,   "",  "inline-images",          "",         t_("Enable inline images support. (Sixel, iTerm2, Jexer)") },
