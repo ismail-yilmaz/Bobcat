@@ -414,6 +414,7 @@ const Array<CmdArg>& GetCmdArgs()
 		{ CmdArgType::General,     "p", "profile",                "PROFILE",  t_("Run with the given terminal PROFILE. (Names are case-sensitive)") },
 		{ CmdArgType::General,     "s", "settings",               "",         t_("Open settings window.") },
 		{ CmdArgType::General,     "" , "list-palettes",          "",         t_("List available color palettes.") },
+		{ CmdArgType::General,     "" , "list-fonts",             "",         t_("List available monospaced fonts.") },
 		{ CmdArgType::General,     "" , "list-gui-themes",        "",         t_("List available GUI themes.") },
 		{ CmdArgType::General,     "",  "gui-theme",              "THEME",    t_("Set the GUI theme to THEME.") },
 		{ CmdArgType::General,     "b", "show-bars",              "",         t_("Show the menu and title bar.") },
@@ -459,6 +460,8 @@ const Array<CmdArg>& GetCmdArgs()
 
 		// Appearance options
 		{ CmdArgType::Appearance,  "",  "palette",                "PALETTE",  t_("Set color palette to PALETTE.") },
+		{ CmdArgType::Appearance,  "",  "font-family",            "FONT",     t_("Set the font family to be used to FONT.") },
+		{ CmdArgType::Appearance,  "",  "font-size",              "SIZE",     t_("Set the font size to SIZE") },
 		{ CmdArgType::Appearance,  "",  "bell",                   "",         t_("Enable notification bell.") },
 		{ CmdArgType::Appearance,  "",  "no-bell",                "",         t_("Disable notification bell.") },
 	};

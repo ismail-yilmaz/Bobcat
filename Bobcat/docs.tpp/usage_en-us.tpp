@@ -17,6 +17,8 @@ given terminal PROFILE. (Names are case`-sensitive)]&]
 window.]&]
 [s0; [C1       ][C@3;1   `-`-list`-palettes][C1           ][1 List available 
 color palettes]&]
+[s0; [C1       ][C@3;1   `-`-list`-fonts][C1              ][1 List available 
+monospaced fonts]&]
 [s0; [C1        ][C@3;1  `-`-list`-gui`-themes][C1         ][1 List available 
 GUI themes.]&]
 [s0; [C1         ][C@3;1 `-`-gui`-theme THEME ][C1        ][1 Set the GUI 
@@ -98,6 +100,10 @@ ich`-text][1  annotations.]&]
 [s0; [*2 Appearance:]&]
 [s0; [C1      ][C@3;1   `-`-palette PALETTE ][C1        ][1 Set color palette 
 to PALETTE.]&]
+[s0; [C1      ][C@3;1   `-`-font`-family FONT ][C1       ][1 Set the font 
+family to be used to FONT.]&]
+[s0; [C1      ][C@3;1   `-`-font`-size SIZE  ][C1        ][1 Set the font 
+size to SIZE.]&]
 [s0; [C1      ][C@3;1   `-`-bell         ][C1           ][1 Enable notification 
 bell.]&]
 [s0; [C1      ][C@3;1   `-`-no`-bell      ][C1           Disable][1  notification 

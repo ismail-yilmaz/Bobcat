@@ -82,8 +82,22 @@ void PrintPaletteList()
 void PrintGuiThemeList()
 {
 	String list;
-	for(const auto theme: GetAllGuiThemes())
+	for(const auto& theme: GetAllGuiThemes())
 		list << theme.b << "\n";
+#ifdef PLATFORM_POSIX
+	Cout() << list;
+#else
+	PromptOK(DeQtf(list));
+#endif
+}
+
+void PrintFontList()
+{
+	String list;
+	for(int i = 0; i < Font::GetFaceCount(); i++)
+		if((Font::GetFaceInfo(i) & Font::FIXEDPITCH)) {
+			list << Font::GetFaceName(i) << "\n";
+		}
 #ifdef PLATFORM_POSIX
 	Cout() << list;
 #else
@@ -130,6 +144,11 @@ void BobcatAppMain()
 			if(arglist.HasOption("list-palettes"))
 			{
 				PrintPaletteList();
+				return;
+			}
+			if(arglist.HasOption("list-fonts"))
+			{
+				PrintFontList();
 				return;
 			}
 			if(arglist.HasOption("list-gui-themes"))
@@ -299,6 +318,15 @@ void BobcatAppMain()
 			if(const String& q = arglist.Get("palette"); !IsNull(q))
 			{
 				p.palette = q;
+			}
+			if(const String& q = arglist.Get("font-family"); !IsNull(q))
+			{
+				if(Font f = p.font; f.FaceName(q).IsFixedPitch())
+					p.font = f;
+			}
+			if(const String& q = arglist.Get("font-size"); !IsNull(q))
+			{
+				p.font.Height(clamp(StrInt(q), 6, 128));
 			}
 			if(arglist.HasOption("bell"))
 			{
