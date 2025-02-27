@@ -123,7 +123,7 @@ bool Terminal::StartPty(const Profile& p)
 		pty->SetSize(GetPageSize());
 		return true;
 	}
-	AskRestartExitError(this);
+	AskRestartExitError(this, p);
 	return false;
 }
 

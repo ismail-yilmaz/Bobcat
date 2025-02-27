@@ -357,10 +357,9 @@ void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& n
 	c.WhenAction = action;
 }
 
-void AskRestartExitError(Ptr<Terminal> t)
+void AskRestartExitError(Ptr<Terminal> t, const Profile& p)
 {
 	t->KeepAsking();
-	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
 	AskYesNo(*t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [t](int id) {
@@ -368,10 +367,14 @@ void AskRestartExitError(Ptr<Terminal> t)
 	});
 }
 
-void AskRestartExitOK(Ptr<Terminal> t)
+void AskRestartExitError(Ptr<Terminal> t)
+{
+	AskRestartExitError(t, LoadProfile(t->profilename));
+}
+
+void AskRestartExitOK(Ptr<Terminal> t, const Profile& p)
 {
 	t->KeepAsking();
-	Profile p = LoadProfile(t->profilename);
 	const char *txt = t_("Command exited.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
 	AskYesNo(*t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [t](int id) {
@@ -383,6 +386,11 @@ void AskRestartExitOK(Ptr<Terminal> t)
 		else
 			t->ScheduleExit();
 	});
+}
+
+void AskRestartExitOK(Ptr<Terminal> t)
+{
+	AskRestartExitOK(t, LoadProfile(t->profilename));
 }
 
 String GetDefaultShell()

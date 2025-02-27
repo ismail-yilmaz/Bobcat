@@ -195,7 +195,9 @@ void                       InsertUnicodeCodePoint(Terminal& term);
 bool                       AnnotationEditor(String& s, const char *title);
 
 // Terminal specific notifications
+void AskRestartExitOK(Ptr<Terminal> t, const Profile& p);
 void AskRestartExitOK(Ptr<Terminal> t);
+void AskRestartExitError(Ptr<Terminal> t, const Profile& p);
 void AskRestartExitError(Ptr<Terminal> t);
 
 // Operators
