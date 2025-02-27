@@ -516,8 +516,8 @@ bool CmdArgParser::Parse(const Vector<String>& cmdline, CmdArgList& list, String
          
          // Handle command after "--"
          if(cmdsep) {
-             list.command = arg;
-             return true;
+             list.command << arg << ' ';
+            continue;
          }
          
          if(arg == "--") {
@@ -551,6 +551,9 @@ bool CmdArgParser::Parse(const Vector<String>& cmdline, CmdArgList& list, String
          }
      }
      
+     if(!IsNull(list.command))
+	     list.command = TrimBoth(list.command);
+
      return true;
 }
 
