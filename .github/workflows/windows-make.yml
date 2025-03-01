@@ -3,10 +3,11 @@ name: Windows
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
+      - '*.*.*'
   pull_request:
     branches: [ main ]
-  release:
-    types: [ published ]
 
 jobs:
   build:
@@ -105,16 +106,66 @@ jobs:
         ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 ptyagent
         cp ptyagent.exe out\PtyAgent.exe
 
+    - name: Download Bobcat assets
+      uses: actions/checkout@v3
+      with:
+        repository: ismail-yilmaz/Bobcat-Assets
+        path: bobcat-assets
+
+    - name: Copy binaries from the assets repo
+      run: |
+        # Ensure the output directory exists
+        mkdir -p Bobcat/out
+        cp bobcat-assets/OpenConsole.exe Bobcat/out/
+        cp bobcat-assets/conpty.dll Bobcat/out/
+        
+    # Upload artifacts for main branch builds
     - name: Archive binaries
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: bobcat-win64
         path: Bobcat/out/*
 
-    - name: Push assets into release
-      if: github.event_name == 'release' && github.event.action == 'published'
+    # Only create release and upload assets when a tag is pushed
+    - name: Check if running on tag
+      id: check_tag
+      if: startsWith(github.ref, 'refs/tags/')
+      run: echo "IS_TAG=true" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Get the version
+      id: get_version
+      if: steps.check_tag.outputs.IS_TAG == 'true'
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Create Release
+      id: create_release
+      if: steps.check_tag.outputs.IS_TAG == 'true'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: Compress binaries
+      if: steps.check_tag.outputs.IS_TAG == 'true'
       working-directory: Bobcat
       run: |
-        Compress-Archive -Path out\* -DestinationPath bobcat-${{ github.event.release.tag_name }}-win64.zip
-        gh release upload ${{ github.event.release.tag_name }} bobcat-${{ github.event.release.tag_name }}-win64.zip
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        Compress-Archive -Path out\* -DestinationPath "bobcat-$version-win64.zip"
+
+    - name: Upload Release Asset
+      if: steps.check_tag.outputs.IS_TAG == 'true'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./Bobcat/bobcat-${{ steps.get_version.outputs.VERSION }}-win64.zip
+        asset_name: bobcat-${{ steps.get_version.outputs.VERSION }}-win64.zip
+        asset_content_type: application/zip
