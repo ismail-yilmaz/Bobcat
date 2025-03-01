@@ -114,8 +114,6 @@ jobs:
 
     - name: Copy binaries from the assets repo
       run: |
-        # Ensure the output directory exists
-        mkdir -p Bobcat/out
         cp bobcat-assets/OpenConsole.exe Bobcat/out/
         cp bobcat-assets/conpty.dll Bobcat/out/
         
