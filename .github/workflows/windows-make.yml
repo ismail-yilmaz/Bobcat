@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+  contents: read
+  
 jobs:
   build:
     runs-on: windows-latest
