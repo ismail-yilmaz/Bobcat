@@ -121,14 +121,19 @@ Bobcat on Windows
 
 ![bobcat-windows](resources/bobcat-about-windows.png)
 
-
 Bobcat, running zellij, with a background image of well..., a bobcat!
 
 ![bobcat-zellij](resources/bobcat-zellij-background-linux.png)
 
-Bobcat, running yazi, in borderless/frameless mode (best suitable for tiling window managers).
+Bobcat, running yazi, in borderless mode on Linux.
 
 ![bobcat-yazi](resources/bobcat-yazi-borderless-linux.png)
+
+Bobcat, running yazi with image preview feature on Windows
+![bobcat-yazi2](resources/bobcat-yazi-imagepreview-windows.png)
+
+Bobcat, running Neovim on Windows
+![bobcat-nvim](resources/bobcat-neovim-windows.png)
 
 Multiple terminal profile support (linux, btop)
 
