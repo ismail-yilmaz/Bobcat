@@ -242,7 +242,7 @@ String GetModifierKeyDesc(dword key)
 
 String GetVersion()
 {
-	String ver = Format("%d.%d.%d", 0, 9, 0);
+	String ver = Format("%d.%d.%d", 0, 9, 1);
 
 #ifdef bmGIT_REVCOUNT
 	return ver + " (r" + bmGIT_REVCOUNT + ")";
