@@ -247,7 +247,7 @@ String GetVersion()
 #ifdef bmGIT_REVCOUNT
 	return ver + " (r" + bmGIT_REVCOUNT + ")";
 #else
-	return "(beta)";
+	return ver;
 #endif
 }
 
