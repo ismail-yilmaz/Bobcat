@@ -28,47 +28,38 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 
 *For complete VT feature details, see TerminalCtrl's [features](https://github.com/ismail-yilmaz/Terminal#features) list and technical specs [document](https://github.com/ismail-yilmaz/Terminal/blob/master/Terminal/Specs.md).*
 
-### Core Capabilities
+### Core Features  
 
- - Runs smoothly on Linux, Windows, MacOS, and BSD systems
- - Very high compatibility with VT (DEC/ANSI) and xterm standards
- - Displays images right in your terminal: Supports both classic Sixel and modern formats (PNG, JPG, BMP, TIFF)
- - Smart shell integration that tracks your working directory
- - Powerful text selection and manipulation tools
+- **Cross-Platform Compatibility:** Runs seamlessly on **Linux, Windows, MacOS, and BSD**, supporting multiple terminal backends with **high VT (DEC/ANSI) and xterm compatibility**.  
+- **Inline Image Support:** Displays images directly in the terminal with both **Sixel** and modern formats (**PNG, JPG, BMP, TIFF**), supporting multiple protocols such as **iTerm2** and **Jexer**.  
+- **Advanced Clipboard & Hyperlinks:** Clickable links, **OSC-based clipboard integration**, and extended **(rich-)text annotations** for a modern workflow.  
+- **Smart Shell Integration:** Tracks working directories and allows opening them in the system's default file manager via shortcuts or menus.  
+- **Versatile Text Selection:** **Selector mode** with keyboard-driven selection, **customizable regex-based patterns**, and support for rectangular, word, and line selections.  
+- **Full Mouse & Keyboard Support:** Works across **all major protocols**, with **customizable key bindings** for a tailored experience.  
 
-### Modern Terminal Features
+### Powerful Tools  
 
-- Clickable hyperlinks and advanced clipboard handling
-- Support for emojis and rich text annotations
-- Full mouse support across all protocols
-- Customizable keyboard shortcuts
-- Vibrant color support (16, 256, and 24-bit colors)
+- **Finder Search Engine:** A robust text search tool with **case-sensitive/insensitive modes**, **regex search**, and **CSV extraction** via **Harvester Mode**, preserving structured data integrity.  
+- **Linkifier:** Instantly turns text into **clickable hyperlinks** using **custom regex patterns**, adaptable per terminal profile.  
+- **QuickText:** Maintain a list of frequently used commands and snippets for fast insertion with a keyboard shortcut.  
 
-### Smart Tools
+### Customization & Interface  
 
-- **Finder**: Advanced search engine with regular expression support and data extraction to CSV
-- **Linkifier**: Turn any text into clickable links using custom patterns
-- **Smart Text Selection**: Define your own selection patterns
-- **QuickText**: Easy access to frequently used commands and text
+- **Multiple Profiles:** Configure different terminal settings and **color schemes** for various tasks.  
+- **Minimal vs. Full UI:** Choose between a lightweight or fully-featured interface with a **stacked terminal manager** for easy navigation.  
+- **Simple Configuration:** JSON-based configuration with **real-time updates**, or use a **GUI settings panel**—no manual file editing required.  
 
-### Customization & Interface
+### Windows-Specific Features  
 
-- Create multiple profiles for different tasks
-- Choose between minimal and full-featured interfaces
-- Stack-based design with easy terminal management
-- Simple JSON configuration with immediate settings updates
+- **Multiple Pty Backends:** Supports both **ConPty** and **WinPty**, with runtime switching for maximum flexibility.  
+- **Standalone Compatibility:** Works without external dependencies like **msys2** or **cygwin**, but remains compatible with them.  
 
-### Windows-Specific Features
+### Experimental Features  
 
-- Supports both ConPty and WinPty
-- No external environment dependencies required
+- **Web Terminal Access:** Run the terminal in a **modern web browser** via **HTML5 Canvas**, enabling remote access.  
+- **Headless Mode:** Operates on minimal setups via an **SDL2-GL backend**, eliminating GUI dependencies.  
 
-### Experimental Features
-
-- Web support: Access your terminal through any modern browser
-- Headless UI: Run on minimal systems using SDL2-GL
-
-And yes, it can run Doom! 🎮
+And yes—**it can run Doom!** 🎮  
 
 
 ## Requirements
@@ -83,7 +74,7 @@ Bobcat has minimal requirements. You'll need:
 
 ## Installation
 
-You can install Bobcat in three ways:
+You can install Bobcat in several ways:
 
 ### 1. Via UppHub (Recommended)
 
@@ -103,6 +94,19 @@ You can install Bobcat in three ways:
 ### 3. Manual Setup
 
 - Clone or download the repository and set up as a U++ assembly/nest. See the U++ [documentation](https://www.ultimatepp.org/app$ide$PackagesAssembliesAndNests$en-us.html) for details.
+
+### 4. AUR package (ArchLinux):
+
+- There is an [AUR package](https://aur.archlinux.org/packages/bobcat-terminal-git) for Bobcat. Use your favorite AUR installer, to download, compile and install it. E.g:
+
+
+```
+# sudo yay -S bobcat-terminal-git
+```
+
+### 5. Binary installation (Windows)
+
+- Release page always contains an up-to-date link to the compiled Windows binaries of Bobcat. Download the archive file, unpack it and enjoy!
 
 ## [ToDo](#todo)
 
