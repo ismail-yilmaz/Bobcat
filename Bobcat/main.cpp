@@ -206,11 +206,8 @@ void BobcatAppMain()
 			}
 			if(const String& q = arglist.Get("geometry"); !IsNull(q))
 			{
-				// Allow both COLxROW and COL:ROW formats.
-				auto sDelimFn = [](int c) { return decode(c, 'x', 1, ':', 1, 0); };
-				if(String r, c; SplitTo(ToLower(q), sDelimFn, c, r)) {
-					page_size.cx = clamp(StrInt(c), 10, 300);
-					page_size.cy = clamp(StrInt(r), 10, 300);
+				if(Size sz = ParsePageSize(q); !IsNull(sz)) {
+					page_size = sz;
 					app.Maximize(false);
 					fullscreen = false;
 				}

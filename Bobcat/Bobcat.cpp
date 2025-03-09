@@ -597,13 +597,8 @@ void Bobcat::SizeMenu(Bar& menu)
 	menu.Add(AK_GEOM_132_48, [this] { SetPageSize(Size(132, 48)); });
 	StringStream ss(settings.custompagesizes);
 	while(!ss.IsEof()) {
-		String row, col;
-		if(SplitTo(ss.GetLine(), 'x', col, row)) {
-			Size sz(StrInt(col), StrInt(row));
-			if(10 <= sz.cx && sz.cx <= 300
-			&& 10 <= sz.cy && sz.cy <= 300) {
-				menu.Add(col + "x" + row, [this, sz] { SetPageSize(sz); });
-			}
+		if(Size sz = ParsePageSize(ss.GetLine()); !IsNull(sz)) {
+			menu.Add(AsString(sz.cx) + "x" + AsString(sz.cy), [this, sz] { SetPageSize(sz); });
 		}
 	}
 }

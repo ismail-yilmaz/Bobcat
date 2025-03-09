@@ -214,6 +214,8 @@ String GetDefaultShell();
 String GetVersion();
 String GetBuildInfo();
 
+Size ParsePageSize(const String& s);
+
 const Display& StdBackgroundDisplay();
 const Display& NormalImageDisplay();
 const Display& TiledImageDisplay();

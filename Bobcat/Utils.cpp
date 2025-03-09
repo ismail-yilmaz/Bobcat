@@ -577,4 +577,14 @@ const Upp::CmdArg *CmdArgParser::Find(const String& arg) const
 	return nullptr;
 }
 
+Size ParsePageSize(const String& s)
+{
+	// Accepted formats: COLxROW or COL:ROW
+	auto sDelimFn = [](int c) { return decode(c, 'x', 1, ':', 1, 0); };
+	if(String c, r; SplitTo(ToLower(s), sDelimFn, c, r)) {
+		return { clamp(StrInt(c), 10, 300), clamp(StrInt(r), 10, 300) };
+	}
+	return  Null;
+}
+
 }
