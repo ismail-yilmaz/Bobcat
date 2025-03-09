@@ -101,7 +101,7 @@ You can install Bobcat in several ways:
 
 
 ```
-# sudo yay -S bobcat-terminal-git
+# yay -S bobcat-terminal-git
 ```
 
 ### 5. Binary installation (Windows)
