@@ -344,7 +344,7 @@ MessageCtrl& GetNotificationDaemon()
 	return Single<MessageCtrl>();
 }
 
-void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no, MessageBox::Type type, const Event<int>& action)
+Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no, MessageBox::Type type, const Event<int>& action)
 {
 	auto& m = GetNotificationDaemon();
 	auto& c = m.Create();
@@ -355,29 +355,30 @@ void AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& n
 	c.UseIcon(false);
 	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), 0);
 	c.WhenAction = action;
+	return &c;
 }
 
-void AskRestartExitError(Ptr<Terminal> t, const Profile& p)
+Ptr<MessageBox> AskRestartExitError(Ptr<Terminal> t, const Profile& p)
 {
 	t->KeepAsking();
 	const char *txt = t_("Command execution failed.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
-	AskYesNo(*t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [t](int id) {
+	return AskYesNo(*t, text, t_("Restart"), t_("Exit"), MessageBox::Type::FAILURE, [t](int id) {
 		if(t) id == IDYES ? t->ScheduleRestart() : t->ScheduleExit();
 	});
 }
 
-void AskRestartExitError(Ptr<Terminal> t)
+Ptr<MessageBox> AskRestartExitError(Ptr<Terminal> t)
 {
-	AskRestartExitError(t, LoadProfile(t->profilename));
+	return AskRestartExitError(t, LoadProfile(t->profilename));
 }
 
-void AskRestartExitOK(Ptr<Terminal> t, const Profile& p)
+Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t, const Profile& p)
 {
 	t->KeepAsking();
 	const char *txt = t_("Command exited.&Profile: %s&Command: %s&Exit code: %d");
 	String text = Format(txt, p.name, p.command, t->pty->GetExitCode());
-	AskYesNo(*t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [t](int id) {
+	return AskYesNo(*t, text, t_("Restart"), t_("Close"), MessageBox::Type::INFORMATION, [t](int id) {
 		if(!t) return;
 		if(id == IDYES) {
 			t->ScheduleRestart();
@@ -388,9 +389,21 @@ void AskRestartExitOK(Ptr<Terminal> t, const Profile& p)
 	});
 }
 
-void AskRestartExitOK(Ptr<Terminal> t)
+Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t)
 {
-	AskRestartExitOK(t, LoadProfile(t->profilename));
+	return AskRestartExitOK(t, LoadProfile(t->profilename));
+}
+
+Ptr<MessageBox> Warning(Upp::Ctrl& ctrl, const Upp::String& text, int timeout)
+{
+	auto& m = GetNotificationDaemon();
+	auto& c = m.Create();
+	c.MessageType(MessageBox::Type::WARNING);
+	c.Placement(m.GetPlacement());
+	c.UseIcon(false);
+	c.UseCross();
+	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	return &c;
 }
 
 String GetDefaultShell()
@@ -586,5 +599,72 @@ Size ParsePageSize(const String& s)
 	}
 	return  Null;
 }
+
+#ifdef PLATFORM_LINUX
+
+pid_t GetProcessGroupId(APtyProcess& pty)
+{
+	return tcgetpgrp(static_cast<LinuxPtyProcess&>(pty).GetSocket());
+}
+
+Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid)
+{
+    uid_t ruid = 0, euid = 0;
+    
+    if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
+        char line[256];
+        while(fgets(line, sizeof(line), f)) {
+            if(strncmp(line, "Uid:", 4) == 0) {
+                unsigned long r, e, s;
+                if(sscanf(line, "Uid:\t%lu\t%lu\t%lu", &r, &e, &s) == 3) {
+                    ruid = r;
+                    euid = e;
+                }
+                break;
+            }
+        }
+        fclose(f);
+    }
+    return {ruid, euid};
+}
+
+String GetUsernameFromUserId(uid_t uid)
+{
+	if(passwd *p = getpwuid(uid); p)
+		return String(p->pw_name);
+	return AsString(uid);
+}
+
+bool LinuxPtyProcess::IsRoot()
+{
+	if(pid_t pgid = GetProcessGroupId(*this); pgid > 0)
+		if(auto [r, e] = GetUserIdsFromProcess(pgid); e == 0) {
+			ruid = r;
+			euid = e;
+			return true;
+		}
+	return false;
+}
+
+bool LinuxPtyProcess::CheckPrivileges(Terminal& t)
+{
+	if(bool b = IsRoot(); b && !isroot) {
+		isroot = true;
+		String txt = t_("Warning: Privilege escalation!");
+		txt << " &ruid: " << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
+		    << ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
+		notification = Warning(t, txt);
+		if(t.bell)
+			BeepExclamation();
+	}
+	else
+	if(isroot && !b) {
+		isroot = false;
+		GetNotificationDaemon().Remove(notification);
+	}
+	return isroot;
+}
+
+#endif
 
 }

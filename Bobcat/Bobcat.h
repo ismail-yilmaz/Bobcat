@@ -19,6 +19,7 @@
 
 #ifdef PLATFORM_POSIX
 #include <poll.h>
+#include <pwd.h>
 template <>
 inline constexpr bool Upp::is_upp_guest<pollfd> = true;
 #endif
@@ -226,8 +227,8 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 
 MessageCtrl& GetNotificationDaemon();
 
-void AskYesNo(Ctrl& c, const String& text, const String& yes, const String& no,
+Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no,
                             MessageBox::Type type, const Event<int>& action);
-
+Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout = 0);
 }
 #endif

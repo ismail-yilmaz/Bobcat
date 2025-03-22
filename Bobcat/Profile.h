@@ -17,6 +17,7 @@ struct Profile : Moveable<Profile> {
     bool        noenv;
     bool        shellintegration;
     String      ptybackend;
+    bool        warnonrootaccess;
     Font        font;
     bool        bell;
     bool        blinktext;

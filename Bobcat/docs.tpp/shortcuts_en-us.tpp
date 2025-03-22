@@ -155,7 +155,10 @@ ctor][C1  mode.]]
 :: [s0; [C1 Treat the spacing characters in Eastern Asian Ambiguous (A) 
 category as wide (double width)characters. Requires UTF`-8 charset.]]
 :: [s0; [*C1 Ctrl`+Space]]
-:: [s0; [C1 Pop up the QuickText list at the cursor position.]]}}&]
+:: [s0; [C1 Pop up the QuickText list at the cursor position.]]
+:: [s0; [*C1 Shift`+Ctrl`+R]]
+:: [s0; [C1 Toggle root access (privilege escalation) warning. (Linux 
+specific)]]}}&]
 [s0; &]
 [s0;:finder`_shortcuts: [* Finder Specific Shortcuts]&]
 [s0; &]

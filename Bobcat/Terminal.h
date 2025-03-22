@@ -33,7 +33,7 @@ struct Terminal : TerminalCtrl {
     bool        IsFailure();
     bool        IsSuccess();
     bool        IsAsking();
-    
+      
     void        DontExit();
     void        KeepAsking();
     void        ScheduleExit();
@@ -156,6 +156,7 @@ struct Terminal : TerminalCtrl {
     bool         smartwordsel:1;
     bool         shellintegration:1;
     bool         findselectedtext:1;
+    bool         warnonrootaccess:1;
     ExitMode     exitmode;
     String       profilename;
     String       workingdir;
@@ -167,7 +168,7 @@ struct Terminal : TerminalCtrl {
     QuickText    quicktext;
     Color        highlight[4];
     TimeCallback timer;
-    
+   
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
@@ -195,10 +196,28 @@ void                       InsertUnicodeCodePoint(Terminal& term);
 bool                       AnnotationEditor(String& s, const char *title);
 
 // Terminal specific notifications
-void AskRestartExitOK(Ptr<Terminal> t, const Profile& p);
-void AskRestartExitOK(Ptr<Terminal> t);
-void AskRestartExitError(Ptr<Terminal> t, const Profile& p);
-void AskRestartExitError(Ptr<Terminal> t);
+Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t, const Profile& p);
+Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t);
+Ptr<MessageBox> AskRestartExitError(Ptr<Terminal> t, const Profile& p);
+Ptr<MessageBox> AskRestartExitError(Ptr<Terminal> t);
+
+// Linux specific functions
+#ifdef PLATFORM_LINUX
+pid_t               GetProcessGroupId(APtyProcess& pty);
+Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid);
+String              GetUsernameFromUserId(uid_t uid);
+
+class LinuxPtyProcess : public PosixPtyProcess {
+public:
+    bool            IsRoot();
+    bool            CheckPrivileges(Terminal& t);
+private:
+    uid_t euid   = 0;
+    uid_t ruid   = 0;
+    bool  isroot = false;
+    Ptr<MessageBox> notification;
+};
+#endif
 
 // Operators
 

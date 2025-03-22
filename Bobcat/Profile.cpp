@@ -41,6 +41,7 @@ Profile::Profile()
 , bell(false)
 , blinktext(true)
 , shellintegration(false)
+, warnonrootaccess(false)
 , blinkinterval(500)
 , lightcolors(false)
 , adjustcolors(false)
@@ -121,6 +122,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("Encoding",             encoding)
 	("TreatAmbiguousCharsAsWideChars", ambiguoustowide)
 	("WindowsPtyBackend",    ptybackend)
+	("WarnOnRootAccess",     warnonrootaccess)
 	("Font",				 font)
 	("LineSpacing",          linespacing)
 	("Bell",				 bell)
@@ -247,6 +249,9 @@ Profiles::Setup::Setup()
 	#endif
 	general.pty.Add("winpty", t_("Winpty")).SetIndex(0);
 #else
+	#ifndef PLATFORM_LINUX
+		general.warnonrootaccess.Hide();
+	#endif
 	general.pty.Hide();
 	general.ptylabel.Hide();
 #endif
@@ -269,6 +274,7 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (general.cmdexit,          p.onexit)
      (general.answerback,       p.answerbackmsg)
      (general.pty,              p.ptybackend)
+     (general.warnonrootaccess, p.warnonrootaccess)
      (visuals.font,             p.font)
      (visuals.linespacing,      p.linespacing)
      (visuals.cursorstyle,      p.cursorstyle)

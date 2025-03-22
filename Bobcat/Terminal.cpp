@@ -22,6 +22,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , canresize(true)
 , smartwordsel(false)
 , shellintegration(false)
+, warnonrootaccess(false)
 , finder(*this)
 , linkifier(*this)
 , quicktext(*this)
@@ -80,7 +81,11 @@ void Terminal::PostParse()
 bool Terminal::StartPty(const Profile& p)
 {
 	#ifdef PLATFORM_POSIX
+	#ifdef PLATFORM_LINUX
+	pty.Create<LinuxPtyProcess>().WhenAttrs = [this, &p](termios& t) -> bool
+	#else
 	pty.Create<PosixPtyProcess>().WhenAttrs = [this, &p](termios& t) -> bool
+	#endif
 	{
 		t.c_iflag |= IXANY;
 		#ifdef IUTF8
@@ -172,6 +177,11 @@ bool Terminal::Do()
 {
 	if(pty->IsRunning()) {
 		Write(pty->Get(), IsUtf8Mode());
+		#ifdef PLATFORM_LINUX
+		// Warn the user about root access.
+		if(warnonrootaccess)
+			static_cast<LinuxPtyProcess&>(*pty).CheckPrivileges(*this);
+		#endif
 		return true;
 	}
 	if(ShouldExit())
@@ -304,6 +314,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	workingdir  = p.address;
 	shellintegration = p.shellintegration;
 	findselectedtext = p.findselectedtext;
+	warnonrootaccess = p.warnonrootaccess;
 	bell = p.bell;
 	filter = p.filterctrl;
 	WindowActions(p.windowactions);
@@ -902,6 +913,9 @@ void Terminal::EmulationMenu(Bar& menu)
 	menu.Add(AK_BUFFEREDREFRESH,  [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
 	menu.Add(AK_LAZYRESIZE,       [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
 	menu.Add(AK_WIDECHARS,        [this] { TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && !IsAmbiguousCharsWide()); }).Check(IsAmbiguousCharsWide()).Enable(IsUtf8Mode());
+#ifdef PLATFORM_LINUX
+	menu.Add(AK_WARNROOT,         [this] { warnonrootaccess = !warnonrootaccess; }).Check(warnonrootaccess);
+#endif
 }
 
 void Terminal::ContextMenu(Bar& menu)
