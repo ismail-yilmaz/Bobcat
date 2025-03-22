@@ -488,6 +488,7 @@ void Bobcat::MainMenu(Bar& menu)
 	menu.Sub(t_("File"),     [this](Bar& menu) { FileMenu(menu);  });
 	menu.Sub(t_("Edit"),     [this](Bar& menu) { EditMenu(menu);  });
 	menu.Sub(t_("View"),     [this](Bar& menu) { ViewMenu(menu);  });
+	menu.Sub(t_("Emulation"),[this](Bar& menu) { EmulationMenu(menu); });
 	menu.Sub(t_("List"),     [this](Bar& menu) { ListMenu(menu);  });
 	menu.Sub(t_("Setup"),    [this](Bar& menu) { SetupMenu(menu); });
 	menu.Sub(t_("Help"),     [this](Bar& menu) { HelpMenu(menu);  });
@@ -531,6 +532,12 @@ void Bobcat::ViewMenu(Bar& menu)
 
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->ViewMenu(menu);
+}
+
+void Bobcat::EmulationMenu(Upp::Bar& menu)
+{
+	if(Terminal *t = GetActiveTerminal(); t)
+		t->EmulationMenu(menu);
 }
 
 void Bobcat::SetupMenu(Bar& menu)

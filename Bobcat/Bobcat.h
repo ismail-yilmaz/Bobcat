@@ -108,6 +108,7 @@ struct Bobcat : Pte<Bobcat> {
     void        FileMenu(Bar& menu);
     void        EditMenu(Bar& menu);
     void        ViewMenu(Bar& menu);
+    void        EmulationMenu(Bar& menu);
     void        SetupMenu(Bar& menu);
     void        HelpMenu(Bar& menu);
     void        TermMenu(Bar& menu);
