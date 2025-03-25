@@ -248,6 +248,7 @@ Profiles::Setup::Setup()
 		general.pty.Add("conpty", t_("ConPty"));
 	#endif
 	general.pty.Add("winpty", t_("Winpty")).SetIndex(0);
+	general.warnonrootaccess.Hide();
 #else
 	#ifndef PLATFORM_LINUX
 		general.warnonrootaccess.Hide();
