@@ -850,8 +850,8 @@ void Terminal::EditMenu(Bar& menu)
 	if(HasHyperlinks() && IsMouseOverLink()) {
 		menu.Separator();
 		String lnk = GetLink();
-		menu.Add(AK_COPYLINK, Images::Copy(),  [this, lnk = pick(lnk)] { CopyLink(lnk); });
-		menu.Add(AK_OPENLINK, CtrlImg::open(), [this, lnk = pick(lnk)] { OpenLink(lnk); });
+		menu.Add(AK_COPYLINK, Images::Copy(),  [this, lnk] { CopyLink(lnk); });
+		menu.Add(AK_OPENLINK, CtrlImg::open(), [this, lnk] { OpenLink(lnk); });
 	}
 	else
 	if(HasAnnotations() && IsMouseOverAnnotation()) {
