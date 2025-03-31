@@ -18,10 +18,7 @@
 #include <PtyProcess/PtyProcess.h>
 
 #ifdef PLATFORM_POSIX
-#include <poll.h>
 #include <pwd.h>
-template <>
-inline constexpr bool Upp::is_upp_guest<pollfd> = true;
 #endif
 
 namespace Upp {
@@ -120,7 +117,6 @@ struct Bobcat : Pte<Bobcat> {
     void        About();
     void        Help();
 
-    void        Wait(int timeout);
     void        ProcessEvents();
     
     struct  Config {

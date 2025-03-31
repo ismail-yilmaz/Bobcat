@@ -609,7 +609,7 @@ pid_t GetProcessGroupId(APtyProcess& pty)
 
 Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid)
 {
-    uid_t ruid = 0, euid = 0;
+    uid_t ruid = -1, euid = -1;
     
     if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
         char line[256];
