@@ -123,7 +123,7 @@ void Bobcat::ProcessEvents()
 	auto& we = Single<PtyWaitEvent>();
 	we.Clear();
 	for(Terminal& t : terminals)
-		we.Add(*(t.pty), WAIT_READ);
+		we.Add(*(t.pty), WAIT_READ | WAIT_IS_EXCEPTION);
 	we.Wait(10);
 	for(Terminal& t : terminals)
 		if(!t.Do())
@@ -506,7 +506,7 @@ void Bobcat::ViewMenu(Bar& menu)
 		t->ViewMenu(menu);
 }
 
-void Bobcat::EmulationMenu(Upp::Bar& menu)
+void Bobcat::EmulationMenu(Bar& menu)
 {
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->EmulationMenu(menu);

@@ -394,7 +394,7 @@ Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t)
 	return AskRestartExitOK(t, LoadProfile(t->profilename));
 }
 
-Ptr<MessageBox> Warning(Upp::Ctrl& ctrl, const Upp::String& text, int timeout)
+Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 {
 	auto& m = GetNotificationDaemon();
 	auto& c = m.Create();
@@ -570,7 +570,7 @@ bool CmdArgParser::Parse(const Vector<String>& cmdline, CmdArgList& list, String
      return true;
 }
 
-const Upp::CmdArg *CmdArgParser::Find(const String& arg) const
+const CmdArg *CmdArgParser::Find(const String& arg) const
 {
 	if(arg.GetCount() < 2 || arg[0] != '-')
 		return nullptr;

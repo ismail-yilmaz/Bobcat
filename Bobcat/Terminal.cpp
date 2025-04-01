@@ -486,13 +486,13 @@ Terminal& Terminal::SetWordSelectionPattern(const String& s)
 	return *this;
 }
 
-Upp::Terminal& Terminal::SetPathTranslationMode(const String& s)
+Terminal& Terminal::SetPathTranslationMode(const String& s)
 {
 	pathmode = decode(s, "unix", PathMode::Unix, "windows", PathMode::Windows, PathMode::Native);
 	return *this;
 }
 
-Upp::Terminal& Terminal::SetPathDelimiter(const String& s)
+Terminal& Terminal::SetPathDelimiter(const String& s)
 {
 	pathdelimiter = s;
 	return *this;
@@ -814,7 +814,7 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 	return false;
 }
 
-Terminal& Terminal::PutText(const Upp::WString& txt)
+Terminal& Terminal::PutText(const WString& txt)
 {
 	TerminalCtrl::Put(txt);
 	return *this;

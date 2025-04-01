@@ -258,7 +258,7 @@ void LinkifierSetup::Drag()
 		list.RemoveSelection();
 }
 
-void LinkifierSetup::DnDInsert(int line, Upp::PasteClip& d)
+void LinkifierSetup::DnDInsert(int line, PasteClip& d)
 {
 	if(AcceptInternal<ArrayCtrl>(d, "linkifierpatternlist")) {
 		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);

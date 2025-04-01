@@ -534,7 +534,7 @@ void Profiles::Drag()
 		list.RemoveSelection();
 }
 
-void Profiles::DnDInsert(int line, Upp::PasteClip& d)
+void Profiles::DnDInsert(int line, PasteClip& d)
 {
 	if(AcceptInternal<ArrayCtrl>(d, "profilelist")) {
 		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);

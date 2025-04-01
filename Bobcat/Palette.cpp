@@ -274,7 +274,7 @@ void Palettes::Drag()
 		list.RemoveSelection();
 }
 
-void Palettes::DnDInsert(int line, Upp::PasteClip& d)
+void Palettes::DnDInsert(int line, PasteClip& d)
 {
 	if(AcceptInternal<ArrayCtrl>(d, "palettelist")) {
 		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);

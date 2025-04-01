@@ -23,7 +23,7 @@ static PopUpList& sGetTextList()
 	return Single<PopUpList>();
 }
 
-QuickText::QuickText(Upp::Terminal& t)
+QuickText::QuickText(Terminal& t)
 : term(t)
 {
 	auto& q = sGetTextList();
@@ -85,7 +85,7 @@ QuickText::Config::Config()
 {
 }
 
-void QuickText::Config::Jsonize(Upp::JsonIO& jio)
+void QuickText::Config::Jsonize(JsonIO& jio)
 {
 	 jio("Texts", texts);
 }
@@ -108,7 +108,7 @@ void QuickTextSetup::Sync()
 	toolbar.Set(THISFN(ContextMenu));
 }
 
-void QuickTextSetup::ContextMenu(Upp::Bar& bar)
+void QuickTextSetup::ContextMenu(Bar& bar)
 {
 	bool e = list.IsEditable();
 	bool c = !list.IsEdit() && e;
@@ -132,7 +132,7 @@ void QuickTextSetup::Drag()
 		list.RemoveSelection();
 }
 
-void QuickTextSetup::DnDInsert(int line, Upp::PasteClip& d)
+void QuickTextSetup::DnDInsert(int line, PasteClip& d)
 {
 	if(AcceptInternal<ArrayCtrl>(d, "quicktextlist")) {
 		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
@@ -147,7 +147,7 @@ void QuickTextSetup::DnDInsert(int line, Upp::PasteClip& d)
 	}
 }
 
-void QuickTextSetup::Load(const Upp::Profile& p)
+void QuickTextSetup::Load(const Profile& p)
 {
 	list.Clear();
 	for(const String& text : p.quicktext.texts)
@@ -155,7 +155,7 @@ void QuickTextSetup::Load(const Upp::Profile& p)
 	list.SetCursor(0);
 }
 
-void QuickTextSetup::Store(Upp::Profile& p) const
+void QuickTextSetup::Store(Profile& p) const
 {
 	if(IsNull(p.name))
 		return;

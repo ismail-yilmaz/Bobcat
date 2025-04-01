@@ -667,7 +667,7 @@ void FinderSetup::Drag()
 		list.RemoveSelection();
 }
 
-void FinderSetup::DnDInsert(int line, Upp::PasteClip& d)
+void FinderSetup::DnDInsert(int line, PasteClip& d)
 {
 	if(AcceptInternal<ArrayCtrl>(d, "finderpatternlist")) {
 		const ArrayCtrl& src = GetInternal<ArrayCtrl>(d);
