@@ -124,7 +124,7 @@ void Bobcat::ProcessEvents()
 	we.Clear();
 	for(Terminal& t : terminals)
 		we.Add(*(t.pty), WAIT_READ | WAIT_IS_EXCEPTION);
-	we.Wait(10);
+	we.Wait(clamp(settings.ptywaitinterval, 0, 100));
 	for(Terminal& t : terminals)
 		if(!t.Do())
 			RemoveTerminal(t);
@@ -241,6 +241,7 @@ void Bobcat::Settings()
 	cr(settingspane.imagemode, settings.backgroundimagemode);
 	cr(settingspane.imagepath, settings.backgroundimagepath);
 	cr(settingspane.imageblur, settings.backgroundimageblur);
+	cr(settingspane.waitinterval, settings.ptywaitinterval);
 	cr.Set();
 
 	profiles.Load();
@@ -699,6 +700,7 @@ Bobcat::Config::Config()
 , backgroundimage(false)
 , backgroundimagemode("normal")
 , backgroundimageblur(0)
+, ptywaitinterval(10)
 {
 }
 
@@ -722,6 +724,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("BackgroundImagePath", backgroundimagepath)
 	   ("BackgroundImageMode", backgroundimagemode)
 	   ("BackgroundImageBlur", backgroundimageblur)
+	   ("PtyMonitoringInterval", ptywaitinterval)
 	   ("GuiTheme", guitheme)
 	   ("GuiFont", guifont);
 }
