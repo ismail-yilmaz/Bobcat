@@ -88,7 +88,7 @@ LAYOUT(EmulationProfileLayout, 616, 452)
 END_LAYOUT
 
 LAYOUT(LinkifierProfileLayout, 400, 200)
-	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).HSizePosZ(1, 2).VSizePosZ(2, 3))
+	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).SetLineCy(24).HSizePosZ(1, 2).VSizePosZ(2, 3))
 END_LAYOUT
 
 LAYOUT(SettingsLayout, 708, 360)
@@ -183,7 +183,7 @@ LAYOUT(FinderProfileLayout, 659, 299)
 	ITEM(Upp::Label, dv___9, SetLabel(t_("Harvesting format")).LeftPosZ(12, 191).TopPosZ(67, 16))
 	ITEM(Upp::Label, dv___10, SetLabel(t_("items")).LeftPosZ(396, 110).TopPosZ(31, 19))
 	ITEM(Upp::EditString, delimiter, MaxLen(4).TrimLeft(true).TrimRight(true).NotNull(true).MaxChars(4).LeftPosZ(210, 64).TopPosZ(115, 20))
-	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).HSizePosZ(1, 2).VSizePosZ(140, 3))
+	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Inserting(true).Appending(true).Removing(true).Moving(true).Track(true).VertGrid(false).HorzGrid(false).MultiSelect(true).SetLineCy(24).HSizePosZ(1, 2).VSizePosZ(140, 3))
 END_LAYOUT
 
 LAYOUT(AnnotationEditorLayout, 310, 183)
@@ -208,5 +208,20 @@ LAYOUT(PasteLayout, 564, 120)
 	ITEM(Upp::EditString, pathdelimiter, MaxLen(8).HSizePosZ(207, 212).TopPosZ(31, 20))
 	ITEM(Upp::Label, dv___3, SetLabel(t_("Path delimiter")).LeftPosZ(4, 198).TopPosZ(33, 16))
 	ITEM(Upp::Label, dv___4, SetLabel(t_("Path translation")).LeftPosZ(4, 198).TopPosZ(8, 16))
+END_LAYOUT
+
+LAYOUT(QuickTextListLayout, 400, 200)
+	ITEM(Upp::ArrayCtrl, list, AutoHideSb(true).Header(false).AskRemove(false).VertGrid(false).HorzGrid(false).SetLineCy(24).HSizePosZ(2, -1).VSizePosZ(1, 4))
+END_LAYOUT
+
+LAYOUT(QuickTextLayout, 388, 208)
+	ITEM(Upp::DropList, type, HSizePosZ(80, 4).TopPosZ(4, 19))
+	ITEM(Upp::EditString, alias, HSizePosZ(80, 4).TopPosZ(28, 19))
+	ITEM(Upp::DocEdit, text, HSizePosZ(80, 4).VSizePosZ(52, 32))
+	ITEM(Upp::Button, ok, SetLabel(t_("OK")).RightPosZ(64, 56).BottomPosZ(5, 23))
+	ITEM(Upp::Button, cancel, SetLabel(t_("Cancel")).RightPosZ(4, 56).BottomPosZ(5, 23))
+	ITEM(Upp::Label, dv___5, SetLabel(t_("String")).LeftPosZ(4, 68).TopPosZ(52, 19))
+	ITEM(Upp::Label, dv___6, SetLabel(t_("Alias")).LeftPosZ(4, 68).TopPosZ(28, 19))
+	ITEM(Upp::Label, dv___7, SetLabel(t_("Type")).LeftPosZ(4, 68).TopPosZ(4, 19))
 END_LAYOUT
 

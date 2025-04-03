@@ -14,23 +14,37 @@ public:
     void OnCancel();
 
     void Popup();
+
+	struct Item : Moveable<Item> {
+		String   type;
+		String   alias;
+		String   text;
+		bool     IsCommand() const;
+		operator AttrText() const;
+		void     Jsonize(JsonIO& jio);
+		String   ToString() const;
+	};
 	
     struct Config {
         Config();
         void Jsonize(JsonIO& jio);
-        WithDeepCopy<Vector<String>> texts;
+        WithDeepCopy<Vector<Item>> texts;
     };
     
 private:
     Terminal& term;
+    PopUpList plist;
 };
 
-class QuickTextSetup : public WithLinkifierProfileLayout<ParentCtrl> {
+class QuickTextSetup : public WithQuickTextListLayout<ParentCtrl> {
 public:
     typedef QuickTextSetup CLASSNAME;
     
     QuickTextSetup();
 
+	void        Add();
+	void        Edit();
+	
     void        Sync();
     void        ContextMenu(Bar& bar);
 
@@ -42,9 +56,7 @@ public:
 
 private:
     ToolBar     toolbar;
-    EditStringNotNull edit;
+	WithQuickTextLayout<TopWindow> dlg;
 };
-
-const Display& QuickPasteDisplay();
 
 #endif
