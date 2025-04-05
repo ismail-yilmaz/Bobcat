@@ -115,15 +115,16 @@ bool Terminal::StartPty(const Profile& p)
 		m = clone(Environment());
 	if(p.addtopath) {
 		String& s = m.GetAdd("PATH");
-		String  q = GetExeFolder();
-		if(!IsNull(s) && s.Find(q) < 0) {
-		#ifdef PLATFORM_WIN32
-			s += ";";
-		#else
-			s += ":";
-		#endif
+		if(String  q = GetExeFolder(); s.Find(q) < 0) {
+			if(!IsNull(s)) {
+			#ifdef PLATFORM_WIN32
+				s += ";";
+			#else
+				s += ":";
+			#endif
+			}
+			s += q;
 		}
-		s += q;
 	}
 	MemReadStream ms(p.env, p.env.GetLength());
 	while(!ms.IsEof()) {
