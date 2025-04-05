@@ -62,6 +62,7 @@ struct Profile : Moveable<Profile> {
     String      pathtranslation;
     String      pathdelimiter;
     String      answerbackmsg;
+    bool        addtopath;
     bool        filterctrl;
     bool        sizehint;
     int         order;

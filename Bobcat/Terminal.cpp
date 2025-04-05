@@ -110,21 +110,33 @@ bool Terminal::StartPty(const Profile& p)
 		#endif
 	#endif
 
-	VectorMap<String, String> vv;
+	VectorMap<String, String> m;
 	if(!p.noenv)
-		vv = clone(Environment());
+		m = clone(Environment());
+	if(p.addtopath) {
+		String& s = m.GetAdd("PATH");
+		String  q = GetExeFolder();
+		if(!IsNull(s) && s.Find(q) < 0) {
+		#ifdef PLATFORM_WIN32
+			s += ";";
+		#else
+			s += ":";
+		#endif
+		}
+		s += q;
+	}
 	MemReadStream ms(p.env, p.env.GetLength());
 	while(!ms.IsEof()) {
 		String k, v;
 		if(SplitTo(ms.GetLine(), '=', k, v)) {
-			vv.GetAdd(k) = v;
+			m.GetAdd(k) = v;
 		}
 	}
 	
 	MakeTitle(profilename);
 	if(ctx.stack.Find(*this) < 0)
 		ctx.stack.Add(*this);
-	if(pty->Start(p.command, vv, p.address)) {
+	if(pty->Start(p.command, m, p.address)) {
 		pty->SetSize(GetPageSize());
 		return true;
 	}
