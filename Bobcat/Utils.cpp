@@ -304,7 +304,7 @@ String GetBuildInfo()
 	h << t_("Compiled") << ": " << bmTIME;
 #endif
 
-	h << '\n';;
+	h << '\n';
 	h << t_("Path") << ": " << GetExeFilePath();
 
 	return h;
