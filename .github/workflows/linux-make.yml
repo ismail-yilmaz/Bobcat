@@ -2,9 +2,9 @@ name: Linux
 
 on:
   push:
-    branches: [ linux_workflow_test ]
+    branches: [ main ]
   pull_request:
-    branches: [ linux_workflow_test ]
+    branches: [ main ]
 
 jobs:
   build:
