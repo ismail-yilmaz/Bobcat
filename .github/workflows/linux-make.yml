@@ -31,7 +31,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: ultimatepp/ultimatepp
-        ref: release/2024.1.1 # always use release branch, not main.
+        ref: tag/2025.1 # always use release branch, not main.
         path: upp-source
 
     - name: Configure and build U++ from the master branch
