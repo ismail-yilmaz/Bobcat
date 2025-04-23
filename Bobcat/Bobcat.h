@@ -223,6 +223,9 @@ void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 
+bool IsWaylandEnabled();
+void EnableWayland(bool b);
+
 MessageCtrl& GetNotificationDaemon();
 
 Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no,

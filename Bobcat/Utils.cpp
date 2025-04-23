@@ -293,7 +293,10 @@ String GetBuildInfo()
 #endif
 
 #ifdef GUI_GTK
-	h << " (Gtk)";
+	int i = 0;
+	if(auto ctx = GetContext(); ctx)
+		i = ctx->window.IsWayland() ? 1 : 0;
+	h << Format(" (Gtk - %[1:Wayland;XWayland]s)", i);
 #elif  flagWEBGUI
 	h << " (Turtle)";
 #elif  flagSDLGUI
@@ -337,6 +340,28 @@ void LoadGuiTheme(Bobcat& ctx)
 void LoadGuiFont(Bobcat& ctx)
 {
 	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
+}
+
+bool IsWaylandEnabled()
+{
+#ifdef GUI_GTK
+	auto ctx = GetContext();
+	return ctx
+		&& (ctx->window.IsWayland() || ctx->window.IsXWayland())
+		&& FileExists(ConfigFile("USE_WAYLAND"));
+#else
+	return false;
+#endif
+}
+
+void EnableWayland(bool enabled)
+{
+#ifdef GUI_GTK
+	if(auto ctx = GetContext(); ctx && IsWaylandEnabled() != enabled) {
+		String wlpath = ConfigFile("USE_WAYLAND");
+		enabled ? SaveFile(wlpath, Null) : DeleteFile(wlpath);
+	}
+#endif
 }
 
 MessageCtrl& GetNotificationDaemon()

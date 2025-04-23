@@ -246,6 +246,13 @@ void Bobcat::Settings()
 
 	profiles.Load();
 
+	// ** EXPERIMENTAL WAYLAND SUPPORT **
+	settingspane.wayland.Hide();
+	#ifdef GUI_GTK
+	settingspane.wayland.Show();
+	settingspane.wayland <<= IsWaylandEnabled();
+	#endif
+
 	TabDlg dlg;
 	dlg.Add(profiles, tt_("Profiles"));
 	dlg.Add(settingspane, tt_("General"));
@@ -259,6 +266,7 @@ void Bobcat::Settings()
 			cr.Retrieve();
 			profiles.Store();
 			SaveConfig(*this);
+			EnableWayland(~settingspane.wayland);
 			if(window.IsOpen()) {
 				GetHyperlinkPatterns().Clear();     // Drop all patterns. Terminals will reacquire them.
 				GetWordSelectionPatterns().Clear(); // Drop all patterns.
