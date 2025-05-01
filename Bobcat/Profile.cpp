@@ -320,7 +320,8 @@ void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
      (emulation.paste.pathdelimiter,   p.pathdelimiter)
      (emulation.paste.filter,          p.filterctrl)
      (emulation.selection.wordselmode,      p.wordselmode)
-     (emulation.selection.findselectedtext, p.findselectedtext);
+     (emulation.selection.findselectedtext, p.findselectedtext)
+     (emulation.selection.wordselpattern, p.wordselpattern);
 
 }
 
