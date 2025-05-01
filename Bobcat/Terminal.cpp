@@ -650,7 +650,7 @@ String Terminal::GetLink()
 	if(IsMouseOverExplicitHyperlink())
 		return GetHyperlinkUri();
 	if(IsMouseOverImplicitHyperlink())
-		return linkifier.GetCurrentLinkInfo().url;
+		return linkifier.GetCurrentItemInfo().data;
 	return Null;
 }
 

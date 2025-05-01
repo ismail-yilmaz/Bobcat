@@ -39,6 +39,7 @@ namespace Upp {
 struct Bobcat;
 struct Terminal;
 struct Profile;
+struct ItemInfo;
 
 // Global context
 Ptr<Bobcat> GetContext();
@@ -162,6 +163,14 @@ struct Bobcat : Pte<Bobcat> {
     StackCtrl  stack;
     Config     settings;
     Array<Terminal> terminals;
+};
+
+// Generic terminal buffer item information. (For highlighting and other markers)
+
+struct ItemInfo : Moveable<ItemInfo> {
+	Point pos    = { 0, 0 };
+	int   length = 0;
+	Value data;
 };
 
 // Command line arguments/options parsing stuff

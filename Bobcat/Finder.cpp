@@ -347,7 +347,7 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 	// Notes: 1) We are using this for search, because it is faster than using WString::Find() here.
 	//        2) m.GetCount() > 1 == text is wrapped.
 	
-	auto ScanText = [&](Vector<TextAnchor>& v, int limit, bool tolower) {
+	auto ScanText = [&](Vector<ItemInfo>& v, int limit, bool tolower) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
 			for(int col = 0; col < m[row].GetLength(); col++, i++) {
 				int a = m[row][col], b = s[0];
@@ -377,7 +377,7 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 					}
 					// If tlen is 0, then the substring is found.
 					if(!tlen) {
-						TextAnchor& a = v.Add();
+						ItemInfo& a = v.Add();
 						a.pos.y = offset;
 						a.pos.x = i;
 						a.length = slen;
@@ -406,12 +406,12 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	if(q.IsEmpty())
 		return false;
 	
-	auto ScanText = [&](Vector<TextAnchor>& v, int limit) {
+	auto ScanText = [&](Vector<ItemInfo>& v, int limit) {
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
 		while(r.GlobalMatch(ln)) {
 			int o = r.GetOffset();
-			TextAnchor& a = v.Add();
+			ItemInfo& a = v.Add();
 			a.pos.y = offset;
 			a.pos.x = Utf32Len(~ln, o);
 			a.length = Utf32Len(~ln + o, r.GetLength());
@@ -436,14 +436,14 @@ void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
 	if(!term.HasFinder() || term.IsSearching() || !foundtext.GetCount() || index < 0)
 		return;
 
-	TextAnchor p = foundtext[index];
+	ItemInfo p = foundtext[index];
 
 	LTIMING("Finder::OnHighlight");
 
 	Vector<int> rows;
 	int dx = AdjustLineOffset(hl.GetKeys(), rows);
 	
-	for(const TextAnchor& a : foundtext)
+	for(const ItemInfo& a : foundtext)
 		for(int row = 0, col = 0, offset = -dx; row < hl.GetCount(); row++) {
 			if(rows[row] != a.pos.y)
 				continue;
@@ -509,7 +509,7 @@ bool Finder::Harvester::Reap(Stream& s)
 		if(txt.IsEmpty())
 			return false;
 		String reaped;
-		for(const TextAnchor& a : finder.foundtext) {
+		for(const ItemInfo& a : finder.foundtext) {
 			if(m.GetKey(0) != a.pos.y)
 				continue;
 			if((aborted = pi.StepCanceled()))

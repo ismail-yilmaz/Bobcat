@@ -79,15 +79,15 @@ int Linkifier::GetCount() const
 	return links.GetCount();
 }
 
-LinkInfo& Linkifier::operator[](int i)
+ItemInfo& Linkifier::operator[](int i)
 {
 	 ASSERT(i >= 0 && i < GetCount());
 	 return links[i];
 }
 
-const LinkInfo& Linkifier::GetCurrentLinkInfo() const
+const ItemInfo& Linkifier::GetCurrentItemInfo() const
 {
-	return links.Get(cursor, Single<LinkInfo>());
+	return links.Get(cursor, Single<ItemInfo>());
 }
 
 void Linkifier::Clear()
@@ -103,7 +103,7 @@ bool Linkifier::Sync()
 	if(!enabled || links.IsEmpty())
 		return false;
 	pos = term.GetMousePosAsIndex();
-	cursor = FindMatch(links, [this](const LinkInfo& q) {
+	cursor = FindMatch(links, [this](const ItemInfo& q) {
 		int i = term.GetPosAsIndex(q.pos, true);
 		return pos >= i && pos < i + q.length;
 	});
@@ -116,22 +116,22 @@ void Linkifier::Update()
 		Search();
 }
 
-const LinkInfo *Linkifier::begin() const
+const ItemInfo *Linkifier::begin() const
 {
 	 return links.begin();
 }
 
-LinkInfo *Linkifier::begin()
+ItemInfo *Linkifier::begin()
 {
 	 return links.begin();
 }
 
-const LinkInfo *Linkifier::end() const
+const ItemInfo *Linkifier::end() const
 {
 	 return links.end();
 }
 
-LinkInfo *Linkifier::end()
+ItemInfo *Linkifier::end()
 {
 	 return links.end();
 }
@@ -164,11 +164,11 @@ void Linkifier::Scan()
 			RegExp r(pi.pattern);
 			while(r.GlobalMatch(s)) {
 				int o = r.GetOffset();
-				LinkInfo& p = links.Add();
-				p.pos.y = offset;
-				p.pos.x = Utf32Len(~s, o);
+				ItemInfo& p = links.Add();
+				p.pos.y  = offset;
+				p.pos.x  = Utf32Len(~s, o);
 				p.length = Utf32Len(~s + o, r.GetLength());
-				p.url = s.Mid(o, r.GetLength());
+				p.data   = s.Mid(o, r.GetLength());
 			}
 		}
 		return false;
@@ -183,7 +183,7 @@ void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
 
 	LTIMING("Linkifier::OnHighlight");
 
-	for(const LinkInfo& pt : links) {
+	for(const ItemInfo& pt : links) {
 		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
 			if(hl.GetKey(row) != pt.pos.y)
 				continue;
