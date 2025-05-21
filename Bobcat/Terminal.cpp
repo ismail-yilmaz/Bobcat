@@ -235,7 +235,11 @@ bool Terminal::IsAsking()
 
 bool Terminal::IsRoot()
 {
+#ifdef PLATFORM_LINUX
 	return warnonrootaccess && static_cast<LinuxPtyProcess&>(*pty).IsRoot();
+#else
+	return false;
+#endif
 }
 
 void Terminal::DontExit()
