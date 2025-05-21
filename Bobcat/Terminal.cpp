@@ -233,6 +233,11 @@ bool Terminal::IsAsking()
 	return !IsRunning() && exitmode == ExitMode::KeepAsking;
 }
 
+bool Terminal::IsRoot()
+{
+	return warnonrootaccess && static_cast<LinuxPtyProcess&>(*pty).IsRoot();
+}
+
 void Terminal::DontExit()
 {
 	exitmode = ExitMode::Keep;
