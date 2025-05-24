@@ -203,6 +203,20 @@ bool AnnotationEditor(String& s, const char *title)
 	return false;
 }
 
+int AdjustLineOffset(Terminal& term, const Vector<int>& in, Vector<int>& out)
+{
+	int i = 0, dx = 0;
+	auto range = term.GetPageRange();
+	if(out = clone(in), i = out[0]; i == range.a) {
+		if(auto span = term.GetPage().GetLineSpan(i); i > span.a && i <= span.b) {
+			dx = GetLength(term.GetPage(), span.a, i);
+			for(int j = 0; j < out.GetCount(); j++)
+				out[j] = span.a + j;
+		}
+	}
+	return dx;
+}
+
 static const Vector<Tuple<dword, const char*>> mod_keys = {
     { K_SHIFT,              "K_SHIFT" },
     { K_ALT,                "K_ALT"   },

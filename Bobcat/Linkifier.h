@@ -49,7 +49,7 @@ public:
     void        Search();
     void        Update();
 
-    void        OnHighlight(VectorMap<int, VTLine>& hl);
+    void        OnHighlight(HighlightInfo& hlinfo);
     
     const ItemInfo* begin() const;
     ItemInfo*       begin();

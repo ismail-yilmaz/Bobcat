@@ -323,20 +323,6 @@ void Finder::SaveToClipboard()
 	harvester.SaveToClipboard();
 }
 
-int Finder::AdjustLineOffset(const Vector<int>& in, Vector<int>& out)
-{
-	int i = 0, dx = 0;
-	auto range = term.GetPageRange();
-	if(out = clone(in), i = out[0]; i == range.a) {
-		if(auto span = term.GetPage().GetLineSpan(i); i > span.a && i <= span.b) {
-			dx = GetLength(term.GetPage(), span.a, i);
-			for(int j = 0; j < out.GetCount(); j++)
-				out[j] = span.a + j;
-		}
-	}
-	return dx;
-}
-
 bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
@@ -431,42 +417,31 @@ bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 	return IsRegex() ? RegexSearch(m, s) : BasicSearch(m, s);
 }
 
-void Finder::OnHighlight(VectorMap<int, VTLine>& hl)
+void Finder::OnHighlight(HighlightInfo& hl)
 {
 	if(!term.HasFinder() || term.IsSearching() || !foundtext.GetCount() || index < 0)
 		return;
 
-	ItemInfo p = foundtext[index];
-
 	LTIMING("Finder::OnHighlight");
 
-	Vector<int> rows;
-	int dx = AdjustLineOffset(hl.GetKeys(), rows);
-	
-	for(const ItemInfo& a : foundtext)
-		for(int row = 0, col = 0, offset = -dx; row < hl.GetCount(); row++) {
-			if(rows[row] != a.pos.y)
-				continue;
-			for(VTLine& l : hl) {
-				for(VTCell& c : l) {
-					offset += c == 1; // Double width char, second half.
-					if(a.pos.x + offset <= col && col < a.pos.x + offset + a.length) {
-						if(a.pos.y == p.pos.y && a.pos.x + offset == p.pos.x + offset) {
-							c.Normal();
-							c.Ink(term.highlight[1]);
-							c.Paper(term.highlight[3]);
-						}
-						else
-						if(~showall) {
-							c.Normal();
-							c.Ink(term.highlight[0]);
-							c.Paper(term.highlight[2]);
-						}
-					}
-					col++;
-				}
+	hl.adjusted = true;
+	term.DoHighlight(foundtext, hl, [&](HighlightInfo& hl) {
+		const ItemInfo& p = foundtext[index];
+		const ItemInfo* q = hl.iteminfo;
+		int   o = hl.offset;
+		for(auto cell : hl.highlighted) {
+			if(q->pos.y == p.pos.y && q->pos.x + o == p.pos.x + o) {
+				cell->Normal()
+					.Ink(term.highlight[1]).Paper(term.highlight[3]);
+			}
+			else
+			if(~showall) {
+				cell->Normal()
+					.Ink(term.highlight[0]).Paper(term.highlight[2]);
+				
 			}
 		}
+	});
 }
 
 Finder::Harvester::Harvester(Finder& f)

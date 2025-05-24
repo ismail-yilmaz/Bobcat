@@ -40,6 +40,7 @@ struct Bobcat;
 struct Terminal;
 struct Profile;
 struct ItemInfo;
+struct HighlightInfo;
 
 // Global context
 Ptr<Bobcat> GetContext();
@@ -171,6 +172,17 @@ struct ItemInfo : Moveable<ItemInfo> {
 	Point pos    = { 0, 0 };
 	int   length = 0;
 	Value data;
+};
+
+// Generic highlighting structure.
+
+struct HighlightInfo : Moveable<HighlightInfo> {
+	VectorMap<int, VTLine>* line = nullptr;
+	Vector<VTCell*> highlighted;
+	const ItemInfo* iteminfo;
+	int             posindex = 0;
+	int             offset   = 0;
+	bool            adjusted = false;
 };
 
 // Command line arguments/options parsing stuff

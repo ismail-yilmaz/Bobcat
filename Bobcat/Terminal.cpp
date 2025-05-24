@@ -3,8 +3,9 @@
 
 #include "Bobcat.h"
 
-#define LLOG(x)  // RLOG(x)
-#define LDUMP(x) // RDUMP(x)
+#define LLOG(x)    // RLOG(x)
+#define LDUMP(x)   // RDUMP(x)
+#define LTIMING(x) // RTIMING(x)
 
 namespace Upp {
 
@@ -764,10 +765,58 @@ int Terminal::GetMousePosAsIndex() const
 	return GetPosAsIndex(GetMousePagePos(), true);
 }
 
-void Terminal::OnHighlight(VectorMap<int, VTLine>& hl)
+void Terminal::OnHighlight(VectorMap<int, VTLine>& line)
 {
+	HighlightInfo hl;
+	hl.line = &line;
 	linkifier.OnHighlight(hl);
 	finder.OnHighlight(hl);
+}
+
+void Terminal::DoHighlight(const Vector<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb)
+{
+	// Unified highlighting.
+	
+	LTIMING("Terminal::DoHighlight");
+	
+	auto ScanCells = [&](const ItemInfo& q) {
+		int col = 0;
+		hl.iteminfo = &q;
+		for(VTLine& l : *hl.line) {
+			for(VTCell& c : l) {
+				if(c.IsSpecial()) // offset special values (e.g. double width char trail)
+					continue;
+				if(q.pos.x + hl.offset <= col && col < q.pos.x + hl.offset + q.length) {
+					hl.highlighted.Add(&c);
+				}
+				else
+				if(!hl.highlighted.IsEmpty()) {
+					cb(hl);
+					hl.highlighted.Clear();
+				}
+				col++;
+			}
+		}
+		if(!hl.highlighted.IsEmpty())
+			cb(hl);
+	};
+
+	if(!hl.adjusted) {
+		for(const ItemInfo& q : items)
+			if(int i = hl.line->Find(q.pos.y); i >= 0) {
+				hl.posindex = GetPosAsIndex(q.pos, true);
+				ScanCells(q);
+			}
+	}
+	else {
+		Vector<int> rows;
+		hl.offset  = -AdjustLineOffset(*this, hl.line->GetKeys(), rows);
+		for(const ItemInfo& q : items)
+			for(int row = 0; row < hl.line->GetCount(); row++)
+				if(rows[row] == q.pos.y) {
+					ScanCells(q);
+				}
+	}
 }
 
 bool Terminal::GetWordSelection(const Point& pt, Point& pl, Point& ph) const
@@ -799,7 +848,7 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		WString q;
 		for(const VTLine& l : m)
 			q << l.ToWString();
-
+		
 		if(q.IsEmpty())
 			return false;
 
@@ -807,11 +856,12 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		pos += pt.x - GetOffset(page.FetchLine(pt.y), 0, pt.x);
 		
 		RegExp r(sp);
-		String l = ToUtf8(q);
-		while(r.GlobalMatch(l)) {
+		String s = ToUtf8(q);
+	
+		while(r.GlobalMatch(s)) {
 			int o = r.GetOffset();
-			int begin = Utf32Len(~l, o);
-			int end   = begin + Utf32Len(~l + o, r.GetLength());
+			int begin = Utf32Len(~s, o);
+			int end   = begin + Utf32Len(~s + o, r.GetLength());
 			if(pos >= begin && pos < end) {
 				for(int col = 0, row = 0, offset = 0; row < m.GetCount(); row++) {
 					const VTLine& l = m[row];

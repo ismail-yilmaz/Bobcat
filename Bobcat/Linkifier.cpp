@@ -175,37 +175,22 @@ void Linkifier::Scan()
 	};
 	term.GetPage().FetchRange(term.GetPageRange(), ScanRange);
 }
- 
-void Linkifier::OnHighlight(VectorMap<int, VTLine>& hl)
+
+void Linkifier::OnHighlight(HighlightInfo& hl)
 {
-	if(!term.HasLinkifier() || term.HasFinder() || !term.IsVisible() || links.IsEmpty())
+	if(!term.HasLinkifier() || term.HasFinder() || !term.IsVisible() || links.IsEmpty() || !hl.line)
 		return;
 
 	LTIMING("Linkifier::OnHighlight");
 
-	for(const ItemInfo& pt : links) {
-		for(int row = 0, col = 0; row < hl.GetCount(); row++) {
-			if(hl.GetKey(row) != pt.pos.y)
-				continue;
-			int offset = 0;
-			int ipos = term.GetPosAsIndex(pt.pos, true);
-			for(VTLine& l : hl)
-				for(VTCell& c : l) {
-					offset += c == 1; // Double width char, second half.
-					if(!c.IsHypertext() && pt.pos.x + offset <= col && col < pt.pos.x + pt.length + offset) { // First, check if the cell isn't already a hypertext.
-						if(pos >= ipos && pos < ipos + pt.length) {
-							c.Hyperlink();
-							c.data = 0;
-						}
-						else {
-							c.Hyperlink();
-							c.data = (dword) -1;
-						}
-					}
-					col++;
-				}
-		}
-	}
+	term.DoHighlight(links, hl, [this](HighlightInfo& hl) {
+		for(auto q : hl.highlighted)
+			if(!q->IsHypertext()) {
+			bool active = pos >= hl.posindex && pos < hl.posindex + hl.iteminfo->length;
+				q->Hyperlink().data = active ? 0 : (dword) -1;
+
+			}
+	});
 }
 
 Linkifier::Config::Config()
