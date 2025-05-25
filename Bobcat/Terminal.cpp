@@ -773,7 +773,7 @@ void Terminal::OnHighlight(VectorMap<int, VTLine>& line)
 	finder.OnHighlight(hl);
 }
 
-void Terminal::DoHighlight(const Vector<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb)
+void Terminal::DoHighlight(const Index<ItemInfo>& items, Upp::HighlightInfo& hl, const Event<HighlightInfo&>& cb)
 {
 	// Unified highlighting.
 	
@@ -801,21 +801,32 @@ void Terminal::DoHighlight(const Vector<ItemInfo>& items, HighlightInfo& hl, con
 			cb(hl);
 	};
 
-	if(!hl.adjusted) {
-		for(const ItemInfo& q : items)
-			if(int i = hl.line->Find(q.pos.y); i >= 0) {
-				hl.posindex = GetPosAsIndex(q.pos, true);
-				ScanCells(q);
-			}
-	}
-	else {
+	ItemInfo dummy;
+	
+	if(hl.adjusted) {
 		Vector<int> rows;
 		hl.offset  = -AdjustLineOffset(*this, hl.line->GetKeys(), rows);
-		for(const ItemInfo& q : items)
-			for(int row = 0; row < hl.line->GetCount(); row++)
-				if(rows[row] == q.pos.y) {
-					ScanCells(q);
+		for(int row : rows) {
+			dummy.pos.y = row;
+			if(int i = items.Find(dummy); i >= 0) {
+				do {
+					ScanCells(items[i]);
+					i = items.FindNext(i);
 				}
+				while(i >= 0);
+			}
+		}
+	}
+	else {
+		dummy.pos.y = hl.line->GetKey(0);
+		if(int i = items.Find(dummy); i >= 0) {
+			do {
+				hl.posindex = GetPosAsIndex(items[i].pos, true);
+				ScanCells(items[i]);
+				i = items.FindNext(i);
+			}
+			while(i >= 0);
+		}
 	}
 }
 

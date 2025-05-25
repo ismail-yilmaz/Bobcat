@@ -333,7 +333,7 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 	// Notes: 1) We are using this for search, because it is faster than using WString::Find() here.
 	//        2) m.GetCount() > 1 == text is wrapped.
 	
-	auto ScanText = [&](Vector<ItemInfo>& v, int limit, bool tolower) {
+	auto ScanText = [&](Index<ItemInfo>& v, int limit, bool tolower) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
 			for(int col = 0; col < m[row].GetLength(); col++, i++) {
 				int a = m[row][col], b = s[0];
@@ -363,10 +363,11 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 					}
 					// If tlen is 0, then the substring is found.
 					if(!tlen) {
-						ItemInfo& a = v.Add();
-						a.pos.y = offset;
-						a.pos.x = i;
-						a.length = slen;
+						ItemInfo q;
+						q.pos.y = offset;
+						q.pos.x = i;
+						q.length = slen;
+						v.Add(q);
 						if(v.GetCount() == limit)
 							return true;
 					}
@@ -392,15 +393,16 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	if(q.IsEmpty())
 		return false;
 	
-	auto ScanText = [&](Vector<ItemInfo>& v, int limit) {
+	auto ScanText = [&](Index<ItemInfo>& v, int limit) {
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
 		while(r.GlobalMatch(ln)) {
+			ItemInfo a;
 			int o = r.GetOffset();
-			ItemInfo& a = v.Add();
 			a.pos.y = offset;
 			a.pos.x = Utf32Len(~ln, o);
 			a.length = Utf32Len(~ln + o, r.GetLength());
+			v.Add(a);
 			if(v.GetCount() == limit)
 				return true;
 		}

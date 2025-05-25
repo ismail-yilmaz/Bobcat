@@ -73,7 +73,7 @@ private:
     bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
 
-    Vector<ItemInfo> foundtext;
+    Index<ItemInfo> foundtext;
 
     enum class Search {
         CaseSensitive,

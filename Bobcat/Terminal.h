@@ -122,8 +122,7 @@ struct Terminal : TerminalCtrl {
     int         GetMousePosAsIndex() const;
     
     void        OnHighlight(VectorMap<int, VTLine>& hl);
-    void        DoHighlight(const Vector<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb);
-    
+    void        DoHighlight(const Index<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb);
     bool        GetWordSelection(const Point& pt, Point& pl, Point& ph) const override;
     bool        GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) const;
     

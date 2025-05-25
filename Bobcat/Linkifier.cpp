@@ -79,15 +79,14 @@ int Linkifier::GetCount() const
 	return links.GetCount();
 }
 
-ItemInfo& Linkifier::operator[](int i)
+const ItemInfo& Linkifier::operator[](int i)
 {
-	 ASSERT(i >= 0 && i < GetCount());
-	 return links[i];
+	return i >= 0 && i < links.GetCount() ? links[i] : Single<ItemInfo>();
 }
 
 const ItemInfo& Linkifier::GetCurrentItemInfo() const
 {
-	return links.Get(cursor, Single<ItemInfo>());
+	return cursor >= 0 && cursor < links.GetCount() ? links[cursor] : Single<ItemInfo>();
 }
 
 void Linkifier::Clear()
@@ -121,17 +120,7 @@ const ItemInfo *Linkifier::begin() const
 	 return links.begin();
 }
 
-ItemInfo *Linkifier::begin()
-{
-	 return links.begin();
-}
-
 const ItemInfo *Linkifier::end() const
-{
-	 return links.end();
-}
-
-ItemInfo *Linkifier::end()
 {
 	 return links.end();
 }
@@ -164,11 +153,12 @@ void Linkifier::Scan()
 			RegExp r(pi.pattern);
 			while(r.GlobalMatch(s)) {
 				int o = r.GetOffset();
-				ItemInfo& p = links.Add();
+				ItemInfo p;
 				p.pos.y  = offset;
 				p.pos.x  = Utf32Len(~s, o);
 				p.length = Utf32Len(~s + o, r.GetLength());
 				p.data   = s.Mid(o, r.GetLength());
+				links.Add(pick(p));
 			}
 		}
 		return false;

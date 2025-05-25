@@ -38,7 +38,7 @@ public:
     void        ClearPos();
 
     int         GetCount() const;
-    ItemInfo&   operator[](int i);
+    const ItemInfo& operator[](int i);
 
     const ItemInfo& GetCurrentItemInfo() const;
    
@@ -52,9 +52,7 @@ public:
     void        OnHighlight(HighlightInfo& hlinfo);
     
     const ItemInfo* begin() const;
-    ItemInfo*       begin();
     const ItemInfo* end() const;
-    ItemInfo*       end();
     
     struct Config {
         Config();
@@ -67,7 +65,7 @@ private:
     int         cursor;
     int         pos;
     bool        enabled:1;
-    Vector<ItemInfo> links;
+    Index<ItemInfo> links;
 };
 
 class LinkifierSetup : public WithLinkifierProfileLayout<ParentCtrl> {
