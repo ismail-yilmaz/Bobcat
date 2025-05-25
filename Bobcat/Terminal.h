@@ -123,7 +123,7 @@ struct Terminal : TerminalCtrl {
     
     void        OnHighlight(VectorMap<int, VTLine>& hl);
     void        DoHighlight(const Vector<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb);
-
+    
     bool        GetWordSelection(const Point& pt, Point& pl, Point& ph) const override;
     bool        GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) const;
     
@@ -214,6 +214,7 @@ Ptr<MessageBox> AskRestartExitError(Ptr<Terminal> t);
 pid_t               GetProcessGroupId(APtyProcess& pty);
 Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid);
 String              GetUsernameFromUserId(uid_t uid);
+String              GetRunningProcessName(APtyProcess& pty);
 
 class LinuxPtyProcess : public PosixPtyProcess {
 public:

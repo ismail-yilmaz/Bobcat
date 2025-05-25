@@ -651,7 +651,7 @@ Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid)
     uid_t ruid = -1, euid = -1;
     
     if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
-        char line[256];
+        char line[256] = { 0 };
         while(fgets(line, sizeof(line), f)) {
             if(strncmp(line, "Uid:", 4) == 0) {
                 unsigned long r, e, s;
@@ -659,12 +659,33 @@ Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid)
                     ruid = r;
                     euid = e;
                 }
+				break;
+            }
+        }
+        fclose(f);
+    }
+    return { ruid, euid };
+}
+
+String GetRunningProcessName(APtyProcess& pty)
+{
+	pid_t pgid = GetProcessGroupId(pty);
+	if(pgid <= 0)
+		return Null;
+	
+    if(FILE *f = fopen(~Format("/proc/%d/status", pgid), "r"); f) {
+        char line[256] = { 0 }, name[128] = { 0 };
+        while(fgets(line, sizeof(line), f)) {
+            if(strncmp(line, "Name:", 5) == 0) {
+                if(sscanf(line, "Name:\t%127s", name) == 1) {
+					return String(name);
+                }
                 break;
             }
         }
         fclose(f);
     }
-    return {ruid, euid};
+    return Null;
 }
 
 String GetUsernameFromUserId(uid_t uid)
