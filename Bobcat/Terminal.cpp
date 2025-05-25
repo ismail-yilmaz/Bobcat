@@ -773,7 +773,7 @@ void Terminal::OnHighlight(VectorMap<int, VTLine>& line)
 	finder.OnHighlight(hl);
 }
 
-void Terminal::DoHighlight(const Index<ItemInfo>& items, Upp::HighlightInfo& hl, const Event<HighlightInfo&>& cb)
+void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, Upp::HighlightInfo& hl, const Event<HighlightInfo&>& cb)
 {
 	// Unified highlighting.
 	

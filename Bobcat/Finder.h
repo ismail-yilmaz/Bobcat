@@ -48,7 +48,9 @@ public:
     void        Sync();
 
     void        Search();
-    void		SearchText(const WString& text);
+    void        SearchText(const WString& text);
+    void        CancelSearch();
+    bool        IsSearchCanceled() const;
     void        Update();
 
     void        SaveToFile();
@@ -66,6 +68,7 @@ public:
         String  savemode;
         String  delimiter;
         bool    showall;
+        bool    parallelize;
         WithDeepCopy<Vector<String>> patterns;
     };
 
@@ -73,7 +76,7 @@ private:
     bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
     bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
 
-    Index<ItemInfo> foundtext;
+    SortedIndex<ItemInfo> foundtext;
 
     enum class Search {
         CaseSensitive,
@@ -108,6 +111,7 @@ private:
     Terminal&     term;
     Value         data;
     SearchField   text;
+    bool          cancel:1;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
     FrameRight<ToolButton> fsave, csave;

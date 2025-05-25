@@ -51,9 +51,6 @@ public:
 
     void        OnHighlight(HighlightInfo& hlinfo);
     
-    const ItemInfo* begin() const;
-    const ItemInfo* end() const;
-    
     struct Config {
         Config();
         void Jsonize(JsonIO& jio);
@@ -65,7 +62,7 @@ private:
     int         cursor;
     int         pos;
     bool        enabled:1;
-    Index<ItemInfo> links;
+    SortedIndex<ItemInfo> links;
 };
 
 class LinkifierSetup : public WithLinkifierProfileLayout<ParentCtrl> {

@@ -176,6 +176,7 @@ struct ItemInfo : Moveable<ItemInfo> {
 };
 
 inline bool operator==(const ItemInfo& a, const ItemInfo& b) { return a.pos.y == b.pos.y; };
+inline bool operator<(const ItemInfo& a, const ItemInfo& b)  { return a.pos.y < b.pos.y; };
 
 // Generic highlighting structure.
 

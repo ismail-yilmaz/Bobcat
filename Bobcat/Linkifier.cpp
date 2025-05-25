@@ -115,16 +115,6 @@ void Linkifier::Update()
 		Search();
 }
 
-const ItemInfo *Linkifier::begin() const
-{
-	 return links.begin();
-}
-
-const ItemInfo *Linkifier::end() const
-{
-	 return links.end();
-}
-
 void Linkifier::Search()
 {
 	Clear();
