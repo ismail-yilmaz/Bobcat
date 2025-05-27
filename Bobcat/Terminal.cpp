@@ -24,6 +24,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , smartwordsel(false)
 , shellintegration(false)
 , warnonrootaccess(false)
+, starttime(Null)
 , finder(*this)
 , linkifier(*this)
 , quicktext(*this)
@@ -139,6 +140,7 @@ bool Terminal::StartPty(const Profile& p)
 	if(ctx.stack.Find(*this) < 0)
 		ctx.stack.Add(*this);
 	if(pty->Start(p.command, m, p.address)) {
+		starttime = GetSysTime();
 		pty->SetSize(GetPageSize());
 		return true;
 	}
@@ -1021,6 +1023,11 @@ void Terminal::ContextMenu(Bar& menu)
 	ctx.HelpMenu(menu);
 	menu.AddKey(AK_CLOSE, [this] { Stop(); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
+}
+
+Time Terminal::GetUpTime() const
+{
+	return Time(1, 1, 1, 0, 0, 0) + (GetSysTime() - starttime);
 }
 
 Terminal::TitleBar::TitleBar(Terminal& ctx)

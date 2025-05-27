@@ -234,6 +234,7 @@ FileSel& BobcatFs();
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
+String GetUpTime(Time t);
 String GetDefaultShell();
 String GetVersion();
 String GetBuildInfo();

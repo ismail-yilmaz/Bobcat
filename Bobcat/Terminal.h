@@ -133,6 +133,8 @@ struct Terminal : TerminalCtrl {
     void        ViewMenu(Bar& menu);
     void        ContextMenu(Bar& menu);
     
+    Time        GetUpTime() const;
+    
     int         GetExitCode()                   { return pty->GetExitCode();     }
     String      GetExitMessage()                { return pty->GetExitMessage();  }
 
@@ -164,6 +166,7 @@ struct Terminal : TerminalCtrl {
     String       profilename;
     String       workingdir;
     PathMode     pathmode;
+    Time         starttime;
     String       pathdelimiter;
     Value        data;
     Finder       finder;

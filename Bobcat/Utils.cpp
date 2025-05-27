@@ -218,22 +218,22 @@ int AdjustLineOffset(Terminal& term, const Vector<int>& in, Vector<int>& out)
 }
 
 static const Vector<Tuple<dword, const char*>> mod_keys = {
-    { K_SHIFT,              "K_SHIFT" },
-    { K_ALT,                "K_ALT"   },
-    { K_CTRL,               "K_CTRL"  },
-    { K_CTRL|K_ALT,         "K_CTRL_ALT" },
-    { K_SHIFT|K_CTRL,       "K_SHIFT_CTRL" },
-    { K_SHIFT|K_ALT,        "K_SHIFT_ALT"  },
-    { K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT" },
+	{ K_SHIFT,              "K_SHIFT" },
+	{ K_ALT,                "K_ALT"   },
+	{ K_CTRL,               "K_CTRL"  },
+	{ K_CTRL|K_ALT,         "K_CTRL_ALT" },
+	{ K_SHIFT|K_CTRL,       "K_SHIFT_CTRL" },
+	{ K_SHIFT|K_ALT,        "K_SHIFT_ALT"  },
+	{ K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT" },
 #ifdef PLATFORM_COCOA
-    { K_OPTION,                      "K_OPTION"      },
-    { K_OPTION|K_SHIFT,              "K_SHIFT_OPTION " },
-    { K_OPTION|K_ALT,                "K_ALT_OPTION " },
-    { K_OPTION|K_CTRL,               "K_CTRL_OPTION" },
-    { K_OPTION|K_CTRL|K_ALT,         "K_CTRL_ALT_OPTION " },
-    { K_OPTION|K_SHIFT|K_ALT,        "K_SHIFT_ALT_OPTION " },
-    { K_OPTION|K_ALT,                "K_SHIFT_CTRL_OPTION " },
-    { K_OPTION|K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT_OPTION" },
+	{ K_OPTION,                      "K_OPTION"      },
+	{ K_OPTION|K_SHIFT,              "K_SHIFT_OPTION " },
+	{ K_OPTION|K_ALT,                "K_ALT_OPTION " },
+	{ K_OPTION|K_CTRL,               "K_CTRL_OPTION" },
+	{ K_OPTION|K_CTRL|K_ALT,         "K_CTRL_ALT_OPTION " },
+	{ K_OPTION|K_SHIFT|K_ALT,        "K_SHIFT_ALT_OPTION " },
+	{ K_OPTION|K_ALT,                "K_SHIFT_CTRL_OPTION " },
+	{ K_OPTION|K_SHIFT|K_CTRL|K_ALT, "K_SHIFT_CTRL_ALT_OPTION" },
 #endif
 };
 
@@ -331,7 +331,7 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
 {
 	return Vector<Tuple<void (*)(), String, String>> {
 		{ ChHostSkin, "host", tt_("Host platform") },
-	    { ChClassicSkin, "classic", tt_("Classic") },
+		{ ChClassicSkin, "classic", tt_("Classic") },
 		{ ChStdSkin, "standard", tt_("Standard") },
 		{ ChGraySkin, "gray", tt_("Gray") },
 		{ ChDarkSkin, "dark", tt_("Dark") },
@@ -445,6 +445,11 @@ Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 	return &c;
 }
 
+String GetUpTime(Time t)
+{
+	return Format("%d:%0d:%02d:%02d", t - Date(1, 1, 1), t.hour, t.minute, t.second);
+}
+
 String GetDefaultShell()
 {
 #if defined(PLATFORM_POSIX)
@@ -532,14 +537,14 @@ Vector<const CmdArg*> FindCmdArgs(CmdArgType t)
 
 const char* GetCmdArgTypeName(CmdArgType cat)
 {
-    switch(cat) {
-    case CmdArgType::General:     return t_("General");
-    case CmdArgType::Environment: return t_("Environment");
-    case CmdArgType::Emulation:   return t_("Emulation");
-    case CmdArgType::Appearance:  return t_("Appearance");
-    default:  break;
-    }
-    return t_("Other");
+	switch(cat) {
+	case CmdArgType::General:     return t_("General");
+	case CmdArgType::Environment: return t_("Environment");
+	case CmdArgType::Emulation:   return t_("Emulation");
+	case CmdArgType::Appearance:  return t_("Appearance");
+	default:  break;
+	}
+	return t_("Other");
 }
 
 const String& CmdArgList::Get(const char *id, const String& defval)
@@ -559,61 +564,61 @@ CmdArgParser::CmdArgParser(const Array<CmdArg>& args)
 
 bool CmdArgParser::Parse(const Vector<String>& cmdline, CmdArgList& list, String& error)
 {
-     list.options.Clear();
-     list.command.Clear();
-     bool cmdsep = false;
-     
-     for(int i = 0; i < cmdline.GetCount(); i++) {
-         const String& arg = cmdline[i];
-         
-         // Handle command after "--"
-         if(cmdsep) {
-             list.command << arg << ' ';
-            continue;
-         }
-         
-         if(arg == "--") {
-             cmdsep = true;
-             continue;
-         }
-         
-         // Parse options
-         if(arg[0] == '-') {
-             const CmdArg* opt = Find(arg);
-             if(!opt) {
-                 error = Format(t_("Unknown option: %s"), arg);
-                 return false;
-             }
-             
-             String value = String(opt->arg);
-             if(!value.IsEmpty()) {
-                 // Option requires a value
-                 if(i + 1 >= cmdline.GetCount()) {
-                     error = Format(t_("Option '%s' requires a value"), arg);
-                     return false;
-                 }
-                 value = cmdline[++i];
-             }
-             
-             // Store using the long option name for consistency
-             list.options.Add(opt->lopt, value);
-         }
-         else {
-             list.command = arg;
-         }
-     }
-     
-     if(!IsNull(list.command))
-	     list.command = TrimBoth(list.command);
+	list.options.Clear();
+	list.command.Clear();
+	bool cmdsep = false;
+	
+	for(int i = 0; i < cmdline.GetCount(); i++) {
+		const String& arg = cmdline[i];
+		
+		// Handle command after "--"
+		if(cmdsep) {
+			list.command << arg << ' ';
+			continue;
+		}
+		
+		if(arg == "--") {
+			cmdsep = true;
+			continue;
+		}
+		
+		// Parse options
+		if(arg[0] == '-') {
+			const CmdArg* opt = Find(arg);
+			if(!opt) {
+				error = Format(t_("Unknown option: %s"), arg);
+				return false;
+			}
+			
+			String value = String(opt->arg);
+			if(!value.IsEmpty()) {
+				// Option requires a value
+				if(i + 1 >= cmdline.GetCount()) {
+					error = Format(t_("Option '%s' requires a value"), arg);
+					return false;
+				}
+				value = cmdline[++i];
+			}
+			
+			// Store using the long option name for consistency
+			list.options.Add(opt->lopt, value);
+		}
+		else {
+			list.command = arg;
+		}
+	}
+	
+	if(!IsNull(list.command))
+		list.command = TrimBoth(list.command);
 
-     return true;
+	return true;
 }
 
 const CmdArg *CmdArgParser::Find(const String& arg) const
 {
 	if(arg.GetCount() < 2 || arg[0] != '-')
 		return nullptr;
-      
+	
 	bool islopt = arg[1] == '-';
 	
 	String s = arg.Mid(islopt ? 2 : 1);
@@ -646,25 +651,35 @@ pid_t GetProcessGroupId(APtyProcess& pty)
 	return tcgetpgrp(static_cast<LinuxPtyProcess&>(pty).GetSocket());
 }
 
+void ReadProcessStatus(pid_t pid, Gate<String&> fn)
+{
+	if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
+		char line[256] = { 0 };
+		while(fgets(line, sizeof(line), f)) {
+			String ln(line, min(sizeof(line), strlen(line)));
+			if(fn(ln))
+				break;
+		}
+		fclose(f);
+	}
+}
+
 Tuple<uid_t, uid_t> GetUserIdsFromProcess(pid_t pid)
 {
-    uid_t ruid = -1, euid = -1;
-    
-    if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
-        char line[256] = { 0 };
-        while(fgets(line, sizeof(line), f)) {
-            if(strncmp(line, "Uid:", 4) == 0) {
-                unsigned long r, e, s;
-                if(sscanf(line, "Uid:\t%lu\t%lu\t%lu", &r, &e, &s) == 3) {
-                    ruid = r;
-                    euid = e;
-                }
-				break;
-            }
-        }
-        fclose(f);
-    }
-    return { ruid, euid };
+	uid_t ruid = -1, euid = -1;
+
+	ReadProcessStatus(pid, [&](String& line) {
+		if(line.TrimStart("Uid:")) {
+			if(auto v = Split(line, '\t'); v.GetCount() > 3) {
+				ruid = StrInt(v[0]);
+				euid = StrInt(v[1]);
+				return true;
+			}
+		}
+		return false;
+	});
+	
+	return { ruid, euid };
 }
 
 String GetRunningProcessName(APtyProcess& pty)
@@ -672,20 +687,17 @@ String GetRunningProcessName(APtyProcess& pty)
 	pid_t pgid = GetProcessGroupId(pty);
 	if(pgid <= 0)
 		return Null;
-	
-    if(FILE *f = fopen(~Format("/proc/%d/status", pgid), "r"); f) {
-        char line[256] = { 0 }, name[128] = { 0 };
-        while(fgets(line, sizeof(line), f)) {
-            if(strncmp(line, "Name:", 5) == 0) {
-                if(sscanf(line, "Name:\t%127s", name) == 1) {
-					return String(name);
-                }
-                break;
-            }
-        }
-        fclose(f);
-    }
-    return Null;
+
+	String name;
+	ReadProcessStatus(pgid, [&](String& line) {
+		if(line.TrimStart("Name:")) {
+			name = line;
+			return true;
+		}
+		return false;
+	});
+
+	return name;
 }
 
 String GetUsernameFromUserId(uid_t uid)
@@ -708,11 +720,14 @@ bool LinuxPtyProcess::IsRoot()
 
 bool LinuxPtyProcess::CheckPrivileges(Terminal& t)
 {
+	
 	if(bool b = IsRoot(); b && !isroot) {
 		isroot = true;
 		String txt = t_("Warning: Privilege escalation!");
-		txt << " &ruid: " << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
-		    << ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
+		txt << "&"
+			<< t_("Process") << ": " << Nvl(GetRunningProcessName(*this), t_("Unknown"))
+		    << ", ruid: "  << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
+			<< ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
 		notification = Warning(t, txt);
 		if(t.bell)
 			BeepExclamation();
