@@ -35,6 +35,8 @@ T_("Edit")
 
 T_("View")
 
+T_("Emulation")
+
 T_("List")
 
 T_("Setup")
@@ -133,6 +135,8 @@ T_("Open settings window.")
 
 T_("List available color palettes.")
 
+T_("List available monospaced fonts.")
+
 T_("List available GUI themes.")
 
 T_("Set the GUI theme to THEME.")
@@ -171,13 +175,11 @@ T_("Close the terminal on exit.")
 
 T_("Ask what to do on exit.")
 
+T_("Inherit the environment.")
+
 T_("Don't inherit the environment.")
 
 T_("Set the working directory to PATH.")
-
-T_("Enable application clipboard access.")
-
-T_("Disable application clipboard access.")
 
 T_("Use VT-style function keys.")
 
@@ -190,6 +192,10 @@ T_("Disable window reports.")
 T_("Enable window actions.")
 
 T_("Disable window actions.")
+
+T_("Enable application clipboard access.")
+
+T_("Disable application clipboard access.")
 
 T_("Enable hyperlink detection. (OSC 52 + Linkifier)")
 
@@ -205,13 +211,15 @@ T_("Disable rich-text annotations.")
 
 T_("Set color palette to PALETTE.")
 
+T_("Set the font family to be used to FONT.")
+
+T_("Set the font size to SIZE")
+
 T_("Enable notification bell.")
 
 T_("Disable notification bell.")
 
 T_("Environment")
-
-T_("Emulation")
 
 T_("Appearance")
 
@@ -220,6 +228,12 @@ T_("Other")
 T_("Unknown option: %s")
 
 T_("Option '%s' requires a value")
+
+T_("Warning: Privilege escalation!")
+
+T_("Process")
+
+T_("Unknown")
 
 
 // Terminal.cpp
@@ -399,6 +413,8 @@ T_("Color Profile: %")
 
 // Navigator.cpp
 
+T_("Privilege escalation!")
+
 T_("Close navigator")
 
 T_("Search terminal")
@@ -456,7 +472,11 @@ T_("Hyperlink patterns")
 
 // QuickText.cpp
 
+T_("QuickText Editor")
+
 T_("Text")
+
+T_("Command")
 
 T_("Add text")
 
@@ -540,6 +560,10 @@ T_("Treat ambiguous width chars as wide chars")
 
 T_("Paste predefined text")
 
+T_("Warn on root access")
+
+T_("Insert unicode")
+
 
 // Navigator.key
 
@@ -586,13 +610,19 @@ T_("Copy")
 
 T_("Select All")
 
+T_("Parallel search")
+
 
 // Bobcat.lay
 
 T_("Don't inherit the environment")
 
+T_("Add Bobcat's exe path to PATH")
+
 T_("Choose the pseudo-terminal backend. Note that winpty backend requires "
      "the PtyAgent.exe file in the exe directory.")
+
+T_("Pty backend")
 
 T_("Variables")
 
@@ -603,8 +633,6 @@ T_("Answerback message")
 T_("Command line")
 
 T_("On exit")
-
-T_("Pty backend")
 
 T_("Click to change font.")
 
@@ -710,6 +738,10 @@ T_("Wheel mode")
 
 T_("Setting  a lower than 100 ms will effectively disable the animation.")
 
+T_("\001[g Pty monitoring interval can be a value between 0`-100 ms.&Decreasing "
+     "the interval may increase the performance but will also result in higher "
+     "CPU usage.&The recommended value is 10 ms. ]")
+
 T_("\aHide window caption and frames")
 
 T_("Hides window caption and frames. (Suitable for tiling WMs)")
@@ -724,6 +756,8 @@ T_("Saves screenshot as file instead of placing it in clipboard.")
 
 T_("Animate")
 
+T_("Use Wayland (experimental, needs restart)")
+
 T_("Page size format is  COLUMNSxROWS. Valid size range is between 2 to 300 "
      "cells.")
 
@@ -735,9 +769,11 @@ T_("Notifications placement")
 
 T_("Finder placement")
 
-T_("Stack animation duration")
+T_("Pty monitoring interval")
 
 T_("Stack transition mode")
+
+T_("Stack animation duration")
 
 T_("Custom page sizes")
 
@@ -767,6 +803,10 @@ T_("Restore defaults")
 
 T_("Show all")
 
+T_("Parallelize")
+
+T_("Enables or disables parallel (multithreaded) search.")
+
 T_("Show all ")
 
 T_("Default search mode")
@@ -779,7 +819,7 @@ T_("Delimiter")
 
 T_("Harvesting format")
 
-T_("items")
+T_("items (per thread)")
 
 T_("Word selection extra chars")
 
@@ -795,8 +835,19 @@ T_("Path delimiter")
 
 T_("Path translation")
 
+T_("String")
 
-// Terminal.cpp
+T_("Alias")
+
+T_("Type")
+
+
+// Obsolete
+
+T_("items")
+
+
+// PACKAGE 'Terminal' FILE 'Terminal.cpp'
 
 T_("Options")
 
@@ -807,7 +858,7 @@ T_("Selector mode")
 T_("Cursor style")
 
 
-// Colors.cpp
+// PACKAGE 'Terminal' FILE 'Colors.cpp'
 
 T_("Bad hash color text format")
 
@@ -818,9 +869,12 @@ T_("Bad rgb/a color text format")
 T_("Bad cmy/k color text format")
 
 
-// Terminal.key
+// Obsolete
 
 T_("Insert")
+
+
+// PACKAGE 'Terminal' FILE 'Terminal.key'
 
 T_("Annotate")
 
@@ -909,7 +963,7 @@ T_("Key navigation mode: Move to the beginning of the buffer")
 T_("Key navigation mode: Move to the end of the buffer")
 
 
-// MessageCtrl.cpp
+// PACKAGE 'MessageCtrl' FILE 'MessageCtrl.cpp'
 
 T_("No")
 
