@@ -50,8 +50,8 @@ void Navigator::Item::Paint(Draw& w)
 				}
 				// Always overlay
 				if(blinking && ctrl->IsRoot()) {
-					const char *txt = t_("Warning: Root Access!");
-					Point pt = q.CenterPos(GetTextSize(txt, StdFont()));
+					const char *txt = t_("Privilege escalation!");
+					Point pt = q.CenterPos(GetTextSize(txt, StdFont().Bold()));
 					w.DrawText(pt.x, pt.y, txt, StdFont().Bold(), LtRed());
 				}
 			}

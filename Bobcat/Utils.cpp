@@ -651,7 +651,7 @@ pid_t GetProcessGroupId(APtyProcess& pty)
 	return tcgetpgrp(static_cast<LinuxPtyProcess&>(pty).GetSocket());
 }
 
-void ReadProcessStatus(pid_t pid, Gate<String&> fn)
+void ReadProcessStatus(pid_t pid, const Gate<String&>& fn)
 {
 	if(FILE *f = fopen(~Format("/proc/%d/status", pid), "r"); f) {
 		char line[256] = { 0 };
@@ -726,7 +726,7 @@ bool LinuxPtyProcess::CheckPrivileges(Terminal& t)
 		String txt = t_("Warning: Privilege escalation!");
 		txt << "&"
 			<< t_("Process") << ": " << Nvl(GetRunningProcessName(*this), t_("Unknown"))
-		    << ", ruid: "  << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
+			<< ", ruid: "  << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
 			<< ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
 		notification = Warning(t, txt);
 		if(t.bell)
