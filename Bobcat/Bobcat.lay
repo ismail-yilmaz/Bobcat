@@ -167,13 +167,13 @@ LAYOUT(NavigatorLayout, 593, 22)
 END_LAYOUT
 
 LAYOUT(FinderLayout, 526, 20)
-	ITEM(ToolButton, prev, RightPosZ(262, 16).VSizePosZ(4, 2))
-	ITEM(ToolButton, next, RightPosZ(242, 16).VSizePosZ(4, 2))
-	ITEM(ToolButton, begin, RightPosZ(222, 16).VSizePosZ(4, 2))
-	ITEM(ToolButton, end, RightPosZ(202, 16).VSizePosZ(4, 2))
-	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).RightPosZ(122, 72).VSizePosZ(5, 2))
-	ITEM(Upp::Option, parallelize, SetLabel(t_("Parallelize")).Tip(t_("Enables or disables parallel (multithreaded) search.")).RightPosZ(50, 68).VSizePosZ(5, 2))
-	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(4, 2))
+	ITEM(ToolButton, prev, RightPosZ(262, 16).VSizePosZ(4, 4))
+	ITEM(ToolButton, next, RightPosZ(242, 16).VSizePosZ(4, 4))
+	ITEM(ToolButton, begin, RightPosZ(222, 16).VSizePosZ(4, 4))
+	ITEM(ToolButton, end, RightPosZ(202, 16).VSizePosZ(4, 4))
+	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).RightPosZ(122, 72).VSizePosZ(4, 4))
+	ITEM(Upp::Option, parallelize, SetLabel(t_("Parallelize")).Tip(t_("Enables or disables parallel (multithreaded) search.")).RightPosZ(50, 68).VSizePosZ(4, 4))
+	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(4, 4))
 END_LAYOUT
 
 LAYOUT(FinderProfileLayout, 659, 299)
