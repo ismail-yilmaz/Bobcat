@@ -38,7 +38,7 @@ Terminal::Terminal(Bobcat& ctx_)
 	SColorHighlight
 	}
 {
-	SetDeviceId("Bobcat");
+	SetDeviceId("Bobcat " + GetVersion());
 	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
