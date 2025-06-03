@@ -159,14 +159,14 @@ LAYOUT(AboutLayout, 447, 256)
 	ITEM(Upp::RichTextCtrl, txt, HSizePosZ(0, 1).VSizePosZ(1, 1))
 END_LAYOUT
 
-LAYOUT(NavigatorLayout, 593, 22)
-	ITEM(ToolButton, newterm, LeftPosZ(4, 12).VCenterPosZ(12, 0))
-	ITEM(ToolButton, profiles, LeftPosZ(18, 12).VCenterPosZ(12, 0))
-	ITEM(Upp::EditString, search, HSizePosZ(128, 129).VSizePosZ(2, 1))
-	ITEM(ToolButton, close, RightPosZ(4, 12).VCenterPosZ(12, 0))
+LAYOUT(NavigatorLayout, 526, 24)
+	ITEM(ToolButton, newterm, LeftPosZ(4, 16).VSizePosZ(4, 4))
+	ITEM(ToolButton, profiles, LeftPosZ(18, 16).VSizePosZ(4, 4))
+	ITEM(Upp::EditString, search, HSizePosZ(128, 128).VSizePosZ(2, 2))
+	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(4, 4))
 END_LAYOUT
 
-LAYOUT(FinderLayout, 526, 20)
+LAYOUT(FinderLayout, 526, 24)
 	ITEM(ToolButton, prev, RightPosZ(262, 16).VSizePosZ(4, 4))
 	ITEM(ToolButton, next, RightPosZ(242, 16).VSizePosZ(4, 4))
 	ITEM(ToolButton, begin, RightPosZ(222, 16).VSizePosZ(4, 4))
