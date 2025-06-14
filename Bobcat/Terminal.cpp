@@ -80,7 +80,7 @@ void Terminal::PostParse()
 	Update();
 }
 
-bool Terminal::StartPty(const Profile& p)
+bool Terminal::StartPty(const Profile& p, bool pane)
 {
 	#ifdef PLATFORM_POSIX
 	#ifdef PLATFORM_LINUX
@@ -137,8 +137,12 @@ bool Terminal::StartPty(const Profile& p)
 	}
 	
 	MakeTitle(profilename);
-	if(ctx.stack.Find(*this) < 0)
-		ctx.stack.Add(*this);
+	if(ctx.stack.Find(*this) < 0) {
+		if(pane)
+			ctx.stack.Split(*this);
+		else
+			ctx.stack.Add(*this);
+	}
 	if(pty->Start(p.command, m, p.address)) {
 		starttime = GetSysTime();
 		pty->SetSize(GetPageSize());
@@ -148,20 +152,20 @@ bool Terminal::StartPty(const Profile& p)
 	return false;
 }
 
-bool Terminal::Start(const Profile& p)
+bool Terminal::Start(const Profile& p, bool pane)
 {
 	SetProfile(p);
 	SetPalette(LoadPalette(p.palette));
-	return StartPty(p);
+	return StartPty(p, pane);
 }
 
-bool Terminal::Start(const String& profile_name)
+bool Terminal::Start(const String& profile_name, bool pane)
 {
 	Profile p = LoadProfile(profile_name);
-	return Start(p);
+	return Start(p, pane);
 }
 
-bool Terminal::Start(Terminal *term)
+bool Terminal::Start(Terminal *term, bool pane)
 {
 	Profile p;
 	if(term) {
@@ -170,7 +174,7 @@ bool Terminal::Start(Terminal *term)
 			p.address = term->workingdir;
 		}
 	}
-	return Start(p);
+	return Start(p, pane);
 }
 
 void Terminal::Restart()
@@ -424,6 +428,13 @@ Image Terminal::CursorImage(Point pt, dword keyflags)
 	if(IsMouseOverImplicitHyperlink())
 		return Image::Hand();
 	return TerminalCtrl::CursorImage(pt, keyflags);
+}
+
+void Terminal::GotFocus()
+{
+	TerminalCtrl::GotFocus();
+	if(IsSplitterPane())
+		ctx.stack.Goto(*this);
 }
 
 Terminal& Terminal::SetPalette(const Palette& p)
@@ -1023,6 +1034,16 @@ void Terminal::ContextMenu(Bar& menu)
 	ctx.HelpMenu(menu);
 	menu.AddKey(AK_CLOSE, [this] { Stop(); });
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
+}
+
+Splitter* Terminal::GetParentSplitter() const
+{
+	return dynamic_cast<Splitter*>(GetParent());
+}
+
+bool Terminal::IsSplitterPane() const
+{
+	return GetParentSplitter() != nullptr;
 }
 
 Time Terminal::GetUpTime() const

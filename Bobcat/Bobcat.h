@@ -13,7 +13,6 @@
 #include <plugin/pcre/Pcre.h> // WebGui Windows compilation fix: This has to be above the other include files.
 
 #include <MessageCtrl/MessageCtrl.h>
-#include <StackCtrl/StackCtrl.h>
 #include <Terminal/Terminal.h>
 #include <PtyProcess/PtyProcess.h>
 
@@ -51,6 +50,7 @@ void SetContext(Bobcat& ctx);
 #define LAYOUTFILE <Bobcat/Bobcat.lay>
 #include <CtrlCore/lay.h>
 
+#include "Stacker.h"
 #include "QuickText.h"
 #include "Linkifier.h"
 #include "Finder.h"
@@ -61,9 +61,9 @@ void SetContext(Bobcat& ctx);
 struct Bobcat : Pte<Bobcat> {
     Bobcat();
 
-    bool        AddTerminal(const String& key = Null);
-    bool        AddTerminal(const Profile& profile);
-    bool        NewTerminalFromActiveProfile();
+    bool        AddTerminal(const String& key = Null, bool pane = false);
+    bool        AddTerminal(const Profile& profile, bool pane = false);
+    bool        NewTerminalFromActiveProfile(bool pane = false);
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
@@ -145,6 +145,7 @@ struct Bobcat : Pte<Bobcat> {
         String      backgroundimagemode;
         int         backgroundimageblur;
         int         ptywaitinterval;
+        String      splitterorientation;
         void        Jsonize(JsonIO& jio);
     };
     
@@ -156,12 +157,12 @@ struct Bobcat : Pte<Bobcat> {
         Value       data;
         String      mode;
     };
-    
+
     TopWindow  window;
     MenuBar    menubar;
     Navigator  navigator;
     ViewCtrl   view;
-    StackCtrl  stack;
+    Stacker    stack;
     Config     settings;
     Array<Terminal> terminals;
 };

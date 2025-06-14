@@ -46,7 +46,7 @@ Finder::Finder(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
-	Add(text.HSizePosZ(4, prev.GetRect().left + 4).VSizePosZ(4, 4));
+	Add(text.HSizePosZ(4, 282).VSizePosZ(4, 4));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(display);
 	text.AddFrame(menu);

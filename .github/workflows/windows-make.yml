@@ -42,12 +42,6 @@ jobs:
         repository: ismail-yilmaz/Terminal
         path: upp-source/upp/UppHub/Terminal
 
-    - name: Checkout StackCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/StackCtrl
-        path: upp-source/upp/UppHub/StackCtrl
-
     - name: Checkout MessageCtrl repository
       uses: actions/checkout@v3
       with:

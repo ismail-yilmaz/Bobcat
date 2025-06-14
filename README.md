@@ -45,7 +45,8 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 
 ### Customization & Interface  
 
-- **Multiple Profiles:** Configure different terminal settings and **color schemes** for various tasks.  
+- **Multiple Profiles:** Configure different terminal settings and **color schemes** for various tasks.
+- **Split screen:** You can spit the screen to 2 terminal panes side by side (vertical or horizontal).
 - **Minimal vs. Full UI:** Choose between a lightweight or fully-featured interface with a **stacked terminal manager** for easy navigation.  
 - **Simple Configuration:** JSON-based configuration with **real-time updates**, or use a **GUI settings panel**—no manual file editing required.  
 
@@ -69,7 +70,6 @@ Bobcat has minimal requirements. You'll need:
 - CLANG/GCC (C++17 or later)
 - [U++](https://www.ultimatepp.org) framework
 - [TerminalCtrl](https://github.com/ismail-yilmaz/Terminal)
-- [StackCtrl](https://github.com/ismail-yilmaz/StackCtrl)
 - [MessageCtrl](https://github.com/ismail-yilmaz/MessageCtrl)
 
 ## Installation
@@ -134,10 +134,16 @@ Bobcat, running yazi, in borderless mode on Linux.
 ![bobcat-yazi](resources/bobcat-yazi-borderless-linux.png)
 
 Bobcat, running yazi with image preview feature on Windows
+
 ![bobcat-yazi2](resources/bobcat-yazi-imagepreview-windows.png)
 
 Bobcat, running Neovim on Windows
+
 ![bobcat-nvim](resources/bobcat-neovim-windows.png)
+
+Split screen support (linux, zellij/neovim, btop)
+
+![bobcat-splitter](resources/bobcat-splitter-linux.png)
 
 Multiple terminal profile support (linux, btop)
 

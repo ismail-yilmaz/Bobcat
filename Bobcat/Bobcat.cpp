@@ -53,23 +53,23 @@ Bobcat::Bobcat()
 	GetNotificationDaemon().NoIcon().Append().Animation();
 }
 
-bool Bobcat::AddTerminal(const String& key)
+bool Bobcat::AddTerminal(const String& key, bool pane)
 {
-	bool ok = terminals.Create(*this).Start(key);
+	bool ok = terminals.Create(*this).Start(key, pane);
 	if(ok) Sync();
 	return ok;
 }
 
-bool Bobcat::AddTerminal(const Profile& profile)
+bool Bobcat::AddTerminal(const Profile& profile, bool pane)
 {
-	bool ok = terminals.Create(*this).Start(profile);
+	bool ok = terminals.Create(*this).Start(profile, pane);
 	if(ok) Sync();
 	return ok;
 }
 
-bool Bobcat::NewTerminalFromActiveProfile()
+bool Bobcat::NewTerminalFromActiveProfile(bool pane)
 {
-	bool ok = terminals.Create(*this).Start(GetActiveTerminal());
+	bool ok = terminals.Create(*this).Start(GetActiveTerminal(), pane);
 	if(ok) Sync();
 	return ok;
 }
@@ -91,12 +91,12 @@ void Bobcat::ActivateTerminal()
 
 Terminal *Bobcat::GetActiveTerminal()
 {
-	return dynamic_cast<Terminal*>(stack.GetActiveCtrl());
+	return (Terminal*) stack.GetActiveCtrl();
 }
 
 String Bobcat::GetActiveProfile()
 {
-	if (Terminal *t = GetActiveTerminal(); t)
+	if(Terminal *t = GetActiveTerminal(); t)
 		return t->profilename;
 	else
 		return "";
@@ -186,6 +186,10 @@ void Bobcat::Settings()
 	settingspane.direction.Add("vertical", tt_("Vertical"));
 	settingspane.direction.GoBegin();
 	
+	settingspane.splitterorientation.Add("horizontal", tt_("Horizontal"));
+	settingspane.splitterorientation.Add("vertical", tt_("Vertical"));
+	settingspane.splitterorientation.GoBegin();
+	
 	settingspane.imagemode.Add("normal", tt_("Normal"));
 	settingspane.imagemode.Add("centered", tt_("Centered"));
 	settingspane.imagemode.Add("stretched", tt_("Stretched"));
@@ -229,6 +233,7 @@ void Bobcat::Settings()
 	cr(settingspane.direction, settings.stackdirection);
 	cr(settingspane.animation, settings.stackanimation);
 	cr(settingspane.wheel, settings.stackwheel);
+	cr(settingspane.splitterorientation, settings.splitterorientation);
 	cr(settingspane.showmenu, settings.showmenu);
 	cr(settingspane.showtitle, settings.showtitle);
 	cr(settingspane.frameless, settings.frameless);
@@ -409,6 +414,7 @@ void Bobcat::Sync()
 	ShowMenuBar(settings.showmenu);
 	window.FrameLess(settings.frameless);
 	settings.stackdirection == "horizontal"	? stack.Horz() : stack.Vert();
+	settings.splitterorientation == "horizontal" ? stack.HorzSplitter() : stack.VertSplitert();
 	auto& m = GetNotificationDaemon();
 	settings.notificationalignment == "top" ? m.Top() : m.Bottom();
 	m.Animation(settings.notificationanimation);
@@ -444,11 +450,8 @@ void Bobcat::SyncBackground()
 		view <<= Null;
 	
 	stack.Transparent(bkimg);
-	for(int i = 0; i < stack.GetCount(); i++) {
-		Terminal& t = AsTerminal(stack[i]);
-		t.Sync().NoBackground(bkimg);
-	}
-
+	for(int i = 0; i < stack.GetCount(); i++)
+		AsTerminal(stack[i]).Sync().NoBackground(bkimg);
 }
 
 void Bobcat::SyncTerminalProfiles()
@@ -536,7 +539,9 @@ void Bobcat::HelpMenu(Bar& menu)
 void Bobcat::TermMenu(Bar& menu)
 {
 	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { NewTerminalFromActiveProfile(); });
-
+	menu.AddKey(AK_NEWPANE, [this] { NewTerminalFromActiveProfile(true); });
+	menu.AddKey(AK_TOGGLESPLITTER, [this] { stack.ToggleSplitterOrientation(); });
+	
 	Vector<String> pnames = GetProfileNames();
 	if(!pnames.GetCount())
 		return;
@@ -562,6 +567,17 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 				7, (KeyInfo& (*)()) AK_PROFILE8,
 				8, (KeyInfo& (*)()) AK_PROFILE9,
 				(KeyInfo& (*)()) AK_PROFILE10));
+			menu.AddKey(decode(i,
+				0, (KeyInfo& (*)()) AK_SPROFILE1,
+				1, (KeyInfo& (*)()) AK_SPROFILE2,
+				2, (KeyInfo& (*)()) AK_SPROFILE3,
+				3, (KeyInfo& (*)()) AK_SPROFILE4,
+				4, (KeyInfo& (*)()) AK_SPROFILE5,
+				5, (KeyInfo& (*)()) AK_SPROFILE6,
+				6, (KeyInfo& (*)()) AK_SPROFILE7,
+				7, (KeyInfo& (*)()) AK_SPROFILE8,
+				8, (KeyInfo& (*)()) AK_SPROFILE9,
+				(KeyInfo& (*)()) AK_PROFILE10), [this, name] { AddTerminal(name, true); });
 		}
 	}
 }
@@ -571,7 +587,7 @@ void Bobcat::ListMenu(Bar& menu)
 	menu.Add(AK_NAVIGATOR, Images::Navigator(), [this] { ToggleNavigator(); });
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
-		Terminal& t = (Terminal &) stack[i];
+		Terminal& t = AsTerminal(stack[i]);
 		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); SyncTitle(); }).Radio(stack.GetCursor() == i);
 	}
 }
@@ -709,6 +725,7 @@ Bobcat::Config::Config()
 , backgroundimagemode("normal")
 , backgroundimageblur(0)
 , ptywaitinterval(10)
+, splitterorientation("horizontal")
 {
 }
 
@@ -722,6 +739,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("StackAnimationDirection", stackdirection)
 	   ("StackAnimationDuration", stackanimation)
 	   ("StackWheelMode", stackwheel)
+	   ("SplitterOrientation", splitterorientation)
 	   ("ShowMenuBar", showmenu)
 	   ("ShowTitleBar", showtitle)
 	   ("FramelessWindow", frameless)

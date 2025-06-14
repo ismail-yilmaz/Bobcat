@@ -329,16 +329,10 @@ int Navigator::GetCursor()
 
 void Navigator::SwapItem(int i, int ii)
 {
-	if(AnimateSwap(i, ii))
-		return;
-
-	Item& a = items[i];
-	Item& b = items[ii];
-	ctx.stack.Swap(*a.ctrl, *b.ctrl);
-	Swap(a.ctrl, b.ctrl);
-	Swap(a.img, b.img);
-	b.SetFocus();
-	Refresh();
+	if(!AnimateSwap(i, ii)) {
+		ctx.stack.Swap(*items[i].ctrl, *items[ii].ctrl);
+		Sync();
+	}
 }
 
 void Navigator::SwapFirst()

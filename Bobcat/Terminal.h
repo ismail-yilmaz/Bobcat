@@ -20,10 +20,12 @@ struct Terminal : TerminalCtrl {
     void        LeftDouble(Point pt, dword keyflags) override;
     Image       CursorImage(Point pt, dword keyflags) override;
     
-    bool        StartPty(const Profile& profile);
-    bool        Start(const String& profile_name);
-    bool        Start(const Profile& profile);
-    bool        Start(Terminal *term);
+    void        GotFocus() override;
+    
+    bool        StartPty(const Profile& profile, bool pane = false);
+    bool        Start(const String& profile_name, bool pane = false);
+    bool        Start(const Profile& profile, bool pane = false);
+    bool        Start(Terminal *term, bool pane = false);
     void        Stop();
     bool        Do();
     void        Restart();
@@ -132,6 +134,10 @@ struct Terminal : TerminalCtrl {
     void        EditMenu(Bar& menu);
     void        ViewMenu(Bar& menu);
     void        ContextMenu(Bar& menu);
+
+
+    Splitter*   GetParentSplitter() const;
+    bool        IsSplitterPane() const;
     
     Time        GetUpTime() const;
     

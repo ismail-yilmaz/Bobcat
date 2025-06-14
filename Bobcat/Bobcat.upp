@@ -7,7 +7,6 @@ uses
 	CtrlLib,
 	Terminal,
 	PtyProcess,
-	StackCtrl,
 	plugin/pcre,
 	MessageCtrl;
 
@@ -41,6 +40,9 @@ file
 	QuickText readonly separator,
 	QuickText.h,
 	QuickText.cpp,
+	Stacker readonly separator,
+	Stacker.h,
+	Stacker.cpp,
 	Resources readonly separator,
 	Application.key,
 	Terminal.key,
