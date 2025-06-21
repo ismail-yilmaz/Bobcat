@@ -46,6 +46,10 @@ public:
     void        Swap(Ctrl& a, Ctrl& b);
     void        SwapNext();
     void        SwapPrev();
+    
+    void        ExpandLeftPane();
+    void        ExpandRightPane();
+    void        ResetSplitterPos();
 
     void        Goto(int i);
     void        Goto(Ctrl& ctrl);

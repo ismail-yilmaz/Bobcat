@@ -540,8 +540,11 @@ void Bobcat::HelpMenu(Bar& menu)
 void Bobcat::TermMenu(Bar& menu)
 {
 	menu.Add(AK_NEWTAB, Images::Terminal(), [this] { NewTerminalFromActiveProfile(); });
-	menu.AddKey(AK_NEWPANE, [this] { NewTerminalFromActiveProfile(true); });
-	menu.AddKey(AK_TOGGLESPLITTER, [this] { stack.ToggleSplitterOrientation(); });
+	menu.AddKey(AK_NEWPANE,                 [this] { NewTerminalFromActiveProfile(true); });
+	menu.AddKey(AK_TOGGLESPLITTER,          [this] { stack.ToggleSplitterOrientation(); });
+	menu.AddKey(AK_SPLITTER_EXPANDLEFT,     [this] { stack.ExpandLeftPane(); });
+	menu.AddKey(AK_SPLITTER_EXPANDRIGHT,    [this] { stack.ExpandRightPane(); });
+	menu.AddKey(AK_SPLITTER_RESETPOS,       [this] { stack.ResetSplitterPos(); });
 	
 	Vector<String> pnames = GetProfileNames();
 	if(!pnames.GetCount())
