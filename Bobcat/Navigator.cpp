@@ -356,10 +356,10 @@ void Navigator::SwapNext()
 		SwapItem(i, i + 1);
 }
 
-bool Navigator::AnimateSwap(int i, int ii)
+void Navigator::AnimateSwap(int i, int ii)
 {
-	if(swapanim)
-		return true;
+	if(!IsShown() || swapanim)
+		return;
 	
 	swapanim = true;
 	
@@ -401,7 +401,6 @@ bool Navigator::AnimateSwap(int i, int ii)
 	Refresh();
 
 	swapanim = false;
-	return false;
 }
 
 void Navigator::Paint(Draw& w)

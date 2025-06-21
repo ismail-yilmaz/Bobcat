@@ -514,6 +514,11 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.Add(enable, AK_NEXT, Images::Next(),  [this] { stack.Next();    SyncTitle(); });
 	menu.Add(enable, AK_BEGIN,Images::Begin(), [this] { stack.GoBegin(); SyncTitle(); });
 	menu.Add(enable, AK_END,  Images::End(),   [this] { stack.GoEnd();   SyncTitle(); });
+	menu.AddKey(AK_SPLITTER_TOGGLE,            [this] { stack.ToggleSplitterOrientation(); });
+	menu.AddKey(AK_SPLITTER_EXPANDTOPLEFT,     [this] { stack.ExpandTopLeftPane(); });
+	menu.AddKey(AK_SPLITTER_EXPANDBOTTOMRIGHT, [this] { stack.ExpandBottomRightPane(); });
+	menu.AddKey(AK_SPLITTER_RESETPOS,          [this] { stack.ResetSplitterPos(); });
+	menu.AddKey(AK_SPLITTER_SWAPPANES,         [this] { stack.SwapPanes(); });
 
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->ViewMenu(menu);
@@ -541,10 +546,6 @@ void Bobcat::TermMenu(Bar& menu)
 {
 	menu.Add(AK_NEWTAB, Images::Terminal(),    [this] { NewTerminalFromActiveProfile(); });
 	menu.AddKey(AK_NEWPANE,                    [this] { NewTerminalFromActiveProfile(true); });
-	menu.AddKey(AK_SPLITTER_TOGGLE,            [this] { stack.ToggleSplitterOrientation(); });
-	menu.AddKey(AK_SPLITTER_EXPANDTOPLEFT,     [this] { stack.ExpandTopLeftPane(); });
-	menu.AddKey(AK_SPLITTER_EXPANDBOTTOMRIGHT, [this] { stack.ExpandBottomRightPane(); });
-	menu.AddKey(AK_SPLITTER_RESETPOS,          [this] { stack.ResetSplitterPos(); });
 	
 	Vector<String> pnames = GetProfileNames();
 	if(!pnames.GetCount())

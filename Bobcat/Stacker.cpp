@@ -186,7 +186,7 @@ int Stacker::Find(Ctrl& ctrl) const
 	return FindIndex(list, &ctrl);
 }
 
-void Stacker::Swap(int a, int b)
+void Stacker::SwapCtrls(int a, int b, bool activate)
 {
 	if (a == b || a < 0 || a >= list.GetCount() || b < 0 || b >= list.GetCount())
 		return;
@@ -253,7 +253,13 @@ void Stacker::Swap(int a, int b)
 	
 	list.Swap(a, b);
 	WhenSwap(a, b);
-	Activate(list[a]);
+	if(activate)
+		Activate(list[a]);
+}
+
+void Stacker::Swap(int a, int b)
+{
+	SwapCtrls(a, b);
 }
 
 void Stacker::Swap(Ctrl& a, Ctrl& b)
@@ -271,6 +277,17 @@ void Stacker::SwapPrev()
 {
 	int i = Find(*activectrl);
 	Swap(i, i - 1);
+}
+
+void Stacker::SwapPanes()
+{
+	if(Splitter *sp = GetParentSplitter(activectrl); sp) {
+		if(Ctrl *l = sp->GetFirstChild(), *r = sp->GetLastChild(); l && r) {
+			bool lfocus = l->HasFocus();
+			SwapCtrls(Find(*l), Find(*r), false);
+			lfocus ? l->SetFocus() : r->SetFocus();
+		}
+	}
 }
 
 void Stacker::ExpandTopLeftPane()

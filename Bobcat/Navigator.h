@@ -30,7 +30,7 @@ struct Navigator : ParentCtrl {
     void          SwapPrev();
     void          SwapNext();
     
-    bool          AnimateSwap(int i, int ii);
+    void          AnimateSwap(int i, int ii);
     
     Event<Bar&>   WhenBar;
     Event<>       WhenClose;
