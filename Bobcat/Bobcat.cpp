@@ -577,7 +577,7 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 				6, (KeyInfo& (*)()) AK_SPROFILE7,
 				7, (KeyInfo& (*)()) AK_SPROFILE8,
 				8, (KeyInfo& (*)()) AK_SPROFILE9,
-				(KeyInfo& (*)()) AK_PROFILE10), [this, name] { AddTerminal(name, true); });
+				(KeyInfo& (*)()) AK_SPROFILE10), [this, name] { AddTerminal(name, true); });
 		}
 	}
 }
