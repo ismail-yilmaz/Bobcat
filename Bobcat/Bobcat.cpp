@@ -49,6 +49,7 @@ Bobcat::Bobcat()
 	navigator.WhenGotoItem   = [this](Ctrl& c)   { ToggleNavigator(); stack.Goto(c); };
 	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
 	stack.WhenAction         = [this]()          { Sync(); };
+	stack.WhenSwap           = [this](int a, int b) { navigator.AnimateSwap(a, b); };
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
 	GetNotificationDaemon().NoIcon().Append().Animation();
 }

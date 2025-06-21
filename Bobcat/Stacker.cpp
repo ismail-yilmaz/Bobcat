@@ -190,38 +190,70 @@ void Stacker::Swap(int a, int b)
 {
 	if (a == b || a < 0 || a >= list.GetCount() || b < 0 || b >= list.GetCount())
 		return;
-	
-	int cursor = GetCursor();
-	
+
 	Ctrl *ctrl_a = list[a];
 	Ctrl *ctrl_b = list[b];
 	
 	Splitter *splitter_a = GetParentSplitter(ctrl_a);
 	Splitter *splitter_b = GetParentSplitter(ctrl_b);
 	
-	int pos_a = splitter_a ? splitter_a->GetChildIndex(ctrl_a) : -1;
-	int pos_b = splitter_b ? splitter_b->GetChildIndex(ctrl_b) : -1;
-	
+	int idx_a = -1, idx_b = -1, pos_a = 0, pos_b = 0;
+
+	if(splitter_a) {
+		idx_a = splitter_a->GetChildIndex(ctrl_a);
+		pos_a = splitter_a->GetPos();
+	}
+
+	if(splitter_b) {
+		idx_b = splitter_b->GetChildIndex(ctrl_b);
+		pos_b = splitter_b->GetPos();
+	}
+
 	if(splitter_a && splitter_b) {
 		splitter_a->Remove(*ctrl_a);
 		splitter_b->Remove(*ctrl_b);
-		splitter_a->Insert(pos_a, *ctrl_b);
-		splitter_b->Insert(pos_b, *ctrl_a);
+	
+		if(splitter_a == splitter_b) {
+			splitter_a->Set(idx_a < idx_b ? *ctrl_b : *ctrl_a,
+			                idx_a < idx_b ? *ctrl_a : *ctrl_b);
+		}
+		else {
+			Ctrl* a_first = splitter_a->GetFirstChild();
+			Ctrl* b_first = splitter_b->GetFirstChild();
+	
+			splitter_a->Set(idx_a == 0 ? *ctrl_b : *a_first,
+			                idx_a == 0 ? *a_first : *ctrl_b);
+	
+			splitter_b->Set(idx_b == 0 ? *ctrl_a : *b_first,
+			                idx_b == 0 ? *b_first : *ctrl_a);
+		}
+		splitter_a->SetPos(pos_a);
+		splitter_b->SetPos(pos_b);
+		
 	}
 	else
 	if(splitter_a && !splitter_b) {
-		splitter_a->Swap(*ctrl_a, *ctrl_b);
+		ctrl_b->Remove();
+		splitter_a->Remove(*ctrl_a);
 		Ctrl::Add(ctrl_a->SizePos());
+		Ctrl* a_first = splitter_a->GetFirstChild();
+		splitter_a->Set(idx_a == 0 ? *ctrl_b : *a_first,
+						idx_a == 0 ? *a_first : *ctrl_b);
+		splitter_a->SetPos(pos_a);
 	}
 	else
 	if(splitter_b && !splitter_a) {
-		splitter_b->Swap(*ctrl_b, *ctrl_a);
+		ctrl_a->Remove();
 		Ctrl::Add(ctrl_b->SizePos());
+		Ctrl* b_first = splitter_b->GetFirstChild();
+		splitter_b->Set(idx_b == 0 ? *ctrl_a : *b_first,
+						idx_b == 0 ? *b_first : *ctrl_a);
+		splitter_b->SetPos(pos_b);
 	}
 	
 	list.Swap(a, b);
-
-	Goto(*ctrl_b);
+	WhenSwap(a, b);
+	Activate(list[a]);
 }
 
 void Stacker::Swap(Ctrl& a, Ctrl& b)
@@ -243,8 +275,10 @@ void Stacker::SwapPrev()
 
 void Stacker::Goto(int i)
 {
-	if(i >= 0 && i < GetCount())
+	if(i >= 0 && i < GetCount()) {
 		Activate(list[i]);
+		WhenAction();
+	}
 }
 
 void Stacker::Goto(Ctrl& ctrl)
@@ -294,19 +328,16 @@ void Stacker::Activate(Ctrl *ctrl)
 	if(!activectrl)
 		activectrl = ctrl;
 	
+	Splitter *currentsp = GetParentSplitter(activectrl);
+	Splitter *nextsp = GetParentSplitter(ctrl);
+
 	if(activectrl == ctrl) {
-		// Already active, just ensure focus
-		ctrl->SetFocus();
-		ctrl->Show();
-		WhenAction();
+		currentsp ? currentsp->Show() : activectrl->Show();
+		activectrl->SetFocus();
 		return;
 	}
 	
 	GuiLock __;
-	
-	Splitter *currentsp = GetParentSplitter(activectrl);
-	Splitter *nextsp = GetParentSplitter(ctrl);
-
 
 	if(ctrl != activectrl && ((currentsp != nextsp) || (!currentsp && !nextsp)) && duration >= 100) {
 		// Animate the splitter if present, otherwise animate the control
@@ -315,11 +346,9 @@ void Stacker::Activate(Ctrl *ctrl)
 		Animate(currentctrl, nextctrl, IsNext(ctrl));
 		currentsp ? currentsp->Hide() : activectrl->Hide();
 	}
-
 	activectrl = ctrl;
 	nextsp ? nextsp->Show() : activectrl->Show();
 	activectrl->SetFocus();
-	WhenAction();
 }
 
 bool Stacker::IsNext(Ctrl *nextctrl) const

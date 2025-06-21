@@ -324,15 +324,12 @@ void Navigator::Layout()
 
 int Navigator::GetCursor()
 {
-	return FindMatch(items, [](const Item& m) { return m.HasFocus(); });
+	return FindMatch(items, [](const Item& m) { return m.HasFocus() ; });
 }
 
 void Navigator::SwapItem(int i, int ii)
 {
-	if(!AnimateSwap(i, ii)) {
-		ctx.stack.Swap(*items[i].ctrl, *items[ii].ctrl);
-		Sync();
-	}
+	ctx.stack.Swap(*items[i].ctrl, *items[ii].ctrl);
 }
 
 void Navigator::SwapFirst()
@@ -368,6 +365,7 @@ bool Navigator::AnimateSwap(int i, int ii)
 	
 	Item& a = items[i];
 	Item& b = items[ii];
+	
 	Rect ra = a.GetRect();
 	Rect rb = b.GetRect();
 	
@@ -396,6 +394,12 @@ bool Navigator::AnimateSwap(int i, int ii)
 		GuiSleep(0);
 	}
 	
+	Swap(a.ctrl, b.ctrl);
+	Swap(a.img, b.img);
+
+	b.SetFocus();
+	Refresh();
+
 	swapanim = false;
 	return false;
 }

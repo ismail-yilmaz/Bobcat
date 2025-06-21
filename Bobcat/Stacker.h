@@ -31,6 +31,7 @@ public:
 
     Event<int, Ctrl&> WhenInsert;
     Event<int, Ctrl&> WhenRemove;
+    Event<int, int>   WhenSwap;
 
     int         GetCount() const;
     int         GetCursor() const;
