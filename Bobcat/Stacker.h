@@ -47,8 +47,8 @@ public:
     void        SwapNext();
     void        SwapPrev();
     
-    void        ExpandLeftPane();
-    void        ExpandRightPane();
+    void        ExpandTopLeftPane();
+    void        ExpandBottomRightPane();
     void        ResetSplitterPos();
 
     void        Goto(int i);

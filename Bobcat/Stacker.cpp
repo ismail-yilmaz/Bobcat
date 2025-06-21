@@ -273,13 +273,13 @@ void Stacker::SwapPrev()
 	Swap(i, i - 1);
 }
 
-void Stacker::ExpandLeftPane()
+void Stacker::ExpandTopLeftPane()
 {
 	if(Splitter *sp = GetParentSplitter(activectrl); sp)
 		sp->SetPos(clamp(sp->GetPos() + 500, 0, 10000));
 }
 
-void Stacker::ExpandRightPane()
+void Stacker::ExpandBottomRightPane()
 {
 	if(Splitter *sp = GetParentSplitter(activectrl); sp)
 		sp->SetPos(clamp(sp->GetPos() - 500, 0, 10000));
