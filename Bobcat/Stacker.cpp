@@ -278,9 +278,9 @@ void Stacker::SwapPanes()
 {
 	if(Splitter *sp = GetParentSplitter(activectrl); sp) {
 		if(Ctrl *l = sp->GetFirstChild(), *r = sp->GetLastChild(); l && r) {
-			bool lfocus = l->HasFocus();
+			activectrl = l->HasFocus() ? l  : r;
 			Swap(Find(*l), Find(*r));
-			lfocus ? l->SetFocus() : r->SetFocus();
+			activectrl->SetFocus();
 		}
 	}
 }
