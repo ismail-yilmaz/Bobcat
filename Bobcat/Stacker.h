@@ -14,6 +14,8 @@ public:
     Stacker&    Wheel(bool b = true);
     Stacker&    Animation(int ms = 150);
     int         GetDuration() const;
+    
+    Stacker&    NoBackground(bool b = true);
 
     Stacker&    Horz();
     Stacker&    Vert();

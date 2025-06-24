@@ -38,6 +38,15 @@ int Stacker::GetDuration() const
 	return duration;
 }
 
+Stacker& Stacker::NoBackground(bool b)
+{
+	Transparent(b);
+	if(splitters.GetCount() > 0)
+		for(Splitter& s : splitters)
+			s.Transparent(b);
+	return *this;
+}
+
 Stacker& Stacker::Horz()
 {
 	vertical = false;

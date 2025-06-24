@@ -450,7 +450,7 @@ void Bobcat::SyncBackground()
 	else
 		view <<= Null;
 	
-	stack.Transparent(bkimg);
+	stack.NoBackground(bkimg);
 	for(int i = 0; i < stack.GetCount(); i++)
 		AsTerminal(stack[i]).Sync().NoBackground(bkimg);
 }
