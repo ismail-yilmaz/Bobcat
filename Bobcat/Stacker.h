@@ -63,7 +63,6 @@ private:
     Splitter*   GetParentSplitter(Ctrl *c) const;
     void        RemoveSplitter(const Splitter& s);
     bool        RemoveFromSplitter(int i);
-    void        SwapCtrls(int a, int b, bool activate = true);
     void        Activate(Ctrl* ctrl);
 
     // Animation related stuff.

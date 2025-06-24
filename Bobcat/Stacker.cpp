@@ -186,7 +186,7 @@ int Stacker::Find(Ctrl& ctrl) const
 	return FindIndex(list, &ctrl);
 }
 
-void Stacker::SwapCtrls(int a, int b, bool activate)
+void Stacker::Swap(int a, int b)
 {
 	if (a == b || a < 0 || a >= list.GetCount() || b < 0 || b >= list.GetCount())
 		return;
@@ -234,32 +234,27 @@ void Stacker::SwapCtrls(int a, int b, bool activate)
 	else
 	if(splitter_a && !splitter_b) {
 		ctrl_b->Remove();
+		ctrl_a->Hide();
 		splitter_a->Remove(*ctrl_a);
 		Ctrl::Add(ctrl_a->SizePos());
 		Ctrl* a_first = splitter_a->GetFirstChild();
 		splitter_a->Set(idx_a == 0 ? *ctrl_b : *a_first,
 						idx_a == 0 ? *a_first : *ctrl_b);
-		splitter_a->SetPos(pos_a);
+		splitter_a->SetPos(pos_a).Show();
 	}
 	else
 	if(splitter_b && !splitter_a) {
 		ctrl_a->Remove();
+		ctrl_b->Hide();
 		Ctrl::Add(ctrl_b->SizePos());
 		Ctrl* b_first = splitter_b->GetFirstChild();
 		splitter_b->Set(idx_b == 0 ? *ctrl_a : *b_first,
 						idx_b == 0 ? *b_first : *ctrl_a);
-		splitter_b->SetPos(pos_b);
+		splitter_b->SetPos(pos_b).Show();
 	}
 	
-	list.Swap(a, b);
 	WhenSwap(a, b);
-	if(activate)
-		Activate(list[a]);
-}
-
-void Stacker::Swap(int a, int b)
-{
-	SwapCtrls(a, b);
+	list.Swap(a, b);
 }
 
 void Stacker::Swap(Ctrl& a, Ctrl& b)
@@ -284,7 +279,7 @@ void Stacker::SwapPanes()
 	if(Splitter *sp = GetParentSplitter(activectrl); sp) {
 		if(Ctrl *l = sp->GetFirstChild(), *r = sp->GetLastChild(); l && r) {
 			bool lfocus = l->HasFocus();
-			SwapCtrls(Find(*l), Find(*r), false);
+			Swap(Find(*l), Find(*r));
 			lfocus ? l->SetFocus() : r->SetFocus();
 		}
 	}
