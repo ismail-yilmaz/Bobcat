@@ -510,10 +510,10 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.AddKey(AK_MAXIMIZE,   [this] { Maximize(!window.IsMaximized()); });
 	menu.AddKey(AK_MINIMIZE,   [this] { Minimize(!window.IsMinimized()); });
 	menu.Separator();
-	menu.Add(enable, AK_PREV, Images::Prev(),  [this] { stack.Prev();    SyncTitle(); });
-	menu.Add(enable, AK_NEXT, Images::Next(),  [this] { stack.Next();    SyncTitle(); });
-	menu.Add(enable, AK_BEGIN,Images::Begin(), [this] { stack.GoBegin(); SyncTitle(); });
-	menu.Add(enable, AK_END,  Images::End(),   [this] { stack.GoEnd();   SyncTitle(); });
+	menu.Add(enable, AK_PREV, Images::Prev(),  [this] { stack.Prev(); });
+	menu.Add(enable, AK_NEXT, Images::Next(),  [this] { stack.Next(); });
+	menu.Add(enable, AK_BEGIN,Images::Begin(), [this] { stack.GoBegin(); });
+	menu.Add(enable, AK_END,  Images::End(),   [this] { stack.GoEnd(); });
 	menu.AddKey(AK_SPLITTER_TOGGLE,            [this] { stack.ToggleSplitterOrientation(); });
 	menu.AddKey(AK_SPLITTER_EXPANDTOPLEFT,     [this] { stack.ExpandTopLeftPane(); });
 	menu.AddKey(AK_SPLITTER_EXPANDBOTTOMRIGHT, [this] { stack.ExpandBottomRightPane(); });
