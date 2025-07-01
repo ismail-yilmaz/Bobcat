@@ -383,10 +383,18 @@ void Stacker::Activate(Ctrl *ctrl)
 		Ctrl* nextctrl = nextsp ? static_cast<Ctrl*>(nextsp) : ctrl;
 		Ctrl* currentctrl = currentsp ? static_cast<Ctrl*>(currentsp) : activectrl;
 		Animate(currentctrl, nextctrl, IsNext(ctrl));
-		currentsp ? currentsp->Hide() : activectrl->Hide();
 	}
+
+	currentsp
+		? currentsp->Hide()
+			: activectrl->Hide();
+
 	activectrl = ctrl;
-	nextsp ? nextsp->Show() : activectrl->Show();
+
+	nextsp
+		? nextsp->Show()
+			: activectrl->Show();
+
 	activectrl->SetFocus();
 }
 
