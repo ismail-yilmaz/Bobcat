@@ -63,9 +63,9 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 And yes—**it can run Doom!** 🎮  
 
 
-## Requirements
+## Build Requirements
 
-Bobcat has minimal requirements. You'll need:
+Bobcat has minimal build requirements. You'll need:
 
 - CLANG/GCC (C++17 or later)
 - [U++](https://www.ultimatepp.org) framework
