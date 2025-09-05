@@ -19,7 +19,6 @@ struct Terminal : TerminalCtrl {
     void        MouseWheel(Point pt, int zdelta, dword keyflags) override;
     void        MouseMove(Point pt, dword keyflags) override;
     void        LeftDouble(Point pt, dword keyflags) override;
-    void        MiddleDown(Point pt, dword keyflags) override;
     Image       CursorImage(Point pt, dword keyflags) override;
     
     void        GotFocus() override;
