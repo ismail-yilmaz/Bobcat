@@ -125,9 +125,6 @@ public:
     Setup       setup;
 };
 
-dword          GetModifierKey(String s);
-String         GetModifierKeyDesc(dword keyflags);
-
 Profile        LoadProfile(const String& name);
 int            LoadProfiles(VectorMap<String, Profile>& v);
 

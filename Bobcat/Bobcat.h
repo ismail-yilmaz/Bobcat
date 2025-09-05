@@ -235,6 +235,10 @@ FileSel& BobcatFs();
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
 
+dword  GetModifierKey(String s);
+String GetModifierKeyDesc(dword keyflags);
+dword  GetAKModifierKey(const KeyInfo& k, int index = 0);
+
 String GetUpTime(Time t);
 String GetDefaultShell();
 String GetVersion();

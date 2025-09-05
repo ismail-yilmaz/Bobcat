@@ -405,6 +405,17 @@ void Terminal::MouseLeave()
 	Refresh();
 }
 
+void Terminal::MouseWheel(Point pt, int zdelta, dword keyflags)
+{
+	// Since we are using wheel, combine the keyflags for zoom-in and zoom-out.
+	if(dword k = GetAKModifierKey(AK_ZOOMIN())
+	           | GetAKModifierKey(AK_ZOOMOUT()); k > 0 && k == keyflags) {
+		SetFontZoom(zdelta >= 0 ? 1 : -1);
+	}
+	else
+		TerminalCtrl::MouseWheel(pt, zdelta, keyflags);
+}
+
 void Terminal::MouseMove(Point pt, dword keyflags)
 {
 	if(linkifier.Sync())
@@ -421,6 +432,10 @@ void Terminal::LeftDouble(Point pt, dword keyflags)
 	}
 	else
 		TerminalCtrl::LeftDouble(pt, keyflags);
+}
+
+void Terminal::MiddleDown(Upp::Point pt, Upp::dword keyflags)
+{
 }
 
 Image Terminal::CursorImage(Point pt, dword keyflags)

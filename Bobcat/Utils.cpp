@@ -247,11 +247,25 @@ dword GetModifierKey(String s)
 
 String GetModifierKeyDesc(dword key)
 {
+#ifdef PLATFORM_COCOA
+	key &= (K_SHIFT|K_CTRL|K_ALT|K_OPTION);
+#else
 	key &= (K_SHIFT|K_CTRL|K_ALT);
+#endif
 	for(const auto& t : mod_keys)
 		if(t.a == key)
 			return t.b;
 	return String::GetVoid();
+}
+
+dword GetAKModifierKey(const KeyInfo& k, int index)
+{
+	ASSERT(index >= 0 && index < 4);
+#ifdef PLATFORM_COCOA
+	return k.key[index] & (K_CTRL|K_ALT|K_SHIFT|K_OPTION);
+#else
+	return k.key[index] & (K_CTRL|K_ALT|K_SHIFT);
+#endif
 }
 
 String GetVersion()
