@@ -434,10 +434,6 @@ void Terminal::LeftDouble(Point pt, dword keyflags)
 		TerminalCtrl::LeftDouble(pt, keyflags);
 }
 
-void Terminal::MiddleDown(Upp::Point pt, Upp::dword keyflags)
-{
-}
-
 Image Terminal::CursorImage(Point pt, dword keyflags)
 {
 	if(IsMouseOverImplicitHyperlink())
