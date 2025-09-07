@@ -1181,7 +1181,7 @@ void Terminal::ProgressBar::Show(int percent)
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
 		term.InsertFrame(0, Height(Zy(4)));
-		term.ShowSizeHint();
+		term.ShowSizeHint(b);
 	}
 	timer.Kill();
 	if(IsNull(percent)) { // "Busy" mode...

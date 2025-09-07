@@ -184,7 +184,7 @@ struct Terminal : TerminalCtrl {
     Linkifier    linkifier;
     QuickText    quicktext;
     Color        highlight[4];
-    TimeCallback timer, busytimer;
+    TimeCallback timer;
 
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);
