@@ -459,6 +459,18 @@ Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 	return &c;
 }
 
+Ptr<MessageBox> Error(Ctrl& ctrl, const Upp::String& text, int timeout)
+{
+	auto& m = GetNotificationDaemon();
+	auto& c = m.Create();
+	c.MessageType(MessageBox::Type::FAILURE);
+	c.Placement(m.GetPlacement());
+	c.UseIcon(false);
+	c.UseCross();
+	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	return &c;
+}
+
 String GetUpTime(Time t)
 {
 	return Format("%d:%0d:%02d:%02d", t - Date(1, 1, 1), t.hour, t.minute, t.second);

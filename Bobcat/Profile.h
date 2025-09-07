@@ -33,6 +33,7 @@ struct Profile : Moveable<Profile> {
     bool        inlineimages;
     bool        hyperlinks;
     bool        annotations;
+    bool        progress;
     bool        windowactions;
     bool        windowreports;
     bool        clipboardread;

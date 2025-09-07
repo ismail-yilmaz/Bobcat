@@ -262,5 +262,6 @@ MessageCtrl& GetNotificationDaemon();
 Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no,
                             MessageBox::Type type, const Event<int>& action);
 Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout = 0);
+Ptr<MessageBox> Error(Ctrl& ctrl, const String& text, int timeout = 0);
 }
 #endif

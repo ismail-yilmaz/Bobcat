@@ -29,6 +29,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , linkifier(*this)
 , quicktext(*this)
 , titlebar(*this)
+, progressbar(*this)
 , exitmode(ExitMode::Exit)
 , pathmode(PathMode::Native)
 , highlight {
@@ -57,6 +58,8 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenHighlight  = THISFN(OnHighlight);
 	WhenAnnotation = THISFN(OnAnnotation);
 	WhenMessage    = THISFN(OnNotification);
+	WhenProgress   = THISFN(OnProgress);
+
 }
 
 Terminal::~Terminal()
@@ -346,6 +349,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	warnonrootaccess = p.warnonrootaccess;
 	bell = p.bell;
 	filter = p.filterctrl;
+	NotifyProgress(p.progress);
 	WindowActions(p.windowactions);
 	WindowReports(p.windowreports);
 	History(p.history);
@@ -732,6 +736,31 @@ void Terminal::OnNotification(const String& text)
 	GetNotificationDaemon().NoIcon().Information(*this, text);
 }
 
+void Terminal::OnProgress(int type, int data)
+{
+	switch(type) {
+	case TerminalCtrl::PROGRESS_NORMAL:
+		progressbar.Show(data);
+		break;
+	case TerminalCtrl::PROGRESS_BUSY:
+		progressbar.Show(Null);
+		break;
+	case TerminalCtrl::PROGRESS_ERROR:
+		progressbar.Hide();
+		Error(*this, Format(t_("Progress failed.&Error code: %d"), data));
+		break;
+	case TerminalCtrl::PROGRESS_OFF:
+	default:
+		progressbar.Hide();
+		break;
+	}
+}
+
+bool Terminal::InProgress() const
+{
+	return progressbar.IsChild();
+}
+
 void Terminal::DragAndDrop(Point pt, PasteClip& d)
 {
 	if(IsReadOnly() || IsDragAndDropSource())
@@ -1016,6 +1045,7 @@ void Terminal::EmulationMenu(Bar& menu)
 	menu.Add(AK_INLINEIMAGES,     [this] { InlineImages(!HasInlineImages()); }).Check(HasInlineImages());
 	menu.Add(AK_HYPERLINKS,       [this] { Hyperlinks(!HasHyperlinks()); }).Check(HasHyperlinks());
 	menu.Add(AK_ANNOTATIONS,      [this] { Annotations(!HasAnnotations()); }).Check(HasAnnotations());
+	menu.Add(AK_PROGRESS,         [this] { NotifyProgress(!IsNotifyingProgress()); }).Check(IsNotifyingProgress());
 	menu.Add(AK_SIZEHINT,         [this] { ShowSizeHint(!HasSizeHint()); }).Check(HasSizeHint());
 	menu.Add(AK_BUFFEREDREFRESH,  [this] { DelayedRefresh(!IsDelayingRefresh()); }).Check(IsDelayingRefresh());
 	menu.Add(AK_LAZYRESIZE,       [this] { LazyResize(!IsLazyResizing()); }).Check(IsLazyResizing());
@@ -1122,6 +1152,56 @@ void Terminal::TitleBar::Menu()
 	if(Vector<String> pnames = GetProfileNames(); pnames.GetCount()) {
 		MenuBar::Execute([this, &pnames](Bar& menu) { term.ctx.TermSubmenu(menu, pnames);});
 	}
+}
+
+Terminal::ProgressBar::ProgressBar(Terminal& t)
+: term(t)
+{
+}
+
+void Terminal::ProgressBar::SetData(const Value& v)
+{
+	data = v;
+	term.RefreshLayout();
+}
+
+Value Terminal::ProgressBar::GetData() const
+{
+	return data;
+}
+
+void Terminal::ProgressBar::FrameLayout(Rect& r)
+{
+	LayoutFrameBottom(r, this, cy ? cy : r.Height());
+}
+
+void Terminal::ProgressBar::Show(int percent)
+{
+	if(!IsChild()) {
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.InsertFrame(0, Height(Zy(4)));
+		term.ShowSizeHint();
+	}
+	timer.Kill();
+	if(IsNull(percent)) { // "Busy" mode...
+		Set(0, 0);
+		timer.Set(-12, [this] { if(IsChild()) static_cast<ProgressIndicator&>(*this)++; });
+	}
+	else
+		Set(percent, 100);
+}
+
+void Terminal::ProgressBar::Hide()
+{
+	if(IsChild()) {
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.RemoveFrame(*this);
+		term.ShowSizeHint(b);
+	}
+	timer.Kill();
+	Set(0, 0);
 }
 
 Terminal& AsTerminal(Ctrl& c)

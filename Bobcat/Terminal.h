@@ -112,6 +112,9 @@ struct Terminal : TerminalCtrl {
     bool        OnAnnotation(Point pt, String& s);
     
     void        OnNotification(const String& text);
+    
+    void        OnProgress(int type, int data);
+    bool        InProgress() const;
 
     void        DragAndDrop(Point pt, PasteClip& d) override;
     
@@ -162,6 +165,7 @@ struct Terminal : TerminalCtrl {
     
     Bobcat&          ctx;
     One<APtyProcess> pty;
+    One<FrameTop<ProgressIndicator>> pi;
     bool         bell:1;
     bool         filter:1;
     bool         canresize:1;
@@ -180,7 +184,7 @@ struct Terminal : TerminalCtrl {
     Linkifier    linkifier;
     QuickText    quicktext;
     Color        highlight[4];
-    TimeCallback timer;
+    TimeCallback timer, busytimer;
 
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);
@@ -200,6 +204,20 @@ struct Terminal : TerminalCtrl {
         StaticText  title;
         Value       data;
     }  titlebar;
+    
+    struct ProgressBar : FrameTB<ProgressIndicator> {
+        ProgressBar(Terminal& t);
+        void        SetData(const Value& v) override;
+        Value       GetData() const override;
+        void        FrameLayout(Rect& r) override;
+
+        void        Show(int percent);
+        void        Hide();
+
+        Terminal&    term;
+        Value        data;
+        TimeCallback timer;
+    } progressbar;
 };
 
 // Global functions
