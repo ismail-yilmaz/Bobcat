@@ -1172,7 +1172,10 @@ Value Terminal::ProgressBar::GetData() const
 
 void Terminal::ProgressBar::FrameLayout(Rect& r)
 {
-	LayoutFrameBottom(r, this, cy ? cy : r.Height());
+	// Snap to title bar.
+	term.titlebar.data == "bottom"
+		? LayoutFrameBottom(r, this, cy ? cy : r.Height())
+		: LayoutFrameTop(r, this, cy ? cy : r.Height()); // default
 }
 
 void Terminal::ProgressBar::Show(int percent)
@@ -1180,7 +1183,8 @@ void Terminal::ProgressBar::Show(int percent)
 	if(!IsChild()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		term.InsertFrame(0, Height(Zy(4)));
+		int i = term.FindFrame(term.titlebar);
+		term.InsertFrame(decode(i, 0, 1, 0), Height(Zy(4)));
 		term.ShowSizeHint(b);
 	}
 	timer.Kill();
