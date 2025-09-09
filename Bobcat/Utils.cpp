@@ -270,7 +270,7 @@ dword GetAKModifierKey(const KeyInfo& k, int index)
 
 String GetVersion()
 {
-	String ver = Format("%d.%d.%d", 0, 9, 5);
+	String ver = Format("%d.%d.%d", 0, 9, 6);
 
 #ifdef bmGIT_REVCOUNT
 	return ver + " (r" + bmGIT_REVCOUNT + ")";
