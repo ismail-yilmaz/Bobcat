@@ -221,6 +221,7 @@ bool Terminal::Do()
 void Terminal::Reset()
 {
 	HardReset();
+	progressbar.Hide();
 }
 
 bool Terminal::IsRunning()
