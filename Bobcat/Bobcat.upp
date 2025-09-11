@@ -8,7 +8,8 @@ uses
 	Terminal,
 	PtyProcess,
 	plugin/pcre,
-	MessageCtrl;
+	MessageCtrl,
+	plugin/tif;
 
 uses(SDLGUI) VirtualGui/SDL2GL;
 
