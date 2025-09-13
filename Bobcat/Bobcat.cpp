@@ -276,6 +276,7 @@ void Bobcat::Settings()
 			if(window.IsOpen()) {
 				GetHyperlinkPatterns().Clear();     // Drop all patterns. Terminals will reacquire them.
 				GetWordSelectionPatterns().Clear(); // Drop all patterns.
+				GetWebSearchProviders().Clear();    // Drop all providers.
 				view <<= Null;                      // Drop any existing background image.
 				Sync();
 				SyncTerminalProfiles();

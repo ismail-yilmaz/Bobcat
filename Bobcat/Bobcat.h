@@ -52,6 +52,7 @@ void SetContext(Bobcat& ctx);
 #include <CtrlCore/lay.h>
 
 #include "Stacker.h"
+#include "WebSearch.h"
 #include "QuickText.h"
 #include "Linkifier.h"
 #include "Finder.h"

@@ -28,6 +28,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , finder(*this)
 , linkifier(*this)
 , quicktext(*this)
+, websearch(*this)
 , titlebar(*this)
 , progressbar(*this)
 , exitmode(ExitMode::Exit)
@@ -395,6 +396,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	smartwordsel = p.wordselmode == "smart";
 	finder.SetConfig(p);
 	linkifier.SetConfig(p);
+	websearch.SetConfig(p);
 	return *this;
 }
 
@@ -884,6 +886,11 @@ void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, Upp::HighlightInf
 	}
 }
 
+WString Terminal::GetSelectedText() const
+{
+	return TerminalCtrl::GetSelectedText();
+}
+
 bool Terminal::GetWordSelection(const Point& pt, Point& pl, Point& ph) const
 {
 	if(smartwordsel && GetWordSelectionByPattern(pt, pl, ph))
@@ -1013,6 +1020,7 @@ void Terminal::EditMenu(Bar& menu)
 	}
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { OpenFinder(); });
+	websearch.ContextMenu(menu);
 	menu.AddKey(AK_SELECTOR_ENTER,      [this] { BeginSelectorMode(); });
 	menu.AddKey(AK_QUICKTEXT,           [this] { quicktext.Popup(); });
 }

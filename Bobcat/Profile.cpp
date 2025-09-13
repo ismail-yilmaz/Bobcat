@@ -173,7 +173,8 @@ void Profile::Jsonize(JsonIO& jio)
 	("Palette",              palette)
 	("Finder",               finder)
 	("Linkifier",            linkifier)
-	("QuickText",            quicktext);
+	("QuickText",            quicktext)
+	("WebSearch",            websearch);
 }
 
 Profiles::Setup::EmulationProfileSetup::EmulationProfileSetup()
@@ -222,6 +223,7 @@ Profiles::Setup::Setup()
 	tabs.Add(finder.SizePos(), t_("Finder"));
 	tabs.Add(linkifier.SizePos(), t_("Linkifier"));
 	tabs.Add(quicktext.SizePos(), t_("QuickText"));
+	tabs.Add(websearch.SizePos(), t_("Web Search"));
 	general.cmdexit.Add("exit", t_("Close the terminal"));
 	general.cmdexit.Add("keep", t_("Don't close the terminal"));
 	general.cmdexit.Add("restart", t_("Restart command"));
@@ -338,6 +340,7 @@ void Profiles::Setup::SetData(const Value& data)
 	finder.Load(p);
 	linkifier.Load(p);
 	quicktext.Load(p);
+	websearch.Load(p);
 }
 
 Value Profiles::Setup::GetData() const
@@ -347,6 +350,7 @@ Value Profiles::Setup::GetData() const
 	finder.Store(p);
 	linkifier.Store(p);
 	quicktext.Store(p);
+	websearch.Store(p);
 	return RawToValue(p);
 }
 

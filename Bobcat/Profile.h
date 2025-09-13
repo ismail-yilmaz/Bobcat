@@ -70,6 +70,7 @@ struct Profile : Moveable<Profile> {
     Finder::Config finder;
     Linkifier::Config linkifier;
     QuickText::Config quicktext;
+    WebSearch::Config websearch;
     hash_t      GetHashValue() const;
     void        Serialize(Stream& s);
     void        Jsonize(JsonIO& jio);
@@ -116,6 +117,7 @@ private:
         mutable         FinderSetup                            finder;
         mutable         LinkifierSetup                         linkifier;
         mutable         QuickTextSetup                         quicktext;
+        mutable         WebSearchSetup                         websearch;
         mutable         Palettes                               palettes;
     };
     

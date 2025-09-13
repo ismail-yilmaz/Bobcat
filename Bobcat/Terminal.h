@@ -130,6 +130,8 @@ struct Terminal : TerminalCtrl {
     void        OnHighlight(VectorMap<int, VTLine>& hl);
     void        DoHighlight(const SortedIndex<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb);
     
+    WString     GetSelectedText() const;
+    
     bool        GetWordSelection(const Point& pt, Point& pl, Point& ph) const override;
     bool        GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) const;
     
@@ -183,6 +185,7 @@ struct Terminal : TerminalCtrl {
     Finder       finder;
     Linkifier    linkifier;
     QuickText    quicktext;
+    WebSearch    websearch;
     Color        highlight[4];
     TimeCallback timer;
 
