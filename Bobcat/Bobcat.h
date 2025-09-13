@@ -31,6 +31,11 @@ namespace Upp {
 #define KEYFILE <Bobcat/Application.key>
 #include <CtrlLib/key_header.h>
 
+#define KEYGROUPNAME TERMINALCTRL_KEYGROUPNAME
+#define KEYNAMESPACE TerminalCtrlKeys
+#define KEYFILE <Bobcat/Terminal.key>
+#include <CtrlLib/key_header.h>
+
 #define IMAGEFILE <Bobcat/Bobcat.iml>
 #define IMAGECLASS Images
 #include <Draw/iml_header.h>

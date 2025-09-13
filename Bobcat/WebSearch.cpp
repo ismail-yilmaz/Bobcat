@@ -9,14 +9,32 @@
 
 namespace Upp {
 
-struct WebSearchSetupListDisplayCls : Display {
+#define KEYGROUPNAME TERMINALCTRL_KEYGROUPNAME
+#define KEYNAMESPACE TerminalCtrlKeys
+#define KEYFILE <Bobcat/Terminal.key>
+#include <CtrlLib/key_source.h>
+
+using namespace TerminalCtrlKeys;
+
+struct DefaultSearchProviderDisplayCls : Display {
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		const auto& ti = q.To<WebSearch::Provider>();
-		StdDisplay().Paint(w, r, AttrText(ti), ink, paper, style);
+		StdDisplay().Paint(w, r, AttrText(ti).Bold(true), ink, paper, style);
 	}
 };
 
+struct NormalSearchProviderDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		const auto& ti = q.To<WebSearch::Provider>();
+		StdDisplay().Paint(w, r, AttrText(ti).Bold(false), ink, paper, style);
+	}
+};
+
+
+const Display& DefaultSearchProviderDisplay()   { return Single<DefaultSearchProviderDisplayCls>();  }
+const Display& NormalSearchProviderDisplay()    { return Single<NormalSearchProviderDisplayCls>();  }
 
 WebSearch::WebSearch(Terminal& t)
 : term(t)
@@ -39,12 +57,15 @@ void WebSearch::ContextMenu(Bar& menu)
 		bool b = term.IsSelection();
 		String txt = term.GetSelectedText().ToString();
 		menu.Sub(b, t_("Search on web..."), Images::FindWeb(), [&, i, txt = pick(txt)](Bar& menu) {
-			for(const WebSearch::Provider& wsp : m[i]) {
-				menu.Add(wsp.name, Images::Provider(), [&] {
+			for(int j = 0; j < m[i].GetCount(); j++) {
+				const WebSearch::Provider& wsp = m[i][j];
+				Bar::Item& q = menu.Add(wsp.name, Images::Provider(), [&, txt] {
 					String uri = wsp.uri;
 					uri.Replace("%s", txt);
 					LaunchWebBrowser(uri);
 				});
+				if(j == 0)
+					q.Key(AK_WEBSEARCH);
 			}
 		});
 		if(menu.IsPopUp())
@@ -87,7 +108,7 @@ WebSearchSetup::WebSearchSetup()
 	CtrlLayoutOKCancel(dlg, t_("Web search engine setup"));
 	
 	AddFrame(toolbar);
-	list.AddColumn(t_("Text")).SetDisplay(Single<WebSearchSetupListDisplayCls>());
+	list.AddColumn(t_("Text"));
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
 	list.WhenDrag = THISFN(Drag);
@@ -131,6 +152,11 @@ void WebSearchSetup::Edit()
 void WebSearchSetup::Sync()
 {
 	toolbar.Set(THISFN(ContextMenu));
+	for(int i = 0; i < list.GetCount(); i++) {
+		list.SetDisplay(i, 0, i == 0 ? DefaultSearchProviderDisplay()
+								     : NormalSearchProviderDisplay());
+	}
+	Action();
 }
 
 void WebSearchSetup::ContextMenu(Bar& bar)

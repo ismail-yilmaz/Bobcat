@@ -9,11 +9,6 @@
 
 namespace Upp {
 
-#define KEYGROUPNAME TERMINALCTRL_KEYGROUPNAME
-#define KEYNAMESPACE TerminalCtrlKeys
-#define KEYFILE <Bobcat/Terminal.key>
-#include <CtrlLib/key_source.h>
-
 using namespace TerminalCtrlKeys;
 
 Terminal::Terminal(Bobcat& ctx_)
