@@ -51,11 +51,11 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenWindowFullScreen     = [this](int i)   { if(CanResize()) ctx.FullScreen(i);};
 	WhenWindowGeometryChange = [this](Rect r)  { if(CanResize()) ctx.SetRect(r);   };
 	WhenDirectoryChange      = THISFN(SetWorkingDirectory);
-	WhenHighlight  = THISFN(OnHighlight);
-	WhenAnnotation = THISFN(OnAnnotation);
-	WhenMessage    = THISFN(OnNotification);
-	WhenProgress   = THISFN(OnProgress);
-
+	WhenHighlight            = THISFN(OnHighlight);
+	WhenAnnotation           = THISFN(OnAnnotation);
+	WhenMessage              = THISFN(OnNotification);
+	WhenProgress             = THISFN(OnProgress);
+	WhenSelectorScan         = THISFN(OnSelectorScan);
 }
 
 Terminal::~Terminal()
@@ -732,6 +732,11 @@ bool Terminal::OnAnnotation(Point pt, String& s)
 void Terminal::OnNotification(const String& text)
 {
 	GetNotificationDaemon().NoIcon().Information(*this, text);
+}
+
+bool Terminal::OnSelectorScan(dword key)
+{
+	return MenuBar::Scan([&](Bar& menu) { websearch.ContextMenu(menu); }, key);
 }
 
 void Terminal::OnProgress(int type, int data)

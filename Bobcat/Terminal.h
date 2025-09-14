@@ -116,6 +116,8 @@ struct Terminal : TerminalCtrl {
     void        OnProgress(int type, int data);
     bool        InProgress() const;
 
+    bool        OnSelectorScan(dword key);
+    
     void        DragAndDrop(Point pt, PasteClip& d) override;
     
     Terminal&   PutText(const WString& txt);
