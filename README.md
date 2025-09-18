@@ -191,6 +191,12 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 
 ## [Videos](#Videos)
 
+A short screencast of [@mmulet](https://github.com/mmulet)'s amazing [term.everything](https://github.com/mmulet/term.everything), running KDE Neon (a whole linux distro) in gnome-boxes on Bobcat!
+
+
+https://github.com/user-attachments/assets/374395f1-5089-4433-a12a-4fb051c0a6e1
+
+
 A very short [demonstration](https://vimeo.com/999236026) of Bobcat, running DOOM!
 
 A very short [demonstration](https://vimeo.com/1003353669?share=copy) of finder/harvester and unicode character (emoji) input.
