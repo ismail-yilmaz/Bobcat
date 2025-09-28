@@ -22,13 +22,18 @@ jobs:
       run: |
         pacman -Syu --noconfirm
         pacman -S --noconfirm --needed \
-          git base-devel clang \
+          git base-devel sudo clang \
           gtk3 libnotify openssl freetype2 \
           libx11 libxinerama libxrender libxft \
           libxdmcp fontconfig libxcb libxext \
           gdk-pixbuf2 zlib harfbuzz pango \
           atk cairo glib2 libpng
-        
+          
+    - name: Create build user
+      run: |
+        useradd -m builder
+        echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers       
+    
     - name: Checkout Bobcat repository
       uses: actions/checkout@v4
       with:
@@ -89,7 +94,7 @@ jobs:
         
         # Create source tarball and build package
         tar czf bobcat-${{ env.VERSION }}.tar.gz Bobcat/
-        makepkg -s --noconfirm
+        sudo -u builder makepkg -s --noconfirm
         
     - name: List files to debug
       run: ls -la *.pkg.tar.* || echo "No package files found"
