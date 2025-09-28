@@ -57,6 +57,7 @@ jobs:
       shell: bash
         
     - name: Setup Debian packaging tree
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
         mkdir -p bobcat-deb/usr/bin
         mkdir -p bobcat-deb/usr/share/applications
@@ -68,6 +69,7 @@ jobs:
         cp Bobcat/Bobcat/Copying bobcat-deb/usr/share/licenses/bobcat-terminal/LICENSE
         
     - name: Create Debian package
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
         mkdir -p bobcat-deb/DEBIAN
         cat <<EOF > bobcat-deb/DEBIAN/control
@@ -83,6 +85,7 @@ jobs:
         dpkg-deb --build bobcat-deb bobcat-terminal_${{ env.VERSION }}_amd64.deb
         
     - name: Upload .deb package as artifact
+      if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
         name: bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64
