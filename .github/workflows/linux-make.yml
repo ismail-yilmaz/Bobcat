@@ -1,4 +1,4 @@
-name: Linux
+name: Arch Linux
 
 on:
   push:
@@ -13,27 +13,28 @@ permissions:
   contents: write
 
 jobs:
-  build-and-package:
+  build-arch:
     runs-on: ubuntu-latest
-
+    container: archlinux:latest
+    
     steps:
+    - name: Update Arch and install dependencies
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm --needed \
+          git base-devel clang \
+          gtk3 libnotify openssl freetype2 \
+          libx11 libxinerama libxrender libxft \
+          libxdmcp fontconfig libxcb libxext \
+          gdk-pixbuf2 zlib harfbuzz pango \
+          atk cairo glib2 libpng
+        
     - name: Checkout Bobcat repository
       uses: actions/checkout@v4
       with:
         path: Bobcat
         fetch-depth: 0
         
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          git build-essential clang pkg-config \
-          libgtk-3-dev libnotify-dev openssl libfreetype6-dev \
-          libx11-dev libxinerama-dev libxrender-dev libxft-dev \
-          libxdmcp-dev libfontconfig1-dev libxcb1-dev libxext-dev \
-          libgdk-pixbuf2.0-dev zlib1g-dev libharfbuzz-dev libpango1.0-dev \
-          libatk1.0-dev libcairo2-dev libglib2.0-dev libpng-dev
- 
     - name: Checkout U++ repository
       uses: actions/checkout@v4
       with:
@@ -53,53 +54,48 @@ jobs:
       
     - name: Get the version
       if: startsWith(github.ref, 'refs/tags/')
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      run: echo "VERSION=0.9.7" >> $GITHUB_ENV
       shell: bash
         
-    - name: Setup Debian packaging tree
+    - name: Create Arch Linux package
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        mkdir -p bobcat-deb/usr/bin
-        mkdir -p bobcat-deb/usr/share/applications
-        mkdir -p bobcat-deb/usr/share/pixmaps
-        mkdir -p bobcat-deb/usr/share/licenses/bobcat-terminal
-        install -m 755 Bobcat/bobcat bobcat-deb/usr/bin/bobcat
-        cp Bobcat/Bobcat/data/bobcat.desktop bobcat-deb/usr/share/applications/bobcat.desktop
-        cp Bobcat/Bobcat/data/bobcat128x128.png bobcat-deb/usr/share/pixmaps/bobcat.png
-        cp Bobcat/Bobcat/Copying bobcat-deb/usr/share/licenses/bobcat-terminal/LICENSE
-        
-    - name: Create Debian package
-      if: startsWith(github.ref, 'refs/tags/')
-      run: |
-        mkdir -p bobcat-deb/DEBIAN
-        cat <<EOF > bobcat-deb/DEBIAN/control
-        Package: bobcat-terminal
-        Version: ${{ env.VERSION }}
-        Section: utils
-        Priority: optional
-        Architecture: amd64
-        Depends: libgtk-3-0, libnotify4, libssl3, libfreetype6, libx11-6, libxinerama1, libxrender1, libxft2, libxdmcp6, libfontconfig1, libxcb1, libxext6, libgdk-pixbuf-2.0-0, zlib1g, libharfbuzz0b, libpango-1.0-0, libatk1.0-0, libcairo2, libglib2.0-0, libpng16-16, libgcc-s1, libexpat1
-        Maintainer: İsmail Yılmaz <iylmz.iylmz@gmail.com>
-        Description: A powerful yet user-friendly, cross platform terminal emulator
+        # Create PKGBUILD
+        cat <<EOF > PKGBUILD
+        pkgname=bobcat-terminal
+        pkgver=${{ env.VERSION }}
+        pkgrel=1
+        pkgdesc="A powerful yet user-friendly, cross platform terminal emulator"
+        arch=('x86_64')
+        url="https://github.com/ismail-yilmaz/bobcat"
+        license=('custom')
+        depends=(
+        gtk3 libnotify openssl freetype2
+        libx11 libxinerama libxrender libxft
+        libxdmcp fontconfig libxcb libxext
+        gdk-pixbuf2 zlib harfbuzz pango
+        atk cairo glib2 libpng
+        )
+        source=("bobcat-\$pkgver.tar.gz")
+        sha256sums=('SKIP')
+
+        package() {
+        cd "\$srcdir/bobcat-\$pkgver"
+  
+        install -Dm755 bobcat "\$pkgdir/usr/bin/bobcat"
+        install -Dm644 Bobcat/data/bobcat.desktop "\$pkgdir/usr/share/applications/bobcat.desktop"
+        install -Dm644 Bobcat/data/bobcat128x128.png "\$pkgdir/usr/share/pixmaps/bobcat.png"
+        install -Dm644 Bobcat/Copying "\$pkgdir/usr/share/licenses/\$pkgname/LICENSE"
+        }
         EOF
-        dpkg-deb --build bobcat-deb bobcat-terminal_${{ env.VERSION }}_amd64.deb
         
-    - name: Upload .deb package as artifact
-      if: startsWith(github.ref, 'refs/tags/')
+        # Create source tarball and build package
+        tar czf bobcat-${{ env.VERSION }}.tar.gz Bobcat/
+        makepkg -s --noconfirm
+        
+    - name: Upload Arch package as artifact
+      #if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
       with:
-        name: bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64
-        path: bobcat-terminal_${{ env.VERSION }}_amd64.deb
-
-    - name: Create GitHub release & upload asset
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.VERSION }}
-        name: Release ${{ env.VERSION }}
-        draft: false
-        prerelease: false
-        files: |
-          bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64.deb
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: bobcat-terminal_${{ env.VERSION }}_arch_amd64
+        path: bobcat-terminal-*.pkg.tar.zst
