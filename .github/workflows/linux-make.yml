@@ -53,12 +53,10 @@ jobs:
       run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED bobcat
       
     - name: Get the version
-      if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=0.9.7" >> $GITHUB_ENV
       shell: bash
         
     - name: Create Arch Linux package
-      if: startsWith(github.ref, 'refs/tags/')
       run: |
         # Create PKGBUILD
         cat <<EOF > PKGBUILD
@@ -94,13 +92,11 @@ jobs:
         makepkg -s --noconfirm
         
     - name: List files to debug
-      if: startsWith(github.ref, 'refs/tags/')
       run: ls -la *.pkg.tar.* || echo "No package files found"
         
-    #- name: Upload Arch package as artifact
-    #  if: startsWith(github.ref, 'refs/tags/')
-    #  uses: actions/upload-artifact@v4
-    #  with:
-    #    name: bobcat-terminal_${{ env.VERSION }}_arch_amd64
-    #    path: *.pkg.tar.*
+    - name: Upload Arch package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bobcat-terminal_${{ env.VERSION }}_arch_amd64
+        path: bobcat-terminal-${{ env.VERSION }}-*.pkg.tar.zst
         
