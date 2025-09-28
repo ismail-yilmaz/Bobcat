@@ -98,6 +98,7 @@ struct Bobcat : Pte<Bobcat> {
     Bobcat&     SetPageSize(Size sz);
     Bobcat&     SetRect(Rect r);
 
+    Bobcat&     SetupMenuBar();
     Bobcat&     ShowMenuBar(bool b = true);
     Bobcat&     HideMenuBar();
     bool        HasMenuBar() const;

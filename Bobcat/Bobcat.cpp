@@ -50,7 +50,7 @@ Bobcat::Bobcat()
 	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
 	stack.WhenAction         = [this]()          { Sync(); };
 	stack.WhenSwap           = [this](int a, int b) { navigator.AnimateSwap(a, b); };
-	menubar.Set([this](Bar& menu) { MainMenu(menu); });
+	SetupMenuBar();
 	GetNotificationDaemon().NoIcon().Append().Animation();
 }
 
@@ -362,6 +362,16 @@ Bobcat& Bobcat::NoFullScreen()
 bool Bobcat::IsFullScreen() const
 {
 	return window.IsFullScreen();
+}
+
+Bobcat& Bobcat::SetupMenuBar()
+{
+	menubar.Set([this](Bar& menu) { MainMenu(menu); });
+#if defined(PLATFORM_COCOA) && !defined(VIRTUALGUI)
+	// TODO: Add MacOS menu bar support.
+	window.WhenDockMenu = [this](Bar& menu) { MainMenu(menu); };
+#endif
+	return *this;
 }
 
 Bobcat& Bobcat::ShowMenuBar(bool b)
