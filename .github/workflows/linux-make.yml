@@ -3,19 +3,29 @@ name: Linux
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
+      - '*.*.*'
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-and-package:
     runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
     
     steps:
     - name: Checkout Bobcat repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: Bobcat
-
+        fetch-depth: 0
+        
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -31,15 +41,80 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: ultimatepp/ultimatepp
-        ref: v2025.1.1 # always use release branch, not main.
+        ref: v2025.1.1
         path: upp-source
-
+        
     - name: Configure and build U++ from the master branch
       working-directory: upp-source
       run: |
         ./configure
         make -f ./umkMakefile -j 4
-
+        
     - name: Build Bobcat
       working-directory: Bobcat
-      run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED Bobcat
+      run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED bobcat
+      
+    - name: Get version from tag and revision
+      working-directory: Bobcat
+      id: version
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        REV_COUNT=$(git rev-list --count HEAD)
+        
+        # Create Debian-compliant version: tag-revision (e.g., 0.9.5-2323)
+        DEB_VERSION="${TAG}-${REV_COUNT}"
+        
+        # Create artifact name: tag-platform-arch (e.g., 0.9.5-ubuntu-amd64)
+        ARTIFACT_NAME="bobcat-terminal_${TAG}_ubuntu_amd64"
+        
+        echo "deb_version=$DEB_VERSION" >> $GITHUB_OUTPUT
+        echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+        echo "tag_name=$TAG" >> $GITHUB_OUTPUT
+        echo "Using Debian version: $DEB_VERSION"
+        echo "Using artifact name: $ARTIFACT_NAME"
+        
+    - name: Setup Debian packaging tree
+      run: |
+        mkdir -p bobcat-deb/usr/bin
+        mkdir -p bobcat-deb/usr/share/applications
+        mkdir -p bobcat-deb/usr/share/pixmaps
+        mkdir -p bobcat-deb/usr/share/licenses/bobcat-terminal
+        install -m 755 Bobcat/bobcat bobcat-deb/usr/bin/bobcat
+        cp Bobcat/Bobcat/data/bobcat.desktop bobcat-deb/usr/share/applications/bobcat.desktop
+        cp Bobcat/Bobcat/data/bobcat128x128.png bobcat-deb/usr/share/pixmaps/bobcat.png
+        cp Bobcat/Bobcat/Copying bobcat-deb/usr/share/licenses/bobcat-terminal/LICENSE
+        
+    - name: Create Debian package
+      run: |
+        DEB_VERSION="${{ steps.version.outputs.deb_version }}"
+        mkdir -p bobcat-deb/DEBIAN
+        cat <<EOF > bobcat-deb/DEBIAN/control
+        Package: bobcat-terminal
+        Version: $DEB_VERSION
+        Section: utils
+        Priority: optional
+        Architecture: amd64
+        Depends: libgtk-3-0, libnotify4, libssl3, libfreetype6, libx11-6, libxinerama1, libxrender1, libxft2, libxdmcp6, libfontconfig1, libxcb1, libxext6, libgdk-pixbuf-2.0-0, zlib1g, libharfbuzz0b, libpango-1.0-0, libatk1.0-0, libcairo2, libglib2.0-0, libpng16-16, libgcc-s1, libexpat1
+        Maintainer: İsmail Yılmaz <iylmz.iylmz@gmail.com>
+        Description: A powerful yet user-friendly, cross platform terminal emulator
+        EOF
+        dpkg-deb --build bobcat-deb bobcat-terminal_${DEB_VERSION}_amd64.deb
+        
+    - name: Upload .deb package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.version.outputs.artifact_name }}
+        path: bobcat-terminal_${{ steps.version.outputs.deb_version }}_amd64.deb
+
+    - name: Create GitHub release & upload asset
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.version.outputs.tag_name }}
+        name: Release ${{ steps.version.outputs.tag_name }}
+        draft: false
+        prerelease: false
+        files: |
+          ${{ steps.version.outputs.artifact_name }}.deb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
