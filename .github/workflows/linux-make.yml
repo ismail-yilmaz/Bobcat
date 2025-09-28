@@ -2,12 +2,12 @@ name: Linux
 
 on:
   push:
-    branches: [ archlinux ]
+    branches: [ main ]
     tags:
       - 'v*'
       - '*.*.*'
   pull_request:
-    branches: [ archlinux ]
+    branches: [ main ]
 
 permissions:
   contents: write
