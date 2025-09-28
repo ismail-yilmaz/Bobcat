@@ -98,4 +98,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bobcat-terminal_${{ env.VERSION }}_arch_amd64
-        path: bobcat-terminal-*.pkg.tar.zst
+        path: bobcat-*.pkg.tar.zst
