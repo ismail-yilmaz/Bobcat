@@ -16,9 +16,6 @@ jobs:
   build-and-package:
     runs-on: ubuntu-latest
 
-    env:
-      GH_TOKEN: ${{ github.token }}
-    
     steps:
     - name: Checkout Bobcat repository
       uses: actions/checkout@v4
@@ -54,24 +51,10 @@ jobs:
       working-directory: Bobcat
       run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED bobcat
       
-    - name: Get version from tag and revision
-      working-directory: Bobcat
-      id: version
-      run: |
-        TAG=${GITHUB_REF#refs/tags/}
-        REV_COUNT=$(git rev-list --count HEAD)
-        
-        # Create Debian-compliant version: tag-revision (e.g., 0.9.5-2323)
-        DEB_VERSION="${TAG}-${REV_COUNT}"
-        
-        # Create artifact name: tag-platform-arch (e.g., 0.9.5-ubuntu-amd64)
-        ARTIFACT_NAME="bobcat-terminal_${TAG}_ubuntu_amd64"
-        
-        echo "deb_version=$DEB_VERSION" >> $GITHUB_OUTPUT
-        echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-        echo "tag_name=$TAG" >> $GITHUB_OUTPUT
-        echo "Using Debian version: $DEB_VERSION"
-        echo "Using artifact name: $ARTIFACT_NAME"
+    - name: Get the version
+      if: startsWith(github.ref, 'refs/tags/')
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      shell: bash
         
     - name: Setup Debian packaging tree
       run: |
@@ -86,11 +69,10 @@ jobs:
         
     - name: Create Debian package
       run: |
-        DEB_VERSION="${{ steps.version.outputs.deb_version }}"
         mkdir -p bobcat-deb/DEBIAN
         cat <<EOF > bobcat-deb/DEBIAN/control
         Package: bobcat-terminal
-        Version: $DEB_VERSION
+        Version: ${{ env.VERSION }}
         Section: utils
         Priority: optional
         Architecture: amd64
@@ -98,23 +80,23 @@ jobs:
         Maintainer: İsmail Yılmaz <iylmz.iylmz@gmail.com>
         Description: A powerful yet user-friendly, cross platform terminal emulator
         EOF
-        dpkg-deb --build bobcat-deb bobcat-terminal_${DEB_VERSION}_amd64.deb
+        dpkg-deb --build bobcat-deb bobcat-terminal_${{ env.VERSION }}_amd64.deb
         
     - name: Upload .deb package as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ steps.version.outputs.artifact_name }}
-        path: bobcat-terminal_${{ steps.version.outputs.deb_version }}_amd64.deb
+        name: bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64
+        path: bobcat-terminal_${{ env.VERSION }}_amd64.deb
 
     - name: Create GitHub release & upload asset
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ steps.version.outputs.tag_name }}
-        name: Release ${{ steps.version.outputs.tag_name }}
+        tag_name: ${{ env.VERSION }}
+        name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false
         files: |
-          ${{ steps.version.outputs.artifact_name }}.deb
+          bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64.deb
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
