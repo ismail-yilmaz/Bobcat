@@ -392,6 +392,35 @@ void EnableWayland(bool enabled)
 #endif
 }
 
+bool IsBobcatAdmin()
+{
+	// This is a U++ 2025.1.1 workaround. later rels/revs will include IsUserAdmin() function.
+	// Here we simply "backport" it to use it with 2025.1.1.
+	// TODO: Remove this when U++ 2025.2 is released.
+	
+#ifdef PLATFORM_POSIX
+    return geteuid() == 0;
+#elif PLATFORM_WIN32
+    BOOL isAdmin = FALSE;
+    PSID pAdminGroup = nullptr;
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    if(AllocateAndInitializeSid(
+				&NtAuthority,
+				2,
+				SECURITY_BUILTIN_DOMAIN_RID,
+				DOMAIN_ALIAS_RID_ADMINS,
+				0, 0, 0, 0, 0, 0,
+				&pAdminGroup)) {
+        CheckTokenMembership(nullptr, pAdminGroup, &isAdmin);
+        FreeSid(pAdminGroup);
+    }
+    return isAdmin;
+#else
+    // Unsupported platform. (Assume no elevation.)
+    return false;
+#endif
+}
+
 void CheckPrivileges()
 {
 	const char *txt = t_(
@@ -406,7 +435,7 @@ void CheckPrivileges()
 	String mode = "root";
 #endif
 
-	if(IsUserAdmin() && ErrorYesNo(Format(txt, mode)) == 0)
+	if(IsBobcatAdmin() && ErrorYesNo(Format(txt, mode)) == 0)
 		Exit(1);
 }
 
