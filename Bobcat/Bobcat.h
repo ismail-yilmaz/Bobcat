@@ -265,6 +265,8 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 bool IsWaylandEnabled();
 void EnableWayland(bool b);
 
+void CheckPrivileges();
+
 MessageCtrl& GetNotificationDaemon();
 
 Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no,

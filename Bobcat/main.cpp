@@ -107,6 +107,9 @@ void PrintFontList()
 
 void BobcatAppMain()
 {
+	// See if we're launched in admin/root mode.
+	CheckPrivileges();
+	
 	Size page_size(80, 24);
 	bool fullscreen = false;
 	

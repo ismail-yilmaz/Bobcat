@@ -392,6 +392,24 @@ void EnableWayland(bool enabled)
 #endif
 }
 
+void CheckPrivileges()
+{
+	const char *txt = t_(
+		"Bobcat is started in [*/ %s] mode.&"
+		"This may pose a security risk.&"
+		"Do you really want to continue?"
+	);
+
+#if defined(PLATFORM_WIN32)
+	String mode = "administrator";
+#else
+	String mode = "root";
+#endif
+
+	if(IsUserAdmin() && ErrorYesNo(Format(txt, mode)) == 0)
+		Exit(1);
+}
+
 MessageCtrl& GetNotificationDaemon()
 {
 	return Single<MessageCtrl>();
