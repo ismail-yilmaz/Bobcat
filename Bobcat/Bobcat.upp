@@ -62,12 +62,12 @@ file
 	Copying;
 
 mainconfig
-	"" = "GUI",
-	"" = "GUI NOGTK",
-	"" = "GUI WIN10",
-	"" = "WEBGUI",
-	"" = "WEBGUI WIN10",
-	"" = "SDLGUI",
-	"" = "SDLGUI WIN10",
+	"Posix" = "GUI",
+	"Posix (X11)" = "GUI NOGTK",
+	"Windows" = "GUI WIN10",
+	"WebGUI (POSIX)" = "WEBGUI VIRTUALGUI",
+	"WebGUI (Windows)" = "WEBGUI WIN10 VIRTUALGUI ",
+	"Headless (POSIX)" = "SDLGUI VIRTUALGUI",
+	"Headless (Windows)" = "SDLGUI WIN10 VIRTUALGUI",
 	"Wayland Mode (experimental)" = "GUI WAYLAND";
 

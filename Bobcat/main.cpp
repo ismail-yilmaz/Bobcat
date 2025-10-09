@@ -411,7 +411,7 @@ CONSOLE_APP_MAIN
 
 	const Vector<String>& cmd = CommandLine();
 
-	if(int n = FindIndex(cmd, "--sdl-screen-size"); n >= 0 && ++n < cmd.GetCount()) {
+	if(int n = FindIndex(cmd, "--screen-size"); n >= 0 && ++n < cmd.GetCount()) {
 		if(String cx, cy; SplitTo(cmd[n], 'x', cx, cy)) {
 			screen.SetSize(
 				clamp(StrInt(cx), 1024, 4096),

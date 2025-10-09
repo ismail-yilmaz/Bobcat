@@ -561,7 +561,12 @@ const Array<CmdArg>& GetCmdArgs()
 		{ CmdArgType::General,     "f", "fullscreen",             "",         t_("Full screen mode.") },
 		{ CmdArgType::General,     "m", "maximize",               "",         t_("Maximize the window.") },
 		{ CmdArgType::General,     "g", "geometry",               "GEOMETRY", t_("Set the initial window geometry. (E.g. 80x24, 132x24)") },
-		
+#ifdef flagSDLGUI
+		{ CmdArgType::General,     "",  "screen-size",            "GEOMETRY", t_("Set the sdlgui screen size. (E.g. 1920xz1080)") },
+#elif  flagWEBGUI
+		{ CmdArgType::General,     "",  "url"        ,            "URL",      t_("Set the webgui server URL. (E.g. localhost:8888)") },
+#endif
+
 		// Environment options
 #ifdef PLATFORM_WIN32
 		{ CmdArgType::Environment, "z", "pty-backend",            "PTY",      t_("Set the pseudoconsole backend to be used.") },
