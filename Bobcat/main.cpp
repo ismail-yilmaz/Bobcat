@@ -105,12 +105,6 @@ void PrintFontList()
 #endif
 }
 
-void OpenSettings(Bobcat& ctx)
-{
-	CheckPrivileges(ctx);
-	ctx.Settings();
-}
-
 void BobcatAppMain()
 {
 	Size page_size(80, 24);
@@ -136,7 +130,8 @@ void BobcatAppMain()
 				}
 				if(arglist.HasOption("settings"))
 				{
-					OpenSettings(app);
+					CheckPrivileges(app);
+					app.Settings();
 					return;
 				}
 				if(arglist.HasOption("list"))
