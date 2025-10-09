@@ -97,14 +97,25 @@ You can install Bobcat in several ways:
 
 ### 4. AUR package (ArchLinux):
 
-- There is an [AUR package](https://aur.archlinux.org/packages/bobcat-terminal-git) for Bobcat. Use your favorite AUR installer, to download, compile and install it. E.g:
+- Two versions of Bobcat is available via AUR.  Use your favorite AUR installer, to download, compile and install it. E.g:
 
+    1. You can install [the standard version](https://aur.archlinux.org/packages/bobcat-terminal-git) of Bobcat (ideal for *desktop* systems)
 
-```
-# yay -S bobcat-terminal-git
-```
+    ```
+    # yay -S bobcat-terminal-git
+    ```
 
-### 5. Binary installation (Windows)
+    2. You can install [the headless version](https://aur.archlinux.org/packages/bobcat-terminal-headless-git) of Bobcat (ideal for *desktopless* systems)
+
+    ```
+    # yay -S bobcat-terminal-headless-git
+    ```
+
+### 5. Debian packages (Ubuntu):
+
+- Release page contains an up-to-date link to the compiled Ubuntu binaries of Bobcat. Download the archive file, unpack it, install it with your package manager.
+
+### 6. Binary installation (Windows)
 
 - Release page always contains an up-to-date link to the compiled Windows binaries of Bobcat. Download the archive file, unpack it and enjoy!
 

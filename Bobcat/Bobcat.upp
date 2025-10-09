@@ -68,6 +68,5 @@ mainconfig
 	"WebGUI (POSIX)" = "WEBGUI VIRTUALGUI",
 	"WebGUI (Windows)" = "WEBGUI WIN10 VIRTUALGUI ",
 	"Headless (POSIX)" = "SDLGUI VIRTUALGUI",
-	"Headless (Windows)" = "SDLGUI WIN10 VIRTUALGUI",
-	"Wayland Mode (experimental)" = "GUI WAYLAND";
+	"Headless (Windows)" = "SDLGUI WIN10 VIRTUALGUI";
 
