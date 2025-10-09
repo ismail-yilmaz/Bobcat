@@ -36,6 +36,18 @@ struct NormalSearchProviderDisplayCls : Display {
 const Display& DefaultSearchProviderDisplay()   { return Single<DefaultSearchProviderDisplayCls>();  }
 const Display& NormalSearchProviderDisplay()    { return Single<NormalSearchProviderDisplayCls>();  }
 
+struct ConvertValidatedUrlNotNull : ConvertString {
+	virtual Value Scan(const Value& text) const
+	{
+		Value v = StdConvertStringNotNull().Scan(text);
+		if(!v.IsError()) {
+			if(UrlInfo uri(v); uri.scheme != "https" || IsNull(uri.query))
+				return ErrorValue(t_("Invalid URL format"));
+		}
+		return v;
+	}
+};
+	
 WebSearch::WebSearch(Terminal& t)
 : term(t)
 {
@@ -114,6 +126,8 @@ WebSearchSetup::WebSearchSetup()
 	list.WhenDrag = THISFN(Drag);
 	list.WhenLeftDouble = THISFN(Edit);
 	list.WhenDropInsert = THISFN(DnDInsert);
+	dlg.uri.NullText(t_("Basic format: https://www.searchprovider/?q%s"));
+	dlg.uri.SetConvert(Single<ConvertValidatedUrlNotNull>());
 	Sync();
 }
 
@@ -202,9 +216,10 @@ void WebSearchSetup::DnDInsert(int line, PasteClip& d)
 void WebSearchSetup::Load(const Profile& p)
 {
 	list.Clear();
-	for(const WebSearch::Provider& wsp : p.websearch.providers)
-		if(!IsNull(wsp.uri))
+	for(const WebSearch::Provider& wsp : p.websearch.providers) {
+		if(UrlInfo uri(wsp.uri); uri.scheme == "https" && !IsNull(uri.query))
 			list.Add(RawToValue(wsp));
+	}
 	list.SetCursor(0);
 }
 
@@ -212,8 +227,11 @@ void WebSearchSetup::Store(Profile& p) const
 {
 	if(IsNull(p.name))
 		return;
-	for(int i = 0; i < list.GetCount(); i++)
-		p.websearch.providers.Add() = list.Get(i, 0).To<WebSearch::Provider>();
+	for(int i = 0; i < list.GetCount(); i++) {
+		const auto& wsp =  list.Get(i, 0).To<WebSearch::Provider>();
+		if(UrlInfo uri(wsp.uri); uri.scheme == "https" && !IsNull(uri.query))
+			p.websearch.providers.Add(wsp);
+	}
 }
 
 
