@@ -235,6 +235,7 @@ void Bobcat::Settings()
 	cr(settingspane.animation, settings.stackanimation);
 	cr(settingspane.wheel, settings.stackwheel);
 	cr(settingspane.splitterorientation, settings.splitterorientation);
+	cr(settingspane.warnifelevated, settings.warnifelevated);
 	cr(settingspane.showmenu, settings.showmenu);
 	cr(settingspane.showtitle, settings.showtitle);
 	cr(settingspane.frameless, settings.frameless);
@@ -731,6 +732,7 @@ Bobcat::Config::Config()
 , stackdirection("horizontal")
 , stackanimation(150)
 , stackwheel(true)
+, warnifelevated(true)
 , showmenu(true)
 , showtitle(false)
 , frameless(false)
@@ -756,6 +758,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("StackAnimationDuration", stackanimation)
 	   ("StackWheelMode", stackwheel)
 	   ("SplitterOrientation", splitterorientation)
+	   ("PrivilegeElevationWarning", warnifelevated)
 	   ("ShowMenuBar", showmenu)
 	   ("ShowTitleBar", showtitle)
 	   ("FramelessWindow", frameless)

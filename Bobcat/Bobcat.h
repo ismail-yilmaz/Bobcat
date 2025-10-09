@@ -144,6 +144,7 @@ struct Bobcat : Pte<Bobcat> {
         bool        savescreenshot;
         bool        custominputmethod;
         String      custompagesizes;
+        bool        warnifelevated;
         bool        showmenu;
         bool        showtitle;
         bool        frameless;
@@ -265,7 +266,7 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
 bool IsWaylandEnabled();
 void EnableWayland(bool b);
 
-void CheckPrivileges();
+void CheckPrivileges(const Bobcat& ctx);
 
 MessageCtrl& GetNotificationDaemon();
 

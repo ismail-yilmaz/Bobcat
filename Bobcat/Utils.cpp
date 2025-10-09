@@ -51,6 +51,14 @@ const Display& NormalImageDisplay()     { return Single<NormalImageDisplayCls>()
 const Display& TiledImageDisplay()      { return Single<TiledImageDisplayCls>(); }
 const Display& FontListDisplay()        { return Single<FontListDisplayCls>(); }
 
+int ExclamationYesNo(const char *qtf)
+{
+	return Prompt(callback(LaunchWebBrowser), BEEP_ERROR,
+	              Ctrl::GetAppName(), CtrlImg::exclamation(), qtf, false,
+	              t_("&Yes"), t_("&No"), NULL, 0,
+	              YesButtonImage(), NoButtonImage(), Null);
+}
+
 Font SelectFont(Font f, dword type)
 {
 	WithFontSelectorLayout<TopWindow> dlg;
@@ -392,10 +400,8 @@ void EnableWayland(bool enabled)
 #endif
 }
 
-bool IsBobcatAdmin()
+bool IsBobcatPrivileged()
 {
-	// This is a U++ 2025.1.1 workaround. later rels/revs will include IsUserAdmin() function.
-	// Here we simply "backport" it to use it with 2025.1.1.
 	// TODO: Remove this when U++ 2025.2 is released.
 	
 #ifdef PLATFORM_POSIX
@@ -421,22 +427,19 @@ bool IsBobcatAdmin()
 #endif
 }
 
-void CheckPrivileges()
+void CheckPrivileges(const Bobcat& ctx)
 {
+	if(!ctx.settings.warnifelevated)
+		return;
+	
 	const char *txt = t_(
-		"Bobcat is started in [*/ %s] mode.&"
+		"Bobcat is running with elevated privileges.&"
 		"This may pose a security risk.&"
 		"Do you really want to continue?"
 	);
 
-#if defined(PLATFORM_WIN32)
-	String mode = "administrator";
-#else
-	String mode = "root";
-#endif
-
-	if(IsBobcatAdmin() && ErrorYesNo(Format(txt, mode)) == 0)
-		Exit(1);
+	if(IsBobcatPrivileged() && ExclamationYesNo(txt) == 0)
+		throw Exc(t_("User aborted."));
 }
 
 MessageCtrl& GetNotificationDaemon()

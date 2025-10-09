@@ -105,257 +105,274 @@ void PrintFontList()
 #endif
 }
 
+void OpenSettings(Bobcat& ctx)
+{
+	CheckPrivileges(ctx);
+	ctx.Settings();
+}
+
 void BobcatAppMain()
 {
-	// See if we're launched in admin/root mode.
-	CheckPrivileges();
-	
 	Size page_size(80, 24);
 	bool fullscreen = false;
 	
 	Bobcat app;
 	LoadConfig(app);
 	
-	// Try loading the default profile, if any, and fallback to default configuration on failure.
-	Profile p = LoadProfile(app.settings.defaultprofile);
-	
-	if(const Vector<String>& cmd = CommandLine(); !cmd.IsEmpty()) {
-		CmdArgList arglist;
-		String cmdargerr;
-		if(CmdArgParser argparser(GetCmdArgs()); argparser.Parse(cmd, arglist, cmdargerr)) {
-			// Note that selected profile should be loaded before any profile related options.
-			if(arglist.HasOption("help"))
-			{
-				PrintHelp();
-				return;
-			}
-			if(arglist.HasOption("settings"))
-			{
-				app.Settings();
-				return;
-			}
-			if(arglist.HasOption("list"))
-			{
-				PrintProfileList();
-				return;
-			}
-			if(arglist.HasOption("version"))
-			{
-				Cout() << GetBuildInfo() << "\n";
-				return;
-			}
-			if(arglist.HasOption("list-palettes"))
-			{
-				PrintPaletteList();
-				return;
-			}
-			if(arglist.HasOption("list-fonts"))
-			{
-				PrintFontList();
-				return;
-			}
-			if(arglist.HasOption("list-gui-themes"))
-			{
-				PrintGuiThemeList();
-				return;
-			}
-			if(const String& q = arglist.Get("gui-theme"); !IsNull(q))
-			{
-				app.settings.guitheme = q;
-			}
-			if(arglist.HasOption("show-bars"))
-			{
-				app.settings.showmenu = true;
-				app.settings.showtitle = true;
-			}
-			if(arglist.HasOption("hide-bars"))
-			{
-				app.settings.showmenu = false;
-				app.settings.showtitle = false;
-			}
-			if(arglist.HasOption("show-menubar"))
-			{
-				app.settings.showmenu = true;
-			}
-			if(arglist.HasOption("hide-menubar"))
-			{
-				app.settings.showmenu = false;
-			}
-			if(arglist.HasOption("show-titlebar"))
-			{
-				app.settings.showtitle = true;
-			}
-			if(arglist.HasOption("hide-titlebar"))
-			{
-				app.settings.showtitle = false;
-			}
-			if(arglist.HasOption("show-borders"))
-			{
-				app.settings.frameless = false;
-			}
-			if(arglist.HasOption("hide-borders"))
-			{
-				app.settings.frameless = true;
-			}
-			if(arglist.HasOption("fullscreen"))
-			{
-				fullscreen = true;
-				app.Maximize(false);
-			}
-			if(arglist.HasOption("maximize"))
-			{
-				app.Maximize();
-				fullscreen = false;
-			}
-			if(const String& q = arglist.Get("geometry"); !IsNull(q))
-			{
-				if(Size sz = ParsePageSize(q); !IsNull(sz)) {
-					page_size = sz;
+	try {
+		
+		// Try loading the default profile, if any, and fallback to default configuration on failure.
+		Profile p = LoadProfile(app.settings.defaultprofile);
+		
+		if(const Vector<String>& cmd = CommandLine(); !cmd.IsEmpty()) {
+			CmdArgList arglist;
+			String cmdargerr;
+			if(CmdArgParser argparser(GetCmdArgs()); argparser.Parse(cmd, arglist, cmdargerr)) {
+				// Note that selected profile should be loaded before any profile related options.
+				if(arglist.HasOption("help"))
+				{
+					PrintHelp();
+					return;
+				}
+				if(arglist.HasOption("settings"))
+				{
+					OpenSettings(app);
+					return;
+				}
+				if(arglist.HasOption("list"))
+				{
+					PrintProfileList();
+					return;
+				}
+				if(arglist.HasOption("version"))
+				{
+					Cout() << GetBuildInfo() << "\n";
+					return;
+				}
+				if(arglist.HasOption("list-palettes"))
+				{
+					PrintPaletteList();
+					return;
+				}
+				if(arglist.HasOption("list-fonts"))
+				{
+					PrintFontList();
+					return;
+				}
+				if(arglist.HasOption("list-gui-themes"))
+				{
+					PrintGuiThemeList();
+					return;
+				}
+				if(const String& q = arglist.Get("gui-theme"); !IsNull(q))
+				{
+					app.settings.guitheme = q;
+				}
+				if(arglist.HasOption("show-bars"))
+				{
+					app.settings.showmenu = true;
+					app.settings.showtitle = true;
+				}
+				if(arglist.HasOption("hide-bars"))
+				{
+					app.settings.showmenu = false;
+					app.settings.showtitle = false;
+				}
+				if(arglist.HasOption("show-menubar"))
+				{
+					app.settings.showmenu = true;
+				}
+				if(arglist.HasOption("hide-menubar"))
+				{
+					app.settings.showmenu = false;
+				}
+				if(arglist.HasOption("show-titlebar"))
+				{
+					app.settings.showtitle = true;
+				}
+				if(arglist.HasOption("hide-titlebar"))
+				{
+					app.settings.showtitle = false;
+				}
+				if(arglist.HasOption("show-borders"))
+				{
+					app.settings.frameless = false;
+				}
+				if(arglist.HasOption("hide-borders"))
+				{
+					app.settings.frameless = true;
+				}
+				if(arglist.HasOption("fullscreen"))
+				{
+					fullscreen = true;
 					app.Maximize(false);
+				}
+				if(arglist.HasOption("maximize"))
+				{
+					app.Maximize();
 					fullscreen = false;
 				}
+				if(const String& q = arglist.Get("geometry"); !IsNull(q))
+				{
+					if(Size sz = ParsePageSize(q); !IsNull(sz)) {
+						page_size = sz;
+						app.Maximize(false);
+						fullscreen = false;
+					}
+				}
+				if(const String& q = arglist.Get("profile"); !IsNull(q))
+				{
+					p = LoadProfile(q);
+				}
+	#ifdef PLATFORM_WIN32
+				if(const String& q = arglist.Get("pty-backend"); !IsNull(q))
+				{
+					p.ptybackend = q;
+				}
+	#endif
+				if(arglist.HasOption("restart"))
+				{
+					p.onexit = "restart";
+				}
+				if(arglist.HasOption("restart-failed"))
+				{
+					p.onexit = "restart_failed";
+				}
+				if(arglist.HasOption("keep"))
+				{
+					p.onexit = "keep";
+				}
+				if(arglist.HasOption("dont-keep"))
+				{
+					p.onexit = "exit";
+				}
+				if(arglist.HasOption("ask"))
+				{
+					p.onexit = "ask";
+				}
+				if(arglist.HasOption("environment"))
+				{
+					p.noenv = false;
+				}
+				if(arglist.HasOption("no-environment"))
+				{
+					p.noenv = true;
+				}
+				if(const String& q = arglist.Get("working-dir"); !IsNull(q))
+				{
+					p.address = q;
+				}
+				if(arglist.HasOption("vt-style-fkeys"))
+				{
+					p.functionkeystyle = "vt";
+				}
+				if(arglist.HasOption("pc-style-fkeys"))
+				{
+					p.functionkeystyle = "pc";
+				}
+				if(arglist.HasOption("window-reports"))
+				{
+					p.windowreports = true;
+				}
+				if(arglist.HasOption("no-window-reports"))
+				{
+					p.windowreports = false;
+				}
+				if(arglist.HasOption("window-actions"))
+				{
+					p.windowactions = true;
+				}
+				if(arglist.HasOption("no-window-actions"))
+				{
+					p.windowactions = false;
+				}
+				if(arglist.HasOption("hyperlinks"))
+				{
+					p.hyperlinks = true;
+				}
+				if(arglist.HasOption("no-hyperlinks"))
+				{
+					p.hyperlinks = false;
+				}
+				if(arglist.HasOption("inline-images"))
+				{
+					p.inlineimages = true;
+				}
+				if(arglist.HasOption("no-inline-images"))
+				{
+					p.inlineimages = false;
+				}
+				if(arglist.HasOption("annotations"))
+				{
+					p.annotations = true;
+				}
+				if(arglist.HasOption("no-annotations"))
+				{
+					p.annotations = false;
+				}
+				if(arglist.HasOption("clipboard-access"))
+				{
+					p.clipboardread = true;
+					p.clipboardwrite = true;
+				}
+				if(arglist.HasOption("no-clipboard-access"))
+				{
+					p.clipboardread = false;
+					p.clipboardwrite = false;
+				}
+				if(const String& q = arglist.Get("palette"); !IsNull(q))
+				{
+					p.palette = q;
+				}
+				if(const String& q = arglist.Get("font-family"); !IsNull(q))
+				{
+					if(Font f = p.font; f.FaceName(q).IsFixedPitch())
+						p.font = f;
+				}
+				if(const String& q = arglist.Get("font-size"); !IsNull(q))
+				{
+					p.font.Height(clamp(StrInt(q), 6, 128));
+				}
+				if(arglist.HasOption("bell"))
+				{
+					p.bell = true;
+				}
+				if(arglist.HasOption("no-bell"))
+				{
+					p.bell = false;
+				}
+				if(!IsNull(arglist.command))
+				{
+					p.command = arglist.command;
+				}
 			}
-			if(const String& q = arglist.Get("profile"); !IsNull(q))
-			{
-				p = LoadProfile(q);
-			}
-#ifdef PLATFORM_WIN32
-			if(const String& q = arglist.Get("pty-backend"); !IsNull(q))
-			{
-				p.ptybackend = q;
-			}
-#endif
-			if(arglist.HasOption("restart"))
-			{
-				p.onexit = "restart";
-			}
-			if(arglist.HasOption("restart-failed"))
-			{
-				p.onexit = "restart_failed";
-			}
-			if(arglist.HasOption("keep"))
-			{
-				p.onexit = "keep";
-			}
-			if(arglist.HasOption("dont-keep"))
-			{
-				p.onexit = "exit";
-			}
-			if(arglist.HasOption("ask"))
-			{
-				p.onexit = "ask";
-			}
-			if(arglist.HasOption("environment"))
-			{
-				p.noenv = false;
-			}
-			if(arglist.HasOption("no-environment"))
-			{
-				p.noenv = true;
-			}
-			if(const String& q = arglist.Get("working-dir"); !IsNull(q))
-			{
-				p.address = q;
-			}
-			if(arglist.HasOption("vt-style-fkeys"))
-			{
-				p.functionkeystyle = "vt";
-			}
-			if(arglist.HasOption("pc-style-fkeys"))
-			{
-				p.functionkeystyle = "pc";
-			}
-			if(arglist.HasOption("window-reports"))
-			{
-				p.windowreports = true;
-			}
-			if(arglist.HasOption("no-window-reports"))
-			{
-				p.windowreports = false;
-			}
-			if(arglist.HasOption("window-actions"))
-			{
-				p.windowactions = true;
-			}
-			if(arglist.HasOption("no-window-actions"))
-			{
-				p.windowactions = false;
-			}
-			if(arglist.HasOption("hyperlinks"))
-			{
-				p.hyperlinks = true;
-			}
-			if(arglist.HasOption("no-hyperlinks"))
-			{
-				p.hyperlinks = false;
-			}
-			if(arglist.HasOption("inline-images"))
-			{
-				p.inlineimages = true;
-			}
-			if(arglist.HasOption("no-inline-images"))
-			{
-				p.inlineimages = false;
-			}
-			if(arglist.HasOption("annotations"))
-			{
-				p.annotations = true;
-			}
-			if(arglist.HasOption("no-annotations"))
-			{
-				p.annotations = false;
-			}
-			if(arglist.HasOption("clipboard-access"))
-			{
-				p.clipboardread = true;
-				p.clipboardwrite = true;
-			}
-			if(arglist.HasOption("no-clipboard-access"))
-			{
-				p.clipboardread = false;
-				p.clipboardwrite = false;
-			}
-			if(const String& q = arglist.Get("palette"); !IsNull(q))
-			{
-				p.palette = q;
-			}
-			if(const String& q = arglist.Get("font-family"); !IsNull(q))
-			{
-				if(Font f = p.font; f.FaceName(q).IsFixedPitch())
-					p.font = f;
-			}
-			if(const String& q = arglist.Get("font-size"); !IsNull(q))
-			{
-				p.font.Height(clamp(StrInt(q), 6, 128));
-			}
-			if(arglist.HasOption("bell"))
-			{
-				p.bell = true;
-			}
-			if(arglist.HasOption("no-bell"))
-			{
-				p.bell = false;
-			}
-			if(!IsNull(arglist.command))
-			{
-				p.command = arglist.command;
+			else {
+				Cout() << t_("Command line error.");
+				if(!IsNull(cmdargerr)) {
+					Cout() << " [" << cmdargerr << "]\n\n";
+				}
+				PrintHelp();
+				Exit();
 			}
 		}
-		else {
-			Cout() << t_("Command line error.");
-			if(!IsNull(cmdargerr)) {
-				Cout() << " [" << cmdargerr << "]\n\n";
-			}
-			PrintHelp();
-			Exit();
-		}
+
+		CheckPrivileges(app);
+		LoadShortcutKeys();
+		LoadGuiFont(app);
+		LoadGuiTheme(app);
+		app.Run(p, page_size, fullscreen);
+		SaveShortcutKeys();
+
+	}
+	catch(const Exc& e) {
+		LLOG(e);
+		Exit(1);
+	}
+	catch(...) {
+		LLOG("Unknown exception");
+		Exit(1);
 	}
 
-	LoadShortcutKeys();
-	LoadGuiFont(app);
-	LoadGuiTheme(app);
-	app.Run(p, page_size, fullscreen);
-	SaveShortcutKeys();
 }
 
 #ifdef flagWEBGUI
