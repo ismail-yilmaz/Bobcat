@@ -53,7 +53,7 @@ const Display& FontListDisplay()        { return Single<FontListDisplayCls>(); }
 
 int ExclamationYesNo(const char *qtf)
 {
-	return Prompt(callback(LaunchWebBrowser), BEEP_ERROR,
+	return Prompt(callback(LaunchWebBrowser), BEEP_EXCLAMATION,
 	              Ctrl::GetAppName(), CtrlImg::exclamation(), qtf, false,
 	              t_("&Yes"), t_("&No"), NULL, 0,
 	              YesButtonImage(), NoButtonImage(), Null);
