@@ -36,7 +36,7 @@ struct NormalSearchProviderDisplayCls : Display {
 const Display& DefaultSearchProviderDisplay()   { return Single<DefaultSearchProviderDisplayCls>();  }
 const Display& NormalSearchProviderDisplay()    { return Single<NormalSearchProviderDisplayCls>();  }
 
-struct ConvertValidatedUrlNotNull : ConvertString {
+struct ConvertValidatedUrlNotNull : Convert {
 	virtual Value Scan(const Value& text) const
 	{
 		Value v = StdConvertStringNotNull().Scan(text);
@@ -126,7 +126,7 @@ WebSearchSetup::WebSearchSetup()
 	list.WhenDrag = THISFN(Drag);
 	list.WhenLeftDouble = THISFN(Edit);
 	list.WhenDropInsert = THISFN(DnDInsert);
-	dlg.uri.NullText(t_("Basic format: https://www.searchprovider/?q%s"));
+	dlg.uri.NullText(t_("Basic format: https://www.searchprovider.com/?q%s"));
 	dlg.uri.SetConvert(Single<ConvertValidatedUrlNotNull>());
 	Sync();
 }
