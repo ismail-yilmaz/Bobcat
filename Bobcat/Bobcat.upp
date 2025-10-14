@@ -64,9 +64,9 @@ file
 mainconfig
 	"Posix" = "GUI",
 	"Posix (X11)" = "GUI NOGTK",
+	"Posix (Headless)" = "SDLGUI VIRTUALGUI",
+	"Posix (WebGui)" = "WEBGUI VIRTUALGUI",
 	"Windows" = "GUI WIN10",
-	"WebGUI (POSIX)" = "WEBGUI VIRTUALGUI",
-	"WebGUI (Windows)" = "WEBGUI WIN10 VIRTUALGUI ",
-	"Headless (POSIX)" = "SDLGUI VIRTUALGUI",
-	"Headless (Windows)" = "SDLGUI WIN10 VIRTUALGUI";
+	"Windows (WebGui)" = "WEBGUI WIN10 VIRTUALGUI ",
+	"Windows (Headless)" = "SDLGUI WIN10 VIRTUALGUI";
 
