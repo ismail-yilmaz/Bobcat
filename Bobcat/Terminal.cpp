@@ -13,7 +13,9 @@ using namespace TerminalCtrlKeys;
 
 Terminal::Terminal(Bobcat& ctx_)
 : ctx(ctx_)
-, bell(true)
+, bell(false)
+, ring(false)
+, flash(false)
 , filter(false)
 , canresize(true)
 , smartwordsel(false)
@@ -39,7 +41,6 @@ Terminal::Terminal(Bobcat& ctx_)
 	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
 	
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
-	WhenBell    = [this]()                     { if(bell) BeepExclamation();       };
 	WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
 	WhenScroll  = [this]()                     { Update();                         };
 	WhenOutput  = [this](String s)             { pty->Write(s);                    };
@@ -56,6 +57,7 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenMessage              = THISFN(OnNotification);
 	WhenProgress             = THISFN(OnProgress);
 	WhenSelectorScan         = THISFN(OnSelectorScan);
+	WhenBell                 = THISFN(OnBell);
 }
 
 Terminal::~Terminal()
@@ -308,7 +310,7 @@ void Terminal::Update()
 			Refresh();
 	};
 	
-	timer.KillSet(20, cb); // Safeguard against spamming.
+	updatetimer.KillSet(20, cb); // Safeguard against spamming.
 }
 
 void Terminal::SyncHighlight()
@@ -344,7 +346,9 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	shellintegration = p.shellintegration;
 	findselectedtext = p.findselectedtext;
 	warnonrootaccess = p.warnonrootaccess;
-	bell = p.bell;
+	ring = p.bell;
+	flash = p.flashscreen;
+	bell = ring || flash;
 	filter = p.filterctrl;
 	NotifyProgress(p.progress);
 	WindowActions(p.windowactions);
@@ -975,6 +979,16 @@ void Terminal::OpenFinder()
 	if(findselectedtext && IsSelection())
 		finder.SearchText(GetSelectedText());
 	ShowFinder(true);
+}
+
+void Terminal::OnBell()
+{
+	if(!bell)
+		return;
+	if(ring)
+		BeepExclamation();
+	if(flash)
+		FlashDisplay();
 }
 
 void Terminal::FileMenu(Bar& menu)

@@ -125,6 +125,8 @@ struct Terminal : TerminalCtrl {
     void        FindText(const WString& txt);
     void        OpenFinder();
     
+    void        OnBell();
+    
     const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
     int         GetMousePosAsIndex() const;
@@ -171,6 +173,8 @@ struct Terminal : TerminalCtrl {
     One<APtyProcess> pty;
     One<FrameTop<ProgressIndicator>> pi;
     bool         bell:1;
+    bool         ring:1;
+    bool         flash:1;
     bool         filter:1;
     bool         canresize:1;
     bool         smartwordsel:1;
@@ -189,7 +193,7 @@ struct Terminal : TerminalCtrl {
     QuickText    quicktext;
     WebSearch    websearch;
     Color        highlight[4];
-    TimeCallback timer;
+    TimeCallback updatetimer, belltimer;
 
     struct TitleBar : FrameTB<Ctrl> {
         TitleBar(Terminal& ctx);

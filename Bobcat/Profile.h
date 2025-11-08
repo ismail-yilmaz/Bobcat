@@ -20,6 +20,7 @@ struct Profile : Moveable<Profile> {
     bool        warnonrootaccess;
     Font        font;
     bool        bell;
+    bool        flashscreen;
     bool        blinktext;
     int         blinkinterval;
     String      palette;
