@@ -375,6 +375,7 @@ Terminal& Terminal::SetProfile(const Profile& p)
 	MetaShiftsKeys(p.altshiftskeys);
 	KeyNavigation(p.keynavigation);
 	PCStyleFunctionKeys(p.functionkeystyle == "pc");
+	ReverseWrap(p.reversewrap);
 	DelayedRefresh(p.delayedrefresh);
 	LazyResize(p.lazyresize);
 	ShowSizeHint(p.sizehint);
@@ -1053,7 +1054,7 @@ void Terminal::ViewMenu(Bar& menu)
 void Terminal::EmulationMenu(Bar& menu)
 {
 	menu.Add(AK_SHELLINTEGRATION, [this] { shellintegration = !shellintegration; }).Check(shellintegration);
-	menu.Add(AK_VTFUNCTIONKEYS,   [this] { PCStyleFunctionKeys(!HasPCStyleFunctionKeys()); }).Check(HasPCStyleFunctionKeys());
+	menu.Add(AK_VTFUNCTIONKEYS,   [this] { PCStyleFunctionKeys(HasPCStyleFunctionKeys()); }).Check(!HasPCStyleFunctionKeys());
 	menu.Add(AK_KEYNAVIGATION,    [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
 	menu.Add(AK_SCROLLBAR,        [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());
 	menu.Add(AK_AUTOSCROLL,       [this] { ScrollToEnd(!IsScrollingToEnd()); }).Check(IsScrollingToEnd());

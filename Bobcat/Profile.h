@@ -55,6 +55,7 @@ struct Profile : Moveable<Profile> {
     String      encoding;
     bool        ambiguoustowide;
     String      erasechar;
+    bool        reversewrap;
     int         linespacing;
     String      overridetracking;
     String      onexit;
