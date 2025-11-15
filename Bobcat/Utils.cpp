@@ -378,6 +378,13 @@ void LoadGuiFont(Bobcat& ctx)
 	SetStdFont(Nvl(ctx.settings.guifont, GetStdFont()));
 }
 
+void OpenProfileMenu(Bobcat& ctx)
+{
+	if(Vector<String> pnames = GetProfileNames(); pnames.GetCount()) {
+		MenuBar::Execute([&](Bar& bar) { ctx.TermSubmenu(bar, pnames); });
+	}
+}
+
 bool IsWaylandEnabled()
 {
 #ifdef GUI_GTK

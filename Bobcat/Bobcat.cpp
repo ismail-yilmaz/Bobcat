@@ -560,10 +560,10 @@ void Bobcat::TermMenu(Bar& menu)
 	menu.AddKey(AK_NEWPANE,                    [this] { NewTerminalFromActiveProfile(true); });
 	
 	Vector<String> pnames = GetProfileNames();
-	if(!pnames.GetCount())
-		return;
-	menu.Sub(t_("New terminal from..."), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
-	menu.AddKey(AK_NAVIGATOR, [this] { ToggleNavigator(); });
+	if(pnames.GetCount())
+		menu.Sub(t_("New terminal from..."), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
+	menu.AddKey(AK_PROFILEMENU, [this] { OpenProfileMenu(*this); });
+	menu.AddKey(AK_NAVIGATOR,   [this] { ToggleNavigator(); });
 }
 
 void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)

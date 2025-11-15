@@ -159,14 +159,7 @@ Navigator::Navigator(Bobcat& ctx_)
 	searchbar.close  << [this] { WhenClose(); };
 	searchbar.profiles.Image(CtrlImg::down_arrow());
 	searchbar.profiles.Tip(t_("Open new terminal from..."));
-	searchbar.profiles << [this] {
-		Vector<String> pnames = GetProfileNames();
-		if(pnames.GetCount())
-			MenuBar::Execute([this, &pnames](Bar& bar) {
-				ctx.TermSubmenu(bar, pnames);
-			});
-	};
-
+	searchbar.profiles << [this] { OpenProfileMenu(ctx); };
 	AddFrame(sb);
 	sb.AutoHide();
 	sb.WhenScroll = [this] { (void) SyncItemLayout(); Refresh(); };
