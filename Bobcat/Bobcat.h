@@ -261,6 +261,7 @@ const Display& TiledImageDisplay();
 
 void OpenProfileMenu(Bobcat& ctx);
 
+void LoadGuiTheme(const String& s);
 void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();

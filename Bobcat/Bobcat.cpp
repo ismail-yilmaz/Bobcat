@@ -52,6 +52,7 @@ Bobcat::Bobcat()
 	stack.WhenSwap           = [this](int a, int b) { navigator.AnimateSwap(a, b); };
 	SetupMenuBar();
 	GetNotificationDaemon().NoIcon().Append().Animation();
+	Ctrl::SkinChangeSensitive();
 }
 
 bool Bobcat::AddTerminal(const String& key, bool pane)
@@ -202,10 +203,13 @@ void Bobcat::Settings()
 		settingspane.chstyle.GoBegin();
 	}
 
+	settingspane.chstyle.WhenAction = [&] {
+		LoadGuiTheme(~settingspane.chstyle);
+	};
+	
 	settingspane.guifont.SetDisplay(FontProfileDisplay());
 
-	settingspane.guifont.WhenPush = [&]
-	{
+	settingspane.guifont.WhenPush = [&] {
 		dword type = Font::FIXEDPITCH|Font::SCALEABLE;
 		settingspane.guifont <<= SelectFont(~settingspane.guifont, type);
 		settingspane.guifont.Action();

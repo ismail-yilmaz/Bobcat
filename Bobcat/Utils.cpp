@@ -363,14 +363,19 @@ Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
 	};
 }
 
-void LoadGuiTheme(Bobcat& ctx)
+void LoadGuiTheme(const String& s)
 {
 	for(const auto& q : GetAllGuiThemes()) {
-		if(ctx.settings.guitheme == q.b) {
+		if(s == q.b) {
 			Ctrl::SetSkin(q.a);
 			return;
 		}
 	}
+}
+
+void LoadGuiTheme(Bobcat& ctx)
+{
+	LoadGuiTheme(~ctx.settings.guitheme);
 }
 
 void LoadGuiFont(Bobcat& ctx)
