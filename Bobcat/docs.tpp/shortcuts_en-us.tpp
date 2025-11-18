@@ -2,7 +2,7 @@ topic "Keyboard Shortcuts";
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_} 
 [s0; [* Keyboard Shortcuts]&]
-[s0;C+75 &]
+[s0;C+75%% &]
 [s0; [+75 Bobcat predefines several groups of configurable keyboard 
 shortcuts: ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#global`_shortcuts^+75 glo
 bal][/+75  ][+75 and ][/^topic`:`/`/Bobcat`/docs`/shortcuts`_en`-us`#terminal`_shortcuts^+75 t
