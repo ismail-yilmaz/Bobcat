@@ -158,7 +158,7 @@ void Bobcat::Close()
 		return;
 
 	if(int n = terminals.GetCount(); n > 1)
-		if(!PromptYesNo(Format(tt_("%d terminals are open.&Close them all and exit?"), n)))
+		if(!PromptYesNo(Format(t_("%d terminals are open.&Close them all and exit?"), n)))
 			return;
 
 	window.Close();
@@ -169,8 +169,8 @@ void Bobcat::Settings()
 	Profiles  profiles(*this);
 	WithSettingsLayout<ParentCtrl> settingspane;
 
-	String st = tt_("Top");
-	String sb = tt_("Bottom");
+	String st = t_("Top");
+	String sb = t_("Bottom");
 	
 	settingspane.titlepos.Add("top", st);
 	settingspane.titlepos.Add("bottom", sb);
@@ -184,18 +184,18 @@ void Bobcat::Settings()
 	settingspane.notifierpos.Add("bottom", sb);
 	settingspane.notifierpos.GoBegin();
 	
-	settingspane.direction.Add("horizontal", tt_("Horizontal"));
-	settingspane.direction.Add("vertical", tt_("Vertical"));
+	settingspane.direction.Add("horizontal", t_("Horizontal"));
+	settingspane.direction.Add("vertical", t_("Vertical"));
 	settingspane.direction.GoBegin();
 	
-	settingspane.splitterorientation.Add("horizontal", tt_("Horizontal"));
-	settingspane.splitterorientation.Add("vertical", tt_("Vertical"));
+	settingspane.splitterorientation.Add("horizontal", t_("Horizontal"));
+	settingspane.splitterorientation.Add("vertical", t_("Vertical"));
 	settingspane.splitterorientation.GoBegin();
 	
-	settingspane.imagemode.Add("normal", tt_("Normal"));
-	settingspane.imagemode.Add("centered", tt_("Centered"));
-	settingspane.imagemode.Add("stretched", tt_("Stretched"));
-	settingspane.imagemode.Add("tiled", tt_("Tiled"));
+	settingspane.imagemode.Add("normal", t_("Normal"));
+	settingspane.imagemode.Add("centered", t_("Centered"));
+	settingspane.imagemode.Add("stretched", t_("Stretched"));
+	settingspane.imagemode.Add("tiled", t_("Tiled"));
 	settingspane.direction.GoBegin();
 	
 	for(auto& ch : GetAllGuiThemes()) {
@@ -265,10 +265,10 @@ void Bobcat::Settings()
 	#endif
 
 	TabDlg dlg;
-	dlg.Add(profiles, tt_("Profiles"));
-	dlg.Add(settingspane, tt_("General"));
+	dlg.Add(profiles, t_("Profiles"));
+	dlg.Add(settingspane, t_("General"));
 	dlg.WhenClose = dlg.Acceptor(IDEXIT);
-	dlg.OK().Cancel().Title(tt_("Settings")).OpenMain();
+	dlg.OK().Cancel().Title(t_("Settings")).OpenMain();
 
 	while(dlg.IsOpen()) {
 		if(window.IsOpen())
@@ -651,9 +651,9 @@ void Bobcat::About()
 	CtrlLayout(about);
 	CtrlLayout(contributors);
 	CtrlLayout(licenses);
-	dlg.Add(about, tt_("About"));
-	dlg.Add(contributors, tt_("Contributors"));
-	dlg.Add(licenses, tt_("Licenses"));
+	dlg.Add(about, t_("About"));
+	dlg.Add(contributors, t_("Contributors"));
+	dlg.Add(licenses, t_("Licenses"));
 	String atxt =  GetTopic("topic://Bobcat/docs/about_en-us");
 	atxt.Replace("$(BUILD)", DeQtf(GetBuildInfo()));
 	about.txt.SetQTF(atxt);

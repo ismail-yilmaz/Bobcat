@@ -40,6 +40,9 @@ namespace Upp {
 #define IMAGECLASS Images
 #include <Draw/iml_header.h>
 
+#define  TFILE <Bobcat/Bobcat.t>
+#include <Core/t.h>
+
 // Forward declaration
 struct Bobcat;
 struct Terminal;

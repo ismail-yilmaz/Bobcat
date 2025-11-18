@@ -105,8 +105,8 @@ Palettes::Palettes()
 {
 	int cx = Zx(GetTextSize(sSampleText, Monospace()).cx + Zx(8));
 	Ctrl::Add(list.SizePos());
-	list.AddColumn(tt_("Name"));
-	list.AddColumn(tt_("Sample")).SetDisplay(NormalPaletteSampleDisplay()).HeaderTab().Fixed(cx);
+	list.AddColumn(t_("Name"));
+	list.AddColumn(t_("Sample")).SetDisplay(NormalPaletteSampleDisplay()).HeaderTab().Fixed(cx);
 	list.Moving().Removing().Track().NoAskRemove().NoHeader().AutoHideSb();
 	list.VertGrid(false).HorzGrid(false).SetLineCy(24).SetFrame(0, toolbar);
 	list.WhenLeftDouble = [this]() { GetCtrl() ? MakeActive() : Edit(); };
@@ -122,18 +122,18 @@ void Palettes::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
 	bool q = b && list.GetCursor() < list.GetCount() - 1;
-	bar.Add(tt_("Add palette"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
-	bar.Add(tt_("Clone palette"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
-	bar.Add(b, tt_("Edit palette"), Images::Edit(), [this]() { Edit(); }).Key(K_SPACE);
-	bar.Add(tt_("Rename palette"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
-	bar.Add(b, tt_("Remove palette"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
-	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
-	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
+	bar.Add(t_("Add palette"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(t_("Clone palette"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
+	bar.Add(b, t_("Edit palette"), Images::Edit(), [this]() { Edit(); }).Key(K_SPACE);
+	bar.Add(t_("Rename palette"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
+	bar.Add(b, t_("Remove palette"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
+	bar.Add(list.GetCursor() > 0, t_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, t_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
-		bar.Add(b, tt_("Set as active palette"), [this]() { MakeActive(); }).Key(K_CTRL|K_D);
+		bar.Add(b, t_("Set as active palette"), [this]() { MakeActive(); }).Key(K_CTRL|K_D);
 		bar.Separator();
-		bar.Add(tt_("Open palettes directory"), Images::Directory(), []{ LaunchWebBrowser(PaletteDir()); }).Key(K_CTRL_HOME);
+		bar.Add(t_("Open palettes directory"), Images::Directory(), []{ LaunchWebBrowser(PaletteDir()); }).Key(K_CTRL_HOME);
 
 	}
 }
@@ -213,11 +213,11 @@ void Palettes::SetPalette()
 		return;
 
 	WithColorPaletteLayout<TopWindow> dlg;
-	CtrlLayoutOKCancel(dlg, tt_("Color Profile"));
+	CtrlLayoutOKCancel(dlg, t_("Color Profile"));
 	dlg.Sizeable();
 
-	dlg.colors.AddColumn(tt_("Description"));
-	dlg.colors.AddColumn(tt_("Color")).Ctrls<ColorPusher>();
+	dlg.colors.AddColumn(t_("Description"));
+	dlg.colors.AddColumn(t_("Color")).Ctrls<ColorPusher>();
 	dlg.colors.ColumnWidths("100 24");
 
 	Palette p = list.Get(list.GetCursor(), 1).To<Palette>();
@@ -237,7 +237,7 @@ void Palettes::SetPalette()
 
 	LoadColors(p);
 
-	if(dlg.Title(Format(tt_("Color Profile: %"), p.name)).ExecuteOK()) {
+	if(dlg.Title(Format(t_("Color Profile: %"), p.name)).ExecuteOK()) {
 		for(int i = 0; i < dlg.colors.GetCount(); i++)
 			p.table[i] = dlg.colors.Get(i, 1);
 		if(list.FindSetCursor(p.name)) {

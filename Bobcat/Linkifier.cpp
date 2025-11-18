@@ -186,7 +186,7 @@ LinkifierSetup::LinkifierSetup()
 {
 	CtrlLayout(*this);
 	AddFrame(toolbar);
-	list.AddColumn(tt_("Hyperlink patterns")).Edit(edit);
+	list.AddColumn(t_("Hyperlink patterns")).Edit(edit);
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
 	list.WhenDrag = THISFN(Drag);
@@ -207,14 +207,14 @@ void LinkifierSetup::ContextMenu(Bar& bar)
 	bool q = list.GetCursor() >= 0 && list.GetCursor() < list.GetCount() - 1;
 
 	bool b = list.IsCursor();
-	bar.Add(c, tt_("Add pattern"), Images::Add(), [this]() { list.DoAppend(); }).Key(K_INSERT);
-	bar.Add(d, tt_("Edit pattern"), Images::Edit(), [this]() { list.DoEdit(); }).Key(K_SPACE);
-	bar.Add(d, tt_("Remove pattern"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);
+	bar.Add(c, t_("Add pattern"), Images::Add(), [this]() { list.DoAppend(); }).Key(K_INSERT);
+	bar.Add(d, t_("Edit pattern"), Images::Edit(), [this]() { list.DoEdit(); }).Key(K_SPACE);
+	bar.Add(d, t_("Remove pattern"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);
 	bar.Separator();
-	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
-	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
+	bar.Add(list.GetCursor() > 0, t_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, t_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	bar.Separator();
-	bar.Add(list.GetCount() > 0, tt_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
+	bar.Add(list.GetCount() > 0, t_("Select all"), Images::SelectAll(), [this]() { list.DoSelectAll(); }).Key(K_CTRL_A);
 }
 
 void LinkifierSetup::Drag()

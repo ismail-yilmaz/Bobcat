@@ -62,7 +62,7 @@ int ExclamationYesNo(const char *qtf)
 Font SelectFont(Font f, dword type)
 {
 	WithFontSelectorLayout<TopWindow> dlg;
-	CtrlLayoutOKCancel(dlg, tt_("Select Font"));
+	CtrlLayoutOKCancel(dlg, t_("Select Font"));
 
 	FrameLeft<DisplayCtrl> icon;
 	icon.SetDisplay(CenteredImageDisplay());
@@ -352,14 +352,14 @@ String GetBuildInfo()
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
 {
 	return Vector<Tuple<void (*)(), String, String>> {
-		{ ChHostSkin, "host", tt_("Host platform") },
-		{ ChClassicSkin, "classic", tt_("Classic") },
-		{ ChStdSkin, "standard", tt_("Standard") },
-		{ ChGraySkin, "gray", tt_("Gray") },
-		{ ChDarkSkin, "dark", tt_("Dark") },
-		{ ChFlatSkin, "flat", tt_("Flat") },
-		{ ChFlatGraySkin, "flatgray", tt_("Flat Gray") },
-		{ ChFlatDarkSkin, "flatdark", tt_("Flat Dark") }
+		{ ChHostSkin, "host", t_("Host platform") },
+		{ ChClassicSkin, "classic", t_("Classic") },
+		{ ChStdSkin, "standard", t_("Standard") },
+		{ ChGraySkin, "gray", t_("Gray") },
+		{ ChDarkSkin, "dark", t_("Dark") },
+		{ ChFlatSkin, "flat", t_("Flat") },
+		{ ChFlatGraySkin, "flatgray", t_("Flat Gray") },
+		{ ChFlatDarkSkin, "flatdark", t_("Flat Dark") }
 	};
 }
 

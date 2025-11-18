@@ -107,6 +107,8 @@ void PrintFontList()
 
 void BobcatAppMain()
 {
+	SetLanguage(GetSystemLNG());
+	
 	Size page_size(80, 24);
 	bool fullscreen = false;
 	

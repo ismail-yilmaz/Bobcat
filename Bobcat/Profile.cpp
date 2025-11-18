@@ -394,17 +394,17 @@ void Profiles::ContextMenu(Bar& bar)
 {
 	bool b = list.IsCursor();
 	bool q = b && list.GetCursor() < list.GetCount() - 1;
-	bar.Add(tt_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
-	bar.Add(b, tt_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
-	bar.Add(b, tt_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
-	bar.Add(b, tt_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
-	bar.Add(list.GetCursor() > 0, tt_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
-	bar.Add(q, tt_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
+	bar.Add(t_("Add profile"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
+	bar.Add(b, t_("Clone profile"), Images::Copy(), [this]() { Clone(); }).Key(K_CTRL|K_C);
+	bar.Add(b, t_("Rename profile"), Images::Rename(), [this]() { Rename(); }).Key(K_F2);
+	bar.Add(b, t_("Remove profile"), Images::Delete(), [this]() { Remove(); }).Key(K_DELETE);
+	bar.Add(list.GetCursor() > 0, t_("Move up"), Images::Up(), [this]() { list.SwapUp(); }).Key(K_CTRL_UP);
+	bar.Add(q, t_("Move down"), Images::Down(), [this]() { list.SwapDown(); }).Key(K_CTRL_DOWN);
 	if(bar.IsMenuBar()) {
 		bar.Separator();
-		bar.Add(b, tt_("Set as default profile"), [this]() { SetDefault(); }).Key(K_CTRL|K_D);
+		bar.Add(b, t_("Set as default profile"), [this]() { SetDefault(); }).Key(K_CTRL|K_D);
 		bar.Separator();
-		bar.Add(tt_("Open profiles directory"), Images::Directory(), []{ LaunchWebBrowser(ProfilesDir()); }).Key(K_CTRL_HOME);
+		bar.Add(t_("Open profiles directory"), Images::Directory(), []{ LaunchWebBrowser(ProfilesDir()); }).Key(K_CTRL_HOME);
 	}
 }
 
