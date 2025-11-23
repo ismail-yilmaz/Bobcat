@@ -346,7 +346,7 @@ String GetBuildInfo()
 	h << '\n';
 	h << t_("Path") << ": " << GetExeFilePath();
 
-	return h;
+	return ToUtf8(h.ToWString());
 }
 
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes()
