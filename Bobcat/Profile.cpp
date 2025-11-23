@@ -209,12 +209,13 @@ Profiles::Setup::Setup()
 		CtrlImg::Set(CtrlImg::I_select_all, Images::SelectAll());
 	}
 	
-	for(int i = 0; i < CharsetCount(); i++) {
+	emulation.charset.Add("UTF-8");
+	for(int i = 1; i < CharsetCount(); i++) {
 		String cset = CharsetName(i);
 		if(!cset.StartsWith("dec-"))
 			emulation.charset.Add(cset);
 	}
-	
+		
 	Add(tabs.SizePos());
 	CtrlLayout(general);
 	CtrlLayout(visuals);
