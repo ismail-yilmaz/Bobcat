@@ -121,7 +121,6 @@ Vector<Terminal*> Bobcat::GetTerminalGroup(const Profile& p)
 
 void Bobcat::ProcessEvents()
 {
-	window.ProcessEvents();
 	auto& we = Single<PtyWaitEvent>();
 	we.Clear();
 	for(Terminal& t : terminals)
@@ -130,6 +129,7 @@ void Bobcat::ProcessEvents()
 	for(Terminal& t : terminals)
 		if(!t.Do())
 			RemoveTerminal(t);
+	Ctrl::ProcessEvents();
 }
 
 void Bobcat::Run(const Profile& profile, Size size, bool fullscreen)
