@@ -28,320 +28,72 @@ static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
 
 Finder::Finder(Terminal& t)
 : term(t)
-, index(0)
+, mode(Finder::Mode::CaseSensitive)
 , limit(SEARCH_MAX)
-, harvester(*this)
 , cancel(false)
-, searchtype(Search::CaseSensitive)
 {
-	CtrlLayout(*this);
-	close.Image(Images::Delete()).Tip(t_("Close finder"));
-	next.Image(Images::Next());
-	prev.Image(Images::Prev());
-	begin.Image(Images::Begin());
-	end.Image(Images::End());
-	next  << THISFN(Next);
-	prev  << THISFN(Prev);
-	begin << THISFN(Begin);
-	end   << THISFN(End);
-	close << THISFN(Hide);
-	showall << THISFN(Sync);
-	Add(text.HSizePosZ(4, 282).VSizePosZ(4, 4));
-	text.NullText(t_("Type to search..."));
-	text.AddFrame(display);
-	text.AddFrame(menu);
-	text.WhenBar << THISFN(StdKeys);
-	text.WhenAction << THISFN(Search);
-	fsave.Image(Images::Reap());
-	fsave << [=] { SaveToFile(); };
-	csave.Image(Images::Paste());
-	csave << [=] { SaveToClipboard(); };
-	menu.Image(Images::Find());
-	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
-	display.SetDisplay(StdCenterDisplay());
-	Sync();
 }
 
 Finder::~Finder()
 {
 }
 
-void Finder::SetConfig(const Profile& p)
+Finder& Finder::SetLimit(int n)
 {
-	SetSearchMode(p.finder.searchmode);
-	limit = clamp(p.finder.searchlimit, 1, SEARCH_MAX);
-	showall = p.finder.showall;
-	parallelize = p.finder.parallelize;
-	harvester.Format(p.finder.saveformat);
-	harvester.Delimiter(p.finder.delimiter);
-	harvester.Mode(p.finder.savemode);
-	text.ClearList();
-	for(const String& s: p.finder.patterns)
-		text.AddList(s);
+	limit = clamp(n, 1, SEARCH_MAX);
+	return *this;
 }
 
-void Finder::SetData(const Value& v)
+Finder& Finder::SetMode(Mode m)
 {
-	data = v;
-	term.RefreshLayout();
+	mode = m;
+	return *this;
 }
 
-Value Finder::GetData() const
+Finder& Finder::CaseSensitive()
 {
-	return data;
+	mode = Mode::CaseSensitive;
+	return *this;
 }
 
-void Finder::FrameLayout(Rect& r)
+Finder& Finder::CaseInsensitive()
 {
-	data == "top"
-		? LayoutFrameTop(r, this, cy ? cy : r.Width())
-		: LayoutFrameBottom(r, this, cy ? cy : r.Width()); // default
+	mode = Mode::CaseInsensitive;
+	return *this;
 }
 
-void Finder::Show()
+Finder& Finder::Regex()
 {
-	if(!IsChild()) {
-		bool b = term.HasSizeHint();
-		term.HideSizeHint();
-		term.AddFrame(Height(StdFont().GetCy() + 16));
-		term.SyncHighlight();
-		term.ShowSizeHint(b);
-	}
-	text.SetFocus();
-}
-
-void Finder::Hide()
-{
-	if(IsChild()) {
-		bool b = term.HasSizeHint();
-		term.HideSizeHint();
-		term.RemoveFrame(*this);
-		term.SyncHighlight();
-		term.RefreshLayout();
-		term.ShowSizeHint(b);
-	}
-	term.SetFocus();
-}
-
-int Finder::GetCount() const
-{
-	return foundtext.GetCount();
-}
-
-bool Finder::HasFound() const
-{
-	return foundtext.GetCount() > 0;
-}
-
-void Finder::Goto(int i)
-{
-	if(i >= 0 && i < foundtext.GetCount()) {
-		term.Goto(foundtext[i].pos.y);;
-		Sync();
-	}
-}
-
-void Finder::Next()
-{
-	if(int n = foundtext.GetCount(); n >= 0) {
-		index = clamp(++index, 0, n - 1);
-		Goto(index);
-	}
-}
-
-void Finder::Prev()
-{
-	if(int n = foundtext.GetCount(); n >= 0) {
-		index = clamp(--index, 0, n - 1);
-		Goto(index);
-	}
-}
-
-void Finder::Begin()
-{
-	if(int n = foundtext.GetCount(); n >= 0) {
-		index = 0;
-		Goto(index);
-	}
-}
-
-void Finder::End()
-{
-	if(int n = foundtext.GetCount(); n >= 0) {
-		index = n - 1;
-		Goto(index);
-	}
-}
-
-void Finder::SetSearchMode(const String& mode)
-{
-	searchtype = decode(mode,
-		"insensitive", Search::CaseInsensitive,
-		"regex", Search::Regex,
-		Search::CaseSensitive);
-	Sync();
-}
-
-void Finder::CheckCase()
-{
-	searchtype = Search::CaseSensitive;
-	Update();
-}
-
-void Finder::IgnoreCase()
-{
-	searchtype = Search::CaseInsensitive;
-	Update();
-}
-
-void Finder::CheckPattern()
-{
-	searchtype = Search::Regex;
-	Update();
+	mode = Mode::Regex;
+	return *this;
 }
 
 bool Finder::IsCaseSensitive() const
 {
-	return searchtype == Search::CaseSensitive;
+	return mode == Mode::CaseSensitive;
 }
 
 bool Finder::IsCaseInsensitive() const
 {
-	return searchtype == Search::CaseInsensitive;
+	return mode == Mode::CaseInsensitive;
 }
 
 bool Finder::IsRegex() const
 {
-	return searchtype == Search::Regex;
+	return mode == Mode::Regex;
 }
 
-void Finder::StdBar(Bar& menu)
+bool Finder::Find(const WString& text, bool co)
 {
-	menu.Add(AK_CHECKCASE, THISFN(CheckCase)).Radio(IsCaseSensitive());
-	menu.Add(AK_IGNORECASE,THISFN(IgnoreCase)).Radio(IsCaseInsensitive());
-	menu.Add(AK_REGEX,     THISFN(CheckPattern)).Radio(IsRegex());
-	StdKeys(menu);
-}
-
-void Finder::StdKeys(Bar& menu)
-{
-	menu.AddKey(AK_FIND_ALL,     [this] { showall = !showall; Sync(); });
-	menu.AddKey(AK_FIND_NEXT,    THISFN(Next));
-	menu.AddKey(AK_FIND_PREV,    THISFN(Prev));
-	menu.AddKey(AK_FIND_FIRST,   THISFN(Begin));
-	menu.AddKey(AK_FIND_LAST,    THISFN(End));
-	menu.AddKey(AK_HIDE_FINDER,  THISFN(Hide));
-	menu.AddKey(AK_HARVEST_FILE, THISFN(SaveToFile));
-	menu.AddKey(AK_HARVEST_CLIP, THISFN(SaveToClipboard));
-	menu.AddKey(AK_HARVEST_LIST, [this] { harvester.Mode("list"); });
-	menu.AddKey(AK_HARVEST_MAP,  [this] { harvester.Mode("map");  });
-	menu.AddKey(AK_PARALLELIZE,  [this] { parallelize = !parallelize; Sync(); });
-}
-
-bool Finder::Key(dword key, int count)
-{
-	MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
-	return true;
-}
-
-void Finder::Sync()
-{
-	int cnt = foundtext.GetCount();
-	index = clamp(index, 0, max(0, cnt - 1));
-	String s;
-	s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
-	switch(searchtype) {
-	case Search::CaseSensitive:
-		s << "C ";
-		display.Tip(t_("Case sensitive mode"));
-		break;
-	case Search::CaseInsensitive:
-		s << "I ";
-		display.Tip(t_("Case insensitive mode"));
-		break;
-	case Search::Regex:
-		s << "R ";
-		display.Tip(t_("Regex mode"));
-		break;
-	default:
-		break;
-	}
-	sWriteToDisplay(display, s);
-	
-	String k;
-	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
-	fsave.Tip(t_("Save to file") + k);
-	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_CLIP().key[0]) + ") ";
-	csave.Tip(t_("Copy to clipboard") + k);
-	
-	if(cnt && searchtype == Search::Regex) {
-		if(!fsave.IsChild())
-			text.InsertFrame(2, fsave); // FIXME: Yes, ugly...
-		if(!csave.IsChild())
-			text.InsertFrame(2, csave);
-	}
-	else {
-		if(fsave.IsChild())
-			text.RemoveFrame(fsave);
-		if(csave.IsChild())
-			text.RemoveFrame(csave);
-	}
-	
-	bool a = !term.IsSearching() && cnt > 0 && index > 0;
-	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
-	prev.Enable(a);
-	next.Enable(b);
-	begin.Enable(a);
-	end.Enable(b);
-	text.Error(!IsNull(~text) && !cnt);
-	term.Refresh();
-}
-
-void Finder::SearchText(const WString& txt)
-{
-	text <<= (text.GetLength() <= 256 ? txt : txt.Mid(0, 256));
-	Search();
-}
-
-void Finder::Search()
-{
-	if(term.IsSearching()) {
-		CancelSearch();
-		return;
-	}
 	foundtext.Clear();
 	cancel = false;
-	if(~parallelize)
+	if(co) {
 		term.CoFind(~text, false, THISFN(OnSearch));
-	else
+	}
+	else {
 		term.Find(~text, false, THISFN(OnSearch));
-	Sync();
-}
-
-void Finder::CancelSearch()
-{
-	cancel = true;
-}
-
-bool Finder::IsSearchCanceled() const
-{
-	return cancel;
-}
-
-void Finder::Update()
-{
-	if(IsChild())
-		Search();
-}
-
-void Finder::SaveToFile()
-{
-	harvester.SaveToFile();
-}
-
-void Finder::SaveToClipboard()
-{
-	harvester.SaveToClipboard();
+	}
+	return HasFound();
 }
 
 bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -357,7 +109,7 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 	auto ScanText = [&](SortedIndex<ItemInfo>& v, int limit, bool tolower) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
 			for(int col = 0; col < m[row].GetLength(); col++, i++) {
-				if(IsSearchCanceled())
+				if(IsCanceled())
 					return true;
 				int a = m[row][col], b = s[0];
 				if(tolower) {
@@ -422,7 +174,7 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 		RegExp r(s.ToString());
 		String ln = ToUtf8(q);
 		while(r.GlobalMatch(ln)) {
-			if(IsSearchCanceled())
+			if(IsCanceled())
 				return true;
 			ItemInfo a;
 			int o = r.GetOffset();
@@ -443,160 +195,44 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
 {
-	if(!term.HasFinder())
-		return true;
 	return IsRegex() ? RegexSearch(m, s) : BasicSearch(m, s);
 }
 
-void Finder::OnHighlight(HighlightInfo& hl)
+const SortedIndex<ItemInfo>& Finder::GetItems() const
 {
-	if(!term.HasFinder() || term.IsSearching() || !foundtext.GetCount() || index < 0)
-		return;
-
-	LTIMING("Finder::OnHighlight");
-
-	hl.adjusted = true;
-	term.DoHighlight(foundtext, hl, [&](HighlightInfo& hl) {
-		const ItemInfo& p = foundtext[index];
-		const ItemInfo* q = hl.iteminfo;
-		int   o = hl.offset;
-		for(auto cell : hl.highlighted) {
-			if(q->pos.y == p.pos.y && q->pos.x + o == p.pos.x + o) {
-				cell->Normal()
-					.Ink(term.highlight[1]).Paper(term.highlight[3]);
-			}
-			else
-			if(~showall) {
-				cell->Normal()
-					.Ink(term.highlight[0]).Paper(term.highlight[2]);
-			}
-		}
-	});
+	return foundtext;
 }
 
-Finder::Harvester::Harvester(Finder& f)
-: finder(f)
-, format(Fmt::Csv)
-, delimiter(",")
+const ItemInfo& Finder::Get(int i)
 {
+	ASSERT(i > 0 && i <= foundtext.GetCount());
+	return foundtext[i];
 }
 
-Finder::Harvester& Finder::Harvester::Format(const String& fmt)
+
+const ItemInfo& Finder::operator[](int i)
 {
-	format = decode(fmt, "csv", Harvester::Fmt::Csv, Harvester::Fmt::Txt);
-	return *this;
+	return Get(i);
 }
 
-Finder::Harvester& Finder::Harvester::Mode(const String& md)
+int Finder::GetCount() const
 {
-	if(md == "list")
-		delimiter = "\r\n";
-	return *this;
+	return foundtext.GetCount();
 }
 
-Finder::Harvester& Finder::Harvester::Delimiter(const String& delim)
+bool Finder::HasFound() const
 {
-	delimiter = delim;
-	return *this;
+	return foundtext.GetCount() > 0;
 }
 
-bool Finder::Harvester::Reap(Stream& s)
+void Finder::Cancel()
 {
-	bool aborted = false;
-	Progress pi(&finder.term);
-	pi.Title(t_("Harvester"));
-	pi.Set(0, finder.foundtext.GetCount());
-	const char *status = t_("Saved %d of %d item(s). [%s]");
-	finder.term.Find(~finder.text, false, [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
-		WString txt;
-		for(const WString& s : m)
-			txt << s;
-		if(txt.IsEmpty())
-			return false;
-		String reaped;
-		for(const ItemInfo& a : finder.foundtext) {
-			if(m.GetKey(0) != a.pos.y)
-				continue;
-			if((aborted = pi.StepCanceled()))
-				return true;
-			String q = ToUtf8(txt.Mid(a.pos.x, a.length));
-			if(!q.IsEmpty())
-				reaped << (format == Fmt::Csv ? CsvString(q) : q) << delimiter;
-		}
-		if(!reaped.IsEmpty()) {
-			reaped.TrimEnd(delimiter);
-			s.Put(reaped);
-			s.PutCrLf();
-		}
-		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
-		return false;
-	});
-	s.Close();
-	return !aborted;
+	cancel = true;
 }
 
-bool Finder::Harvester::IsReady() const
+bool Finder::IsCanceled() const
 {
-	if(finder.term.IsSearching())
-		return false;
-
-	if(finder.foundtext.IsEmpty()) {
-		Exclamation(t_("Nothing to harvest."));
-		return false;
-	}
-
-	if(!finder.IsRegex()) {
-		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
-		return false;
-	}
-	
-	return true;
-}
-
-void Finder::Harvester::SaveToClipboard()
-{
-	if(!IsReady())
-		return;
-
-	if(StringStream ss; Reap(ss))
-		AppendClipboardText(ss);
-}
-
-void Finder::Harvester::SaveToFile()
-{
-	if(!IsReady())
-		return;
-
-	String fmt = decode(format,	Fmt::Csv,  "*.csv", "*.txt");
-	if(String path = SelectFileSaveAs(fmt); !path.IsEmpty()) {
-		String tmp = GetTempFileName();
-		if(FileOut fo(tmp); fo && Reap(fo))
-			FileCopy(tmp, path);
-		DeleteFile(tmp);
-	}
-}
-
-Finder::SearchField::SearchField()
-{
-	WhenBar = THISFN(SearchBar);
-}
-
-void Finder::SearchField::SearchBar(Bar& menu)
-{
-	menu.Add(IsEditable(), AK_FIND_UNDO, Images::Undo(), THISFN(Undo));
-	menu.Separator();
-	menu.Add(IsEditable() && IsSelection(), AK_FIND_CUT, Images::Cut(), THISFN(Cut));
-	menu.Add(IsSelection(), AK_FIND_COPY, Images::Copy(),THISFN(Copy));
-	menu.Add(IsEditable() && IsClipboardAvailableText(), AK_FIND_PASTE, Images::Paste(), THISFN(Paste));
-	menu.Separator();
-	menu.Add(text.GetLength(), AK_FIND_SELECTALL, Images::SelectAll(), THISFN(SelectAll));
-}
-
-bool Finder::SearchField::Key(dword key, int count)
-{
-	if(MenuBar::Scan(WhenBar, key))
-		return true;
-	return WithDropChoice<EditString>::Key(key, count);
+	return cancel;
 }
 
 Finder::Config::Config()
@@ -620,6 +256,434 @@ void Finder::Config::Jsonize(JsonIO& jio)
 	   ("HarvestingMode",    savemode)
 	   ("Delimiter",         delimiter)
 	   ("Patterns",          patterns);
+}
+
+FinderBar::FinderBar(Terminal& t)
+: Finder(t)
+, term(t)
+, index(0)
+, harvester(*this)
+{
+	CtrlLayout(*this);
+	close.Image(Images::Delete()).Tip(t_("Close finder"));
+	next.Image(Images::Next());
+	prev.Image(Images::Prev());
+	begin.Image(Images::Begin());
+	end.Image(Images::End());
+	next  << THISFN(Next);
+	prev  << THISFN(Prev);
+	begin << THISFN(Begin);
+	end   << THISFN(End);
+	close << THISFN(Hide);
+	showall << THISFN(Sync);
+	Add(text.HSizePosZ(4, 282).VSizePosZ(4, 4));
+	text.NullText(t_("Type to search..."));
+	text.AddFrame(display);
+	text.AddFrame(menu);
+	text.WhenBar << THISFN(StdKeys);
+	text.WhenAction << [this] { Search(); };
+	fsave.Image(Images::Reap());
+	fsave << [=] { SaveToFile(); };
+	csave.Image(Images::Paste());
+	csave << [=] { SaveToClipboard(); };
+	menu.Image(Images::Find());
+	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
+	display.SetDisplay(StdCenterDisplay());
+	Sync();
+}
+
+FinderBar::~FinderBar()
+{
+}
+
+void FinderBar::SetConfig(const Profile& p)
+{
+	SetSearchMode(p.finder.searchmode);
+	SetLimit(p.finder.searchlimit);
+	showall = p.finder.showall;
+	parallelize = p.finder.parallelize;
+	harvester.Format(p.finder.saveformat);
+	harvester.Delimiter(p.finder.delimiter);
+	harvester.Mode(p.finder.savemode);
+	text.ClearList();
+	for(const String& s: p.finder.patterns)
+		text.AddList(s);
+}
+
+void FinderBar::SetData(const Value& v)
+{
+	data = v;
+	term.RefreshLayout();
+}
+
+Value FinderBar::GetData() const
+{
+	return data;
+}
+
+void FinderBar::FrameLayout(Rect& r)
+{
+	data == "top"
+		? LayoutFrameTop(r, this, cy ? cy : r.Width())
+		: LayoutFrameBottom(r, this, cy ? cy : r.Width()); // default
+}
+
+void FinderBar::Show()
+{
+	if(!IsChild()) {
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.AddFrame(Height(StdFont().GetCy() + 16));
+		term.SyncHighlight();
+		term.ShowSizeHint(b);
+	}
+	text.SetFocus();
+}
+
+void FinderBar::Hide()
+{
+	if(IsChild()) {
+		bool b = term.HasSizeHint();
+		term.HideSizeHint();
+		term.RemoveFrame(*this);
+		term.SyncHighlight();
+		term.RefreshLayout();
+		term.ShowSizeHint(b);
+	}
+	term.SetFocus();
+}
+
+void FinderBar::Goto(int i)
+{
+	if(i >= 0 && i < GetCount()) {
+		term.Goto(Get(i).pos.y);;
+		Sync();
+	}
+}
+
+void FinderBar::Next()
+{
+	if(int n = GetCount(); n >= 0) {
+		index = clamp(++index, 0, n - 1);
+		Goto(index);
+	}
+}
+
+void FinderBar::Prev()
+{
+	if(int n = GetCount(); n >= 0) {
+		index = clamp(--index, 0, n - 1);
+		Goto(index);
+	}
+}
+
+void FinderBar::Begin()
+{
+	if(int n = GetCount(); n >= 0) {
+		index = 0;
+		Goto(index);
+	}
+}
+
+void FinderBar::End()
+{
+	if(int n = GetCount(); n >= 0) {
+		index = n - 1;
+		Goto(index);
+	}
+}
+
+void FinderBar::SetSearchMode(const String& mode)
+{
+	SetMode(decode(mode,
+			"regex", Finder::Mode::Regex,
+				"insensitive", Finder::Mode::CaseInsensitive,
+					/* sensitive */		Finder::Mode::CaseSensitive));
+	Sync();
+}
+
+void FinderBar::CheckCase()
+{
+	CaseSensitive();
+	Update();
+}
+
+void FinderBar::IgnoreCase()
+{
+	CaseInsensitive();
+	Update();
+}
+
+void FinderBar::CheckPattern()
+{
+	Regex();
+	Update();
+}
+
+void FinderBar::StdBar(Bar& menu)
+{
+	menu.Add(AK_CHECKCASE, THISFN(CheckCase)).Radio(IsCaseSensitive());
+	menu.Add(AK_IGNORECASE,THISFN(IgnoreCase)).Radio(IsCaseInsensitive());
+	menu.Add(AK_REGEX,     THISFN(CheckPattern)).Radio(IsRegex());
+	StdKeys(menu);
+}
+
+void FinderBar::StdKeys(Bar& menu)
+{
+	menu.AddKey(AK_FIND_ALL,     [this] { showall = !showall; Sync(); });
+	menu.AddKey(AK_FIND_NEXT,    THISFN(Next));
+	menu.AddKey(AK_FIND_PREV,    THISFN(Prev));
+	menu.AddKey(AK_FIND_FIRST,   THISFN(Begin));
+	menu.AddKey(AK_FIND_LAST,    THISFN(End));
+	menu.AddKey(AK_HIDE_FINDER,  THISFN(Hide));
+	menu.AddKey(AK_HARVEST_FILE, THISFN(SaveToFile));
+	menu.AddKey(AK_HARVEST_CLIP, THISFN(SaveToClipboard));
+	menu.AddKey(AK_HARVEST_LIST, [this] { harvester.Mode("list"); });
+	menu.AddKey(AK_HARVEST_MAP,  [this] { harvester.Mode("map");  });
+	menu.AddKey(AK_PARALLELIZE,  [this] { parallelize = !parallelize; Sync(); });
+}
+
+bool FinderBar::Key(dword key, int count)
+{
+	MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
+	return true;
+}
+
+void FinderBar::Sync()
+{
+	int cnt = GetCount();
+	index = clamp(index, 0, max(0, cnt - 1));
+	String s;
+	s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
+	if(IsCaseSensitive()) {
+		s << "C ";
+		display.Tip(t_("Case sensitive mode"));
+	}
+	else
+	if(IsCaseInsensitive()) {
+		s << "I ";
+		display.Tip(t_("Case insensitive mode"));
+	}
+	else
+	if(IsRegex()) {
+		s << "R ";
+		display.Tip(t_("Regex mode"));
+	}
+	else
+		NEVER();
+
+	sWriteToDisplay(display, s);
+	
+	String k;
+	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
+	fsave.Tip(t_("Save to file") + k);
+	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_CLIP().key[0]) + ") ";
+	csave.Tip(t_("Copy to clipboard") + k);
+	
+	if(cnt && IsRegex()) {
+		if(!fsave.IsChild())
+			text.InsertFrame(2, fsave); // FIXME: Yes, ugly...
+		if(!csave.IsChild())
+			text.InsertFrame(2, csave);
+	}
+	else {
+		if(fsave.IsChild())
+			text.RemoveFrame(fsave);
+		if(csave.IsChild())
+			text.RemoveFrame(csave);
+	}
+	
+	bool a = !term.IsSearching() && cnt > 0 && index > 0;
+	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
+	prev.Enable(a);
+	next.Enable(b);
+	begin.Enable(a);
+	end.Enable(b);
+	text.Error(!IsNull(~text) && !cnt);
+	term.Refresh();
+}
+
+void FinderBar::Search()
+{
+	Search(~text);
+}
+
+void FinderBar::Search(const WString& txt)
+{
+	if(term.IsSearching()) {
+		Cancel();
+		return;
+	}
+	Find(txt, ~parallelize);
+	Sync();
+}
+
+
+void FinderBar::Update()
+{
+	if(IsChild())
+		Search();
+}
+
+void FinderBar::SaveToFile()
+{
+	harvester.SaveToFile();
+}
+
+void FinderBar::SaveToClipboard()
+{
+	harvester.SaveToClipboard();
+}
+
+void FinderBar::OnHighlight(HighlightInfo& hl)
+{
+	if(!term.HasFinder() || term.IsSearching() || !HasFound() || index < 0)
+		return;
+
+	LTIMING("FinderBar::OnHighlight");
+
+	hl.adjusted = true;
+	term.DoHighlight(GetItems(), hl, [&](HighlightInfo& hl) {
+		const ItemInfo& p = Get(index);
+		const ItemInfo* q = hl.iteminfo;
+		int   o = hl.offset;
+		for(auto cell : hl.highlighted) {
+			if(q->pos.y == p.pos.y && q->pos.x + o == p.pos.x + o) {
+				cell->Normal()
+					.Ink(term.highlight[1]).Paper(term.highlight[3]);
+			}
+			else
+			if(~showall) {
+				cell->Normal()
+					.Ink(term.highlight[0]).Paper(term.highlight[2]);
+			}
+		}
+	});
+}
+
+FinderBar::Harvester::Harvester(FinderBar& f)
+: finder(f)
+, format(Fmt::Csv)
+, delimiter(",")
+{
+}
+
+FinderBar::Harvester& FinderBar::Harvester::Format(const String& fmt)
+{
+	format = decode(fmt, "csv", Harvester::Fmt::Csv, Harvester::Fmt::Txt);
+	return *this;
+}
+
+FinderBar::Harvester& FinderBar::Harvester::Mode(const String& md)
+{
+	if(md == "list")
+		delimiter = "\r\n";
+	return *this;
+}
+
+FinderBar::Harvester& FinderBar::Harvester::Delimiter(const String& delim)
+{
+	delimiter = delim;
+	return *this;
+}
+
+bool FinderBar::Harvester::Reap(Stream& s)
+{
+	bool aborted = false;
+	Progress pi(&finder.term);
+	pi.Title(t_("Harvester"));
+	pi.Set(0, finder.GetCount());
+	const char *status = t_("Saved %d of %d item(s). [%s]");
+	finder.term.Find(~finder.text, false, [&](const VectorMap<int, WString>& m, const WString& /* NIL*/) {
+		WString txt;
+		for(const WString& s : m)
+			txt << s;
+		if(txt.IsEmpty())
+			return false;
+		String reaped;
+		for(const ItemInfo& a : finder.GetItems()) {
+			if(m.GetKey(0) != a.pos.y)
+				continue;
+			if((aborted = pi.StepCanceled()))
+				return true;
+			String q = ToUtf8(txt.Mid(a.pos.x, a.length));
+			if(!q.IsEmpty())
+				reaped << (format == Fmt::Csv ? CsvString(q) : q) << delimiter;
+		}
+		if(!reaped.IsEmpty()) {
+			reaped.TrimEnd(delimiter);
+			s.Put(reaped);
+			s.PutCrLf();
+		}
+		pi.SetText(Upp::Format(status, pi.GetPos(), pi.GetTotal(), FormatFileSize(s.GetSize())));
+		return false;
+	});
+	s.Close();
+	return !aborted;
+}
+
+bool FinderBar::Harvester::IsReady() const
+{
+	if(finder.term.IsSearching())
+		return false;
+
+	if(!finder.HasFound()) {
+		Exclamation(t_("Nothing to harvest."));
+		return false;
+	}
+
+	if(!finder.IsRegex()) {
+		Exclamation(t_("Cannot harvest.&Finder is not in regexp (R) mode."));
+		return false;
+	}
+	
+	return true;
+}
+
+void FinderBar::Harvester::SaveToClipboard()
+{
+	if(!IsReady())
+		return;
+
+	if(StringStream ss; Reap(ss))
+		AppendClipboardText(ss);
+}
+
+void FinderBar::Harvester::SaveToFile()
+{
+	if(!IsReady())
+		return;
+
+	String fmt = decode(format,	Fmt::Csv,  "*.csv", "*.txt");
+	if(String path = SelectFileSaveAs(fmt); !path.IsEmpty()) {
+		String tmp = GetTempFileName();
+		if(FileOut fo(tmp); fo && Reap(fo))
+			FileCopy(tmp, path);
+		DeleteFile(tmp);
+	}
+}
+
+FinderBar::SearchField::SearchField()
+{
+	WhenBar = THISFN(SearchBar);
+}
+
+void FinderBar::SearchField::SearchBar(Bar& menu)
+{
+	menu.Add(IsEditable(), AK_FIND_UNDO, Images::Undo(), THISFN(Undo));
+	menu.Separator();
+	menu.Add(IsEditable() && IsSelection(), AK_FIND_CUT, Images::Cut(), THISFN(Cut));
+	menu.Add(IsSelection(), AK_FIND_COPY, Images::Copy(),THISFN(Copy));
+	menu.Add(IsEditable() && IsClipboardAvailableText(), AK_FIND_PASTE, Images::Paste(), THISFN(Paste));
+	menu.Separator();
+	menu.Add(text.GetLength(), AK_FIND_SELECTALL, Images::SelectAll(), THISFN(SelectAll));
+}
+
+bool FinderBar::SearchField::Key(dword key, int count)
+{
+	if(MenuBar::Scan(WhenBar, key))
+		return true;
+	return WithDropChoice<EditString>::Key(key, count);
 }
 
 FinderSetup::FinderSetup()

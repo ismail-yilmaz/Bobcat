@@ -188,7 +188,7 @@ struct Terminal : TerminalCtrl {
     Time         starttime;
     String       pathdelimiter;
     Value        data;
-    Finder       finder;
+    FinderBar    finder;
     Linkifier    linkifier;
     QuickText    quicktext;
     WebSearch    websearch;
