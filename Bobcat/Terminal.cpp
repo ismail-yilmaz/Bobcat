@@ -971,14 +971,14 @@ Terminal& Terminal::PutText(const WString& txt)
 
 void Terminal::FindText(const WString& text)
 {
-	finder.SearchText(text);
+	finder.Search(text);
 	ShowFinder(true);
 }
 
 void Terminal::OpenFinder()
 {
 	if(findselectedtext && IsSelection())
-		finder.SearchText(GetSelectedText());
+		finder.Search(GetSelectedText());
 	ShowFinder(true);
 }
 

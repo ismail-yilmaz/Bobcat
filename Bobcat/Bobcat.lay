@@ -171,7 +171,7 @@ LAYOUT(NavigatorLayout, 526, 24)
 	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(4, 4))
 END_LAYOUT
 
-LAYOUT(FinderLayout, 548, 24)
+LAYOUT(FinderBarLayout, 548, 24)
 	ITEM(ToolButton, prev, RightPosZ(262, 16).VSizePosZ(4, 4))
 	ITEM(ToolButton, next, RightPosZ(242, 16).VSizePosZ(4, 4))
 	ITEM(ToolButton, begin, RightPosZ(222, 16).VSizePosZ(4, 4))

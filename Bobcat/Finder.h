@@ -4,13 +4,74 @@
 #ifndef _Bobcat_Finder_h_
 #define _Bobcat_Finder_h_
 
-class Finder : public FrameTB<WithFinderLayout<ParentCtrl>>
+class Finder : public Moveable<Finder> {
+public:
+	typedef Finder CLASSNAME;
+	
+    enum class Mode { CaseSensitive, CaseInsensitive, Regex };
+    
+	Finder(Terminal& t);
+	virtual ~Finder();
+	
+	Finder&     SetLimit(int n);
+	
+	Finder&     SetMode(Mode m);
+	Finder&     CaseSensitive();
+	Finder&     CaseInsensitive();
+	Finder&     Regex();
+	
+	bool        IsCaseSensitive() const;
+	bool        IsCaseInsensitive() const;
+	bool        IsRegex() const;
+
+	bool		Find(const WString& text, bool co = false);
+	bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
+
+	const SortedIndex<ItemInfo>& GetItems() const;
+	
+	const ItemInfo& Get(int i);
+	const ItemInfo& operator[](int i);
+	
+	int         GetCount() const;
+	bool        HasFound() const;
+
+	void        Cancel();
+	bool        IsCanceled() const;
+
+	void        SetConfig(const Profile& p);
+
+    struct Config {
+        Config();
+        void    Jsonize(JsonIO& jio);
+        String  searchmode;
+        int     searchlimit;
+        String  saveformat;
+        String  savemode;
+        String  delimiter;
+        bool    showall;
+        bool    parallelize;
+        WithDeepCopy<Vector<String>> patterns;
+    };
+    
+private:
+    bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
+    bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
+
+    SortedIndex<ItemInfo> foundtext;
+    
+    Terminal&   term;
+	Mode        mode;
+	int         limit;
+	bool        cancel:1;
+};
+
+class FinderBar : public Finder, public FrameTB<WithFinderBarLayout<ParentCtrl>>
 {
 public:
-    typedef Finder CLASSNAME;
+    typedef FinderBar CLASSNAME;
 
-    Finder(Terminal& t);
-    virtual ~Finder();
+    FinderBar(Terminal& t);
+    virtual ~FinderBar();
 
     void        SetConfig(const Profile& p);
     
@@ -32,60 +93,29 @@ public:
     void        End();
     void        Goto(int i);
 
-    int         GetCount() const;
-    bool        HasFound() const;
-
     void        SetSearchMode(const String& mode);
 
     void        CheckCase();
     void        IgnoreCase();
     void        CheckPattern();
-
-    bool        IsCaseSensitive() const;
-    bool        IsCaseInsensitive() const;
-    bool        IsRegex() const;
   
     void        Sync();
 
     void        Search();
-    void        SearchText(const WString& text);
-    void        CancelSearch();
-    bool        IsSearchCanceled() const;
+    void        Search(const WString& txt);
     void        Update();
 
     void        SaveToFile();
     void        SaveToClipboard();
 
-    bool        OnSearch(const VectorMap<int, WString>& m, const WString& s);
     void        OnHighlight(HighlightInfo& hl);
 
-    struct Config {
-        Config();
-        void    Jsonize(JsonIO& jio);
-        String  searchmode;
-        int     searchlimit;
-        String  saveformat;
-        String  savemode;
-        String  delimiter;
-        bool    showall;
-        bool    parallelize;
-        WithDeepCopy<Vector<String>> patterns;
-    };
-
 private:
-    bool        BasicSearch(const VectorMap<int, WString>& m, const WString& s);
-    bool        RegexSearch(const VectorMap<int, WString>& m, const WString& s);
 
     SortedIndex<ItemInfo> foundtext;
 
-    enum class Search {
-        CaseSensitive,
-        CaseInsensitive,
-        Regex
-    }   searchtype;
-
     struct Harvester {
-        Harvester(Finder& f);
+        Harvester(FinderBar& f);
         Harvester& Format(const String& fmt);
         Harvester& Mode(const String& mode);
         Harvester& Delimiter(const String& delim);
@@ -94,7 +124,7 @@ private:
         bool       Reap(Stream& s);
         bool       IsReady() const;
         enum class Fmt  { Txt, Csv };
-        Finder&    finder;
+        FinderBar& finder;
         Fmt        format;
         String     delimiter;
     } harvester;
@@ -107,11 +137,9 @@ private:
     };
 
     int           index;
-    int           limit;
     Terminal&     term;
     Value         data;
     SearchField   text;
-    bool          cancel:1;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
     FrameRight<ToolButton> fsave, csave;
