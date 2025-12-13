@@ -386,7 +386,10 @@ void LoadGuiFont(Bobcat& ctx)
 void OpenProfileMenu(Bobcat& ctx)
 {
 	if(Vector<String> pnames = GetProfileNames(); pnames.GetCount()) {
-		MenuBar::Execute([&](Bar& bar) { ctx.TermSubmenu(bar, pnames); });
+		Point pt = GetMousePos();
+		if(Rect wr = ctx.window.GetScreenView(); !wr.Contains(pt))
+			pt = wr.TopLeft();
+		MenuBar::Execute([&](Bar& bar) { ctx.TermSubmenu(bar, pnames); }, pt);
 	}
 }
 

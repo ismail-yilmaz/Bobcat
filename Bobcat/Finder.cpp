@@ -170,27 +170,25 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	if(q.IsEmpty())
 		return false;
 	
-	auto ScanText = [&](SortedIndex<ItemInfo>& v, int limit) {
-		RegExp r(s.ToString());
-		String ln = ToUtf8(q);
-		while(r.GlobalMatch(ln)) {
-			if(IsCanceled())
-				return true;
-			ItemInfo a;
-			int o = r.GetOffset();
-			a.pos.y = offset;
-			a.pos.x = Utf32Len(~ln, o);
-			a.length = Utf32Len(~ln + o, r.GetLength());
-			sFinderLock.Enter();
-			v.Add(a);
-			sFinderLock.Leave();
-			if(v.GetCount() == limit)
-				return true;
-		}
-		return false;
-	};
-	
-	return ScanText(foundtext, limit);
+	RegExp r(s.ToString());
+	String ln = ToUtf8(q);
+
+	while(r.GlobalMatch(ln)) {
+		if(IsCanceled())
+			return true;
+		ItemInfo a;
+		int o = r.GetOffset();
+		a.pos.y = offset;
+		a.pos.x = Utf32Len(~ln, o);
+		a.length = Utf32Len(~ln + o, r.GetLength());
+		sFinderLock.Enter();
+		foundtext.Add(a);
+		sFinderLock.Leave();
+		if(foundtext.GetCount() == limit)
+			return true;
+	}
+
+	return false;
 }
 
 bool Finder::OnSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -266,8 +264,8 @@ FinderBar::FinderBar(Terminal& t)
 {
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
-	next.Image(Images::Next());
-	prev.Image(Images::Prev());
+	next.Image(Images::Up());
+	prev.Image(Images::Down());
 	begin.Image(Images::Begin());
 	end.Image(Images::End());
 	next  << THISFN(Next);

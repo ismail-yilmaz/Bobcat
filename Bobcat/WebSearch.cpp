@@ -32,7 +32,6 @@ struct NormalSearchProviderDisplayCls : Display {
 	}
 };
 
-
 const Display& DefaultSearchProviderDisplay()   { return Single<DefaultSearchProviderDisplayCls>();  }
 const Display& NormalSearchProviderDisplay()    { return Single<NormalSearchProviderDisplayCls>();  }
 

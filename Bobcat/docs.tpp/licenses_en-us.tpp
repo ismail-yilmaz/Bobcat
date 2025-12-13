@@ -1611,4 +1611,41 @@ claims are]&]
 [s0; [C1 assumed by the product vendor.]&]
 [s0;C1 ]}}&]
 [s0; &]
+[s0; &]
+[s0; Bobcat uses a subset of [^https`:`/`/github`.com`/tabler`/tabler`-icons^ Tabler 
+Icons].&]
+[s0; Tabler icons package has the following license notice:&]
+[s0; &]
+[ {{10000@(255.255.192) [s0; [C1 MIT License]&]
+[s0;C1 &]
+[s0; [C1 Copyright (c) 2020`-2025 Paweł Kuna]&]
+[s0;C1 &]
+[s0; [C1 Permission is hereby granted, free of charge, to any person 
+obtaining a copy]&]
+[s0; [C1 of this software and associated documentation files (the `"Software`"), 
+to deal]&]
+[s0; [C1 in the Software without restriction, including without limitation 
+the rights]&]
+[s0; [C1 to use, copy, modify, merge, publish, distribute, sublicense, 
+and/or sell]&]
+[s0; [C1 copies of the Software, and to permit persons to whom the 
+Software is]&]
+[s0; [C1 furnished to do so, subject to the following conditions:]&]
+[s0;C1 &]
+[s0; [C1 The above copyright notice and this permission notice shall 
+be included in all]&]
+[s0; [C1 copies or substantial portions of the Software.]&]
+[s0;C1 &]
+[s0; [C1 THE SOFTWARE IS PROVIDED `"AS IS`", WITHOUT WARRANTY OF ANY 
+KIND, EXPRESS OR]&]
+[s0; [C1 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,]&]
+[s0; [C1 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
+EVENT SHALL THE]&]
+[s0; [C1 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES 
+OR OTHER]&]
+[s0; [C1 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM,]&]
+[s0; [C1 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE]&]
+[s0; [C1 SOFTWARE.]]}}&]
 [s0;%% ]]

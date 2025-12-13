@@ -200,6 +200,10 @@ Profiles::Setup::Setup()
 {
 	ONCELOCK
 	{
+		CtrlImg::Set(CtrlImg::I_File, Images::File());
+		CtrlImg::Set(CtrlImg::I_Dir, Images::Directory());
+		CtrlImg::Set(CtrlImg::I_FileSmall, Images::File());
+		CtrlImg::Set(CtrlImg::I_DirSmall, Images::Directory());
 		CtrlImg::Set(CtrlImg::I_cut, Images::Cut());
 		CtrlImg::Set(CtrlImg::I_copy, Images::Copy());
 		CtrlImg::Set(CtrlImg::I_paste, Images::Paste());

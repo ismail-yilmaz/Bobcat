@@ -501,11 +501,11 @@ void Bobcat::FileMenu(Bar& menu)
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->FileMenu(menu);
 	menu.Separator();
-	menu.Add(t_("Reset"), [this] { if(Terminal *t = GetActiveTerminal(); t) t->Reset(); });
+	menu.Add(t_("Reset"), Images::ResetTerminal(), [this] { if(Terminal *t = GetActiveTerminal(); t) t->Reset(); });
 	menu.Separator();
-	menu.Add(AK_SCREENSHOT, [this] { ScreenShot(); });
+	menu.Add(AK_SCREENSHOT, Images::Screenshot(), [this] { ScreenShot(); });
 	menu.Separator();
-	menu.Add(t_("Exit"),  [this] { Close(); });
+	menu.Add(t_("Exit"),  Images::Shutdown(), [this] { Close(); });
 }
 
 void Bobcat::EditMenu(Bar& menu)
@@ -526,8 +526,8 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.AddKey(AK_MAXIMIZE,   [this] { Maximize(!window.IsMaximized()); });
 	menu.AddKey(AK_MINIMIZE,   [this] { Minimize(!window.IsMinimized()); });
 	menu.Separator();
-	menu.Add(enable, AK_PREV, Images::Prev(),  [this] { stack.Prev(); });
-	menu.Add(enable, AK_NEXT, Images::Next(),  [this] { stack.Next(); });
+	menu.Add(enable, AK_PREV, Images::Up(),    [this] { stack.Prev(); });
+	menu.Add(enable, AK_NEXT, Images::Down(),  [this] { stack.Next(); });
 	menu.Add(enable, AK_BEGIN,Images::Begin(), [this] { stack.GoBegin(); });
 	menu.Add(enable, AK_END,  Images::End(),   [this] { stack.GoEnd(); });
 	menu.AddKey(AK_SPLITTER_TOGGLE,            [this] { stack.ToggleSplitterOrientation(); });
@@ -548,8 +548,8 @@ void Bobcat::EmulationMenu(Bar& menu)
 
 void Bobcat::SetupMenu(Bar& menu)
 {
-	menu.Add(AK_SETTINGS,  [this] { Settings(); });
-	menu.Add(AK_KEYCONFIG, [] { EditKeys(); SaveShortcutKeys(); });
+	menu.Add(AK_SETTINGS, Images::Cog(), [this] { Settings(); });
+	menu.Add(AK_KEYCONFIG, Images::Keyboard(), [] { EditKeys(); SaveShortcutKeys(); });
 }
 
 void Bobcat::HelpMenu(Bar& menu)
@@ -560,8 +560,8 @@ void Bobcat::HelpMenu(Bar& menu)
 
 void Bobcat::TermMenu(Bar& menu)
 {
-	menu.Add(AK_NEWTAB, Images::Terminal(),    [this] { NewTerminalFromActiveProfile(); });
-	menu.AddKey(AK_NEWPANE,                    [this] { NewTerminalFromActiveProfile(true); });
+	menu.Add(AK_NEWTAB, Images::DefaultTerminal(), [this] { NewTerminalFromActiveProfile(); });
+	menu.AddKey(AK_NEWPANE,                        [this] { NewTerminalFromActiveProfile(true); });
 	
 	Vector<String> pnames = GetProfileNames();
 	if(pnames.GetCount())
@@ -616,14 +616,18 @@ void Bobcat::ListMenu(Bar& menu)
 void Bobcat::SizeMenu(Bar& menu)
 {
 	menu.Separator();
-	menu.Add(AK_GEOM_80_24,  [this] { SetPageSize(Size(80, 24));  });
-	menu.Add(AK_GEOM_80_48,  [this] { SetPageSize(Size(80, 48));  });
-	menu.Add(AK_GEOM_132_24, [this] { SetPageSize(Size(132, 24)); });
-	menu.Add(AK_GEOM_132_48, [this] { SetPageSize(Size(132, 48)); });
+	menu.Add(AK_GEOM_80_24,  Images::Resize(), [this] { SetPageSize(Size(80, 24));  });
+	menu.Add(AK_GEOM_80_48,  Images::Resize(), [this] { SetPageSize(Size(80, 48));  });
+	menu.Add(AK_GEOM_132_24, Images::Resize(), [this] { SetPageSize(Size(132, 24)); });
+	menu.Add(AK_GEOM_132_48, Images::Resize(), [this] { SetPageSize(Size(132, 48)); });
 	StringStream ss(settings.custompagesizes);
 	while(!ss.IsEof()) {
 		if(Size sz = ParsePageSize(ss.GetLine()); !IsNull(sz)) {
-			menu.Add(AsString(sz.cx) + "x" + AsString(sz.cy), [this, sz] { SetPageSize(sz); });
+			menu.Add(
+				AsString(sz.cx) + "x" + AsString(sz.cy),
+				Images::Resize(),
+				[this, sz] { SetPageSize(sz);
+			});
 		}
 	}
 }

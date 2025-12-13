@@ -99,6 +99,9 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 		#endif
 		int chr = decode(p.erasechar, "backspace", 0x08, 0x7F);
 		t.c_cc[VERASE] = chr;
+		t.c_cc[VMIN]   = 0;
+		t.c_cc[VTIME]  = 0;
+		t.c_lflag &= ~IEXTEN;
 		Echo(Format("\033[?67%[1:h;l]s", chr == 0x08));
 		return true;
 	};
