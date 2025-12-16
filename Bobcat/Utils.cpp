@@ -81,17 +81,15 @@ Font SelectFont(Font f, dword type)
 	dlg.slider << [&] { dlg.fontsize  <<= ~dlg.slider; dlg.font.WhenSel(); };
 	
 	Vector<String> fontfaces;
-	
-	int h = Draw::GetStdFontSize().cy + 8;
+
 	for(int i = 0; i < Font::GetFaceCount(); i++) {
 		dword fi = Font::GetFaceInfo(i);
 		if(((type & Font::FIXEDPITCH) & fi) || ((type & Font::SCALEABLE) & fi)) {
 			fontfaces.Add(Font::GetFaceName(i));
 		}
-		h = max(Font().Face(i).GetCy(), h);
 	}
 	
-	dlg.font.ItemHeight(h);
+	dlg.font.ItemHeight(Draw::GetStdFontCy() + Zy(8));
 
 	auto FilterFonts = [&]
 	{
