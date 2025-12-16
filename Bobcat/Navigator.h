@@ -73,15 +73,24 @@ struct Navigator : ParentCtrl {
         TIMEID_COUNT
     };
 
-    bool          FilterItem(const Item& item);
+    struct SearchBar : FrameTop<Ctrl> {
+        SearchBar();
+        void Set(int n = 0);
+        ToolButton   newterm;
+        ToolButton   profiles;
+        EditString   search;
+        ToolButton   close;
+        FrameLeft<DisplayCtrl> icon;
+        FrameRight<DisplayCtrl> status;
+    }  searchbar;
+
+    bool        FilterItem(const Item& item);
     
     Bobcat&     ctx;
     VScrollBar  sb;
     bool        swapanim:1;
     int         cursor;
     Array<Item> items;
-    FrameLeft<DisplayCtrl> icon;
-    FrameTop<WithNavigatorLayout<ParentCtrl>> searchbar;
 };
 
 #endif

@@ -20,12 +20,6 @@ constexpr const int SEARCH_MAX = 256000;
 
 static StaticMutex sFinderLock;
 
-static void sWriteToDisplay(FrameLR<DisplayCtrl>& f, const String& txt)
-{
-	int cx = GetTextSize(txt, GetStdFont()).cx + 8;
-	f.Width(cx) <<= AttrText(txt).Bold().Ink(SColorDisabled);
-}
-
 Finder::Finder(Terminal& t)
 : term(t)
 , mode(Finder::Mode::CaseSensitive)
@@ -286,7 +280,7 @@ FinderBar::FinderBar(Terminal& t)
 	csave << [=] { SaveToClipboard(); };
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
-	display.SetDisplay(StdCenterDisplay());
+	display.SetDisplay(SearchStatusDisplay());
 	Sync();
 }
 
@@ -331,7 +325,7 @@ void FinderBar::Show()
 	if(!IsChild()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		term.AddFrame(Height(StdFont().GetCy() + 16));
+		term.AddFrame(Height(GetStdBarHeight()));
 		term.SyncHighlight();
 		term.ShowSizeHint(b);
 	}
@@ -451,27 +445,34 @@ void FinderBar::Sync()
 {
 	int cnt = GetCount();
 	index = clamp(index, 0, max(0, cnt - 1));
+	bool err = !IsNull(~text) && !cnt;
 	String s;
-	s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
-	if(IsCaseSensitive()) {
-		s << "C ";
-		display.Tip(t_("Case sensitive mode"));
+	if(!err) {
+		if(!IsNull(~text))
+			s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
+		if(IsCaseSensitive()) {
+			s << "C";
+			display.Tip(t_("Case sensitive mode"));
+		}
+		else
+		if(IsCaseInsensitive()) {
+			s << "I";
+			display.Tip(t_("Case insensitive mode"));
+		}
+		else
+		if(IsRegex()) {
+			s << "R";
+			display.Tip(t_("Regex mode"));
+		}
+		else
+			NEVER();
 	}
-	else
-	if(IsCaseInsensitive()) {
-		s << "I ";
-		display.Tip(t_("Case insensitive mode"));
+	else {
+		s << "--"; // No match
 	}
-	else
-	if(IsRegex()) {
-		s << "R ";
-		display.Tip(t_("Regex mode"));
-	}
-	else
-		NEVER();
 
-	sWriteToDisplay(display, s);
-	
+	SetSearchStatusText(display, s);
+
 	String k;
 	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
 	fsave.Tip(t_("Save to file") + k);
@@ -497,7 +498,7 @@ void FinderBar::Sync()
 	next.Enable(b);
 	begin.Enable(a);
 	end.Enable(b);
-	text.Error(!IsNull(~text) && !cnt);
+	text.Error(err);
 	term.Refresh();
 }
 

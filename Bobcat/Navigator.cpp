@@ -145,21 +145,11 @@ Navigator::Navigator(Bobcat& ctx_)
 , swapanim(false)
 {
 	Hide();
-	CtrlLayout(searchbar);
-	icon.SetDisplay(StdCenterDisplay());
-	icon <<= Images::Find();
-	searchbar.search.AddFrame(icon);
-	searchbar.search.WantFocus();
-	AddFrame(searchbar.Height(Zy(22)));
-	searchbar.newterm.Image(Images::Add());
-	searchbar.newterm.Tip(t_("Open new terminal"));
 	searchbar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
 	searchbar.search << [this] { Search();  };
-	searchbar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
-	searchbar.close  << [this] { WhenClose(); };
-	searchbar.profiles.Image(CtrlImg::down_arrow());
-	searchbar.profiles.Tip(t_("Open new terminal from..."));
+	searchbar.close << [this] { WhenClose(); };
 	searchbar.profiles << [this] { OpenProfileMenu(ctx); };
+	AddFrame(searchbar.Height(GetStdBarHeight()));
 	AddFrame(sb);
 	sb.AutoHide();
 	sb.WhenScroll = [this] { (void) SyncItemLayout(); Refresh(); };
@@ -212,6 +202,7 @@ int Navigator::SyncItemLayout()
 		m.Hide();
 	
 	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
+	searchbar.Set(v.GetCount());
 	if(!v.GetCount())
 		return v.GetCount();
 
@@ -244,6 +235,7 @@ int Navigator::SyncItemLayout()
 			row++;
 		}
 	}
+
 	return v.GetCount();
 }
 
@@ -290,7 +282,6 @@ void Navigator::Sync()
 		}
 		if(blinking)
 			KillSetTimeCallback(-500, [this] { Animate(); }, Navigator::TIMEID_BLINK);
-
 		Refresh();
 	};
 
@@ -459,5 +450,34 @@ bool Navigator::Key(dword key, int count)
 	return MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key);
 }
 
+Navigator::SearchBar::SearchBar()
+{
+	Add(newterm.LeftPosZ(4, 12).VCenterPosZ(12, 0));
+	Add(profiles.LeftPosZ(18, 12).VCenterPosZ(12, 0));
+	Add(search.HSizePosZ(128, 128).VSizePosZ(2, 2));
+	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
+	icon.SetDisplay(StdCenterDisplay());
+	status.SetDisplay(SearchStatusDisplay());
+	icon <<= Images::Find();
+	search.AddFrame(icon);
+	search.AddFrame(status);
+	search.WantFocus();
+	newterm.Image(Images::Add());
+	newterm.Tip(t_("Open new terminal"));
+	close.Image(Images::Delete()).Tip(t_("Close navigator"));
+	profiles.Image(CtrlImg::down_arrow());
+	profiles.Tip(t_("Open new terminal from..."));
+}
+
+void Navigator::SearchBar::Set(int n)
+{
+	if(auto ctx = GetContext(); ctx) {
+		String txt;
+		int cnt = ctx->stack.GetCount();
+		if(!IsNull(~search))
+			txt = n > 0 ? Format("%d/%d", n, cnt) : "--";
+		SetSearchStatusText(status, txt);
+	}
+}
 
 }

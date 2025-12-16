@@ -46,10 +46,27 @@ struct TiledImageDisplayCls : Display
 	}
 };
 
-const Display& StdBackgroundDisplay()   { return Single<StdBackgroundDisplayCls>(); }
-const Display& NormalImageDisplay()     { return Single<NormalImageDisplayCls>(); }
-const Display& TiledImageDisplay()      { return Single<TiledImageDisplayCls>(); }
-const Display& FontListDisplay()        { return Single<FontListDisplayCls>(); }
+struct SearchStatusDisplayCls : Display
+{
+	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
+	{
+		AttrText txt(q);
+		txt.Paper(q == "--" ? Blend(SColorPaper, Color(255, 0, 0), 32) : SColorPaper);
+		StdCenterDisplay().Paint(w, r, txt.Bold().Ink(SColorDisabled), ink, paper, style);
+	}
+};
+
+const Display& StdBackgroundDisplay()    { return Single<StdBackgroundDisplayCls>(); }
+const Display& NormalImageDisplay()      { return Single<NormalImageDisplayCls>(); }
+const Display& TiledImageDisplay()       { return Single<TiledImageDisplayCls>(); }
+const Display& FontListDisplay()         { return Single<FontListDisplayCls>(); }
+const Display& SearchStatusDisplay()     { return Single<SearchStatusDisplayCls>(); }
+
+void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
+{
+	int cx = GetTextSize(txt, GetStdFont()).cx + 8;
+	status.Width(cx)  <<= txt;
+}
 
 int ExclamationYesNo(const char *qtf)
 {
@@ -65,10 +82,15 @@ Font SelectFont(Font f, dword type)
 	CtrlLayoutOKCancel(dlg, t_("Select Font"));
 
 	FrameLeft<DisplayCtrl> icon;
+	FrameRight<DisplayCtrl> status;
+	
 	icon.SetDisplay(CenteredImageDisplay());
+	status.SetDisplay(SearchStatusDisplay());
+	
 	icon <<= Images::Find();
 	dlg.search.NullText(t_("Search font..."));
 	dlg.search.AddFrame(icon);
+	dlg.search.AddFrame(status);
 
 	dlg.font.SetDisplay(FontListDisplay());
 	dlg.font.WhenSel = [&]
@@ -104,9 +126,16 @@ Font SelectFont(Font f, dword type)
 		dlg.font.Clear();
 		for(const String& face : FilterFonts())
 			dlg.font.Add(face);
-		dlg.search.Error(dlg.font.GetCount() == 0);
-		int i = dlg.font.Find(f.GetFaceName());
-		if(i >= 0) dlg.font.SetCursor(i);
+		String txt;
+		int cnt = dlg.font.GetCount();
+		if(cnt > 0)
+			txt = AsString(cnt) + "/" + AsString(fontfaces.GetCount());
+		else
+			txt = "--"; // No match.
+		SetSearchStatusText(status, !IsNull(~dlg.search) ? txt: "");
+		dlg.search.Error(cnt == 0);
+		if(int i = dlg.font.Find(f.GetFaceName()); i >= 0)
+			dlg.font.SetCursor(i);
 	};
 	
 	// Init the list.
@@ -116,7 +145,6 @@ Font SelectFont(Font f, dword type)
 		f.FaceName(~dlg.font).Height(~dlg.fontsize);
 	return f;
 }
-
 
 struct EditCodePoint : EditString {
 	Terminal& term;
@@ -389,6 +417,11 @@ void OpenProfileMenu(Bobcat& ctx)
 			pt = wr.TopLeft();
 		MenuBar::Execute([&](Bar& bar) { ctx.TermSubmenu(bar, pnames); }, pt);
 	}
+}
+
+int GetStdBarHeight()
+{
+	return GetStdFontCy() + Zy(8);
 }
 
 bool IsWaylandEnabled()

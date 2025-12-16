@@ -262,12 +262,18 @@ const Display& StdBackgroundDisplay();
 const Display& NormalImageDisplay();
 const Display& TiledImageDisplay();
 
+void  SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt);
+
+const Display& SearchStatusDisplay();
+
 void OpenProfileMenu(Bobcat& ctx);
 
 void LoadGuiTheme(const String& s);
 void LoadGuiTheme(Bobcat& ctx);
 void LoadGuiFont(Bobcat& ctx);
 Vector<Tuple<void (*)(), String, String>> GetAllGuiThemes();
+
+int  GetStdBarHeight();
 
 bool IsWaylandEnabled();
 void EnableWayland(bool b);

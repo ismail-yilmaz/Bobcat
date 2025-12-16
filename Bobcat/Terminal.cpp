@@ -1126,7 +1126,7 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	Add(title.VSizePosZ(0, 0).HSizePosZ(24, 24));
 	Add(newterm.LeftPosZ(4, 12).VCenterPosZ(12, 0));
 	Add(menu.LeftPosZ(18, 12).VCenterPosZ(12, 0));
-	Add(navlist.RightPos(24, 12).VCenterPosZ(12, 0));
+	Add(navlist.RightPosZ(24, 12).VCenterPosZ(12, 0));
 	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
 	newterm.Image(Images::Add()).Tip(t_("Open new terminal"));
 	navlist.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
@@ -1161,7 +1161,7 @@ void Terminal::TitleBar::Show()
 {
 	bool b = term.HasSizeHint();
 	term.HideSizeHint();
-	term.InsertFrame(0, Height(StdFont().GetCy() + Zy(4)));
+	term.InsertFrame(0, Height(GetStdBarHeight()));
 	term.ShowSizeHint(b);
 }
 
