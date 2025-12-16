@@ -451,10 +451,12 @@ bool Navigator::Key(dword key, int count)
 		searchbar.search.SetFocus();
 	}
 	else
-	if(!MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key))
-		return false;
-		
-	return true;
+	if(key < K_CHAR_LIM && key != K_TAB) {
+		searchbar.search.SetFocus();
+		return !searchbar.search.Key(key, count);
+	}
+	
+	return MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key);
 }
 
 
