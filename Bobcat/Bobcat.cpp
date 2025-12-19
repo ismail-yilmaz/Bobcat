@@ -444,9 +444,10 @@ void Bobcat::Sync()
 
 void Bobcat::SyncTitle()
 {
-	String s = t_("Bobcat");
-	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t)
-		s << " [" << t->GetData() << "]";
+	String s = "Bobcat";
+	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t) {
+			s << " [" << t->GetData() << "]";
+	}
 	window.Title(s);
 }
 
@@ -675,7 +676,6 @@ void Bobcat::About()
 void Bobcat::Help()
 {
 	static const Tuple<const char*, const char*> topics[] {
-		{ "overview",  t_("Overview")             },
 		{ "usage",     t_("Command line options") },
 		{ "shortcuts", t_("Keyboard shortcuts")   }
 	};

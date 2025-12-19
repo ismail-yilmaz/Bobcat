@@ -11,6 +11,7 @@ struct Navigator : ParentCtrl {
     Navigator&    Show(bool ok = true);
     Navigator&    Hide();
     void          Search();
+	void          SetSearchResults(int n = 0);
     int           SyncItemLayout();
     void          Sync();
     void          Animate();
@@ -73,23 +74,15 @@ struct Navigator : ParentCtrl {
         TIMEID_COUNT
     };
 
-    struct SearchBar : FrameTop<Ctrl> {
-        SearchBar();
-        void Set(int n = 0);
-        ToolButton   newterm;
-        ToolButton   profiles;
-        EditString   search;
-        ToolButton   close;
-        FrameLeft<DisplayCtrl> icon;
-        FrameRight<DisplayCtrl> status;
-    }  searchbar;
-
     bool        FilterItem(const Item& item);
     
     Bobcat&     ctx;
     VScrollBar  sb;
     bool        swapanim:1;
     int         cursor;
+    FrameLeft<DisplayCtrl>  icon;
+    FrameRight<DisplayCtrl> status;
+    FrameTop<WithNavigatorLayout<ParentCtrl>> bar;
     Array<Item> items;
 };
 

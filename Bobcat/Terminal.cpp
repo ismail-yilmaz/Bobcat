@@ -324,14 +324,9 @@ void Terminal::SyncHighlight()
 
 Terminal& Terminal::Sync()
 {
-	bool b = ctx.stack.GetCount() > 1;
-	titlebar.menu.Show(!ctx.HasMenuBar());
-	titlebar.newterm.Show(!ctx.HasMenuBar());
-	titlebar.navlist.Show(!ctx.HasMenuBar() && b);
-	titlebar.close.Show(b || ctx.window.IsFullScreen());
-	ShowTitleBar(ctx.settings.showtitle);
 	titlebar <<= ctx.settings.titlealignment;
 	finder   <<= ctx.settings.finderalignment;
+	ShowTitleBar(ctx.settings.showtitle);
 	Update();
 	return *this;
 }
@@ -576,7 +571,8 @@ void Terminal::MakeTitle(const String& s)
 	if(!s.IsEmpty() && s != profilename)
 		title << " :: " << s;
 	SetData(title);
-	titlebar.title.SetText("\1[g= " << DeQtf(title) << " ]");
+	titlebar.title.SetText(title);
+	titlebar.title.Sync();
 	ctx.SyncTitle();
 }
 
@@ -593,6 +589,7 @@ void Terminal::ShowTitleBar(bool b)
 	else
 	if(titlebar.IsChild() && !b)
 		titlebar.Hide();
+	titlebar.Sync();
 }
 
 void Terminal::HideTitleBar()
@@ -1123,16 +1120,11 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 : term(ctx)
 {
 	SetData("top");
-	Add(title.VSizePosZ(0, 0).HSizePosZ(24, 24));
-	Add(newterm.LeftPosZ(4, 12).VCenterPosZ(12, 0));
-	Add(menu.LeftPosZ(18, 12).VCenterPosZ(12, 0));
-	Add(navlist.RightPosZ(24, 12).VCenterPosZ(12, 0));
-	Add(close.RightPosZ(4, 12).VCenterPosZ(12, 0));
+	CtrlLayout(*this);
 	newterm.Image(Images::Add()).Tip(t_("Open new terminal"));
 	navlist.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
 	close.Image(Images::Delete()).Tip(t_("Close terminal"));
 	menu.Image(CtrlImg::down_arrow()).Tip(t_("Open new terminal from..."));
-	
 	newterm << [this] { term.ctx.AddTerminal(term.ctx.GetActiveProfile()); };
 	navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
 	close   << [this] { term.Stop(); };
@@ -1179,6 +1171,17 @@ void Terminal::TitleBar::Menu()
 	if(Vector<String> pnames = GetProfileNames(); pnames.GetCount()) {
 		MenuBar::Execute([this, &pnames](Bar& menu) { term.ctx.TermSubmenu(menu, pnames);});
 	}
+}
+
+void Terminal::TitleBar::Sync()
+{
+	bool hasfocus = IsChild() && term.IsSplitterPane() && term.HasFocus();
+	bool multiple = term.ctx.stack.GetCount() > 1;
+	menu.Show(!term.ctx.HasMenuBar());
+	newterm.Show(!term.ctx.HasMenuBar());
+	navlist.Show(!term.ctx.HasMenuBar() && multiple);
+	close.Show(multiple || term.ctx.window.IsFullScreen());
+	title.SetFont(GetStdFont().Bold(hasfocus));
 }
 
 Terminal::ProgressBar::ProgressBar(Terminal& t)

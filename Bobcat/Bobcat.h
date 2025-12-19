@@ -264,8 +264,6 @@ const Display& TiledImageDisplay();
 
 void  SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt);
 
-const Display& SearchStatusDisplay();
-
 void OpenProfileMenu(Bobcat& ctx);
 
 void LoadGuiTheme(const String& s);

@@ -81,6 +81,7 @@ public:
 
     void        StdBar(Bar& menu);
     void        StdKeys(Bar& menu);
+    void        SearchBar(Bar& menu);
 
     bool        Key(dword key, int count) override;
 
@@ -93,6 +94,12 @@ public:
     void        End();
     void        Goto(int i);
 
+	void		Undo();
+	void        Cut();
+	void		Copy();
+	void		Paste();
+	void		SelectAll();
+	
     void        SetSearchMode(const String& mode);
 
     void        CheckCase();
@@ -129,17 +136,9 @@ private:
         String     delimiter;
     } harvester;
 
-    struct SearchField : WithDropChoice<EditString> {
-        typedef SearchField CLASSNAME;
-        SearchField();
-        void SearchBar(Bar& menu);
-        bool Key(dword key, int count) final;
-    };
-
     int           index;
     Terminal&     term;
     Value         data;
-    SearchField   text;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
     FrameRight<ToolButton> fsave, csave;

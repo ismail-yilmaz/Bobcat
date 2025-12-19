@@ -195,7 +195,7 @@ struct Terminal : TerminalCtrl {
     Color        highlight[4];
     TimeCallback updatetimer, belltimer;
 
-    struct TitleBar : FrameTB<Ctrl> {
+    struct TitleBar : FrameTB<WithTitleBarLayout<ParentCtrl>> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
         Value       GetData() const override;
@@ -204,13 +204,9 @@ struct Terminal : TerminalCtrl {
         void        Show();
         void        Hide();
         void        Menu();
+        void        Sync();
 
         Terminal&   term;
-        ToolButton  close;
-        ToolButton  menu;
-        ToolButton  newterm;
-        ToolButton  navlist;
-        StaticText  title;
         Value       data;
     }  titlebar;
     

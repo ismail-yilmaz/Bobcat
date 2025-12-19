@@ -268,11 +268,10 @@ FinderBar::FinderBar(Terminal& t)
 	end   << THISFN(End);
 	close << THISFN(Hide);
 	showall << THISFN(Sync);
-	Add(text.HSizePosZ(4, 282).VSizePosZ(4, 4));
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(display);
 	text.AddFrame(menu);
-	text.WhenBar << THISFN(StdKeys);
+	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
 	fsave.Image(Images::Reap());
 	fsave << [=] { SaveToFile(); };
@@ -280,7 +279,7 @@ FinderBar::FinderBar(Terminal& t)
 	csave << [=] { SaveToClipboard(); };
 	menu.Image(Images::Find());
 	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
-	display.SetDisplay(SearchStatusDisplay());
+	display.SetDisplay(StdRightDisplay());
 	Sync();
 }
 
@@ -412,6 +411,31 @@ void FinderBar::CheckPattern()
 	Update();
 }
 
+void FinderBar::Undo()
+{
+	text.Undo();
+}
+
+void FinderBar::Cut()
+{
+	text.Cut();
+}
+
+void FinderBar::Copy()
+{
+	text.Copy();
+}
+
+void FinderBar::Paste()
+{
+	text.Paste();
+}
+
+void FinderBar::SelectAll()
+{
+	text.SelectAll();
+}
+
 void FinderBar::StdBar(Bar& menu)
 {
 	menu.Add(AK_CHECKCASE, THISFN(CheckCase)).Radio(IsCaseSensitive());
@@ -435,6 +459,20 @@ void FinderBar::StdKeys(Bar& menu)
 	menu.AddKey(AK_PARALLELIZE,  [this] { parallelize = !parallelize; Sync(); });
 }
 
+void FinderBar::SearchBar(Bar& menu)
+{
+	bool ed = text.IsEditable();
+	bool sel = text.IsSelection();
+	menu.Add(ed, AK_FIND_UNDO, Images::Undo(), THISFN(Undo));
+	menu.Separator();
+	menu.Add(ed && sel, AK_FIND_CUT, Images::Cut(), THISFN(Cut));
+	menu.Add(sel, AK_FIND_COPY, Images::Copy(), THISFN(Copy));
+	menu.Add(ed && IsClipboardAvailableText(), AK_FIND_PASTE, Images::Paste(), THISFN(Paste));
+	menu.Separator();
+	menu.Add(text.GetLength(), AK_FIND_SELECTALL, Images::SelectAll(), THISFN(SelectAll));
+	StdKeys(menu);
+}
+
 bool FinderBar::Key(dword key, int count)
 {
 	MenuBar::Scan([this](Bar& menu) { StdBar(menu); }, key);
@@ -449,26 +487,23 @@ void FinderBar::Sync()
 	String s;
 	if(!err) {
 		if(!IsNull(~text))
-			s << (cnt ? index + 1 : 0) << "/" << cnt << "  ";
+			s << (cnt ? index + 1 : 0) << "/" << cnt << " ";
 		if(IsCaseSensitive()) {
-			s << "C";
+			s << "C ";
 			display.Tip(t_("Case sensitive mode"));
 		}
 		else
 		if(IsCaseInsensitive()) {
-			s << "I";
+			s << "I ";
 			display.Tip(t_("Case insensitive mode"));
 		}
 		else
 		if(IsRegex()) {
-			s << "R";
+			s << "R ";
 			display.Tip(t_("Regex mode"));
 		}
 		else
 			NEVER();
-	}
-	else {
-		s << "--"; // No match
 	}
 
 	SetSearchStatusText(display, s);
@@ -660,29 +695,6 @@ void FinderBar::Harvester::SaveToFile()
 			FileCopy(tmp, path);
 		DeleteFile(tmp);
 	}
-}
-
-FinderBar::SearchField::SearchField()
-{
-	WhenBar = THISFN(SearchBar);
-}
-
-void FinderBar::SearchField::SearchBar(Bar& menu)
-{
-	menu.Add(IsEditable(), AK_FIND_UNDO, Images::Undo(), THISFN(Undo));
-	menu.Separator();
-	menu.Add(IsEditable() && IsSelection(), AK_FIND_CUT, Images::Cut(), THISFN(Cut));
-	menu.Add(IsSelection(), AK_FIND_COPY, Images::Copy(),THISFN(Copy));
-	menu.Add(IsEditable() && IsClipboardAvailableText(), AK_FIND_PASTE, Images::Paste(), THISFN(Paste));
-	menu.Separator();
-	menu.Add(text.GetLength(), AK_FIND_SELECTALL, Images::SelectAll(), THISFN(SelectAll));
-}
-
-bool FinderBar::SearchField::Key(dword key, int count)
-{
-	if(MenuBar::Scan(WhenBar, key))
-		return true;
-	return WithDropChoice<EditString>::Key(key, count);
 }
 
 FinderSetup::FinderSetup()

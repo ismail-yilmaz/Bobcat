@@ -46,26 +46,16 @@ struct TiledImageDisplayCls : Display
 	}
 };
 
-struct SearchStatusDisplayCls : Display
-{
-	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
-	{
-		AttrText txt(q);
-		txt.Paper(q == "--" ? Blend(SColorPaper, Color(255, 0, 0), 32) : SColorPaper);
-		StdCenterDisplay().Paint(w, r, txt.Bold().Ink(SColorDisabled), ink, paper, style);
-	}
-};
-
 const Display& StdBackgroundDisplay()    { return Single<StdBackgroundDisplayCls>(); }
 const Display& NormalImageDisplay()      { return Single<NormalImageDisplayCls>(); }
 const Display& TiledImageDisplay()       { return Single<TiledImageDisplayCls>(); }
 const Display& FontListDisplay()         { return Single<FontListDisplayCls>(); }
-const Display& SearchStatusDisplay()     { return Single<SearchStatusDisplayCls>(); }
 
 void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 {
-	int cx = GetTextSize(txt, GetStdFont()).cx + 8;
-	status.Width(cx)  <<= txt;
+	int cx = GetTextSize(txt, GetStdFont()).cx;
+	if(!txt.IsEmpty()) cx += Zx(4);
+	status.Width(cx) <<= AttrText(txt).Bold().Ink(SColorDisabled);
 }
 
 int ExclamationYesNo(const char *qtf)
@@ -85,8 +75,7 @@ Font SelectFont(Font f, dword type)
 	FrameRight<DisplayCtrl> status;
 	
 	icon.SetDisplay(CenteredImageDisplay());
-	status.SetDisplay(SearchStatusDisplay());
-	
+	status.SetDisplay(StdRightDisplay());
 	icon <<= Images::Find();
 	dlg.search.NullText(t_("Search font..."));
 	dlg.search.AddFrame(icon);
@@ -129,9 +118,7 @@ Font SelectFont(Font f, dword type)
 		String txt;
 		int cnt = dlg.font.GetCount();
 		if(cnt > 0)
-			txt = AsString(cnt) + "/" + AsString(fontfaces.GetCount());
-		else
-			txt = "--"; // No match.
+			txt << cnt << "/" << fontfaces.GetCount();
 		SetSearchStatusText(status, !IsNull(~dlg.search) ? txt: "");
 		dlg.search.Error(cnt == 0);
 		if(int i = dlg.font.Find(f.GetFaceName()); i >= 0)
@@ -143,6 +130,7 @@ Font SelectFont(Font f, dword type)
 	
 	if(dlg.Sizeable().ExecuteOK() && !IsNull(~dlg.font))
 		f.FaceName(~dlg.font).Height(~dlg.fontsize);
+
 	return f;
 }
 
@@ -419,11 +407,6 @@ void OpenProfileMenu(Bobcat& ctx)
 	}
 }
 
-int GetStdBarHeight()
-{
-	return GetStdFontCy() + Zy(8);
-}
-
 bool IsWaylandEnabled()
 {
 #ifdef GUI_GTK
@@ -444,6 +427,11 @@ void EnableWayland(bool enabled)
 		enabled ? SaveFile(wlpath, Null) : DeleteFile(wlpath);
 	}
 #endif
+}
+
+int GetStdBarHeight()
+{
+	return max(GetStdFontCy(), Zy(22));
 }
 
 bool IsBobcatPrivileged()
