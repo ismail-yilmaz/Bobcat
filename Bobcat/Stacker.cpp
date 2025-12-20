@@ -75,6 +75,7 @@ Stacker& Stacker::ToggleSplitterOrientation()
 {
 	if(Splitter *s = GetParentSplitter(activectrl); s)
 		s->IsHorz() ? s->Vert() : s->Horz();
+	WhenAction();
 	return *this;
 }
 
@@ -361,7 +362,7 @@ void Stacker::Next()
 
 void Stacker::Activate(Ctrl *ctrl)
 {
-	if(!ctrl)
+	if(!ctrl || animating)
 		return;
 	
 	if(!activectrl)

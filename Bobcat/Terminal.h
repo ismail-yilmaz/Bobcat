@@ -239,6 +239,10 @@ int                        AdjustLineOffset(Terminal& term, const Vector<int>& i
 void SetHighlightCallback(Terminal& t, VectorMap<int, VTLine>& line, const Vector<ItemInfo>& items,
                                             const Event<VTCell&, const ItemInfo&, int>& cb);
 
+// Displays
+
+const Display& TerminalTitleDisplay();
+
 // Terminal specific notifications
 Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t, const Profile& p);
 Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t);

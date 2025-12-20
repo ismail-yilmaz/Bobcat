@@ -315,7 +315,7 @@ void Terminal::SyncHighlight()
 Terminal& Terminal::Sync()
 {
 	titlebar <<= ctx.settings.titlealignment;
-	titlebar.title.SetText(GetTitle());
+	titlebar.Sync();
 	ShowTitleBar(ctx.settings.showtitle);
 	finder <<= ctx.settings.finderalignment;
 	Update();
@@ -1134,6 +1134,8 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
 	close   << [this] { term.Stop(); };
 	menu    << [this] { Menu(); };
+	title.SetDisplay(TerminalTitleDisplay());
+	title.Tip()
 }
 
 void Terminal::TitleBar::SetData(const Value& v)
@@ -1186,7 +1188,7 @@ void Terminal::TitleBar::Sync()
 	newterm.Show(!term.ctx.HasMenuBar());
 	navlist.Show(!term.ctx.HasMenuBar() && multiple);
 	close.Show(multiple || term.ctx.window.IsFullScreen());
-	title.SetFont(GetStdFont().Bold(hasfocus));
+	title <<= AttrText(term.GetTitle()).Bold(hasfocus);
 }
 
 Terminal::ProgressBar::ProgressBar(Terminal& t)

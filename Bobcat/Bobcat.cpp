@@ -447,6 +447,13 @@ void Bobcat::SyncTitle()
 	String s = "Bobcat";
 	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t) {
 			s << " [" << t->GetTitle() << "]";
+			if(Splitter *p = t->GetParentSplitter(); p) {
+				s << " (";
+				if(p->GetFirstChild() == t)
+					s << " (" << (p->IsHorz() ? t_("left pane") : t_("top pane")) << ")";
+				else
+					s << " (" << (p->IsHorz() ? t_("right pane") : t_("bottom pane")) << ")";
+			}
 	}
 	navigator.Refresh();
 	window.Title(s);

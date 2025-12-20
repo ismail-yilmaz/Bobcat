@@ -46,10 +46,21 @@ struct TiledImageDisplayCls : Display
 	}
 };
 
+struct TerminalTitleDisplayCls : Display
+{
+	virtual void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const
+	{
+		AttrText txt = q;
+		bool centered = GetTextSize(txt.text, txt.font).cx < r.Width();
+		StdDisplay().Paint(w, r, txt.Align(centered ? ALIGN_CENTER : ALIGN_LEFT), ink, RGBAZero(), style);
+	}
+};
+
 const Display& StdBackgroundDisplay()    { return Single<StdBackgroundDisplayCls>(); }
 const Display& NormalImageDisplay()      { return Single<NormalImageDisplayCls>(); }
 const Display& TiledImageDisplay()       { return Single<TiledImageDisplayCls>(); }
 const Display& FontListDisplay()         { return Single<FontListDisplayCls>(); }
+const Display& TerminalTitleDisplay()    { return Single<TerminalTitleDisplayCls>(); }
 
 void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 {

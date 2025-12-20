@@ -167,7 +167,7 @@ END_LAYOUT
 LAYOUT(TitleBarLayout, 548, 20)
 	ITEM(ToolButton, newterm, LeftPosZ(4, 16).VSizePosZ(2, 2))
 	ITEM(ToolButton, menu, LeftPosZ(22, 16).VSizePosZ(2, 2))
-	ITEM(Upp::StaticText, title, SetAlign(Upp::ALIGN_CENTER).HSizePosZ(50, 50).VSizePosZ(2, 2))
+	ITEM(DisplayCtrl, title, HSizePosZ(50, 50).VSizePosZ(2, 2))
 	ITEM(ToolButton, navlist, RightPosZ(22, 16).VSizePosZ(2, 2))
 	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(2, 2))
 END_LAYOUT

@@ -391,15 +391,14 @@ void Navigator::Paint(Draw& w)
 	w.Clip(sz);
 	auto *t = static_cast<const Terminal*>(ctx.stack.GetActiveCtrl());
 	int count = 0, total = items.GetCount();
+	AttrText txt;
 	for(const Item& m : items) {
 		if(m.ctrl && m.IsVisible() && !swapanim) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-			String s = m.ctrl->GetTitle();
 			bool highlight = m.ctrl == t && total != 1;
-			bool centered = GetTextSize(s, StdFont().Bold(highlight)).cx < r.Width();
-			const Display& d = centered ? StdCenterDisplay() : StdDisplay();
-			d.Paint(w, r, AttrText(s).Bold(highlight), SColorText, SColorFace, 0);
+			txt.Text(m.ctrl->GetTitle()).Bold(highlight);
+			TerminalTitleDisplay().Paint(w, r, txt, SColorText, SColorFace, 0);
 			count++;
 		}
 	}
