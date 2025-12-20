@@ -11,7 +11,7 @@ struct Terminal : TerminalCtrl {
     ~Terminal();
 
 	Value       GetData() const override;
-	
+
     void        PostParse() override;
 
     void        MouseEnter(Point pt, dword keyflags) override;
@@ -78,7 +78,7 @@ struct Terminal : TerminalCtrl {
     String      GetTitle() const;
 
 	void		SetAlias();
-	
+
     void        ShowTitleBar(bool b = true);
     void        HideTitleBar();
     bool        HasTitleBar() const;

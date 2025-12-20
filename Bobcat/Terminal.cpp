@@ -39,7 +39,7 @@ Terminal::Terminal(Bobcat& ctx_)
 {
 	SetDeviceId("Bobcat " + GetVersion());
 	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
-	
+
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
 	WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
 	WhenScroll  = [this]()                     { Update();                         };
@@ -129,7 +129,7 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 			m.GetAdd(k) = v;
 		}
 	}
-	
+
 	MakeTitle(profilename);
 	if(ctx.stack.Find(*this) < 0) {
 		if(pane)
@@ -302,7 +302,7 @@ void Terminal::Update()
 		if(!HasFinder()) // Finder, if visible, refreshes the display.
 			Refresh();
 	};
-	
+
 	updatetimer.KillSet(20, cb); // Safeguard against spamming.
 }
 
@@ -776,7 +776,7 @@ void Terminal::DragAndDrop(Point pt, PasteClip& d)
 {
 	if(IsReadOnly() || IsDragAndDropSource())
 		return;
-	
+
 	WString s;
 
 	if(AcceptFiles(d)) {
@@ -799,7 +799,7 @@ void Terminal::DragAndDrop(Point pt, PasteClip& d)
 		}
 		s = TrimRight(s);
 	}
-	
+
 	else
 	if(AcceptText(d))
 		s = GetWString(d);
@@ -807,7 +807,7 @@ void Terminal::DragAndDrop(Point pt, PasteClip& d)
 		return;
 
 	d.SetAction(DND_COPY);
-	
+
 	if(d.IsAccepted())
 		Paste(s, filter);
 }
@@ -840,9 +840,9 @@ void Terminal::OnHighlight(VectorMap<int, VTLine>& line)
 void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, Upp::HighlightInfo& hl, const Event<HighlightInfo&>& cb)
 {
 	// Unified highlighting.
-	
+
 	LTIMING("Terminal::DoHighlight");
-	
+
 	auto ScanCells = [&](const ItemInfo& q) {
 		int col = 0;
 		hl.iteminfo = &q;
@@ -866,7 +866,7 @@ void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, Upp::HighlightInf
 	};
 
 	ItemInfo dummy;
-	
+
 	if(hl.adjusted) {
 		Vector<int> rows;
 		hl.offset  = -AdjustLineOffset(*this, hl.line->GetKeys(), rows);
@@ -928,16 +928,16 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 		WString q;
 		for(const VTLine& l : m)
 			q << l.ToWString();
-		
+
 		if(q.IsEmpty())
 			return false;
 
 		int pos = GetLength(page, m.GetKey(0), pt.y);
 		pos += pt.x - GetOffset(page.FetchLine(pt.y), 0, pt.x);
-		
+
 		RegExp r(sp);
 		String s = ToUtf8(q);
-	
+
 		while(r.GlobalMatch(s)) {
 			int o = r.GetOffset();
 			int begin = Utf32Len(~s, o);
@@ -962,7 +962,7 @@ bool Terminal::GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) 
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -1004,7 +1004,7 @@ void Terminal::EditMenu(Bar& menu)
 	menu.Add(AK_READONLY, [this] { SetEditable(IsReadOnly()); }).Check(IsReadOnly());
 	menu.Separator();
 	menu.Add(AK_ALIAS, [this] { SetAlias(); });
-	
+
 	if(IsMouseOverImage()) {
 		menu.Separator();
 		menu.Add(AK_COPYIMAGE, Images::Copy(),  [this] { CopyImage(); });
@@ -1135,7 +1135,6 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	close   << [this] { term.Stop(); };
 	menu    << [this] { Menu(); };
 	title.SetDisplay(TerminalTitleDisplay());
-	title.Tip()
 }
 
 void Terminal::TitleBar::SetData(const Value& v)
@@ -1256,5 +1255,3 @@ VectorMap<String, String>& GetWordSelectionPatterns()
 }
 
 }
-
-
