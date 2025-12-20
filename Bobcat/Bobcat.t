@@ -40,6 +40,18 @@ trTR("Genel")
 T_("Settings")
 trTR("Ayarlar")
 
+T_("left pane")
+trTR("sol b\303\266lme")
+
+T_("top pane")
+trTR("\303\274st b\303\266lme")
+
+T_("right pane")
+trTR("sa\304\237 b\303\266lme")
+
+T_("bottom pane")
+trTR("alt b\303\266lme")
+
 T_("File")
 trTR("Dosya")
 
@@ -657,7 +669,7 @@ T_("Search terminal")
 trTR("Terminal ara")
 
 T_("No matches found.")
-trTR("")
+trTR("E\305\237le\305\237me bulunamad\304\261.")
 
 
 // Finder.cpp
@@ -1181,7 +1193,7 @@ trTR("Kilitli")
 T_("Blinking Text")
 trTR("Yan\304\261p s\303\266nen metin")
 
-T_("Text blinking interval can be an integer value between 100 - 60000 ms.")
+T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
 trTR("")
 
 T_("Ring bell")
@@ -1340,9 +1352,6 @@ trTR("Varsay\304\261lanlar\304\261 geri y\303\274kle")
 
 T_("Show all")
 trTR("T\303\274m\303\274n\303\274 g\303\266ster")
-
-T_("Parallelize")
-trTR("Paralelle\305\237tir")
 
 T_("Enables or disables parallel (multithreaded) search.")
 trTR("Paralel (\303\247ok i\305\237 par\303\247ac\304\261kl\304\261) aramay\304\261 "

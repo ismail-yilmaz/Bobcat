@@ -144,7 +144,7 @@ Navigator::Navigator(Bobcat& ctx_)
 	AddFrame(bar.Height(GetStdBarHeight()));
 	AddFrame(sb);
 	sb.AutoHide();
-	sb.WhenScroll = [this] { (void) SyncItemLayout(); Refresh(); };
+	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
 }
 
 Navigator::~Navigator()
@@ -174,7 +174,9 @@ Navigator& Navigator::Hide()
 
 void Navigator::Search()
 {
-	bar.search.Error(SyncItemLayout() == 0);
+	int n = SyncItemLayout();
+	SetSearchResults(n);
+	bar.search.Error(!n);
 	Refresh();
 }
 
@@ -207,7 +209,6 @@ int Navigator::SyncItemLayout()
 
 	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
 	int cnt = v.GetCount();
-	SetSearchResults(cnt);
 	if(!cnt)
 		return 0;
 
@@ -249,7 +250,8 @@ void Navigator::Sync()
 		if(!cnt || !IsVisible())
 			return;
 		items.SetCount(cnt);
-		SyncItemLayout();
+		if(SyncItemLayout() == 0)
+			return;
 		Size fsz = GetStdFontSize();
 		int blinking = 0;
 		for(int i = 0; i < cnt; i++) {
@@ -265,7 +267,7 @@ void Navigator::Sync()
 			if(!m.IsChild())
 				Add(m);
 			m.WantFocus();
-			if(ctx.stack.GetActiveCtrl() == m.ctrl)
+			if(ctx.stack.GetActiveCtrl() == m.ctrl && !bar.search.HasFocus())
 				m.SetFocus();
 			m.WhenItem = WhenGotoItem;
 			m.WhenClose = WhenRemoveItem;
@@ -408,7 +410,7 @@ void Navigator::Paint(Draw& w)
 		Rect r =  GetRect().CenterRect(sz);
 		w.DrawText(r.left, r.top, s, StdFont().Bold(), SRed);
 	}
-	
+
 	w.End();
 }
 
@@ -467,4 +469,3 @@ bool Navigator::Key(dword key, int count)
 }
 
 }
-
