@@ -184,9 +184,9 @@ struct Terminal : TerminalCtrl {
     ExitMode     exitmode;
     String       profilename;
     String       workingdir;
+    String       pathdelimiter;
     PathMode     pathmode;
     Time         starttime;
-    String       pathdelimiter;
     Value        data;
     FinderBar    finder;
     Linkifier    linkifier;

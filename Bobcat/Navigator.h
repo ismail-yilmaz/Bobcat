@@ -14,6 +14,7 @@ struct Navigator : ParentCtrl {
 	void          SetSearchResults(int n = 0);
     int           SyncItemLayout();
     void          Sync();
+    void          SyncItemTitles();
     void          Animate();
     void          Layout() override;
 
@@ -38,14 +39,12 @@ struct Navigator : ParentCtrl {
     Event<Ctrl&>  WhenGotoItem;
     Event<Ctrl&>  WhenRemoveItem;
 
-    struct Item : public Ctrl {
+    struct Item : public WithNavigatorItemLayout<Ctrl> {
     public:
         Item();
         Event<Ctrl&> WhenItem;
         Event<Rect>  WhenFocus;
         Event<Ctrl&> WhenClose;
-
-        Rect         GetCloseButtonRect();
 
         void         GotFocus() override;
         void         LostFocus() override;
@@ -53,7 +52,6 @@ struct Navigator : ParentCtrl {
         void         LeftUp(Point pt, dword keyflags) override;
         void         MouseEnter(Point pt, dword keyflags) override;
         void         MouseLeave() override;
-        void         MouseMove(Point pt, dword keyflags) override;
         void         DragAndDrop(Point pt, PasteClip& d) override;
         void         CancelMode() override;
         void         DragLeave() override;
@@ -61,7 +59,7 @@ struct Navigator : ParentCtrl {
         Ptr<Terminal> ctrl;
         Image         img;
         bool          blinking:1;
-        
+       
     private:
         Point         pos = {0, 0};
         bool          dnd:1;

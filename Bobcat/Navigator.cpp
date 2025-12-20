@@ -19,7 +19,10 @@ Navigator::Item::Item()
 : blinking(false)
 , dnd(false)
 {
+	CtrlLayout(*this);
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
+	close.Image(Images::Delete());
+	close << [this] { WhenClose(*ctrl); };
 }
 
 void Navigator::Item::GotFocus()
@@ -36,11 +39,9 @@ void Navigator::Item::LostFocus()
 void Navigator::Item::Paint(Draw& w)
 {
 	if(Rect q = GetView(); q.Width() - 16 >= 1 && q.GetHeight() - 16 >= 1) {
-		Rect r = GetCloseButtonRect();
 		w.Clip(q);
 		w.DrawRect(q, SColorFace);
 		w.DrawImage(q.Deflated(8), img);
-		w.DrawImage(r, r.Contains(pos) ? Images::DeleteHL2() : Images::DeleteHL());
 		if(ctrl) {
 			if(ctrl->IsRunning()) {
 				if(dnd) {
@@ -82,10 +83,7 @@ void Navigator::Item::Paint(Draw& w)
 
 void Navigator::Item::LeftUp(Point pt, dword keyflags)
 {
-	if(GetCloseButtonRect().Contains(pt) && ctrl)
-		WhenClose(*ctrl);
-	else
-		Action();
+	Action();
 }
 
 void Navigator::Item::MouseEnter(Point pt, dword keyflags)
@@ -99,19 +97,6 @@ void Navigator::Item::MouseLeave()
 	pos = Null;
 	dnd = false;
 	Refresh();
-}
-
-void Navigator::Item::MouseMove(Point pt, dword keyflags)
-{
-	if(Rect r = GetCloseButtonRect(); r.Contains(pt)) {
-		pos = pt;
-		Refresh(r);
-	}
-	else
-	if(!IsNull(pos)) {
-		Refresh(r);
-		pos = Null;
-	}
 }
 
 void Navigator::Item::DragAndDrop(Point pt, PasteClip& d)
@@ -132,12 +117,6 @@ void Navigator::Item::CancelMode()
 void Navigator::Item::DragLeave()
 {
 	CancelMode();
-}
-
-Rect Navigator::Item::GetCloseButtonRect()
-{
-	Rect r = GetView();
-	return RectC(r.right - 20, r.top + 4, 16, 16);
 }
 
 Navigator::Navigator(Bobcat& ctx_)
@@ -222,52 +201,48 @@ int Navigator::SyncItemLayout()
 {
 	for(auto& m : items)
 		m.Hide();
-	
+
+	constexpr const int mincsz = 200;
+	constexpr const int maxcol = 4;
+
 	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
-	SetSearchResults(v.GetCount());
-	if(!v.GetCount())
-		return v.GetCount();
+	int cnt = v.GetCount();
+	SetSearchResults(cnt);
+	if(!cnt)
+		return 0;
 
-	int cnt = max(v.GetCount(), 1);
-	int fcy = GetStdFontSize().cy;
-
-	Point margins = { 16, fcy * 2 };
-	
+	Point margins = { 16, GetStdFontSize().cy * 2 };
 	Size viewsize = GetSize() + Size(0, bar.GetHeight());
-	Size cellsize = GetRatioSize(viewsize, 200, 0);
-	
-	Size gridsize;
-	gridsize.cx = min(max(1, viewsize.cx / (cellsize.cx + margins.x)), min(4, cnt));
-	gridsize.cy = (cnt + gridsize.cx - 1) / gridsize.cx;
-	
-	Size totalsize = gridsize * cellsize + (gridsize + 1) * margins;
+	Size cellsize = GetRatioSize(viewsize, mincsz, 0);
 
-	
+	Size gridsize;
+	gridsize.cx = min(max(1, viewsize.cx / (cellsize.cx + margins.x)), min(maxcol, cnt));
+	gridsize.cy = (cnt + gridsize.cx - 1) / gridsize.cx;
+
+	Size totalsize = gridsize * cellsize + (gridsize + 1) * margins;
 	Point offset = max({ 8, 8 }, Rect(viewsize).CenterRect(totalsize).TopLeft());
 	offset.x += AddFrameSize({0, 0}).cx;
-	
+
 	sb.SetTotal(totalsize.cy);
 	sb.SetPage(viewsize.cy);
-	
+
 	int row = 0, col = 0;
 	for(Item& m : v) {
-		Rect r(offset + Point(col, row) * (cellsize + margins), cellsize);
-		m.SetRect(r.OffsetedVert(-sb));
+		m.SetRect(Rect(offset + Point(col, row) * (cellsize + margins), m.AddFrameSize(cellsize)).OffsetedVert(-sb));
 		m.Show();
 		if(++col >= gridsize.cx) {
 			col = 0;
 			row++;
 		}
 	}
-
-	return v.GetCount();
+	return cnt;
 }
 
 void Navigator::Sync()
 {
 	if(!IsShown())
 		return;
-	
+
 	auto ScheduledSync = [this]
 	{
 		int cnt = ctx.stack.GetCount();
@@ -279,7 +254,7 @@ void Navigator::Sync()
 		int blinking = 0;
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
-			m.ctrl  = &AsTerminal(ctx.stack[i]);
+			m.ctrl = &AsTerminal(ctx.stack[i]);
 			Size csz = max(Size(1, 1), m.ctrl->GetSize());
 			Size isz = max(Size(1, 1), m.GetSize());
 			ImageDraw w(csz);
@@ -311,7 +286,6 @@ void Navigator::Sync()
 
 	String k = " (" + GetKeyDesc(NavigatorKeys::AK_NAVSEARCH().key[0]) + ") ";
 	bar.search.NullText(t_("Search terminal") + k);
-
 	SetTimeCallback(100, ScheduledSync, TIMEID_SYNC);
 }
 
@@ -368,17 +342,17 @@ void Navigator::AnimateSwap(int i, int ii)
 {
 	if(!IsShown() || swapanim)
 		return;
-	
+
 	swapanim = true;
-	
+
 	Item& a = items[i];
 	Item& b = items[ii];
-	
+
 	Rect ra = a.GetRect();
 	Rect rb = b.GetRect();
-	
+
 	constexpr const int duration = 100;
-	
+
 	for(int start = msecs();;) {
 		int elapsed = msecs(start);
 		if(elapsed > duration) {
@@ -401,7 +375,7 @@ void Navigator::AnimateSwap(int i, int ii)
 		Ctrl::ProcessEvents();
 		GuiSleep(0);
 	}
-	
+
 	Swap(a.ctrl, b.ctrl);
 	Swap(a.img, b.img);
 
@@ -415,13 +389,27 @@ void Navigator::Paint(Draw& w)
 {
 	Size sz = GetSize(), fsz = GetStdFontSize();
 	w.Clip(sz);
+	auto *t = static_cast<const Terminal*>(ctx.stack.GetActiveCtrl());
+	int count = 0, total = items.GetCount();
 	for(const Item& m : items) {
 		if(m.ctrl && m.IsVisible() && !swapanim) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-			StdCenterDisplay().Paint(w, r, ~*m.ctrl, SColorText, SColorFace, 0);
+			String s = ~*m.ctrl;
+			bool highlight = m.ctrl == t && total != 1;
+			bool centered = GetTextSize(s, StdFont().Bold(highlight)).cx < r.Width();
+			const Display& d = centered ? StdCenterDisplay() : StdDisplay();
+			d.Paint(w, r, AttrText(s).Bold(highlight), SColorText, SColorFace, 0);
+			count++;
 		}
 	}
+	if(items.GetCount() && !count) {
+		const String s = t_("No matches found.");
+		Size sz = GetTextSize(s, StdFont().Bold());
+		Rect r =  GetRect().CenterRect(sz);
+		w.DrawText(r.left, r.top, s, StdFont().Bold(), SRed);
+	}
+	
 	w.End();
 }
 
@@ -470,8 +458,9 @@ bool Navigator::Key(dword key, int count)
 		bar.search.SetFocus();
 		return !bar.search.Key(key, count);
 	}
-	
+
 	return MenuBar::Scan([this](Bar& menu) { WhenBar(menu); }, key);
 }
 
 }
+
