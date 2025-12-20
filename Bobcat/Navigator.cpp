@@ -454,7 +454,7 @@ bool Navigator::Key(dword key, int count)
 		bar.search.SetFocus();
 	}
 	else
-	if(Match(AK_ALIAS, key)) {
+	if(Match(AK_NAVALIAS, key)) {
 		if(int i = GetCursor(); i >= 0)
 			items[i].ctrl->SetAlias();
 	}
