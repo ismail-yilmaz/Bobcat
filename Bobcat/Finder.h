@@ -105,6 +105,10 @@ public:
     void        CheckCase();
     void        IgnoreCase();
     void        CheckPattern();
+    
+    void        ShowAll(bool b = true);
+
+    void        Co(bool b = true);
   
     void        Sync();
 
@@ -139,6 +143,8 @@ private:
     int           index;
     Terminal&     term;
     Value         data;
+    bool          showall:1;
+    bool          co:1;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
     FrameRight<ToolButton> fsave, csave;

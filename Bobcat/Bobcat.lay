@@ -184,14 +184,12 @@ LAYOUT(NavigatorItemLayout, 100, 48)
 END_LAYOUT
 
 LAYOUT(FinderBarLayout, 548, 24)
-	ITEM(ToolButton, prev, RightPosZ(262, 16).VSizePosZ(2, 2))
-	ITEM(ToolButton, next, RightPosZ(242, 16).VSizePosZ(2, 2))
-	ITEM(ToolButton, begin, RightPosZ(222, 16).VSizePosZ(2, 2))
-	ITEM(ToolButton, end, RightPosZ(202, 16).VSizePosZ(2, 2))
-	ITEM(Upp::Option, showall, SetLabel(t_("Show all")).RightPosZ(108, 92).VSizePosZ(2, 2))
-	ITEM(Upp::Option, parallelize, SetLabel(t_("Parallelize")).Tip(t_("Enables or disables parallel (multithreaded) search.")).RightPosZ(26, 80).VSizePosZ(2, 2))
+	ITEM(ToolButton, prev, RightPosZ(96, 16).VSizePosZ(2, 2))
+	ITEM(ToolButton, next, RightPosZ(76, 16).VSizePosZ(2, 2))
+	ITEM(ToolButton, begin, RightPosZ(56, 16).VSizePosZ(2, 2))
+	ITEM(ToolButton, end, RightPosZ(36, 16).VSizePosZ(2, 2))
 	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(2, 2))
-	ITEM(Upp::WithDropChoice<Upp::EditString>, text, HSizePosZ(4, 284).TopPosZ(2, 19))
+	ITEM(Upp::WithDropChoice<Upp::EditString>, text, HSizePosZ(4, 120).TopPosZ(2, 19))
 END_LAYOUT
 
 LAYOUT(FinderProfileLayout, 659, 299)

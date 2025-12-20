@@ -10,9 +10,9 @@ struct Terminal : TerminalCtrl {
     Terminal(Bobcat& ctx);
     ~Terminal();
 
+	Value       GetData() const override;
+	
     void        PostParse() override;
-    void        SetData(const Value& data) override;
-    Value       GetData() const override;
 
     void        MouseEnter(Point pt, dword keyflags) override;
     void        MouseLeave() override;
@@ -77,6 +77,8 @@ struct Terminal : TerminalCtrl {
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
 
+	void		SetAlias();
+	
     void        ShowTitleBar(bool b = true);
     void        HideTitleBar();
     bool        HasTitleBar() const;
@@ -183,11 +185,12 @@ struct Terminal : TerminalCtrl {
     bool         warnonrootaccess:1;
     ExitMode     exitmode;
     String       profilename;
+    String       title;
+    String       alias;
     String       workingdir;
     String       pathdelimiter;
     PathMode     pathmode;
     Time         starttime;
-    Value        data;
     FinderBar    finder;
     Linkifier    linkifier;
     QuickText    quicktext;

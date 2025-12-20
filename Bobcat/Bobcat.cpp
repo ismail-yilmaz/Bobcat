@@ -446,7 +446,7 @@ void Bobcat::SyncTitle()
 {
 	String s = "Bobcat";
 	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t) {
-			s << " [" << t->GetData() << "]";
+			s << " [" << t->GetTitle() << "]";
 	}
 	navigator.Refresh();
 	window.Title(s);

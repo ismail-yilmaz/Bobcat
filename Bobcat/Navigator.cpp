@@ -190,8 +190,8 @@ void Navigator::SetSearchResults(int n)
 bool Navigator::FilterItem(const Item& item)
 {
 	if(item.ctrl) {
-		WString s = ~*item.ctrl;
 		WString q = ~bar.search;
+		WString s = ~*item.ctrl;
 		return IsNull(q) || ToLower(s).Find(ToLower(q)) >= 0;
 	}
 	return true;
@@ -395,7 +395,7 @@ void Navigator::Paint(Draw& w)
 		if(m.ctrl && m.IsVisible() && !swapanim) {
 			Rect r = m.GetRect();
 			r = Rect(r.left, r.bottom, r.right, r.bottom + fsz.cy);
-			String s = ~*m.ctrl;
+			String s = m.ctrl->GetTitle();
 			bool highlight = m.ctrl == t && total != 1;
 			bool centered = GetTextSize(s, StdFont().Bold(highlight)).cx < r.Width();
 			const Display& d = centered ? StdCenterDisplay() : StdDisplay();
@@ -452,6 +452,11 @@ bool Navigator::Key(dword key, int count)
 	else
 	if(Match(AK_NAVSEARCH, key)) {
 		bar.search.SetFocus();
+	}
+	else
+	if(Match(AK_ALIAS, key)) {
+		if(int i = GetCursor(); i >= 0)
+			items[i].ctrl->SetAlias();
 	}
 	else
 	if(key < K_CHAR_LIM && key != K_TAB) {

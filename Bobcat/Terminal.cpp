@@ -65,16 +65,6 @@ Terminal::~Terminal()
 	GetNotificationDaemon().Clear(this);
 }
 
-void Terminal::SetData(const Value& v)
-{
-	data = v;
-}
-
-Value Terminal::GetData() const
-{
-	return data;
-}
-
 void Terminal::PostParse()
 {
 	TerminalCtrl::PostParse();
@@ -325,8 +315,9 @@ void Terminal::SyncHighlight()
 Terminal& Terminal::Sync()
 {
 	titlebar <<= ctx.settings.titlealignment;
-	finder   <<= ctx.settings.finderalignment;
+	titlebar.title.SetText(GetTitle());
 	ShowTitleBar(ctx.settings.showtitle);
+	finder <<= ctx.settings.finderalignment;
 	Update();
 	return *this;
 }
@@ -565,20 +556,31 @@ String Terminal::GetWorkingDirectory() const
 
 void Terminal::MakeTitle(const String& s)
 {
-	String title;
+	title.Clear();
 	if(!profilename.IsEmpty())
 		title << profilename;
 	if(!s.IsEmpty() && s != profilename)
 		title << " :: " << s;
-	SetData(title);
-	titlebar.title.SetText(title);
-	titlebar.title.Sync();
-	ctx.SyncTitle();
+	Sync();
 }
 
 String Terminal::GetTitle() const
 {
-	return GetData();
+	return Nvl(alias, title);
+}
+
+void Terminal::SetAlias()
+{
+	WString txt = GetTitle().ToWString();
+	if(EditText(txt, t_("Set terminal title"), t_("Title")))
+		alias = txt.ToString();
+	Sync();
+}
+
+Value Terminal::GetData() const
+{
+	String s = profilename + " " + GetTitle() + " " + workingdir;
+	return s.ToWString();
 }
 
 void Terminal::ShowTitleBar(bool b)
@@ -590,6 +592,7 @@ void Terminal::ShowTitleBar(bool b)
 	if(titlebar.IsChild() && !b)
 		titlebar.Hide();
 	titlebar.Sync();
+	ctx.SyncTitle();
 }
 
 void Terminal::HideTitleBar()
@@ -999,7 +1002,9 @@ void Terminal::FileMenu(Bar& menu)
 void Terminal::EditMenu(Bar& menu)
 {
 	menu.Add(AK_READONLY, [this] { SetEditable(IsReadOnly()); }).Check(IsReadOnly());
-
+	menu.Separator();
+	menu.Add(AK_ALIAS, [this] { SetAlias(); });
+	
 	if(IsMouseOverImage()) {
 		menu.Separator();
 		menu.Add(AK_COPYIMAGE, Images::Copy(),  [this] { CopyImage(); });
@@ -1249,3 +1254,5 @@ VectorMap<String, String>& GetWordSelectionPatterns()
 }
 
 }
+
+

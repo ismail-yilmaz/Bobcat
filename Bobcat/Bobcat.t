@@ -40,9 +40,6 @@ trTR("Genel")
 T_("Settings")
 trTR("Ayarlar")
 
-T_("Bobcat")
-trTR("")
-
 T_("File")
 trTR("Dosya")
 
@@ -90,9 +87,6 @@ trTR("Katk\304\261da Bulunanlar")
 
 T_("Licenses")
 trTR("Lisanslar")
-
-T_("Overview")
-trTR("Genel Bak\304\261\305\237")
 
 T_("Command line options")
 trTR("Komut sat\304\261r\304\261 se\303\247enekleri")
@@ -383,6 +377,12 @@ trTR("Bilinmeyen")
 
 // Terminal.cpp
 
+T_("Set terminal title")
+trTR("Terminalin ba\305\237l\304\261\304\237\304\261n\304\261 de\304\237i\305\237tir")
+
+T_("Title")
+trTR("Ba\305\237l\304\261k")
+
 T_("Annotation")
 trTR("Not")
 
@@ -655,6 +655,9 @@ trTR("Gezgini kapat")
 
 T_("Search terminal")
 trTR("Terminal ara")
+
+T_("No matches found.")
+trTR("")
 
 
 // Finder.cpp
@@ -1021,6 +1024,9 @@ trTR("Paralel arama")
 
 // Bobcat.lay
 
+T_("Animate")
+trTR("Animasyon")
+
 T_("Wheel mode")
 trTR("D\303\266ng\303\274 kipi")
 
@@ -1059,7 +1065,8 @@ trTR("Unicode kod noktalar\304\261 eklemek i\303\247in \303\266zel unicode giri\
      "y\303\266ntemini etkinle\305\237tirir.")
 
 T_("Warn if run with elevated privileges")
-trTR("Y\303\266netici kipinde \303\247al\304\261\305\237t\304\261r\304\261ld\304\261\304\237\304\261nda uyar")
+trTR("Y\303\266netici kipinde \303\247al\304\261\305\237t\304\261r\304\261ld\304\261\304\237\304\261nda "
+     "uyar")
 
 T_("Shows a warning message when Bobcat is started with admin/root rights")
 trTR("Bobcat y\303\266netici/root haklar\304\261yla ba\305\237lat\304\261ld\304\261\304\237\304\261nda "
@@ -1068,19 +1075,16 @@ trTR("Bobcat y\303\266netici/root haklar\304\261yla ba\305\237lat\304\261ld\304\
 T_("Use Wayland (experimental, needs restart)")
 trTR("Wayland kullan (deneysel, yeniden ba\305\237latma gerekir)")
 
-T_("Animate")
-trTR("Animasyon")
-
 T_("Click to change font.")
 trTR("Yaz\304\261 tipini de\304\237i\305\237tirmek i\303\247in t\304\261klay\304\261n.")
+
+T_("Background Image")
+trTR("Arka plan resmi")
 
 T_("Page size format is  COLUMNSxROWS. Valid size range is between 2 to 300 "
      "cells.")
 trTR("Sayfa boyutu bi\303\247imi S\303\234TUNxSATIR \305\237eklindedir. Ge\303\247erli "
      "aral\304\261k 2\342\200\223300 h\303\274cre aras\304\261ndad\304\261r.")
-
-T_("Background Image")
-trTR("Arka plan resmi")
 
 T_("Splitter orientation")
 trTR("B\303\266l\303\274c\303\274 y\303\266n\303\274")
@@ -1177,7 +1181,7 @@ trTR("Kilitli")
 T_("Blinking Text")
 trTR("Yan\304\261p s\303\266nen metin")
 
-T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
+T_("Text blinking interval can be an integer value between 100 - 60000 ms.")
 trTR("")
 
 T_("Ring bell")
@@ -1191,6 +1195,9 @@ trTR("Yazarken fare imlecini gizle")
 
 T_("Show size hint")
 trTR("Boyut ipucunu g\303\266ster")
+
+T_("Don't scroll the page on new output")
+trTR("Yeni \303\247\304\261kt\304\261larda sayfay\304\261 kayd\304\261rma")
 
 T_("Blink interval")
 trTR("S\303\274re")
@@ -1216,18 +1223,12 @@ trTR("Renk Profilleri")
 T_("Misc.")
 trTR("Di\304\237er")
 
-T_("Don't scroll the page on new output")
-trTR("Yeni \303\247\304\261kt\304\261larda sayfay\304\261 kayd\304\261rma")
-
 T_("px")
 trTR("px")
 
 T_("Treat ambiguous width characters as wide characters")
 trTR("Geni\305\237li\304\237i belirsiz karakterleri geni\305\237 karakter olarak "
      "i\305\237le")
-
-T_("Allow key navigation")
-trTR("Tu\305\237larla gezinmeye izin ver")
 
 T_("ALT modifier escapes keys")
 trTR("ALT tu\305\237u di\304\237er tu\305\237lara ka\303\247\304\261\305\237 "
@@ -1237,32 +1238,11 @@ T_("ALT modifier shifts keys")
 trTR("ALT tu\305\237u di\304\237er tu\305\237lar\304\261 tu\305\237lar\304\261 "
      "kayd\304\261rs\304\261n")
 
+T_("Allow key navigation")
+trTR("Tu\305\237larla gezinmeye izin ver")
+
 T_("Alternate scroll")
 trTR("Alternatif kayd\304\261rma")
-
-T_("Inline Images")
-trTR("G\303\266r\303\274nt\303\274ler")
-
-T_("Hyperlinks")
-trTR("Ba\304\237lant\304\261lar")
-
-T_("Delayed display refresh")
-trTR("Gecikmeli ekran yenileme")
-
-T_("Lazy window resize")
-trTR("Gecikmeli pencere boyutland\304\261rma")
-
-T_("Reverse wrap")
-trTR("Ters kayd\304\261rma")
-
-T_("Progress notification")
-trTR("\304\260lerleme bildirimi")
-
-T_("Enables progress notification protocol.")
-trTR("\304\260lerleme bildirim protokol\303\274n\303\274 etkinle\305\237tirir.")
-
-T_("Annotations")
-trTR("Notlar")
 
 T_("History Buffer")
 trTR("Ge\303\247mi\305\237 Belle\304\237i")
@@ -1278,6 +1258,30 @@ trTR("Okuma eri\305\237imine izin ver")
 
 T_("Allow write access")
 trTR("Yazma eri\305\237imine izin ver")
+
+T_("Inline Images")
+trTR("G\303\266r\303\274nt\303\274ler")
+
+T_("Hyperlinks")
+trTR("Ba\304\237lant\304\261lar")
+
+T_("Annotations")
+trTR("Notlar")
+
+T_("Progress notification")
+trTR("\304\260lerleme bildirimi")
+
+T_("Enables progress notification protocol.")
+trTR("\304\260lerleme bildirim protokol\303\274n\303\274 etkinle\305\237tirir.")
+
+T_("Delayed display refresh")
+trTR("Gecikmeli ekran yenileme")
+
+T_("Lazy window resize")
+trTR("Gecikmeli pencere boyutland\304\261rma")
+
+T_("Reverse wrap")
+trTR("Ters kayd\304\261rma")
 
 T_("Max. lines")
 trTR("Azami sat\304\261r say\304\261s\304\261")
@@ -1362,6 +1366,9 @@ trTR("Toplay\304\261c\304\261 format\304\261")
 T_("items (per thread)")
 trTR("\303\266\304\237e (i\305\237 par\303\247ac\304\261\304\237\304\261 ba\305\237\304\261na)")
 
+T_("Copy selected text to finder")
+trTR("Se\303\247ili metni bulucuya kopyala")
+
 T_("Word selection extra chars")
 trTR("S\303\266zc\303\274k se\303\247imi i\303\247in ek karakterler")
 
@@ -1370,9 +1377,6 @@ trTR("S\303\266zc\303\274k se\303\247imi kipi")
 
 T_("Word selection pattern")
 trTR("S\303\266zc\303\274k se\303\247imi kal\304\261b\304\261")
-
-T_("Copy selected text to finder")
-trTR("Se\303\247ili metni bulucuya kopyala")
 
 T_("Filter out control bytes")
 trTR("Kontrol karakterlerini filtrele")
@@ -1398,6 +1402,8 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
+
+
 
 
 // PACKAGE 'Terminal' FILE 'Terminal.key'

@@ -254,6 +254,8 @@ FinderBar::FinderBar(Terminal& t)
 : Finder(t)
 , term(t)
 , index(0)
+, showall(false)
+, co(false)
 , harvester(*this)
 {
 	CtrlLayout(*this);
@@ -267,7 +269,6 @@ FinderBar::FinderBar(Terminal& t)
 	begin << THISFN(Begin);
 	end   << THISFN(End);
 	close << THISFN(Hide);
-	showall << THISFN(Sync);
 	text.NullText(t_("Type to search..."));
 	text.AddFrame(display);
 	text.AddFrame(menu);
@@ -292,7 +293,7 @@ void FinderBar::SetConfig(const Profile& p)
 	SetSearchMode(p.finder.searchmode);
 	SetLimit(p.finder.searchlimit);
 	showall = p.finder.showall;
-	parallelize = p.finder.parallelize;
+	co = p.finder.parallelize;
 	harvester.Format(p.finder.saveformat);
 	harvester.Delimiter(p.finder.delimiter);
 	harvester.Mode(p.finder.savemode);
@@ -411,6 +412,18 @@ void FinderBar::CheckPattern()
 	Update();
 }
 
+void FinderBar::ShowAll(bool b)
+{
+	showall = b;
+	Sync();
+}
+
+void FinderBar::Co(bool b)
+{
+	co = b;
+	Sync();
+}
+
 void FinderBar::Undo()
 {
 	text.Undo();
@@ -441,6 +454,10 @@ void FinderBar::StdBar(Bar& menu)
 	menu.Add(AK_CHECKCASE, THISFN(CheckCase)).Radio(IsCaseSensitive());
 	menu.Add(AK_IGNORECASE,THISFN(IgnoreCase)).Radio(IsCaseInsensitive());
 	menu.Add(AK_REGEX,     THISFN(CheckPattern)).Radio(IsRegex());
+	menu.Separator();
+	menu.Add(AK_FIND_ALL,   [this]{ ShowAll(!showall); }).Check(showall);
+	menu.Separator();
+	menu.Add(AK_PARALLELIZE,[this]{ Co(!co); }).Check(co);
 	StdKeys(menu);
 }
 
@@ -456,7 +473,6 @@ void FinderBar::StdKeys(Bar& menu)
 	menu.AddKey(AK_HARVEST_CLIP, THISFN(SaveToClipboard));
 	menu.AddKey(AK_HARVEST_LIST, [this] { harvester.Mode("list"); });
 	menu.AddKey(AK_HARVEST_MAP,  [this] { harvester.Mode("map");  });
-	menu.AddKey(AK_PARALLELIZE,  [this] { parallelize = !parallelize; Sync(); });
 }
 
 void FinderBar::SearchBar(Bar& menu)
@@ -548,7 +564,7 @@ void FinderBar::Search(const WString& txt)
 		Cancel();
 		return;
 	}
-	Find(txt, ~parallelize);
+	Find(txt, co);
 	Sync();
 }
 
