@@ -170,4 +170,7 @@ private:
     EditStringNotNull edit;
 };
 
+// Displays
+const Display& FinderSetupListDisplay();
+
 #endif

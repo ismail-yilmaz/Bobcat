@@ -730,7 +730,7 @@ FinderSetup::FinderSetup()
 	showall = false;
 	parallelize = false;
 	list.InsertFrame(0, toolbar);
-	list.AddColumn(t_("Predefined search patterns")).Edit(edit);
+	list.AddColumn(t_("Predefined search patterns")).Edit(edit).SetDisplay(FinderSetupListDisplay());
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
 	list.WhenDrag = THISFN(Drag);

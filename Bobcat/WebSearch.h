@@ -55,4 +55,8 @@ private:
 
 VectorMap<String, Vector<WebSearch::Provider>>& GetWebSearchProviders();
 
+// Displays
+const Display& DefaultSearchProviderDisplay();
+const Display& NormalSearchProviderDisplay();
+
 #endif

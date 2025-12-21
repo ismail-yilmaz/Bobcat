@@ -12,30 +12,6 @@ namespace Upp {
 #define IMAGECLASS Images
 #include <Draw/iml_source.h>
 
-struct ProfileNameDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		auto ctx = GetContext();
-		const Image& img = ctx && ctx->settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
-		bool current = ctx && ctx->GetActiveProfile() == q;
-		StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
-	}
-};
-
-struct FontProfileDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		Font f = q.To<Font>();
-		AttrText txt(Format("%s (%d)", f.GetFaceName(), f.GetHeight()).ToWString());
-		txt.font = f.Height(StdFont().GetHeight());
-		StdDisplay().Paint(w, r, txt, ink, paper, style);
-	}
-};
-
-const Display& ProfileNameDisplay()       { return Single<ProfileNameDisplayCls>(); }
-const Display& FontProfileDisplay()       { return Single<FontProfileDisplayCls>(); }
-const Display& GuiFontProfileDisplay()    { return Single<FontProfileDisplayCls>(); }
-
 Profile::Profile()
 : name(String::GetVoid())
 , bell(false)

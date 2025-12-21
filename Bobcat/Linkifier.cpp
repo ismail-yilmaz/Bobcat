@@ -186,7 +186,7 @@ LinkifierSetup::LinkifierSetup()
 {
 	CtrlLayout(*this);
 	AddFrame(toolbar);
-	list.AddColumn(t_("Hyperlink patterns")).Edit(edit);
+	list.AddColumn(t_("Predefined hyperlink patterns")).Edit(edit).SetDisplay(LinkifierSetupListDisplay());
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
 	list.WhenDrag = THISFN(Drag);

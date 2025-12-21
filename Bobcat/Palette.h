@@ -59,4 +59,9 @@ inline bool operator==(const Palette& p, const Palette& q) { return p.name == q.
 inline bool operator==(const Palette& p, const String& s)  { return p.name == s; }
 inline bool operator==(const String& s, const Palette& p)  { return p == s; }
 
+// Displays
+const Display& DefaultPaletteNameDisplay();
+const Display& NormalPaletteNameDisplay();
+const Display& NormalPaletteSampleDisplay();
+
 #endif

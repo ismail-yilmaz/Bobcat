@@ -741,8 +741,8 @@ trTR("T\303\274m\303\274n\303\274 se\303\247")
 
 // Linkifier.cpp
 
-T_("Hyperlink patterns")
-trTR("Ba\304\237lant\304\261 kal\304\261plar\304\261")
+T_("Predefined hyperlink patterns")
+trTR("\303\226ntan\304\261ml\304\261 ba\304\237lant\304\261 kal\304\261plar\304\261")
 
 
 // QuickText.cpp
@@ -1411,7 +1411,6 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
-
 
 
 

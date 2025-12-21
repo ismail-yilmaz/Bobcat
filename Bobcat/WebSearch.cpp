@@ -16,25 +16,6 @@ namespace Upp {
 
 using namespace TerminalCtrlKeys;
 
-struct DefaultSearchProviderDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		const auto& ti = q.To<WebSearch::Provider>();
-		StdDisplay().Paint(w, r, AttrText(ti).Bold(true), ink, paper, style);
-	}
-};
-
-struct NormalSearchProviderDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		const auto& ti = q.To<WebSearch::Provider>();
-		StdDisplay().Paint(w, r, AttrText(ti).Bold(false), ink, paper, style);
-	}
-};
-
-const Display& DefaultSearchProviderDisplay()   { return Single<DefaultSearchProviderDisplayCls>();  }
-const Display& NormalSearchProviderDisplay()    { return Single<NormalSearchProviderDisplayCls>();  }
-
 struct ConvertValidatedUrlNotNull : Convert {
 	virtual Value Scan(const Value& text) const
 	{
@@ -70,7 +51,7 @@ void WebSearch::ContextMenu(Bar& menu)
 		menu.Sub(b, t_("Search on web..."), Images::FindWeb(), [&, i, txt = pick(txt)](Bar& menu) {
 			for(int j = 0; j < m[i].GetCount(); j++) {
 				const WebSearch::Provider& wsp = m[i][j];
-				Bar::Item& q = menu.Add(wsp.name, Images::Provider(), [&, txt] {
+				Bar::Item& q = menu.Add(wsp.name, Images::FindWeb(), [&, txt] {
 					String uri = wsp.uri;
 					uri.Replace("%s", txt);
 					LaunchWebBrowser(uri);
@@ -86,7 +67,7 @@ void WebSearch::ContextMenu(Bar& menu)
 
 WebSearch::Provider::operator AttrText() const
 {
-	return AttrText(Nvl(name, uri)).SetImage(Images::Provider());
+	return AttrText(Nvl(name, uri)).SetImage(Images::FindWeb());
 }
 
 void WebSearch::Provider::Jsonize(JsonIO& jio)

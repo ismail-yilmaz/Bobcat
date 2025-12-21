@@ -240,7 +240,6 @@ void SetHighlightCallback(Terminal& t, VectorMap<int, VTLine>& line, const Vecto
                                             const Event<VTCell&, const ItemInfo&, int>& cb);
 
 // Displays
-
 const Display& TerminalTitleDisplay();
 
 // Terminal specific notifications

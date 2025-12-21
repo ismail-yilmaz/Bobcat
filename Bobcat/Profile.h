@@ -143,7 +143,6 @@ bool           LoadShortcutKeys();
 void           SaveShortcutKeys();
 
 Font SelectFont(Font f, dword type = Font::FIXEDPITCH);
-const Display& FontProfileDisplay();
 
 // Operators
 
@@ -151,5 +150,9 @@ inline bool operator==(const Profile& p, const Profile& q) { return p.name == q.
 inline bool operator==(const Profile& p, const String& s)  { return p.name == s; }
 inline bool operator==(const String& s, const Profile& p)  { return p == s; }
 
+// Displays
+const Display& ProfileNameDisplay();
+const Display& FontProfileDisplay();
+const Display& GuiFontProfileDisplay();
 
 #endif

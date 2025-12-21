@@ -86,4 +86,7 @@ private:
     EditStringNotNull edit;
 };
 
+// Displays
+const Display& LinkifierSetupListDisplay();
+
 #endif

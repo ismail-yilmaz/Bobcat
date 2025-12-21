@@ -56,11 +56,118 @@ struct TerminalTitleDisplayCls : Display
 	}
 };
 
-const Display& StdBackgroundDisplay()    { return Single<StdBackgroundDisplayCls>(); }
-const Display& NormalImageDisplay()      { return Single<NormalImageDisplayCls>(); }
-const Display& TiledImageDisplay()       { return Single<TiledImageDisplayCls>(); }
-const Display& FontListDisplay()         { return Single<FontListDisplayCls>(); }
-const Display& TerminalTitleDisplay()    { return Single<TerminalTitleDisplayCls>(); }
+struct QuickTextDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		if(auto ctx = GetContext(); ctx)
+			if(Terminal *t = ctx->GetActiveTerminal(); t) {
+				const auto& ti = q.To<QuickText::Item>();
+				StdDisplay().Paint(w, r, AttrText(ti).SetFont(t->GetFont()), ink, paper, style);
+			}
+	}
+};
+
+struct QuickTextSetupListDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		const auto& ti = q.To<QuickText::Item>();
+		StdDisplay().Paint(w, r, AttrText(ti), ink, paper, style);
+	}
+};
+
+struct FinderSetupListDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		AttrText txt(q);
+		StdDisplay().Paint(w, r, txt.SetImage(Images::Pattern()), ink, paper, style);
+	}
+};
+
+struct LinkifierSetupListDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		AttrText txt(q);
+		StdDisplay().Paint(w, r, txt.SetImage(Images::Link()), ink, paper, style);
+	}
+};
+
+struct DefaultSearchProviderDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		const auto& ti = q.To<WebSearch::Provider>();
+		StdDisplay().Paint(w, r, AttrText(ti).Bold(true), ink, paper, style);
+	}
+};
+
+struct NormalSearchProviderDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		const auto& ti = q.To<WebSearch::Provider>();
+		StdDisplay().Paint(w, r, AttrText(ti).Bold(false), ink, paper, style);
+	}
+};
+
+struct ProfileNameDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		auto ctx = GetContext();
+		const Image& img = ctx && ctx->settings.defaultprofile == q ? Images::DefaultTerminal() : Images::Terminal();
+		bool current = ctx && ctx->GetActiveProfile() == q;
+		StdDisplay().Paint(w, r, AttrText(q).SetImage(img).Bold(current), ink, paper, style);
+	}
+};
+
+struct FontProfileDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		Font f = q.To<Font>();
+		AttrText txt(Format("%s (%d)", f.GetFaceName(), f.GetHeight()).ToWString());
+		txt.font = f.Height(StdFont().GetHeight());
+		StdDisplay().Paint(w, r, txt, ink, paper, style);
+	}
+};
+
+struct DefaulPaletteNameDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()).Bold(), ink, paper, style);
+	}
+};
+
+struct NormalPaletteNameDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()), ink, paper, style);
+	}
+};
+
+struct NormalPaletteSampleDisplayCls : Display {
+	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
+	{
+		const Palette& p = q.To<Palette>();
+		ink   = p.table[TerminalCtrl::COLOR_INK];
+		paper = p.table[TerminalCtrl::COLOR_PAPER];
+		StdCenterDisplay().Paint(w, r, AttrText("AaZz09...").SetFont(Monospace()), ink, paper, style);
+	}
+};
+
+const Display& StdBackgroundDisplay()         { return Single<StdBackgroundDisplayCls>(); }
+const Display& NormalImageDisplay()           { return Single<NormalImageDisplayCls>(); }
+const Display& TiledImageDisplay()            { return Single<TiledImageDisplayCls>(); }
+const Display& FontListDisplay()              { return Single<FontListDisplayCls>(); }
+const Display& TerminalTitleDisplay()         { return Single<TerminalTitleDisplayCls>(); }
+const Display& FinderSetupListDisplay()       { return Single<FinderSetupListDisplayCls>(); }
+const Display& LinkifierSetupListDisplay()    { return Single<LinkifierSetupListDisplayCls>(); }
+const Display& QuickTextDisplay()             { return Single<QuickTextDisplayCls>(); }
+const Display& QuickTextSetupListDisplay()    { return Single<QuickTextSetupListDisplayCls>(); }
+const Display& DefaultSearchProviderDisplay() { return Single<DefaultSearchProviderDisplayCls>(); }
+const Display& NormalSearchProviderDisplay()  { return Single<NormalSearchProviderDisplayCls>(); }
+const Display& ProfileNameDisplay()           { return Single<ProfileNameDisplayCls>(); }
+const Display& FontProfileDisplay()           { return Single<FontProfileDisplayCls>(); }
+const Display& GuiFontProfileDisplay()        { return Single<FontProfileDisplayCls>(); }
+const Display& DefaultPaletteNameDisplay()    { return Single<DefaulPaletteNameDisplayCls>();  }
+const Display& NormalPaletteNameDisplay()     { return Single<NormalPaletteNameDisplayCls>();  }
+const Display& NormalPaletteSampleDisplay()   { return Single<NormalPaletteSampleDisplayCls>();}
 
 void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 {

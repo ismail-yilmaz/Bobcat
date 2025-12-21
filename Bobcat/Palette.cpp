@@ -10,34 +10,6 @@ namespace Upp {
 
 constexpr const char *sSampleText = "AaZz09...";
 
-struct DefaulPaletteNameDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()).Bold(), ink, paper, style);
-	}
-};
-
-struct NormalPaletteNameDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()), ink, paper, style);
-	}
-};
-
-struct NormalPaletteSampleDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		const Palette& p = q.To<Palette>();
-		ink   = p.table[TerminalCtrl::COLOR_INK];
-		paper = p.table[TerminalCtrl::COLOR_PAPER];
-		StdCenterDisplay().Paint(w, r, AttrText(sSampleText).SetFont(Monospace()), ink, paper, style);
-	}
-};
-
-const Display& DefaultPaletteNameDisplay()   { return Single<DefaulPaletteNameDisplayCls>();  }
-const Display& NormalPaletteNameDisplay()    { return Single<NormalPaletteNameDisplayCls>();  }
-const Display& NormalPaletteSampleDisplay()  { return Single<NormalPaletteSampleDisplayCls>();}
-
 static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
 {
 	static Vector<Tuple<Color, const char*, const char*>> sColorTable = {

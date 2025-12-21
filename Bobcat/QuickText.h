@@ -59,4 +59,8 @@ private:
 	WithQuickTextLayout<TopWindow> dlg;
 };
 
+// Displays
+const Display& QuickTextDisplay();
+const Display& QuickTextSetupListDisplay();
+
 #endif

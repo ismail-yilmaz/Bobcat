@@ -9,29 +9,10 @@
 
 namespace Upp {
 
-struct QuickTextDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		if(auto ctx = GetContext(); ctx)
-			if(Terminal *t = ctx->GetActiveTerminal(); t) {
-				const auto& ti = q.To<QuickText::Item>();
-				StdDisplay().Paint(w, r, AttrText(ti).SetFont(t->GetFont()), ink, paper, style);
-			}
-	}
-};
-
-struct QuickTextSetupListDisplayCls : Display {
-	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
-	{
-		const auto& ti = q.To<QuickText::Item>();
-		StdDisplay().Paint(w, r, AttrText(ti), ink, paper, style);
-	}
-};
-
 QuickText::QuickText(Terminal& t)
 : term(t)
 {
-	plist.SetDisplay(Single<QuickTextDisplayCls>());
+	plist.SetDisplay(QuickTextDisplay());
 	plist.WhenSelect = [this] { OnSelect(); };
 	plist.WhenCancel = [this] { OnCancel(); };
 }
@@ -132,7 +113,7 @@ QuickTextSetup::QuickTextSetup()
 	CtrlLayoutOKCancel(dlg, t_("QuickText Editor"));
 	
 	AddFrame(toolbar);
-	list.AddColumn(t_("Text")).SetDisplay(Single<QuickTextSetupListDisplayCls>());
+	list.AddColumn(t_("Text")).SetDisplay(QuickTextSetupListDisplay());
 	list.WhenBar = THISFN(ContextMenu);
 	list.WhenSel = THISFN(Sync);
 	list.WhenDrag = THISFN(Drag);
