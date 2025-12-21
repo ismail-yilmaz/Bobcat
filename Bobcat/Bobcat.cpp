@@ -563,8 +563,8 @@ void Bobcat::SetupMenu(Bar& menu)
 
 void Bobcat::HelpMenu(Bar& menu)
 {
-	menu.Add(t_("Help"),  [this] { Help();  });
-	menu.Add(t_("About"), [this] { About(); });
+	menu.Add(t_("Help"), Images::Question(), [this] { Help();  });
+	menu.Add(t_("About"), Images::Information(), [this] { About(); });
 }
 
 void Bobcat::TermMenu(Bar& menu)

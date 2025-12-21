@@ -45,9 +45,9 @@ void Navigator::Item::Paint(Draw& w)
 		if(ctrl) {
 			if(ctrl->IsRunning()) {
 				if(dnd) {
-					const Image& ico = Images::DropClipHD();
+					const Image& ico = Images::DropClip();
 					w.DrawRect(q, SColorHighlight);
-					w.DrawImage(q.CenterRect(ico.GetSize()), ico);
+					w.DrawImage(q.CenterRect({32, 32}), ico);
 				}
 				// Always overlay
 				if(blinking && ctrl->IsRoot()) {

@@ -1003,7 +1003,7 @@ void Terminal::EditMenu(Bar& menu)
 {
 	menu.Add(AK_READONLY, [this] { SetEditable(IsReadOnly()); }).Check(IsReadOnly());
 	menu.Separator();
-	menu.Add(AK_ALIAS, [this] { SetAlias(); });
+	menu.Add(AK_ALIAS, Images::Rename(), [this] { SetAlias(); });
 
 	if(IsMouseOverImage()) {
 		menu.Separator();
