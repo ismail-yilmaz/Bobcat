@@ -58,7 +58,7 @@ struct Terminal : TerminalCtrl {
     
     void        Layout() override;
     
-    Terminal&   SetProfile(const Profile& p);
+    Terminal&   SetProfile(const Profile& p, bool reload = false);
     Terminal&   SetPalette(const Palette& p);
     Terminal&   SetExitMode(const String& s);
     Terminal&   SetLocale(const String& s);

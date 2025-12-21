@@ -486,7 +486,7 @@ void Bobcat::SyncTerminalProfiles()
 		for(const Profile& p : v.GetValues()) {
 			Palette q = LoadPalette(p.palette);
 			for(Terminal* t : GetTerminalGroup(p)) {
-				t->SetProfile(p);
+				t->SetProfile(p, true); // hot-reload
 				t->SetPalette(q);
 			}
 		}

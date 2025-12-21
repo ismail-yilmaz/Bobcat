@@ -23,6 +23,7 @@ Navigator::Item::Item()
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
 	close.Image(Images::Delete());
 	close << [this] { WhenClose(*ctrl); };
+	close.Tip(t_("Close terminal"));
 }
 
 void Navigator::Item::GotFocus()

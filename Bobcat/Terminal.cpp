@@ -315,7 +315,6 @@ void Terminal::SyncHighlight()
 Terminal& Terminal::Sync()
 {
 	titlebar <<= ctx.settings.titlealignment;
-	titlebar.Sync();
 	ShowTitleBar(ctx.settings.showtitle);
 	finder <<= ctx.settings.finderalignment;
 	Update();
@@ -328,65 +327,70 @@ void Terminal::Layout()
 	Update();
 }
 
-Terminal& Terminal::SetProfile(const Profile& p)
+Terminal& Terminal::SetProfile(const Profile& p, bool reload)
 {
-	profilename = p.name;
-	workingdir  = p.address;
-	shellintegration = p.shellintegration;
-	findselectedtext = p.findselectedtext;
-	warnonrootaccess = p.warnonrootaccess;
-	ring = p.bell;
-	flash = p.flashscreen;
-	bell = ring || flash;
-	filter = p.filterctrl;
-	NotifyProgress(p.progress);
-	WindowActions(p.windowactions);
-	WindowReports(p.windowreports);
-	History(p.history);
-	SetExitMode(p.onexit);
-	SetHistorySize(p.historysize);
-	LightColors(p.lightcolors);
-	AdjustColors(p.adjustcolors);
-	IntensifyBoldText(p.intensify);
-	DynamicColors(p.dynamiccolors);
-	BlinkingText(p.blinktext);
-	BlinkInterval(p.blinkinterval);
-	UnlockCursor();
-	SetCursorStyle(p.cursorstyle);
-	BlinkingCursor(p.blinkcursor);
-	LockCursor(p.lockcursor);
-	PermitClipboardRead(p.clipboardread);
-	PermitClipboardWrite(p.clipboardwrite);
-	MouseWheelStep(p.mousewheelstep);
-	AutoHideMouseCursor(p.autohidemouse);
-	InlineImages(p.inlineimages);
-	MetaEscapesKeys(p.altescapeskeys);
-	MetaShiftsKeys(p.altshiftskeys);
-	KeyNavigation(p.keynavigation);
-	PCStyleFunctionKeys(p.functionkeystyle == "pc");
-	ReverseWrap(p.reversewrap);
-	DelayedRefresh(p.delayedrefresh);
-	LazyResize(p.lazyresize);
-	ShowSizeHint(p.sizehint);
-	SetLocale(p.encoding);
-	TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
-	SetPadding(Size(0, p.linespacing));
-	SetFont(p.font);
-	AlternateScroll(p.alternatescroll);
-	ScrollToEnd(!p.dontscrolltoend);
-	OverrideTracking(GetModifierKey(p.overridetracking));
-	Hyperlinks(p.hyperlinks);
-	Annotations(p.annotations);
-	SetWordSelectionFilter(p.wordselchars);
-	SetWordSelectionPattern(p.wordselpattern);
-	SetPathTranslationMode(p.pathtranslation);
-	SetPathDelimiter(p.pathdelimiter);
-	AnswerBackMessage(p.answerbackmsg);
-	smartwordsel = p.wordselmode == "smart";
-	finder.SetConfig(p);
-	linkifier.SetConfig(p);
-	websearch.SetConfig(p);
-	return *this;
+    // Session/state settings: new instances only
+    if(!reload) {
+        profilename = p.name;
+        workingdir  = p.address;
+        shellintegration = p.shellintegration;
+        warnonrootaccess = p.warnonrootaccess;
+        ring = p.bell;
+        flash = p.flashscreen;
+        bell = ring || flash;
+        filter = p.filterctrl;
+        NotifyProgress(p.progress);
+        WindowActions(p.windowactions);
+        WindowReports(p.windowreports);
+        History(p.history);
+        SetExitMode(p.onexit);
+        SetHistorySize(p.historysize);
+        LightColors(p.lightcolors);
+        AdjustColors(p.adjustcolors);
+        DynamicColors(p.dynamiccolors);
+        BlinkingText(p.blinktext);
+        PermitClipboardRead(p.clipboardread);
+        PermitClipboardWrite(p.clipboardwrite);
+        MouseWheelStep(p.mousewheelstep);
+        AutoHideMouseCursor(p.autohidemouse);
+        InlineImages(p.inlineimages);
+        MetaEscapesKeys(p.altescapeskeys);
+        MetaShiftsKeys(p.altshiftskeys);
+        KeyNavigation(p.keynavigation);
+        PCStyleFunctionKeys(p.functionkeystyle == "pc");
+        ReverseWrap(p.reversewrap);
+        DelayedRefresh(p.delayedrefresh);
+        LazyResize(p.lazyresize);
+        ShowSizeHint(p.sizehint);
+        SetLocale(p.encoding);
+        TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
+        SetPadding(Size(0, p.linespacing));
+        AlternateScroll(p.alternatescroll);
+        ScrollToEnd(!p.dontscrolltoend);
+        OverrideTracking(GetModifierKey(p.overridetracking));
+        Hyperlinks(p.hyperlinks);
+        Annotations(p.annotations);
+        SetPathTranslationMode(p.pathtranslation);
+        SetPathDelimiter(p.pathdelimiter);
+        AnswerBackMessage(p.answerbackmsg);
+    }
+    
+    // Safe to hot-reload: cosmetic & UI helpers
+    IntensifyBoldText(p.intensify);
+    BlinkInterval(p.blinkinterval);
+    UnlockCursor();
+    SetCursorStyle(p.cursorstyle);
+    BlinkingCursor(p.blinkcursor);
+    LockCursor(p.lockcursor);
+    SetFont(p.font);
+    SetWordSelectionFilter(p.wordselchars);
+    SetWordSelectionPattern(p.wordselpattern);
+    smartwordsel = p.wordselmode == "smart";
+    findselectedtext = p.findselectedtext;
+    finder.SetConfig(p);
+    linkifier.SetConfig(p);
+    websearch.SetConfig(p);
+    return *this;
 }
 
 void Terminal::MouseEnter(Point pt, dword keyflags)
