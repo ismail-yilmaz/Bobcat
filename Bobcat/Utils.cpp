@@ -56,7 +56,8 @@ struct TerminalTitleDisplayCls : Display
 	}
 };
 
-struct QuickTextDisplayCls : Display {
+struct QuickTextDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		if(auto ctx = GetContext(); ctx)
@@ -67,7 +68,8 @@ struct QuickTextDisplayCls : Display {
 	}
 };
 
-struct QuickTextSetupListDisplayCls : Display {
+struct QuickTextSetupListDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		const auto& ti = q.To<QuickText::Item>();
@@ -75,7 +77,8 @@ struct QuickTextSetupListDisplayCls : Display {
 	}
 };
 
-struct FinderSetupListDisplayCls : Display {
+struct FinderSetupListDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		AttrText txt(q);
@@ -83,7 +86,8 @@ struct FinderSetupListDisplayCls : Display {
 	}
 };
 
-struct LinkifierSetupListDisplayCls : Display {
+struct LinkifierSetupListDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		AttrText txt(q);
@@ -91,7 +95,8 @@ struct LinkifierSetupListDisplayCls : Display {
 	}
 };
 
-struct DefaultSearchProviderDisplayCls : Display {
+struct DefaultSearchProviderDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		const auto& ti = q.To<WebSearch::Provider>();
@@ -99,7 +104,8 @@ struct DefaultSearchProviderDisplayCls : Display {
 	}
 };
 
-struct NormalSearchProviderDisplayCls : Display {
+struct NormalSearchProviderDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		const auto& ti = q.To<WebSearch::Provider>();
@@ -107,7 +113,8 @@ struct NormalSearchProviderDisplayCls : Display {
 	}
 };
 
-struct ProfileNameDisplayCls : Display {
+struct ProfileNameDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		auto ctx = GetContext();
@@ -117,7 +124,8 @@ struct ProfileNameDisplayCls : Display {
 	}
 };
 
-struct FontProfileDisplayCls : Display {
+struct FontProfileDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		Font f = q.To<Font>();
@@ -127,21 +135,24 @@ struct FontProfileDisplayCls : Display {
 	}
 };
 
-struct DefaulPaletteNameDisplayCls : Display {
+struct DefaulPaletteNameDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()).Bold(), ink, paper, style);
 	}
 };
 
-struct NormalPaletteNameDisplayCls : Display {
+struct NormalPaletteNameDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		StdDisplay().Paint(w, r, AttrText(q).SetImage(Images::ColorSwatch()), ink, paper, style);
 	}
 };
 
-struct NormalPaletteSampleDisplayCls : Display {
+struct NormalPaletteSampleDisplayCls : Display
+{
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const final
 	{
 		const Palette& p = q.To<Palette>();
