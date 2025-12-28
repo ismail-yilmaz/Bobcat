@@ -1012,14 +1012,14 @@ void Terminal::EditMenu(Bar& menu)
 	if(IsMouseOverImage()) {
 		menu.Separator();
 		menu.Add(AK_COPYIMAGE, Images::Copy(),  [this] { CopyImage(); });
-		menu.Add(AK_OPENIMAGE, CtrlImg::open(), [this] { OpenImage(); });
+		menu.Add(AK_OPENIMAGE, Images::Open(), [this] { OpenImage(); });
 	}
 	else
 	if(HasHyperlinks() && IsMouseOverLink()) {
 		menu.Separator();
 		String lnk = GetLink();
 		menu.Add(AK_COPYLINK, Images::Copy(),  [this, lnk] { CopyLink(lnk); });
-		menu.Add(AK_OPENLINK, CtrlImg::open(), [this, lnk] { OpenLink(lnk); });
+		menu.Add(AK_OPENLINK, Images::Open(), [this, lnk] { OpenLink(lnk); });
 	}
 	else
 	if(HasAnnotations() && IsMouseOverAnnotation()) {
@@ -1101,7 +1101,7 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.Sub(t_("View"), [this](Bar& menu) { ctx.ViewMenu(menu); });
 	menu.Separator();
 	if(shellintegration) {
-		menu.Add(AK_OPENDIR, Images::Directory(), [this] { LaunchWebBrowser(GetWorkingDirectory()); });
+		menu.Add(AK_OPENDIR, Images::Open(), [this] { LaunchWebBrowser(GetWorkingDirectory()); });
 		menu.Separator();
 	}
 	ctx.SetupMenu(menu);
@@ -1259,3 +1259,4 @@ VectorMap<String, String>& GetWordSelectionPatterns()
 }
 
 }
+
