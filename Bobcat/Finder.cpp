@@ -292,7 +292,7 @@ void FinderBar::SetConfig(const Profile& p)
 {
 	SetSearchMode(p.finder.searchmode);
 	SetLimit(p.finder.searchlimit);
-	showall = p.finder.showall;
+	showall = ~p.finder.showall;
 	co = p.finder.parallelize;
 	harvester.Format(p.finder.saveformat);
 	harvester.Delimiter(p.finder.delimiter);
@@ -463,7 +463,7 @@ void FinderBar::StdBar(Bar& menu)
 
 void FinderBar::StdKeys(Bar& menu)
 {
-	menu.AddKey(AK_FIND_ALL,     [this] { showall = !showall; Sync(); });
+	menu.AddKey(AK_FIND_ALL,     [this] { ShowAll(!showall); });
 	menu.AddKey(AK_FIND_NEXT,    THISFN(Next));
 	menu.AddKey(AK_FIND_PREV,    THISFN(Prev));
 	menu.AddKey(AK_FIND_FIRST,   THISFN(Begin));
@@ -603,7 +603,7 @@ void FinderBar::OnHighlight(HighlightInfo& hl)
 					.Ink(term.highlight[1]).Paper(term.highlight[3]);
 			}
 			else
-			if(~showall) {
+			if(showall) {
 				cell->Normal()
 					.Ink(term.highlight[0]).Paper(term.highlight[2]);
 			}
