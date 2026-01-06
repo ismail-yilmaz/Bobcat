@@ -136,7 +136,7 @@ Navigator::Navigator(Bobcat& ctx_)
 	bar.newterm.Image(Images::Add());
 	bar.newterm.Tip(t_("Open new terminal"));
 	bar.close.Image(Images::Delete()).Tip(t_("Close navigator"));
-	bar.profiles.Image(CtrlImg::down_arrow());
+	bar.profiles.Image(Images::ChevronDown());
 	bar.profiles.Tip(t_("Open new terminal from..."));
 	bar.newterm << [this] { ctx.NewTerminalFromActiveProfile(); };
 	bar.profiles << [this] { OpenProfileMenu(ctx); };

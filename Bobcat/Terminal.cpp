@@ -1131,9 +1131,9 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	SetData("top");
 	CtrlLayout(*this);
 	newterm.Image(Images::Add()).Tip(t_("Open new terminal"));
-	navlist.Image(CtrlImg::down_arrow()).Tip(t_("Terminal list"));
+	navlist.Image(Images::ChevronDown()).Tip(t_("Terminal list"));
 	close.Image(Images::Delete()).Tip(t_("Close terminal"));
-	menu.Image(CtrlImg::down_arrow()).Tip(t_("Open new terminal from..."));
+	menu.Image(Images::ChevronDown()).Tip(t_("Open new terminal from..."));
 	newterm << [this] { term.ctx.AddTerminal(term.ctx.GetActiveProfile()); };
 	navlist << [this] { MenuBar::Execute([this](Bar& bar) { term.ctx.ListMenu(bar); }); };
 	close   << [this] { term.Stop(); };
