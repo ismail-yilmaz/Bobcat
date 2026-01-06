@@ -448,7 +448,6 @@ void Bobcat::SyncTitle()
 	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t) {
 			s << " [" << t->GetTitle() << "]";
 			if(Splitter *p = t->GetParentSplitter(); p) {
-				s << " (";
 				if(p->GetFirstChild() == t)
 					s << " (" << (p->IsHorz() ? t_("left pane") : t_("top pane")) << ")";
 				else
