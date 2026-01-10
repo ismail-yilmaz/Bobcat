@@ -372,8 +372,10 @@ bool Bobcat::IsFullScreen() const
 Bobcat& Bobcat::SetupMenuBar()
 {
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
-#if defined(PLATFORM_COCOA) && !defined(VIRTUALGUI)
-	// TODO: Add MacOS menu bar support.
+#ifdef PLATFORM_COCOA
+	window.SetMainMenu([this](Bar& menu) { MainMenu(menu); });
+	HideMenuBar();
+#elif !defined(VIRTUALGUI)
 	window.WhenDockMenu = [this](Bar& menu) { MainMenu(menu); };
 #endif
 	return *this;
@@ -494,13 +496,21 @@ void Bobcat::SyncTerminalProfiles()
 
 void Bobcat::MainMenu(Bar& menu)
 {
-	menu.Sub(t_("File"),     [this](Bar& menu) { FileMenu(menu);  });
-	menu.Sub(t_("Edit"),     [this](Bar& menu) { EditMenu(menu);  });
-	menu.Sub(t_("View"),     [this](Bar& menu) { ViewMenu(menu);  });
+#ifdef PLATFORM_COCOA
+	menu.Sub(t_("Bobcat"),   [this](Bar& menu) { BobcatMenu(menu); });
+#endif
+	menu.Sub(t_("File"),     [this](Bar& menu) { FileMenu(menu);   });
+	menu.Sub(t_("Edit"),     [this](Bar& menu) { EditMenu(menu);   });
+	menu.Sub(t_("View"),     [this](Bar& menu) { ViewMenu(menu);   });
 	menu.Sub(t_("Emulation"),[this](Bar& menu) { EmulationMenu(menu); });
-	menu.Sub(t_("List"),     [this](Bar& menu) { ListMenu(menu);  });
-	menu.Sub(t_("Setup"),    [this](Bar& menu) { SetupMenu(menu); });
-	menu.Sub(t_("Help"),     [this](Bar& menu) { HelpMenu(menu);  });
+	menu.Sub(t_("List"),     [this](Bar& menu) { ListMenu(menu);   });
+	menu.Sub(t_("Setup"),    [this](Bar& menu) { SetupMenu(menu);  });
+	menu.Sub(t_("Help"),     [this](Bar& menu) { HelpMenu(menu);   });
+}
+
+void Bobcat::BobcatMenu(Bar& menu)
+{
+	menu.Add(t_("About"), Images::Information(), [this] { About(); });
 }
 
 void Bobcat::FileMenu(Bar& menu)
@@ -527,7 +537,9 @@ void Bobcat::ViewMenu(Bar& menu)
 	bool enable = stack.GetCount() > 1;
 	
 	menu.Add(AK_FRAMELESS,     [this] { settings.frameless ^= 1; Sync(); }).Check(settings.frameless);
+#ifndef PLATFORM_COCOA
 	menu.Add(AK_MENUBAR,       [this] { settings.showmenu  ^= 1; Sync(); }).Check(settings.showmenu);
+#endif
 	menu.Add(AK_TITLEBAR,      [this] { settings.showtitle ^= 1; Sync(); }).Check(settings.showtitle);
 	menu.AddKey(AK_TOGGLEBARS, [this] { ToggleBars(); });
 	menu.Add(AK_FULLSCREEN,    [this] { FullScreen(0); }).Check(window.IsFullScreen());
@@ -563,7 +575,9 @@ void Bobcat::SetupMenu(Bar& menu)
 void Bobcat::HelpMenu(Bar& menu)
 {
 	menu.Add(t_("Help"), Images::Question(), [this] { Help();  });
+#ifndef PLATFORM_COCOA
 	menu.Add(t_("About"), Images::Information(), [this] { About(); });
+#endif
 }
 
 void Bobcat::TermMenu(Bar& menu)
