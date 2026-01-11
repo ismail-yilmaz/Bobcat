@@ -115,6 +115,7 @@ struct Bobcat : Pte<Bobcat> {
     void        SyncTerminalProfiles();
     
     void        MainMenu(Bar& menu);
+    void        BobcatMenu(Bar& menu);
     void        FileMenu(Bar& menu);
     void        EditMenu(Bar& menu);
     void        ViewMenu(Bar& menu);
