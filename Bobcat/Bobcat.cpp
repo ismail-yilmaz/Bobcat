@@ -375,8 +375,6 @@ Bobcat& Bobcat::SetupMenuBar()
 #ifdef PLATFORM_COCOA
 	window.SetMainMenu([this](Bar& menu) { MainMenu(menu); });
 	HideMenuBar();
-#elif !defined(VIRTUALGUI)
-	window.WhenDockMenu = [this](Bar& menu) { MainMenu(menu); };
 #endif
 	return *this;
 }
