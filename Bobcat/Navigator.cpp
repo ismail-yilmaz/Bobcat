@@ -46,9 +46,10 @@ void Navigator::Item::Paint(Draw& w)
 		if(ctrl) {
 			if(ctrl->IsRunning()) {
 				if(dnd) {
-					const Image& ico = Images::DropClip();
+					const Image& ico = Images::DropClipHD();
 					w.DrawRect(q, SColorHighlight);
-					w.DrawImage(q.CenterRect({32, 32}), ico);
+					Size sz = min(ico.GetSize(), q.GetSize());
+					w.DrawImage(q.CenterRect(sz), ico);
 				}
 				// Always overlay
 				if(blinking && ctrl->IsRoot()) {
@@ -62,19 +63,21 @@ void Navigator::Item::Paint(Draw& w)
 				Image ico;
 				if(ctrl->IsFailure()) {
 					if(ctrl->IsAsking())
-						ico = Images::Exclamation();
+						ico = Images::ExclamationHD();
 					else
-						ico = Images::Error();
+						ico = Images::ErrorHD();
 				}
 				else
 				if(ctrl->IsAsking())
-					ico = Images::Question();
+					ico = Images::QuestionHD();
 				else
 				if(ctrl->IsSuccess())
-					ico = Images::OK();
-				w.DrawImage(q.CenterRect(Size(24, 24)), ico);
+					ico = Images::OkHD();
+				Size sz = min(ico.GetSize(), q.GetSize());
+				w.DrawImage(q.CenterRect(sz), ico);
 			}
 		}
+
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
 		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
 		DrawFrame(w, q.Deflated(1), c);
@@ -405,7 +408,7 @@ void Navigator::Paint(Draw& w)
 			count++;
 		}
 	}
-	if(items.GetCount() && !count) {
+	if(items.GetCount() && !count && !swapanim) {
 		const String s = t_("No matches found.");
 		Size sz = GetTextSize(s, StdFont().Bold());
 		Rect r =  GetRect().CenterRect(sz);

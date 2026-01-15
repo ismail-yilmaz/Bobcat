@@ -14,10 +14,11 @@ namespace Upp {
 Stacker::Stacker()
 : activectrl(nullptr)
 , duration(0)
-, vertical(false)
 , wheel(false)
-, animating(false)
+, vertical(false)
 , splitvert(false)
+, animating(false)
+, swapping(false)
 {
 }
 
@@ -198,9 +199,11 @@ int Stacker::Find(Ctrl& ctrl) const
 
 void Stacker::Swap(int a, int b)
 {
-	if (a == b || a < 0 || a >= list.GetCount() || b < 0 || b >= list.GetCount())
+	if (swapping || a == b || a < 0 || a >= list.GetCount() || b < 0 || b >= list.GetCount())
 		return;
 
+	swapping = true;
+	
 	Ctrl *ctrl_a = list[a];
 	Ctrl *ctrl_b = list[b];
 	
@@ -265,6 +268,8 @@ void Stacker::Swap(int a, int b)
 	
 	WhenSwap(a, b);
 	list.Swap(a, b);
+	
+	swapping = false;
 }
 
 void Stacker::Swap(Ctrl& a, Ctrl& b)

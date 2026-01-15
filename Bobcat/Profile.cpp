@@ -385,7 +385,7 @@ void Profiles::ContextMenu(Bar& bar)
 		bar.Separator();
 		bar.Add(b, t_("Set as default profile"), [this]() { SetDefault(); }).Key(K_CTRL|K_D);
 		bar.Separator();
-		bar.Add(t_("Open profiles directory"), Images::Directory(), []{ LaunchWebBrowser(ProfilesDir()); }).Key(K_CTRL_HOME);
+		bar.Add(t_("Open profiles directory"), Images::Open(), []{ LaunchWebBrowser(ProfilesDir()); }).Key(K_CTRL_HOME);
 	}
 }
 

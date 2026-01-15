@@ -79,6 +79,8 @@ private:
     bool         vertical:1;
     bool         splitvert:1;
     bool         animating:1;
+    bool         swapping:1;
+
 };
 
 #endif
