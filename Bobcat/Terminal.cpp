@@ -748,7 +748,11 @@ void Terminal::OnNotification(const String& text)
 
 bool Terminal::OnSelectorScan(dword key)
 {
-	return MenuBar::Scan([&](Bar& menu) { websearch.ContextMenu(menu); }, key);
+	// Allow text to be searched via finder and on web.
+	return MenuBar::Scan([this, key](Bar& menu) {
+			menu.AddKey(AK_FINDER, [this] { OpenFinder(); });
+			websearch.ContextMenu(menu);
+	}, key);
 }
 
 void Terminal::OnProgress(int type, int data)
@@ -1259,4 +1263,3 @@ VectorMap<String, String>& GetWordSelectionPatterns()
 }
 
 }
-

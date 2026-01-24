@@ -559,7 +559,7 @@ void FinderBar::Search0(const WString& txt)
 		Cancel();
 		return;
 	}
-	Find(~txt, co);
+	Find(txt, co);
 	Sync();
 }
 
