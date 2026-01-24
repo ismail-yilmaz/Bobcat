@@ -553,23 +553,28 @@ void FinderBar::Sync()
 	term.Refresh();
 }
 
-void FinderBar::Search()
-{
-	Search(~text);
-}
-
-void FinderBar::Search(const WString& txt)
+void FinderBar::Search0(const WString& txt)
 {
 	if(term.IsSearching()) {
 		Cancel();
 		return;
 	}
-	Find(txt, co);
+	Find(~txt, co);
 	Sync();
 }
 
+void FinderBar::Search()
+{
+	Search0(~text);
+}
 
-void FinderBar::Update()
+void FinderBar::Search(const WString& txt)
+{
+	text.SetText(txt);
+	Update();
+}
+
+void FinderBar::Updated()
 {
 	if(IsChild())
 		Search();

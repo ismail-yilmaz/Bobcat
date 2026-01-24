@@ -114,7 +114,7 @@ public:
 
     void        Search();
     void        Search(const WString& txt);
-    void        Update();
+    void        Updated() override;
 
     void        SaveToFile();
     void        SaveToClipboard();
@@ -123,6 +123,8 @@ public:
 
 private:
 
+	void       Search0(const WString& txt);
+	
     SortedIndex<ItemInfo> foundtext;
 
     struct Harvester {
