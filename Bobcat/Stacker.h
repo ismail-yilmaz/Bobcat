@@ -65,7 +65,7 @@ private:
     Splitter*   GetParentSplitter(Ctrl *c) const;
     void        RemoveSplitter(const Splitter& s);
     bool        RemoveFromSplitter(int i);
-    void        Activate(Ctrl* ctrl);
+    void        ActivatePane(Ctrl* ctrl);
 
     // Animation related stuff.
     bool IsNext(Ctrl *next) const;
@@ -80,7 +80,6 @@ private:
     bool         splitvert:1;
     bool         animating:1;
     bool         swapping:1;
-
 };
 
 #endif

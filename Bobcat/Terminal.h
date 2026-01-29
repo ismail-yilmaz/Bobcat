@@ -183,12 +183,12 @@ struct Terminal : TerminalCtrl {
     bool         shellintegration:1;
     bool         findselectedtext:1;
     bool         warnonrootaccess:1;
-    ExitMode     exitmode;
     String       profilename;
     String       title;
     String       alias;
     String       workingdir;
     String       pathdelimiter;
+    ExitMode     exitmode;
     PathMode     pathmode;
     Time         starttime;
     FinderBar    finder;

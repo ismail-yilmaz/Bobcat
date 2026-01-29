@@ -175,7 +175,6 @@ void QuickTextSetup::ContextMenu(Bar& bar)
 	bool d = c && list.IsCursor();
 	bool q = list.GetCursor() >= 0 && list.GetCursor() < list.GetCount() - 1;
 
-	bool b = list.IsCursor();
 	bar.Add(c, t_("Add text"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
 	bar.Add(d, t_("Edit text"), Images::Edit(), [this]() { Edit(); }).Key(K_SPACE);
 	bar.Add(d, t_("Remove text"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);

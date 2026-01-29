@@ -94,7 +94,7 @@ Stacker& Stacker::Insert(int i, Ctrl& ctrl)
 		Ctrl::Add(ctrl.SizePos());
 		list.Insert(i, &ctrl);
 		WhenInsert(i, ctrl);
-		Activate(&ctrl);
+		ActivatePane(&ctrl);
 	}
 	return *this;
 }
@@ -113,7 +113,7 @@ Stacker& Stacker::Split(Ctrl& ctrl)
 		s.Add(*list[i]);
 		s.Add(*list[i + 1]);
 		WhenInsert(i + 1, ctrl);
-		Activate(&ctrl);
+		ActivatePane(&ctrl);
 	}
 	
 	return *this;
@@ -154,7 +154,7 @@ bool Stacker::RemoveFromSplitter(int i)
 			if(int j = Find(*s->GetFirstChild()); j >= 0) {
 				activectrl = list[j];
 				Ctrl::Add(activectrl->SizePos());
-				Activate(activectrl);
+				ActivatePane(activectrl);
 			}
 		}
 		RemoveSplitter(*s);
@@ -321,7 +321,7 @@ void Stacker::ResetSplitterPos()
 void Stacker::Goto(int i)
 {
 	if(i >= 0 && i < GetCount()) {
-		Activate(list[i]);
+		ActivatePane(list[i]);
 		WhenAction();
 	}
 }
@@ -365,7 +365,7 @@ void Stacker::Next()
 		GoBegin();
 }
 
-void Stacker::Activate(Ctrl *ctrl)
+void Stacker::ActivatePane(Ctrl *ctrl)
 {
 	if(!ctrl || animating)
 		return;

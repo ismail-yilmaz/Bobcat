@@ -21,21 +21,16 @@ Terminal::Terminal(Bobcat& ctx_)
 , smartwordsel(false)
 , shellintegration(false)
 , warnonrootaccess(false)
+, exitmode(ExitMode::Exit)
+, pathmode(PathMode::Native)
 , starttime(Null)
 , finder(*this)
 , linkifier(*this)
 , quicktext(*this)
 , websearch(*this)
+, highlight { Yellow(), SColorHighlightText, LtRed(), SColorHighlight }
 , titlebar(*this)
 , progressbar(*this)
-, exitmode(ExitMode::Exit)
-, pathmode(PathMode::Native)
-, highlight {
-	Yellow(),
-	SColorHighlightText,
-	LtRed(),
-	SColorHighlight
-	}
 {
 	SetDeviceId("Bobcat " + GetVersion());
 	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();

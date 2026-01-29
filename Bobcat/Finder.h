@@ -142,8 +142,8 @@ private:
         String     delimiter;
     } harvester;
 
-    int           index;
     Terminal&     term;
+    int           index;
     Value         data;
     bool          showall:1;
     bool          co:1;

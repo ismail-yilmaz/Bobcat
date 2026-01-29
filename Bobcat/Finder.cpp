@@ -197,7 +197,7 @@ const SortedIndex<ItemInfo>& Finder::GetItems() const
 
 const ItemInfo& Finder::Get(int i)
 {
-	ASSERT(i > 0 && i <= foundtext.GetCount());
+	ASSERT(i >= 0 && i < foundtext.GetCount());
 	return foundtext[i];
 }
 
@@ -252,11 +252,11 @@ void Finder::Config::Jsonize(JsonIO& jio)
 
 FinderBar::FinderBar(Terminal& t)
 : Finder(t)
+, harvester(*this)
 , term(t)
 , index(0)
 , showall(false)
 , co(false)
-, harvester(*this)
 {
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
@@ -292,7 +292,7 @@ void FinderBar::SetConfig(const Profile& p)
 {
 	SetSearchMode(p.finder.searchmode);
 	SetLimit(p.finder.searchlimit);
-	showall = ~p.finder.showall;
+	showall = p.finder.showall;
 	co = p.finder.parallelize;
 	harvester.Format(p.finder.saveformat);
 	harvester.Delimiter(p.finder.delimiter);

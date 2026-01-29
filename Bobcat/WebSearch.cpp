@@ -160,7 +160,6 @@ void WebSearchSetup::ContextMenu(Bar& bar)
 	bool d = c && list.IsCursor();
 	bool q = list.GetCursor() >= 0 && list.GetCursor() < list.GetCount() - 1;
 
-	bool b = list.IsCursor();
 	bar.Add(c, t_("Add provider"), Images::Add(), [this]() { Add(); }).Key(K_INSERT);
 	bar.Add(d, t_("Edit provider"), Images::Edit(), [this]() { Edit(); }).Key(K_SPACE);
 	bar.Add(d, t_("Remove provider"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);

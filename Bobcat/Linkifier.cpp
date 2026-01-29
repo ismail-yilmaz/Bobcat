@@ -206,7 +206,6 @@ void LinkifierSetup::ContextMenu(Bar& bar)
 	bool d = c && list.IsCursor();
 	bool q = list.GetCursor() >= 0 && list.GetCursor() < list.GetCount() - 1;
 
-	bool b = list.IsCursor();
 	bar.Add(c, t_("Add pattern"), Images::Add(), [this]() { list.DoAppend(); }).Key(K_INSERT);
 	bar.Add(d, t_("Edit pattern"), Images::Edit(), [this]() { list.DoEdit(); }).Key(K_SPACE);
 	bar.Add(d, t_("Remove pattern"), Images::Delete(), [this]() { list.DoRemove(); }).Key(K_DELETE);
