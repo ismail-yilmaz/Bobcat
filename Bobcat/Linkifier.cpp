@@ -164,12 +164,12 @@ void Linkifier::OnHighlight(HighlightInfo& hl)
 	LTIMING("Linkifier::OnHighlight");
 
 	term.DoHighlight(links, hl, [this](HighlightInfo& hl) {
-		for(auto q : hl.highlighted)
+		for(auto q : hl.highlighted) {
 			if(!q->IsHypertext()) {
-			bool active = pos >= hl.posindex && pos < hl.posindex + hl.iteminfo->length;
+				bool active = pos >= hl.posindex && pos < hl.posindex + hl.iteminfo->length;
 				q->Hyperlink().data = active ? 0 : (dword) -1;
-
 			}
+		}
 	});
 }
 

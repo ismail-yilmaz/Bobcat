@@ -1,5 +1,4 @@
 name: Linux
-
 on:
   push:
     branches: [ main ]
@@ -8,14 +7,11 @@ on:
       - '*.*.*'
   pull_request:
     branches: [ main ]
-
 permissions:
   contents: write
-
 jobs:
   build-and-package:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout Bobcat repository
       uses: actions/checkout@v4
@@ -32,7 +28,8 @@ jobs:
           libx11-dev libxinerama-dev libxrender-dev libxft-dev \
           libxdmcp-dev libfontconfig1-dev libxcb1-dev libxext-dev \
           libgdk-pixbuf2.0-dev zlib1g-dev libharfbuzz-dev libpango1.0-dev \
-          libatk1.0-dev libcairo2-dev libglib2.0-dev libpng-dev
+          libatk1.0-dev libcairo2-dev libglib2.0-dev libpng-dev \
+          libfuse2 file
  
     - name: Checkout U++ repository
       uses: actions/checkout@v4
@@ -50,12 +47,14 @@ jobs:
     - name: Build Bobcat
       working-directory: Bobcat
       run: ../upp-source/umk ./,../upp-source/uppsrc Bobcat CLANG.bm -brh +GUI,SHARED bobcat
-      
+
     - name: Get the version
       if: startsWith(github.ref, 'refs/tags/')
       run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       shell: bash
-        
+
+    # Debian packaging
+
     - name: Setup Debian packaging tree
       if: startsWith(github.ref, 'refs/tags/')
       run: |
@@ -83,7 +82,7 @@ jobs:
         Description: A powerful yet user-friendly, cross platform terminal emulator
         EOF
         dpkg-deb --build bobcat-deb bobcat-terminal_${{ env.VERSION }}_amd64.deb
-        
+
     - name: Upload .deb package as artifact
       if: startsWith(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@v4
@@ -91,7 +90,95 @@ jobs:
         name: bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64
         path: bobcat-terminal_${{ env.VERSION }}_amd64.deb
 
-    - name: Create GitHub release & upload asset
+    # AppImage packaging
+
+    - name: Download linuxdeploy and appimagetool
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage \
+          -O /usr/local/bin/linuxdeploy
+        wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage \
+          -O /usr/local/bin/appimagetool
+        chmod +x /usr/local/bin/linuxdeploy /usr/local/bin/appimagetool
+
+    - name: Setup AppDir structure
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        mkdir -p AppDir/usr/bin
+        mkdir -p AppDir/usr/share/applications
+        mkdir -p AppDir/usr/share/icons/hicolor/128x128/apps
+        mkdir -p AppDir/usr/share/licenses/bobcat-terminal
+        install -m 755 Bobcat/bobcat AppDir/usr/bin/bobcat
+        cp Bobcat/Bobcat/data/bobcat.desktop AppDir/usr/share/applications/bobcat.desktop
+        cp Bobcat/Bobcat/data/bobcat128x128.png AppDir/usr/share/icons/hicolor/128x128/apps/bobcat.png
+        cp Bobcat/Bobcat/Copying AppDir/usr/share/licenses/bobcat-terminal/LICENSE
+        cp Bobcat/Bobcat/data/bobcat128x128.png AppDir/bobcat.png
+        cp Bobcat/Bobcat/data/bobcat.desktop AppDir/bobcat.desktop
+
+    - name: Patch .desktop file for AppImage
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        sed -i 's|^Exec=.*|Exec=bobcat|' AppDir/bobcat.desktop
+        sed -i 's|^Icon=.*|Icon=bobcat|' AppDir/bobcat.desktop
+        cp AppDir/bobcat.desktop AppDir/usr/share/applications/bobcat.desktop
+
+    - name: Bundle shared libraries with linuxdeploy
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        linuxdeploy \
+          --appdir AppDir \
+          --executable AppDir/usr/bin/bobcat \
+          --desktop-file AppDir/usr/share/applications/bobcat.desktop \
+          --icon-file AppDir/usr/share/icons/hicolor/128x128/apps/bobcat.png
+      env:
+        LDAI_OUTPUT: ""
+
+    - name: Create AppRun entrypoint
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        cat <<'EOF' > AppDir/AppRun
+        #!/bin/sh
+        SELF=$(readlink -f "$0")
+        HERE="${SELF%/*}"
+        export PATH="${HERE}/usr/bin:${PATH}"
+        export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
+        export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+        export GDK_PIXBUF_MODULEDIR="${HERE}/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders"
+        export GDK_PIXBUF_MODULE_FILE="${HERE}/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+        export PANGO_SYSCONFDIR="${HERE}/usr/etc"
+        export PANGO_LIBDIR="${HERE}/usr/lib"
+        exec bobcat "$@"
+        EOF
+        chmod +x AppDir/AppRun
+
+    - name: Bundle GDK pixbuf loaders
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        LOADERS_DIR=$(pkg-config --variable=gdk_pixbuf_moduledir gdk-pixbuf-2.0 2>/dev/null \
+          || echo /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders)
+        CACHE_FILE=$(pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-2.0 2>/dev/null \
+          || echo /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache)
+        TARGET_DIR="AppDir/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders"
+        mkdir -p "${TARGET_DIR}"
+        cp -a "${LOADERS_DIR}/." "${TARGET_DIR}/"
+        sed "s|${LOADERS_DIR}|/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders|g" \
+          "${CACHE_FILE}" > AppDir/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+
+    - name: Build AppImage
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        ARCH=x86_64 appimagetool AppDir bobcat-terminal_${{ env.VERSION }}_x86_64.AppImage
+
+    - name: Upload AppImage as artifact
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v4
+      with:
+        name: bobcat-terminal_${{ env.VERSION }}_x86_64
+        path: bobcat-terminal_${{ env.VERSION }}_x86_64.AppImage
+
+    # GitHub Release
+
+    - name: Create GitHub release & upload assets
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
@@ -100,6 +187,7 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          bobcat-terminal_${{ env.VERSION }}_ubuntu_amd64.deb
+          bobcat-terminal_${{ env.VERSION }}_amd64.deb
+          bobcat-terminal_${{ env.VERSION }}_x86_64.AppImage
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

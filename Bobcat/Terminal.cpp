@@ -33,7 +33,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , progressbar(*this)
 {
 	SetDeviceId("Bobcat " + GetVersion());
-	InlineImages().Hyperlinks().WindowOps().DynamicColors().WantFocus();
+	WantFocus();
 
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
 	WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
@@ -744,7 +744,7 @@ void Terminal::OnNotification(const String& text)
 bool Terminal::OnSelectorScan(dword key)
 {
 	// Allow text to be searched via finder and on web.
-	return MenuBar::Scan([this, key](Bar& menu) {
+	return MenuBar::Scan([this](Bar& menu) {
 			menu.AddKey(AK_FINDER, [this] { OpenFinder(); });
 			websearch.ContextMenu(menu);
 	}, key);
@@ -840,7 +840,7 @@ void Terminal::OnHighlight(VectorMap<int, VTLine>& line)
 	finder.OnHighlight(hl);
 }
 
-void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, Upp::HighlightInfo& hl, const Event<HighlightInfo&>& cb)
+void Terminal::DoHighlight(const SortedIndex<ItemInfo>& items, HighlightInfo& hl, const Event<HighlightInfo&>& cb)
 {
 	// Unified highlighting.
 
