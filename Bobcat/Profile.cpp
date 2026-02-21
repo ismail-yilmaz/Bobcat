@@ -366,7 +366,7 @@ Profiles::Profiles(Bobcat& ctx)
 	list.WhenLeftDouble = [this] { if(GetCtrl()) SetDefault(); };
 	list.WhenBar  = [this](Bar& bar) { ContextMenu(bar); };
 	list.WhenDrag = [this] { Drag(); };
-	list.WhenDropInsert = [=](int line, PasteClip& d) { DnDInsert(line, d); };
+	list.WhenDropInsert = [this](int line, PasteClip& d) { DnDInsert(line, d); };
 	list.SetFrame(0, toolbar);
 	Sync();
 }

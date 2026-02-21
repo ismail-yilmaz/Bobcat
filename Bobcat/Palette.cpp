@@ -85,7 +85,7 @@ Palettes::Palettes()
 	list.WhenSel        = [this]() { Sync(); Action(); };
 	list.WhenBar        = [this](Bar& bar) { ContextMenu(bar); };
 	list.WhenDrag = [this] { Drag(); };
-	list.WhenDropInsert = [=](int line, PasteClip& d) { DnDInsert(line, d); };
+	list.WhenDropInsert = [this](int line, PasteClip& d) { DnDInsert(line, d); };
 	Load();
 	Sync();
 }

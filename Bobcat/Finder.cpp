@@ -275,11 +275,11 @@ FinderBar::FinderBar(Terminal& t)
 	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
 	fsave.Image(Images::Reap());
-	fsave << [=] { SaveToFile(); };
+	fsave << [this] { SaveToFile(); };
 	csave.Image(Images::Paste());
-	csave << [=] { SaveToClipboard(); };
+	csave << [this] { SaveToClipboard(); };
 	menu.Image(Images::Find());
-	menu << [=] { MenuBar::Execute(THISFN(StdBar)); };
+	menu << [this] { MenuBar::Execute(THISFN(StdBar)); };
 	display.SetDisplay(StdRightDisplay());
 	Sync();
 }

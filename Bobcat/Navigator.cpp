@@ -211,7 +211,7 @@ int Navigator::SyncItemLayout()
 	constexpr const int mincsz = 200;
 	constexpr const int maxcol = 4;
 
-	auto v = FilterRange(items, [=](const Item& item) { return FilterItem(item); });
+	auto v = FilterRange(items, [this](const Item& item) { return FilterItem(item); });
 	int cnt = v.GetCount();
 	if(!cnt)
 		return 0;
