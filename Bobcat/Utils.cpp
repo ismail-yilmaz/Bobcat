@@ -293,7 +293,7 @@ struct EditCodePoint : EditString {
 		AddFrame(preview.Width(sz.cx * 3));
 		MaxChars(5).SetFont(f).SetFilter([](int c) { return IsXDigit(c) ? c : 0; });
 		WhenEnter = term.ctx.window.Breaker();
-		WhenAction = [=, &preview, &f] {
+		WhenAction = [&] {
 			AttrText txt;
 			txt.Ink(ink).Paper(paper).SetFont(f);
 			int n = ScanInt(GetText(), nullptr, 16);

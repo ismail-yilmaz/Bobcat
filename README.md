@@ -156,6 +156,10 @@ Split screen support (linux, zellij/neovim, btop)
 
 ![bobcat-splitter](resources/bobcat-splitter-linux.png)
 
+Rich-text annotations (linux)
+
+![bobcat-annotations](resources/bobcat-rich-annotations-linux.png)
+
 Multiple terminal profile support (linux, btop)
 
 ![bobcat-profiles](resources/bobcat-profiles-linux.png)
