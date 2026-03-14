@@ -35,6 +35,8 @@ public:
 	int         GetCount() const;
 	bool        HasFound() const;
 
+	void		Clear();
+	
 	void        Cancel();
 	bool        IsCanceled() const;
 
@@ -114,7 +116,6 @@ public:
 
     void        Search();
     void        Search(const WString& txt);
-    void        Updated() override;
 
     void        SaveToFile();
     void        SaveToClipboard();

@@ -79,8 +79,10 @@ bool Finder::IsRegex() const
 
 bool Finder::Find(const WString& text, bool co)
 {
-	foundtext.Clear();
-	cancel = false;
+	if(text.IsEmpty())
+		return false;
+	
+	Clear();
 	if(co) {
 		term.CoFind(~text, false, THISFN(OnSearch));
 	}
@@ -201,7 +203,6 @@ const ItemInfo& Finder::Get(int i)
 	return foundtext[i];
 }
 
-
 const ItemInfo& Finder::operator[](int i)
 {
 	return Get(i);
@@ -215,6 +216,13 @@ int Finder::GetCount() const
 bool Finder::HasFound() const
 {
 	return foundtext.GetCount() > 0;
+}
+
+void Finder::Clear()
+{
+	Mutex::Lock __(sFinderLock);
+	foundtext.Clear();
+	cancel = false;
 }
 
 void Finder::Cancel()
@@ -330,10 +338,12 @@ void FinderBar::Show()
 		term.ShowSizeHint(b);
 	}
 	text.SetFocus();
+	text.WhenAction();
 }
 
 void FinderBar::Hide()
 {
+	Clear();
 	if(IsChild()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
@@ -571,13 +581,7 @@ void FinderBar::Search()
 void FinderBar::Search(const WString& txt)
 {
 	text.SetText(txt);
-	Update();
-}
-
-void FinderBar::Updated()
-{
-	if(IsChild())
-		Search();
+	Search();
 }
 
 void FinderBar::SaveToFile()
