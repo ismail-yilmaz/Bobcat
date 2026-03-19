@@ -79,10 +79,10 @@ bool Finder::IsRegex() const
 
 bool Finder::Find(const WString& text, bool co)
 {
+	Clear();
 	if(text.IsEmpty())
 		return false;
 	
-	Clear();
 	if(co) {
 		term.CoFind(~text, false, THISFN(OnSearch));
 	}
