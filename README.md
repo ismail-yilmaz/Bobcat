@@ -31,7 +31,7 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 ### Core Features  
 
 - **Cross-Platform Compatibility:** Runs seamlessly on **Linux, Windows, MacOS, and BSD**, supporting multiple terminal backends with **high VT (DEC/ANSI) and xterm compatibility**.  
-- **Inline Image Support:** Displays images directly in the terminal with both **Sixel** and modern formats (**PNG, JPG, BMP, TIFF**), supporting multiple protocols such as **iTerm2** and **Jexer**.  
+- **Inline Image Support:** Displays images directly in the terminal with both **Sixel** and modern formats (**PNG, JPG, BMP, TIFF**), supporting multiple protocols such as **iTerm2**, **Jexer** and **Kitty**.  
 - **Advanced Clipboard & Hyperlinks:** Clickable links, **OSC-based clipboard integration**, and extended **(rich-)text annotations** for a modern workflow.  
 - **Smart Shell Integration:** Tracks working directories and allows opening them in the system's default file manager via shortcuts or menus.  
 - **Versatile Text Selection:** **Selector mode** with keyboard-driven selection, **customizable regex-based patterns**, and support for rectangular, word, and line selections.  
