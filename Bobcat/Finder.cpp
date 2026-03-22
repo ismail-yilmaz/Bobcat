@@ -407,19 +407,19 @@ void FinderBar::SetSearchMode(const String& mode)
 void FinderBar::CheckCase()
 {
 	CaseSensitive();
-	Update();
+	Sync();
 }
 
 void FinderBar::IgnoreCase()
 {
 	CaseInsensitive();
-	Update();
+	Sync();
 }
 
 void FinderBar::CheckPattern()
 {
 	Regex();
-	Update();
+	Sync();
 }
 
 void FinderBar::ShowAll(bool b)
