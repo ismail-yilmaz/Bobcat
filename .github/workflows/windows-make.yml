@@ -92,13 +92,39 @@ jobs:
 
         $content | Out-File -FilePath CLANG.bm -Encoding utf8
   
+    - name: Check umk.exe dependencies
+      run: |
+        Write-Host "Checking umk.exe and its dependencies..."
+        Write-Host "umk.exe location: upp-source\upp\umk.exe"
+        
+        if (Test-Path "upp-source\upp\umk.exe") {
+          Write-Host "umk.exe found"
+          Get-Item "upp-source\upp\umk.exe" | Format-List
+        } else {
+          Write-Error "umk.exe not found!"
+          exit 1
+        }
+        
+        Write-Host "`nListing files in upp-source\upp\bin:"
+        Get-ChildItem "upp-source\upp\bin" -Recurse -File | Select-Object FullName
+        
+        Write-Host "`nChecking for clang binaries:"
+        Get-ChildItem "upp-source\upp\bin\clang" -Recurse -File -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object FullName
+        Get-ChildItem "upp-source\upp\bin\clang" -Recurse -File -Filter "*.dll" -ErrorAction SilentlyContinue | Select-Object FullName
+  
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
         New-Item -ItemType Directory -Force -Path out
         
+        # Set up PATH to include necessary DLLs
+        $uppRoot = Resolve-Path "..\upp-source\upp"
+        $env:PATH = "$uppRoot\bin\clang\bin;$uppRoot\bin\clang\x86_64-w64-mingw32\bin;$env:PATH"
+        
         Write-Host "Building Bobcat..."
         Write-Host "Current directory: $PWD"
+        Write-Host "UPP Root: $uppRoot"
+        Write-Host "PATH: $env:PATH"
         
         $output = & ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat ..\upp-source\upp\CLANG.bm --hub-dir ..\upp-source\upp\UppHub -brh +GUI,WIN64,WIN10 out\Bobcat.exe 2>&1
         $exitCode = $LASTEXITCODE
@@ -124,6 +150,10 @@ jobs:
     - name: Build PtyAgent
       working-directory: Bobcat
       run: |
+        # Set up PATH to include necessary DLLs
+        $uppRoot = Resolve-Path "..\upp-source\upp"
+        $env:PATH = "$uppRoot\bin\clang\bin;$uppRoot\bin\clang\x86_64-w64-mingw32\bin;$env:PATH"
+        
         Write-Host "Building PtyAgent..."
         
         $output = & ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent ..\upp-source\upp\CLANG.bm --hub-dir ..\upp-source\upp\UppHub -brh +WIN64 out\PtyAgent.exe 2>&1
