@@ -330,6 +330,7 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
         workingdir  = p.address;
         shellintegration = p.shellintegration;
         warnonrootaccess = p.warnonrootaccess;
+        palettename = p.palette;
         ring = p.bell;
         flash = p.flashscreen;
         bell = ring || flash;
@@ -1046,6 +1047,23 @@ void Terminal::EditMenu(Bar& menu)
 	websearch.ContextMenu(menu);
 	menu.AddKey(AK_SELECTOR_ENTER,      [this] { BeginSelectorMode(); });
 	menu.AddKey(AK_QUICKTEXT,           [this] { quicktext.Popup(); });
+}
+
+void Terminal::PaletteMenu(Bar& menu)
+{
+	Vector<String> pnames = GetPaletteNames();
+	if(pnames.GetCount()) {
+		menu.Sub(t_("Color Profiles..."), Images::ColorSwatch(), [this, pnames = pick(pnames)](Bar& menu) {
+			for(const String& name : pnames)
+				menu.Add(name, [this, name] {
+					Palette p = LoadPalette(name);
+					palettename = p.name;
+					SetPalette(p);
+				}).Check(name == palettename);
+		});
+		menu.Separator();
+	}
+
 }
 
 void Terminal::ViewMenu(Bar& menu)

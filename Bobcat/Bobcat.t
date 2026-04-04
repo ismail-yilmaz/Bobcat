@@ -401,6 +401,9 @@ trTR("Not")
 T_("Progress failed.&Error code: %d")
 trTR("\304\260lerleme ba\305\237ar\304\261s\304\261z.&Hata kodu: %d")
 
+T_("Color Profiles...")
+trTR("Renk Profilleri...")
+
 T_("Terminal list")
 trTR("Terminal listesi")
 
@@ -1411,7 +1414,6 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
-
 
 
 // PACKAGE 'Terminal' FILE 'Terminal.key'

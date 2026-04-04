@@ -10,7 +10,7 @@ struct Terminal : TerminalCtrl {
     Terminal(Bobcat& ctx);
     ~Terminal();
 
-	Value       GetData() const override;
+    Value       GetData() const override;
 
     void        PostParse() override;
 
@@ -77,7 +77,7 @@ struct Terminal : TerminalCtrl {
     void        MakeTitle(const String& txt);
     String      GetTitle() const;
 
-	void		SetAlias();
+    void        SetAlias();
 
     void        ShowTitleBar(bool b = true);
     void        HideTitleBar();
@@ -142,6 +142,7 @@ struct Terminal : TerminalCtrl {
     bool        GetWordSelectionByPattern(const Point& pt, Point& pl, Point& ph) const;
     
     void        EmulationMenu(Bar& menu);
+    void        PaletteMenu(Bar& menu);
     void        FileMenu(Bar& menu);
     void        EditMenu(Bar& menu);
     void        ViewMenu(Bar& menu);
@@ -184,6 +185,7 @@ struct Terminal : TerminalCtrl {
     bool         findselectedtext:1;
     bool         warnonrootaccess:1;
     String       profilename;
+    String       palettename;
     String       title;
     String       alias;
     String       workingdir;

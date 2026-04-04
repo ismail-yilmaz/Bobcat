@@ -526,6 +526,8 @@ void Bobcat::ViewMenu(Bar& menu)
 {
 	bool enable = stack.GetCount() > 1;
 	
+	Ptr<Terminal> t = GetActiveTerminal();
+	if(t) t->PaletteMenu(menu);
 	menu.Add(AK_FRAMELESS,     [this] { settings.frameless ^= 1; Sync(); }).Check(settings.frameless);
 	menu.Add(AK_MENUBAR,       [this] { settings.showmenu  ^= 1; Sync(); }).Check(settings.showmenu);
 	menu.Add(AK_TITLEBAR,      [this] { settings.showtitle ^= 1; Sync(); }).Check(settings.showtitle);
@@ -543,9 +545,7 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.AddKey(AK_SPLITTER_EXPANDBOTTOMRIGHT, [this] { stack.ExpandBottomRightPane(); });
 	menu.AddKey(AK_SPLITTER_RESETPOS,          [this] { stack.ResetSplitterPos(); });
 	menu.AddKey(AK_SPLITTER_SWAPPANES,         [this] { stack.SwapPanes(); });
-
-	if(Terminal *t = GetActiveTerminal(); t)
-		t->ViewMenu(menu);
+	if(t) t->ViewMenu(menu);
 }
 
 void Bobcat::EmulationMenu(Bar& menu)
