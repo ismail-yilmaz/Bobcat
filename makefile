@@ -21,7 +21,7 @@ build-headless:
 download:
 	mkdir -p 3p/download
 	wget https://github.com/ultimatepp/ultimatepp/releases/download/v2026.1/uppsrc-18468.tar.gz -P 3p/download
-	wget https://github.com/ultimatepp/ultimatepp/releases/download/v2026.1/umk-posix-17810.tar.gz -P 3p/download
+	wget https://github.com/ultimatepp/ultimatepp/releases/download/v2025.1.1/umk-posix-17810.tar.gz -P 3p/download
 	tar -xf 3p/download/uppsrc-18468.tar.gz -C 3p
 	tar -xf 3p/download/umk-posix-17810.tar.gz -C 3p
 	make -C 3p/umk
