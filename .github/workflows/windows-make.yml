@@ -96,20 +96,62 @@ jobs:
       working-directory: Bobcat
       run: |
         mkdir out
-        ..\upp-source\upp\umk.exe .,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 --out-dir out Bobcat.exe
-        if (-not (Test-Path "out\Bobcat.exe")) {
-          Write-Error "Build failed - Bobcat.exe not found in out directory"
+        Write-Host "Running umk.exe for Bobcat..."
+        Write-Host "Current directory: $PWD"
+        Write-Host "Checking if umk.exe exists..."
+        if (Test-Path "..\upp-source\upp\umk.exe") {
+          Write-Host "umk.exe found"
+        } else {
+          Write-Error "umk.exe not found!"
           exit 1
         }
+        
+        $output = & ..\upp-source\upp\umk.exe .,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 --out-dir out Bobcat.exe 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        Write-Host "umk.exe output:"
+        Write-Host $output
+        Write-Host "Exit code: $exitCode"
+        
+        if ($exitCode -ne 0) {
+          Write-Error "umk.exe failed with exit code $exitCode"
+          exit $exitCode
+        }
+        
+        if (-not (Test-Path "out\Bobcat.exe")) {
+          Write-Error "Build failed - Bobcat.exe not found in out directory"
+          Write-Host "Contents of out directory:"
+          Get-ChildItem out -Recurse
+          exit 1
+        }
+        
+        Write-Host "Build successful - Bobcat.exe created"
 
     - name: Build PtyAgent
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 --out-dir out PtyAgent.exe
+        Write-Host "Running umk.exe for PtyAgent..."
+        
+        $output = & ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 --out-dir out PtyAgent.exe 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        Write-Host "umk.exe output:"
+        Write-Host $output
+        Write-Host "Exit code: $exitCode"
+        
+        if ($exitCode -ne 0) {
+          Write-Error "umk.exe failed with exit code $exitCode"
+          exit $exitCode
+        }
+        
         if (-not (Test-Path "out\PtyAgent.exe")) {
           Write-Error "Build failed - PtyAgent.exe not found in out directory"
+          Write-Host "Contents of out directory:"
+          Get-ChildItem out -Recurse
           exit 1
         }
+        
+        Write-Host "Build successful - PtyAgent.exe created"
 
     - name: Download Bobcat assets
       uses: actions/checkout@v3
