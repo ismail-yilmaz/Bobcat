@@ -95,23 +95,21 @@ jobs:
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe .,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 bobcat.exe
-        if (-not (Test-Path "bobcat.exe")) {
-          Write-Error "Build failed - bobcat.exe not found"
+        mkdir out
+        ..\upp-source\upp\umk.exe .,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 --out-dir out Bobcat.exe
+        if (-not (Test-Path "out\Bobcat.exe")) {
+          Write-Error "Build failed - Bobcat.exe not found in out directory"
           exit 1
         }
-        mkdir out
-        copy bobcat.exe out\Bobcat.exe
 
     - name: Build PtyAgent
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 ptyagent.exe
-        if (-not (Test-Path "ptyagent.exe")) {
-          Write-Error "Build failed - ptyagent.exe not found"
+        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 --out-dir out PtyAgent.exe
+        if (-not (Test-Path "out\PtyAgent.exe")) {
+          Write-Error "Build failed - PtyAgent.exe not found in out directory"
           exit 1
         }
-        cp ptyagent.exe out\PtyAgent.exe
 
     - name: Download Bobcat assets
       uses: actions/checkout@v3
