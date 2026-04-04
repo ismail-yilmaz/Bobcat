@@ -93,21 +93,14 @@ jobs:
         $content | Out-File -FilePath CLANG.bm -Encoding utf8
   
     - name: Build Bobcat
+      working-directory: Bobcat
       run: |
-        $bobcatDir = "D:\a\Bobcat\Bobcat\Bobcat"
-        $uppDir = "D:\a\Bobcat\Bobcat\upp-source\upp"
-        $outDir = "$bobcatDir\out"
-        
-        New-Item -ItemType Directory -Force -Path $outDir
+        New-Item -ItemType Directory -Force -Path out
         
         Write-Host "Building Bobcat..."
-        Write-Host "Bobcat directory: $bobcatDir"
-        Write-Host "UPP directory: $uppDir"
-        Write-Host "Output directory: $outDir"
+        Write-Host "Current directory: $PWD"
         
-        Set-Location $uppDir
-        
-        $output = & .\umk.exe "$bobcatDir,$uppDir\uppsrc" Bobcat "$uppDir\CLANG.bm" -arb +GUI,WIN64,WIN10 "$outDir\Bobcat.exe" 2>&1
+        $output = & ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat ..\upp-source\upp\CLANG.bm -br +GUI,WIN64,WIN10 out\Bobcat.exe 2>&1
         $exitCode = $LASTEXITCODE
         
         Write-Host "umk.exe output:"
@@ -119,26 +112,21 @@ jobs:
           exit $exitCode
         }
         
-        if (-not (Test-Path "$outDir\Bobcat.exe")) {
+        if (-not (Test-Path "out\Bobcat.exe")) {
           Write-Error "Build failed - Bobcat.exe not found"
           Write-Host "Contents of output directory:"
-          Get-ChildItem $outDir -Recurse
+          Get-ChildItem out -Recurse -ErrorAction SilentlyContinue
           exit 1
         }
         
         Write-Host "Build successful - Bobcat.exe created"
 
     - name: Build PtyAgent
+      working-directory: Bobcat
       run: |
-        $bobcatDir = "D:\a\Bobcat\Bobcat\Bobcat"
-        $uppDir = "D:\a\Bobcat\Bobcat\upp-source\upp"
-        $outDir = "$bobcatDir\out"
-        
         Write-Host "Building PtyAgent..."
         
-        Set-Location $uppDir
-        
-        $output = & .\umk.exe "$uppDir\UppHub\Terminal,$uppDir\uppsrc" PtyAgent "$uppDir\CLANG.bm" -arb +WIN64 "$outDir\PtyAgent.exe" 2>&1
+        $output = & ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent ..\upp-source\upp\CLANG.bm -br +WIN64 out\PtyAgent.exe 2>&1
         $exitCode = $LASTEXITCODE
         
         Write-Host "umk.exe output:"
@@ -150,10 +138,10 @@ jobs:
           exit $exitCode
         }
         
-        if (-not (Test-Path "$outDir\PtyAgent.exe")) {
+        if (-not (Test-Path "out\PtyAgent.exe")) {
           Write-Error "Build failed - PtyAgent.exe not found"
           Write-Host "Contents of output directory:"
-          Get-ChildItem $outDir -Recurse
+          Get-ChildItem out -Recurse -ErrorAction SilentlyContinue
           exit 1
         }
         
