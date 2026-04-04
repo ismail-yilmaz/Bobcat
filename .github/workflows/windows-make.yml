@@ -100,7 +100,7 @@ jobs:
         Write-Host "Building Bobcat..."
         Write-Host "Current directory: $PWD"
         
-        $output = & ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat ..\upp-source\upp\CLANG.bm -br +GUI,WIN64,WIN10 out\Bobcat.exe 2>&1
+        $output = & ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat ..\upp-source\upp\CLANG.bm --hub-dir ..\upp-source\upp\UppHub -brh +GUI,WIN64,WIN10 out\Bobcat.exe 2>&1
         $exitCode = $LASTEXITCODE
         
         Write-Host "umk.exe output:"
@@ -126,7 +126,7 @@ jobs:
       run: |
         Write-Host "Building PtyAgent..."
         
-        $output = & ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent ..\upp-source\upp\CLANG.bm -br +WIN64 out\PtyAgent.exe 2>&1
+        $output = & ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent ..\upp-source\upp\CLANG.bm --hub-dir ..\upp-source\upp\UppHub -brh +WIN64 out\PtyAgent.exe 2>&1
         $exitCode = $LASTEXITCODE
         
         Write-Host "umk.exe output:"
