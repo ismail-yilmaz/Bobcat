@@ -2,12 +2,12 @@ name: Windows
 
 on:
   push:
-    branches: [ main ]
+    branches: [ win ]
     tags:
       - 'v*'
       - '*.*.*'
   pull_request:
-    branches: [ main ]
+    branches: [ win ]
 
 permissions:
   contents: write
@@ -27,83 +27,93 @@ jobs:
         path: Bobcat
         fetch-depth: 0
 
-    - name: Download U++ Windows release
+    - name: Download U++ uppsrc
       run: |
-        Invoke-WebRequest -Uri "https://github.com/ultimatepp/ultimatepp/releases/download/v2025.1.1/upp-win-17810.7z" -OutFile "upp-win.7z"
+        Invoke-WebRequest -Uri "https://github.com/ultimatepp/ultimatepp/releases/download/v2026.1/uppsrc-18468.tar.gz" -OutFile "uppsrc.tar.gz"
 
-    - name: Extract U++ release
+    - name: Download U++ umk for Windows
       run: |
-        7z x upp-win.7z -oupp-source
+        Invoke-WebRequest -Uri "https://github.com/ultimatepp/ultimatepp/releases/download/v2026.1/umk-win-18468.7z" -OutFile "umk-win.7z"
 
-    # Since there is a problem with UppHub access of umk, we'll checkout the required components manually.
+    - name: Extract uppsrc
+      run: |
+        mkdir -p 3p
+        tar -xf uppsrc.tar.gz -C 3p
+        
+    - name: Extract umk
+      run: |
+        7z x umk-win.7z -o3p
     
-    - name: Checkout TerminalCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/Terminal
-        path: upp-source/upp/UppHub/Terminal
-
-    - name: Checkout MessageCtrl repository
-      uses: actions/checkout@v3
-      with:
-        repository: ismail-yilmaz/MessageCtrl
-        path: upp-source/upp/UppHub/MessageCtrl
-
-    - name: Checkout Turtle repository
-      uses: actions/checkout@v3
-      with:
-        repository: mirek-fidler/Turtle
-        path: upp-source/upp/UppHub/Turtle
-    
-    # On Windows, no build file is generated. We are generating it dynamically with a basic configuration
-
-    - name: Create a CLANG.bm file
-      working-directory: upp-source/upp
-      env: 
-        UPP_ROOT: "..\\upp-source\\upp\\"
+    - name: Check umk.exe dependencies
       run: |
-        $content = @'
-        BUILDER = "CLANG";
-        COMPILER = "";
-        COMMON_OPTIONS = "";
-        COMMON_CPP_OPTIONS = "--std=c++17";
-        COMMON_C_OPTIONS = "";
-        COMMON_LINK = "";
-        COMMON_FLAGS = "";
-        DEBUG_INFO = "2";
-        DEBUG_BLITZ = "1";
-        DEBUG_LINKMODE = "0";
-        DEBUG_OPTIONS = "";
-        DEBUG_FLAGS = "";
-        DEBUG_LINK = "-Wl,--stack,20000000";
-        RELEASE_BLITZ = "1";
-        RELEASE_LINKMODE = "0";
-        RELEASE_OPTIONS = "-O3 ";
-        RELEASE_FLAGS = "";
-        RELEASE_LINK = "-Wl,--stack,20000000";
-        DEBUGGER = "gdb";
-        ALLOW_PRECOMPILED_HEADERS = "1";
-        DISABLE_BLITZ = "0";
-        PATH = "C${{ env.UPP_ROOT }}/bin/clang/bin;C${{ env.UPP_ROOT }}/bin/clang/x86_64-w64-mingw32/bin;C${{ env.UPP_ROOT }}/bin/SDL2/lib/x64;C${{ env.UPP_ROOT }}/bin/pgsql/x64/bin;C${{ env.UPP_ROOT }}/bin/mysql/lib64";
-        INCLUDE = "C${{ env.UPP_ROOT }}/bin/SDL2/include;C${{ env.UPP_ROOT }}/bin/pgsql/x64/include;C${{ env.UPP_ROOT }}/bin/mysql/include;C${{ env.UPP_ROOT }}/bin/llvm";
-        LIB = "C${{ env.UPP_ROOT }}/bin/SDL2/lib/x64;C${{ env.UPP_ROOT }}/bin/pgsql/x64/lib;C${{ env.UPP_ROOT }}/bin/mysql/lib64;C${{ env.UPP_ROOT }}/bin/llvm";
-        LINKMODE_LOCK = "0";
-        '@
-
-        $content | Out-File -FilePath CLANG.bm -Encoding utf8
+        Write-Host "Checking umk.exe and its dependencies..."
+        Write-Host "umk.exe location: 3p\umk\umk.exe"
+        
+        if (Test-Path "3p\umk\umk.exe") {
+          Write-Host "umk.exe found"
+          Get-Item "3p\umk\umk.exe" | Format-List
+        } else {
+          Write-Error "umk.exe not found!"
+          exit 1
+        }
+        
+        Write-Host "`nListing files in 3p\umk:"
+        Get-ChildItem "3p\umk" -Recurse -File | Select-Object FullName
   
     - name: Build Bobcat
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe .\,..\upp-source\upp\uppsrc Bobcat CLANG.bm -arb +GUI,WIN64,WIN10 bobcat
-        mkdir out
-        copy Bobcat\Bobcat.exe out\Bobcat.exe
+        New-Item -ItemType Directory -Force -Path out
+        
+        Write-Host "Building Bobcat..."
+        Write-Host "Current directory: $PWD"
+        
+        $output = & ..\3p\umk\umk.exe .\,..\3p\uppsrc Bobcat ..\3p\umk\CLANG.bm --hub-dir ..\3p\hub -brh +GUI,WIN64,WIN10 out\Bobcat.exe 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        Write-Host "umk.exe output:"
+        Write-Host $output
+        Write-Host "Exit code: $exitCode"
+        
+        if ($exitCode -ne 0) {
+          Write-Error "umk.exe failed with exit code $exitCode"
+          exit $exitCode
+        }
+        
+        if (-not (Test-Path "out\Bobcat.exe")) {
+          Write-Error "Build failed - Bobcat.exe not found"
+          Write-Host "Contents of output directory:"
+          Get-ChildItem out -Recurse -ErrorAction SilentlyContinue
+          exit 1
+        }
+        
+        Write-Host "Build successful - Bobcat.exe created"
 
     - name: Build PtyAgent
       working-directory: Bobcat
       run: |
-        ..\upp-source\upp\umk.exe ..\upp-source\upp\UppHub\Terminal,..\upp-source\upp\uppsrc PtyAgent CLANG.bm -arb +WIN64 ptyagent
-        cp ptyagent.exe out\PtyAgent.exe
+        Write-Host "Building PtyAgent..."
+        
+        $output = & ..\3p\umk\umk.exe ..\3p\hub\Terminal,..\3p\uppsrc PtyAgent ..\3p\umk\CLANG.bm --hub-dir ..\3p\hub -br +WIN64 out\PtyAgent.exe 2>&1
+        $exitCode = $LASTEXITCODE
+        
+        Write-Host "umk.exe output:"
+        Write-Host $output
+        Write-Host "Exit code: $exitCode"
+        
+        if ($exitCode -ne 0) {
+          Write-Error "umk.exe failed with exit code $exitCode"
+          exit $exitCode
+        }
+        
+        if (-not (Test-Path "out\PtyAgent.exe")) {
+          Write-Error "Build failed - PtyAgent.exe not found"
+          Write-Host "Contents of output directory:"
+          Get-ChildItem out -Recurse -ErrorAction SilentlyContinue
+          exit 1
+        }
+        
+        Write-Host "Build successful - PtyAgent.exe created"
 
     - name: Download Bobcat assets
       uses: actions/checkout@v3
