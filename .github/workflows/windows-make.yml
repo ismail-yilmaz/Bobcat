@@ -2,12 +2,12 @@ name: Windows
 
 on:
   push:
-    branches: [ win ]
+    branches: [ win_workflow ]
     tags:
       - 'v*'
       - '*.*.*'
   pull_request:
-    branches: [ win ]
+    branches: [ win_workflow ]
 
 permissions:
   contents: write
