@@ -888,6 +888,24 @@ Size ParsePageSize(const String& s)
 	return  Null;
 }
 
+bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir)
+{
+#ifndef flagVIRTUALGUI
+	String cmd = GetExeFilePath();
+	if(!IsNull(pname)) cmd << " --profile " << pname;
+	if(!IsNull(dir)) cmd << " --working-dir " << dir;
+	LocalProcess p;
+#ifdef PLATFORM_POSIX
+	p.DoubleFork();
+#endif
+	p.Start(cmd);
+	p.Detach();
+	return true;
+#endif
+	LLOG("Spawning new Bobcat instances is not supported on virtualgui");
+	return false;
+}
+
 #ifdef PLATFORM_LINUX
 
 pid_t GetProcessGroupId(APtyProcess& pty)

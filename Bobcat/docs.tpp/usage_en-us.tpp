@@ -2,7 +2,7 @@ topic "Command Line Options";
 [a83;*R6 $$1,0#31310162474203024125188417583966:caption]
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_} 
-[s0; [* Usage:]&]
+[s0; [* Usage]&]
 [s0; [C@3         bobcat `[OPTIONS`] `-`- `[COMMAND...`]]&]
 [s0;* &]
 [s0; [* General Options]&]
@@ -45,7 +45,7 @@ window.]&]
 [s0; [C1    ][C@3;1  `-g, `-`-geometry GEOMETRY ][C1      ][1 Set the initial 
 window geometry. (E.g. 80x24, 132x24)]&]
 [s0;* &]
-[s0; [* Profile specific options:]&]
+[s0; [* Profile specific options]&]
 [s0;* &]
 [s0; [*2 Environment:]&]
 [s0; [C1   ][C@3;1  `-z, `-`-pty`-backend ][C1            ][1 Set the pseudoconsole 
@@ -97,7 +97,7 @@ ich`-text][1  annotations.]&]
 [s0; [C1      ][C@3;1   `-`-no`-annotations   ][C1       ][1 Disable ][^https`:`/`/www`.ultimatepp`.org`/srcdoc`$RichText`$QTF`_en`-us`.html^1 r
 ich`-text][1  annotations.]&]
 [s0;1 &]
-[s0; [*2 Appearance:]&]
+[s0; [*2 Appearance]&]
 [s0; [C1      ][C@3;1   `-`-palette PALETTE ][C1        ][1 Set color palette 
 to PALETTE.]&]
 [s0; [C1      ][C@3;1   `-`-font`-family FONT ][C1       ][1 Set the font 

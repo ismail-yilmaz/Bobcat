@@ -55,23 +55,36 @@ Bobcat::Bobcat()
 	Ctrl::SkinChangeSensitive();
 }
 
-bool Bobcat::AddTerminal(const String& key, bool pane)
+bool Bobcat::AddTerminal(const String& key, int type)
 {
-	bool ok = terminals.Create(*this).Start(key, pane);
+	if(type == WINDOWED) {
+		if(SpawnNewProcess(*this, key))
+			return true;
+	}
+	bool ok = terminals.Create(*this).Start(key, type == SPLIT);
 	if(ok) Sync();
 	return ok;
 }
 
-bool Bobcat::AddTerminal(const Profile& profile, bool pane)
+bool Bobcat::AddTerminal(const Profile& profile, int type)
 {
-	bool ok = terminals.Create(*this).Start(profile, pane);
+	if(type == WINDOWED) {
+		if(SpawnNewProcess(*this, profile.name))
+			return true;
+	}
+	bool ok = terminals.Create(*this).Start(profile, type == SPLIT);
 	if(ok) Sync();
 	return ok;
 }
 
-bool Bobcat::NewTerminalFromActiveProfile(bool pane)
+bool Bobcat::NewTerminalFromActiveProfile(int type)
 {
-	bool ok = terminals.Create(*this).Start(GetActiveTerminal(), pane);
+	Terminal *t = GetActiveTerminal();
+	if(type == WINDOWED) {
+		if(SpawnNewProcess(*this, t->profilename, t->workingdir))
+			return true;
+	}
+	bool ok = terminals.Create(*this).Start(t, type == SPLIT);
 	if(ok) Sync();
 	return ok;
 }
@@ -568,8 +581,9 @@ void Bobcat::HelpMenu(Bar& menu)
 
 void Bobcat::TermMenu(Bar& menu)
 {
-	menu.Add(AK_NEWTAB, Images::DefaultTerminal(), [this] { NewTerminalFromActiveProfile(); });
-	menu.AddKey(AK_NEWPANE,                        [this] { NewTerminalFromActiveProfile(true); });
+	menu.Add(AK_NEWTAB, Images::DefaultTerminal(), [this] { NewTerminalFromActiveProfile(STACKED); });
+	menu.AddKey(AK_NEWPANE,                        [this] { NewTerminalFromActiveProfile(SPLIT); });
+	menu.AddKey(AK_NEWWINDOW,                      [this] { NewTerminalFromActiveProfile(WINDOWED); });
 	
 	Vector<String> pnames = GetProfileNames();
 	if(pnames.GetCount())
@@ -606,8 +620,19 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 				6, (KeyInfo& (*)()) AK_SPROFILE7,
 				7, (KeyInfo& (*)()) AK_SPROFILE8,
 				8, (KeyInfo& (*)()) AK_SPROFILE9,
-				(KeyInfo& (*)()) AK_SPROFILE10), [this, name] { AddTerminal(name, true); });
-		}
+				(KeyInfo& (*)()) AK_SPROFILE10), [this, name] { AddTerminal(name, SPLIT); });
+			menu.AddKey(decode(i,
+				0, (KeyInfo& (*)()) AK_WPROFILE1,
+				1, (KeyInfo& (*)()) AK_WPROFILE2,
+				2, (KeyInfo& (*)()) AK_WPROFILE3,
+				3, (KeyInfo& (*)()) AK_WPROFILE4,
+				4, (KeyInfo& (*)()) AK_WPROFILE5,
+				5, (KeyInfo& (*)()) AK_WPROFILE6,
+				6, (KeyInfo& (*)()) AK_WPROFILE7,
+				7, (KeyInfo& (*)()) AK_WPROFILE8,
+				8, (KeyInfo& (*)()) AK_WPROFILE9,
+				(KeyInfo& (*)()) AK_WPROFILE10), [this, name] { AddTerminal(name, WINDOWED); });
+			}
 	}
 }
 

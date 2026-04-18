@@ -71,9 +71,11 @@ void SetContext(Bobcat& ctx);
 struct Bobcat : Pte<Bobcat> {
     Bobcat();
 
-    bool        AddTerminal(const String& key = Null, bool pane = false);
-    bool        AddTerminal(const Profile& profile, bool pane = false);
-    bool        NewTerminalFromActiveProfile(bool pane = false);
+	enum Type : int  { STACKED, SPLIT, WINDOWED };
+	
+    bool        AddTerminal(const String& key = Null, int type = STACKED);
+    bool        AddTerminal(const Profile& profile, int type = STACKED);
+    bool        NewTerminalFromActiveProfile(int type = STACKED);
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
@@ -243,6 +245,8 @@ const char*           GetCmdArgTypeName(CmdArgType t);
 // Global functions.
 
 FileSel& BobcatFs();
+
+bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir = Null);
 
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
