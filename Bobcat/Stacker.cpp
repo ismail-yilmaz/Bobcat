@@ -424,7 +424,6 @@ void Stacker::Animate(Ctrl *currentctrl, Ctrl *nextctrl, bool forward)
 	Size size = view.GetSize();
 	
 	// Prepare source and destination rectangles
-	Rect rsrc1 = view;
 	Rect rdst1 = view;
 	Rect rsrc2 = view;
 	Rect rdst2 = view;
@@ -443,28 +442,8 @@ void Stacker::Animate(Ctrl *currentctrl, Ctrl *nextctrl, bool forward)
 	nextctrl->SetRect(rsrc2);
 	nextctrl->Show();
 
-	// Animation loop
-	for(int start = msecs();;) {
-		int elapsed = msecs(start);
-		if(elapsed > duration)
-			break;
-		Rect r1 = rsrc1, r2 = rsrc2;
-		r1 += (rdst1 - rsrc1) * elapsed / duration; // Lerp
-		r2 += (rdst2 - rsrc2) * elapsed / duration; // Lerp
-		currentctrl->SetRect(r1);
-		nextctrl->SetRect(r2);
-#ifdef PLATFORM_POSIX
-		currentctrl->Sync();
-		nextctrl->Sync();
-#else
-		currentctrl->Refresh();
-		nextctrl->Refresh();
-#endif
-		if(IsMainThread()) {
-			Ctrl::ProcessEvents();
-			GuiSleep(0);
-		}
-	}
+	Vector<Ptr<Ctrl>> ctrls = { activectrl, nextctrl };
+	Upp::Animate(ctrls, { rdst1, rdst2 }, duration);
 	
 	currentctrl->SizePos();
 	nextctrl->SizePos();

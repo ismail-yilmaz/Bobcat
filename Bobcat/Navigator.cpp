@@ -358,30 +358,12 @@ void Navigator::AnimateSwap(int i, int ii)
 	Rect rb = b.GetRect();
 
 	constexpr const int duration = 100;
+	Vector<Ptr<Ctrl>> ctrls = { &a, &b };
+	Upp::Animate(ctrls, { rb, ra }, duration);
 
-	for(int start = msecs();;) {
-		int elapsed = msecs(start);
-		if(elapsed > duration) {
-			a.SetRect(ra);
-			b.SetRect(rb);
-			break;
-		}
-		Rect r1 = ra, r2 = rb;
-		r1 += (rb - ra) * elapsed / duration;
-		r2 += (ra - rb) * elapsed / duration;
-		a.SetRect(r1);
-		b.SetRect(r2);
-#ifdef PLATFORM_POSIX
-		a.Sync();
-		b.Sync();
-#else
-		a.Refresh();
-		b.Refresh();
-#endif
-		Ctrl::ProcessEvents();
-		GuiSleep(0);
-	}
-
+	a.SetRect(ra);
+	b.SetRect(rb);
+	
 	Swap(a.ctrl, b.ctrl);
 	Swap(a.img, b.img);
 
