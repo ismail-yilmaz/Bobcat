@@ -910,34 +910,34 @@ T_("New terminal pane from profile 10")
 trTR("Profil 10'dan yeni terminal a\303\247 (b\303\266l)")
 
 T_("New terminal window from profile 1")
-trTR("")
+trTR("Profil 1'den yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 2")
-trTR("")
+trTR("Profil 2'den yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 3")
-trTR("")
+trTR("Profil 3'Ten yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 4")
-trTR("")
+trTR("Profil 4'den yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 5")
-trTR("")
+trTR("Profil 5'ten yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 6")
-trTR("")
+trTR("Profil 6'dan yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 7")
-trTR("")
+trTR("Profil 7'den yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 8")
-trTR("")
+trTR("Profil 8'den yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 9")
-trTR("")
+trTR("Profil 9'dan yeni terminal a\303\247 (ayr\304\261)")
 
 T_("New terminal window from profile 10")
-trTR("")
+trTR("Profil 10'dan yeni terminal a\303\247 (ayr\304\261)")
 
 T_("Toggle splitter orientation")
 trTR("B\303\266lme y\303\266n\303\274n\303\274 de\304\237i\305\237tir")
