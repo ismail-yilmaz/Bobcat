@@ -59,7 +59,7 @@ struct Terminal : TerminalCtrl {
     void        Layout() override;
     
     Terminal&   SetProfile(const Profile& p, bool reload = false);
-    Terminal&   SetPalette(const Palette& p);
+    Terminal&   SetPalette(const Palette& p, bool reload = false);
     Terminal&   SetExitMode(const String& s);
     Terminal&   SetLocale(const String& s);
     Terminal&   SetEraseKey(const String& s);
@@ -72,6 +72,9 @@ struct Terminal : TerminalCtrl {
     Terminal&   SetPathTranslationMode(const String& s);
     Terminal&   SetPathDelimiter(const String& s);
         
+    Terminal&   OverridePalette(const Palette& p);
+    Terminal&   ResetPalette();
+    
     String      GetWorkingDirectory() const;
     
     void        MakeTitle(const String& txt);
@@ -184,6 +187,7 @@ struct Terminal : TerminalCtrl {
     bool         shellintegration:1;
     bool         findselectedtext:1;
     bool         warnonrootaccess:1;
+    bool         paletteoverridden:1;
     String       profilename;
     String       palettename;
     String       title;

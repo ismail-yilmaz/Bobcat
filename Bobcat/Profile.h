@@ -24,6 +24,7 @@ struct Profile : Moveable<Profile> {
     bool        blinktext;
     int         blinkinterval;
     String      palette;
+    bool        inheritpalette;
     bool        lightcolors;
     bool        adjustcolors;
     bool        intensify;

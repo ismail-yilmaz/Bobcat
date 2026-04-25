@@ -21,6 +21,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , smartwordsel(false)
 , shellintegration(false)
 , warnonrootaccess(false)
+, paletteoverridden(false)
 , exitmode(ExitMode::Exit)
 , pathmode(PathMode::Native)
 , starttime(Null)
@@ -144,7 +145,6 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 bool Terminal::Start(const Profile& p, bool pane)
 {
 	SetProfile(p);
-	SetPalette(LoadPalette(p.palette));
 	return StartPty(p, pane);
 }
 
@@ -161,6 +161,8 @@ bool Terminal::Start(Terminal *term, bool pane)
 		p = LoadProfile(term->profilename);
 		if(term->shellintegration && !IsNull(term->workingdir)) {
 			p.address = term->workingdir;
+			if(p.inheritpalette)
+				p.palette = term->palettename;
 		}
 	}
 	return Start(p, pane);
@@ -330,7 +332,7 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
         workingdir  = p.address;
         shellintegration = p.shellintegration;
         warnonrootaccess = p.warnonrootaccess;
-        palettename = p.palette;
+        paletteoverridden = false;
         ring = p.bell;
         flash = p.flashscreen;
         bell = ring || flash;
@@ -372,6 +374,8 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
     }
     
     // Safe to hot-reload: cosmetic & UI helpers
+    SetPalette(LoadPalette(p.palette), reload);
+    palettename = p.palette;
     IntensifyBoldText(p.intensify);
     BlinkInterval(p.blinkinterval);
     UnlockCursor();
@@ -444,15 +448,33 @@ void Terminal::GotFocus()
 		ctx.stack.Goto(*this);
 }
 
-Terminal& Terminal::SetPalette(const Palette& p)
+Terminal& Terminal::SetPalette(const Palette& p, bool reload)
 {
+    if(paletteoverridden && reload)
+		return *this;
+		
 	for(int i = 0, j = 0; i < Palette::MAX_COLOR_COUNT; i++) {
 		if(i < TerminalCtrl::MAX_COLOR_COUNT)
 			SetColor(i, p.table[i]);
 		else
 			highlight[j++] = p.table[i];
 	}
+	
+	palettename = p.name;
 	return *this;
+}
+
+Terminal& Terminal::OverridePalette(const Palette& p)
+{
+	paletteoverridden = true;
+	return SetPalette(p);
+}
+
+Terminal& Terminal::ResetPalette()
+{
+	paletteoverridden = false;
+	Profile p = LoadProfile(profilename);
+	return SetPalette(p.palette, false);
 }
 
 Terminal& Terminal::SetExitMode(const String& s)
@@ -1056,10 +1078,10 @@ void Terminal::PaletteMenu(Bar& menu)
 		menu.Sub(t_("Color Profiles..."), Images::ColorSwatch(), [this, pnames = pick(pnames)](Bar& menu) {
 			for(const String& name : pnames)
 				menu.Add(name, [this, name] {
-					Palette p = LoadPalette(name);
-					palettename = p.name;
-					SetPalette(p);
+					OverridePalette(LoadPalette(name));
 				}).Check(name == palettename);
+			menu.Separator();
+			menu.Add(t_("Reset to profile default"), [this] { ResetPalette(); });
 		});
 		menu.Separator();
 	}

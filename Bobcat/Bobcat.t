@@ -404,6 +404,9 @@ trTR("\304\260lerleme ba\305\237ar\304\261s\304\261z.&Hata kodu: %d")
 T_("Color Profiles...")
 trTR("Renk Profilleri...")
 
+T_("Reset to profile default")
+trTR("Profilin varsay\304\261lan renk profiline d\303\266n")
+
 T_("Terminal list")
 trTR("Terminal listesi")
 
@@ -798,6 +801,9 @@ trTR("Arama motorunu kald\304\261r")
 T_("New terminal")
 trTR("Yeni terminal")
 
+T_("New terminal (window)")
+trTR("")
+
 T_("New terminal (pane)")
 trTR("Yeni terminal (b\303\266l)")
 
@@ -902,6 +908,36 @@ trTR("Profil 9'dan yeni terminal a\303\247 (b\303\266l)")
 
 T_("New terminal pane from profile 10")
 trTR("Profil 10'dan yeni terminal a\303\247 (b\303\266l)")
+
+T_("New terminal window from profile 1")
+trTR("")
+
+T_("New terminal window from profile 2")
+trTR("")
+
+T_("New terminal window from profile 3")
+trTR("")
+
+T_("New terminal window from profile 4")
+trTR("")
+
+T_("New terminal window from profile 5")
+trTR("")
+
+T_("New terminal window from profile 6")
+trTR("")
+
+T_("New terminal window from profile 7")
+trTR("")
+
+T_("New terminal window from profile 8")
+trTR("")
+
+T_("New terminal window from profile 9")
+trTR("")
+
+T_("New terminal window from profile 10")
+trTR("")
 
 T_("Toggle splitter orientation")
 trTR("B\303\266lme y\303\266n\303\274n\303\274 de\304\237i\305\237tir")
@@ -1177,6 +1213,9 @@ trTR("\303\207\304\261karken")
 
 T_("Adjust colors to dark themes")
 trTR("Karanl\304\261k temalara g\303\266re renkleri ayarla")
+
+T_("Inherit color palette from active terminal")
+trTR("Etkin terminalin renk paletini kullan")
 
 T_("Force bright colors")
 trTR("Parlak renkleri zorla")

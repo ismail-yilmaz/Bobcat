@@ -888,17 +888,27 @@ Size ParsePageSize(const String& s)
 	return  Null;
 }
 
-bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir)
+bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir, const String& palette)
 {
 #ifndef flagVIRTUALGUI
-	String cmd = GetExeFilePath();
-	if(!IsNull(pname)) cmd << " --profile " << pname;
-	if(!IsNull(dir)) cmd << " --working-dir " << dir;
+	Vector<String> args;
+	if(!IsNull(pname)) {
+		args.Add("--profile");
+		args.Add(pname);
+	}
+	if(!IsNull(dir)) {
+		args.Add("--working-dir");
+		args.Add(dir);
+	}
+	if(!IsNull(palette)) {
+		args.Add("--palette");
+		args.Add(palette);
+	}
 	LocalProcess p;
 #ifdef PLATFORM_POSIX
 	p.DoubleFork();
 #endif
-	p.Start(cmd);
+	p.Start(GetExeFilePath(), args);
 	p.Detach();
 	return true;
 #endif

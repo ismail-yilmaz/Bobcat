@@ -81,7 +81,9 @@ bool Bobcat::NewTerminalFromActiveProfile(int type)
 {
 	Terminal *t = GetActiveTerminal();
 	if(type == WINDOWED) {
-		if(SpawnNewProcess(*this, t->profilename, t->workingdir))
+		Profile p = LoadProfile(t->profilename);
+		String pname = p.inheritpalette ? t->palettename : p.palette;
+		if(SpawnNewProcess(*this, p.name, t->workingdir, pname))
 			return true;
 	}
 	bool ok = terminals.Create(*this).Start(t, type == SPLIT);
@@ -496,10 +498,8 @@ void Bobcat::SyncTerminalProfiles()
 {
 	if(VectorMap<String, Profile> v; LoadProfiles(v) >= 0) {
 		for(const Profile& p : v.GetValues()) {
-			Palette q = LoadPalette(p.palette);
 			for(Terminal* t : GetTerminalGroup(p)) {
 				t->SetProfile(p, true); // hot-reload
-				t->SetPalette(q);
 			}
 		}
 	}

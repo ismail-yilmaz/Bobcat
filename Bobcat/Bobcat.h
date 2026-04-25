@@ -246,7 +246,8 @@ const char*           GetCmdArgTypeName(CmdArgType t);
 
 FileSel& BobcatFs();
 
-bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir = Null);
+bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir = Null,
+													const String& palette = Null);
 
 void LoadConfig(Bobcat& ctx);
 void SaveConfig(Bobcat& ctx);
