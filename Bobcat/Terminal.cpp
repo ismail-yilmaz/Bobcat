@@ -474,7 +474,8 @@ Terminal& Terminal::ResetPalette()
 {
 	paletteoverridden = false;
 	Profile p = LoadProfile(profilename);
-	return SetPalette(p.palette, false);
+	Palette q = LoadPalette(p.palette);
+	return SetPalette(q);
 }
 
 Terminal& Terminal::SetExitMode(const String& s)
@@ -1077,9 +1078,7 @@ void Terminal::PaletteMenu(Bar& menu)
 	if(pnames.GetCount()) {
 		menu.Sub(t_("Color Profiles..."), Images::ColorSwatch(), [this, pnames = pick(pnames)](Bar& menu) {
 			for(const String& name : pnames)
-				menu.Add(name, [this, name] {
-					OverridePalette(LoadPalette(name));
-				}).Check(name == palettename);
+				menu.Add(name, [this, name] { OverridePalette(LoadPalette(name)); }).Check(name == palettename);
 			menu.Separator();
 			menu.Add(t_("Reset to profile default"), [this] { ResetPalette(); });
 		});
