@@ -45,9 +45,9 @@ window.]&]
 [s0; [C1    ][C@3;1  `-g, `-`-geometry GEOMETRY ][C1      ][1 Set the initial 
 window geometry. (E.g. 80x24, 132x24)]&]
 [s0;* &]
-[s0; [* Profile specific options]&]
+[s0; [* Profile Specific Options]&]
 [s0;* &]
-[s0; [*2 Environment:]&]
+[s0; [*2 Environment]&]
 [s0; [C1   ][C@3;1  `-z, `-`-pty`-backend ][C1            ][1 Set the pseudoconsole 
 backend to be used. (Windows specific)]&]
 [s0; [C1   ][C@3;1  `-r, `-`-restart ][C1                ][1 Restart the 
@@ -67,7 +67,7 @@ the environment.]&]
 [s0; [C1   ][C@3;1  `-d, `-`-working`-dir PATH][C1        ][1 Set the working 
 directory to PATH.]&]
 [s0;* &]
-[s0; [*2 Emulation:]&]
+[s0; [*2 Emulation]&]
 [s0; [C1    ][C@3;1 `-q, `-`-vt`-style`-fkeys  ][C1        ][1 Use VT`-style 
 function keys.]&]
 [s0; [C1   ][C@3;1  `-Q, `-`-pc`-style`-fkeys   ][C1       ][1 Use PC`-style 

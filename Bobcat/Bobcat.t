@@ -3,6 +3,9 @@
 #endif
 // Bobcat.cpp
 
+T_("General")
+trTR("Genel")
+
 T_("%d terminals are open.&Close them all and exit?")
 trTR("%d terminal a\303\247\304\261k.&Hepsini kapat\304\261p \303\247\304\261kmak "
      "istiyor musunuz?")
@@ -33,9 +36,6 @@ trTR("D\303\266\305\237e")
 
 T_("Profiles")
 trTR("Profiller")
-
-T_("General")
-trTR("Genel")
 
 T_("Settings")
 trTR("Ayarlar")
