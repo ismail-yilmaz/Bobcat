@@ -904,13 +904,17 @@ bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir, const 
 		args.Add("--palette");
 		args.Add(palette);
 	}
-	LocalProcess p;
-#ifdef PLATFORM_POSIX
-	p.DoubleFork();
-#endif
-	p.Start(GetExeFilePath(), args);
-	p.Detach();
-	return true;
+	#ifdef PLATFORM_POSIX
+		LocalProcess p;
+		p.DoubleFork();
+		bool b = p.Start(GetExeFilePath(), args);
+		p.Detach();
+		return b;
+	#elif PLATFORM_WIN32
+		Vector<WCHAR> cmd  = ToSystemCharsetW(GetExeFilePath());
+		Vector<WCHAR> wargs = ToSystemCharsetW(Join(args, " "));
+		return ((int64)(ShellExecuteW(NULL, L"open", cmd, wargs, L".", SW_SHOWDEFAULT)) > 32);
+	#endif
 #endif
 	LLOG("Spawning new Bobcat instances is not supported on virtualgui");
 	return false;
