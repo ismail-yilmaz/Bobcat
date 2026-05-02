@@ -891,6 +891,7 @@ Size ParsePageSize(const String& s)
 bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir, const String& palette)
 {
 #ifndef flagVIRTUALGUI
+	String exepath = GetExeFilePath();
 	Vector<String> args;
 	if(!IsNull(pname)) {
 		args.Add("--profile");
@@ -905,13 +906,9 @@ bool SpawnNewProcess(Bobcat& ctx, const String& pname, const String& dir, const 
 		args.Add(palette);
 	}
 	#ifdef PLATFORM_POSIX
-		LocalProcess p;
-		p.DoubleFork();
-		bool b = p.Start(GetExeFilePath(), args);
-		p.Detach();
-		return b;
+		return LocalProcess().DoubleFork().Start(exepath, args);
 	#elif PLATFORM_WIN32
-		Vector<WCHAR> cmd  = ToSystemCharsetW(GetExeFilePath());
+		Vector<WCHAR> cmd  = ToSystemCharsetW(exepath);
 		Vector<WCHAR> wargs = ToSystemCharsetW(Join(args, " "));
 		return ((int64)(ShellExecuteW(NULL, L"open", cmd, wargs, L".", SW_SHOWDEFAULT)) > 32);
 	#endif
