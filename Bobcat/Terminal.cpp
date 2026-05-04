@@ -37,7 +37,7 @@ Terminal::Terminal(Bobcat& ctx_)
 	WantFocus();
 
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
-	WhenResize  = [this]()                     { pty->SetSize(GetPageSize());      };
+	WhenResize  = [this]()                     { pty->SetSize(GetPageSize(), GetSize()); };
 	WhenScroll  = [this]()                     { Update();                         };
 	WhenOutput  = [this](String s)             { pty->Write(s);                    };
 	WhenTitle   = [this](const String& s)      { MakeTitle(s);                     };
