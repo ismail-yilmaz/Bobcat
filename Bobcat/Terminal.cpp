@@ -337,6 +337,7 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
         flash = p.flashscreen;
         bell = ring || flash;
         filter = p.filterctrl;
+        ShowScrollBar(p.scrollbar);
         NotifyProgress(p.progress);
         WindowActions(p.windowactions);
         WindowReports(p.windowreports);
@@ -371,11 +372,11 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
         SetPathTranslationMode(p.pathtranslation);
         SetPathDelimiter(p.pathdelimiter);
         AnswerBackMessage(p.answerbackmsg);
+		SetPalette(LoadPalette(p.palette), reload);
+		palettename = p.palette;
     }
-    
+
     // Safe to hot-reload: cosmetic & UI helpers
-    SetPalette(LoadPalette(p.palette), reload);
-    palettename = p.palette;
     IntensifyBoldText(p.intensify);
     BlinkInterval(p.blinkinterval);
     UnlockCursor();

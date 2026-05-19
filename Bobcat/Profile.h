@@ -53,6 +53,7 @@ struct Profile : Moveable<Profile> {
     int         historysize;
     bool        delayedrefresh;
     bool        lazyresize;
+    bool        scrollbar;
     String      encoding;
     bool        ambiguoustowide;
     String      erasechar;

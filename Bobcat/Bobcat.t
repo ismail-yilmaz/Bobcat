@@ -3,9 +3,6 @@
 #endif
 // Bobcat.cpp
 
-T_("General")
-trTR("Genel")
-
 T_("%d terminals are open.&Close them all and exit?")
 trTR("%d terminal a\303\247\304\261k.&Hepsini kapat\304\261p \303\247\304\261kmak "
      "istiyor musunuz?")
@@ -36,6 +33,9 @@ trTR("D\303\266\305\237e")
 
 T_("Profiles")
 trTR("Profiller")
+
+T_("General")
+trTR("Genel")
 
 T_("Settings")
 trTR("Ayarlar")
@@ -1279,6 +1279,9 @@ trTR("Di\304\237er")
 
 T_("px")
 trTR("px")
+
+T_("Show scrollbar")
+trTR("Kayd\304\261rma \303\247ubu\304\237unu g\303\266ster")
 
 T_("Treat ambiguous width characters as wide characters")
 trTR("Geni\305\237li\304\237i belirsiz karakterleri geni\305\237 karakter olarak "
