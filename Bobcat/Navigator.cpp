@@ -40,22 +40,25 @@ void Navigator::Item::LostFocus()
 void Navigator::Item::Paint(Draw& w)
 {
 	if(Rect q = GetView(); q.Width() - 16 >= 1 && q.GetHeight() - 16 >= 1) {
-		w.Clip(q);
-		w.DrawRect(q, SColorFace);
-		w.DrawImage(q.Deflated(8), img);
+		DrawPainter dp(w, q.GetSize());
+		dp.Begin();
+		dp.RoundedRectangle(q, 8.0, 8.0).Fill(SColorFace());
+		dp.DrawImage(q.Deflated(8), img);
 		if(ctrl) {
 			if(ctrl->IsRunning()) {
 				if(dnd) {
 					const Image& ico = Images::DropClipHD();
-					w.DrawRect(q, SColorHighlight);
+					RGBA c = SColorHighlight();
+					c.a = 128;
+					dp.RoundedRectangle(q, 8.0, 8.0).Fill(c);
 					Size sz = min(ico.GetSize(), q.GetSize());
-					w.DrawImage(q.CenterRect(sz), ico);
+					dp.DrawImage(q.CenterRect(sz), ico);
 				}
 				// Always overlay
 				if(blinking && ctrl->IsRoot()) {
 					const char *txt = t_("Privilege escalation!");
 					Point pt = q.CenterPos(GetTextSize(txt, StdFont().Bold()));
-					w.DrawText(pt.x, pt.y, txt, StdFont().Bold(), LtRed());
+					dp.DrawText(pt.x, pt.y, txt, StdFont().Bold(), LtRed());
 				}
 			}
 			else
@@ -74,14 +77,14 @@ void Navigator::Item::Paint(Draw& w)
 				if(ctrl->IsSuccess())
 					ico = Images::OkHD();
 				Size sz = min(ico.GetSize(), q.GetSize());
-				w.DrawImage(q.CenterRect(sz), ico);
+				dp.DrawImage(q.CenterRect(sz), ico);
 			}
 		}
 
 		Color c = HasMouse() ? SColorText : HasFocus() ? SColorHighlight : Color(30, 30, 30);
-		DrawFrame(w, q.Deflated(2), Color(50, 50, 50));
-		DrawFrame(w, q.Deflated(1), c);
-		w.End();
+		dp.RoundedRectangle(q.Deflated(2), 8.0, 8.0).Stroke(2.0, Color(50, 50, 50));
+		dp.RoundedRectangle(q.Deflated(1), 8.0, 8.0).Stroke(2.0, c);
+		dp.End();
 	}
 }
 
