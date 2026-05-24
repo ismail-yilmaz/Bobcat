@@ -159,11 +159,10 @@ bool Terminal::Start(Terminal *term, bool pane)
 	Profile p;
 	if(term) {
 		p = LoadProfile(term->profilename);
-		if(term->shellintegration && !IsNull(term->workingdir)) {
+		if(term->shellintegration && !IsNull(term->workingdir))
 			p.address = term->workingdir;
-			if(p.inheritpalette)
-				p.palette = term->palettename;
-		}
+		if(p.inheritpalette)
+			p.palette = term->palettename;
 	}
 	return Start(p, pane);
 }
