@@ -207,13 +207,18 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 ## [Videos](#Videos)
 
 A short video demonstrating the **headless** build of Bobcat, running on SDL2-GL backend. This build **does not require a desktop** to run, making it ideal for servers and hobby boards.
-It has its own "virtual gui". So you'll get all the bells and whistles of the desktop version!
+It has its own "virtual GUI". So you'll get all the bells and whistles of the desktop version!
 
 
 https://github.com/user-attachments/assets/86ebc3db-7c35-455f-a9f3-ece0f269f1c9
 
 ---
 
+A short video demonstrating Bobcat's experimental **headless web GUI** build. This version lets you access and control a remote machine from **any modern web browser**, using WebSockets and HTML5 Canvas. Like the SDL2-GL build, it **does not require a desktop environment** on the host machine. It comes with its own "virtual GUI". Under the hood, communication is handled by **Turtle**, a custom wire protocol developed in U++.
+
+https://github.com/user-attachments/assets/62b4551a-7138-4071-9f79-474f3547c7e6
+
+---
 A short screencast of [@mmulet](https://github.com/mmulet)'s amazing [term.everything](https://github.com/mmulet/term.everything), running KDE Neon (a whole linux distro) in gnome-boxes on Bobcat!
 
 
