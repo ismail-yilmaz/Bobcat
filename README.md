@@ -206,7 +206,7 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 
 ## [Videos](#Videos)
 
-A short video demonstrating the **headless** build of Bobcat, running on SDL2-GL backend. This build **does not require an external gui toolkit** to run, making it ideal for servers and hobby boards.
+A short video demonstrating the **headless** build of Bobcat, running on SDL2-GL backend. This build **does not require a desktop** to run, making it ideal for servers and hobby boards.
 It has its own "virtual gui". So you'll get all the bells and whistles of the desktop version!
 
 
