@@ -299,7 +299,7 @@ void Terminal::Update()
 			Refresh();
 	};
 
-	updatetimer.KillSet(10, cb); // Safeguard against spamming.
+	updatetimer.KillSet(12, cb); // Safeguard against spamming.
 }
 
 void Terminal::SyncHighlight()

@@ -412,7 +412,6 @@ CONSOLE_APP_MAIN
 	Rect screen(0, 0, 1024, 768);
 
 	const Vector<String>& cmd = CommandLine();
-
 	if(int n = FindIndex(cmd, "--screen-size"); n >= 0 && ++n < cmd.GetCount()) {
 		if(String cx, cy; SplitTo(cmd[n], 'x', cx, cy)) {
 			screen.SetSize(
@@ -422,7 +421,7 @@ CONSOLE_APP_MAIN
 		}
 	}
 	SDL2GUI gui;
-	gui.Create(screen, t_("Bobcat [SDL2-GUI]"));
+	gui.Create(screen, t_("Bobcat [SDL2-GUI]"), true);
 	RunVirtualGui(gui,BobcatAppMain);
 }
 #else
