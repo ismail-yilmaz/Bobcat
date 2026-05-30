@@ -268,8 +268,8 @@ FinderBar::FinderBar(Terminal& t)
 {
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
-	next.Image(Images::Up());
-	prev.Image(Images::Down());
+	prev.Image(Images::Up());
+	next.Image(Images::Down());
 	begin.Image(Images::Begin());
 	end.Image(Images::End());
 	next  << THISFN(Next);

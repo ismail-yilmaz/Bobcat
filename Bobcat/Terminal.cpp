@@ -54,7 +54,6 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenSelectorScan         = THISFN(OnSelectorScan);
 	WhenBell                 = THISFN(OnBell);
 	WhenScroll               = THISFN(Update);
-	WhenRefresh              = THISFN(Update);
 }
 
 Terminal::~Terminal()
