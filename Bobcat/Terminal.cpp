@@ -38,7 +38,6 @@ Terminal::Terminal(Bobcat& ctx_)
 
 	WhenBar     = [this](Bar& bar)             { ContextMenu(bar);                 };
 	WhenResize  = [this]()                     { pty->SetSize(GetPageSize(), GetSize()); };
-	WhenScroll  = [this]()                     { Update();                         };
 	WhenOutput  = [this](String s)             { pty->Write(s);                    };
 	WhenTitle   = [this](const String& s)      { MakeTitle(s);                     };
 	WhenLink    = [this](const String& s)      { OnLink(s);                        };
@@ -54,6 +53,8 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenProgress             = THISFN(OnProgress);
 	WhenSelectorScan         = THISFN(OnSelectorScan);
 	WhenBell                 = THISFN(OnBell);
+	WhenScroll               = THISFN(Update);
+	WhenRefresh              = THISFN(Update);
 }
 
 Terminal::~Terminal()
@@ -299,7 +300,7 @@ void Terminal::Update()
 			Refresh();
 	};
 
-	updatetimer.KillSet(20, cb); // Safeguard against spamming.
+	updatetimer.KillSet(10, cb); // Safeguard against spamming.
 }
 
 void Terminal::SyncHighlight()

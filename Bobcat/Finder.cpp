@@ -584,6 +584,12 @@ void FinderBar::Search(const WString& txt)
 	Search();
 }
 
+void FinderBar::Update()
+{
+	if(term.HasFinder())
+		Search();
+}
+
 void FinderBar::SaveToFile()
 {
 	harvester.SaveToFile();

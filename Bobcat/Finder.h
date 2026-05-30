@@ -116,6 +116,7 @@ public:
 
     void        Search();
     void        Search(const WString& txt);
+    void        Update();
 
     void        SaveToFile();
     void        SaveToClipboard();
