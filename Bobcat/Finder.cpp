@@ -283,9 +283,9 @@ FinderBar::FinderBar(Terminal& t)
 	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
 	fsave.Image(Images::Reap());
-	fsave << [this] { SaveToFile(); };
+	fsave << THISFN(SaveToFile);
 	csave.Image(Images::Paste());
-	csave << [this] { SaveToClipboard(); };
+	csave << THISFN(SaveToClipboard);
 	menu.Image(Images::Find());
 	menu << [this] { MenuBar::Execute(THISFN(StdBar)); };
 	display.SetDisplay(StdRightDisplay());

@@ -709,7 +709,8 @@ void Bobcat::Help()
 {
 	static const Tuple<const char*, const char*> topics[] {
 		{ "usage",     t_("Command line options") },
-		{ "shortcuts", t_("Keyboard shortcuts")   }
+		{ "shortcuts", t_("Keyboard shortcuts")   },
+		{ "specs",     t_("Specifications")       }
 	};
 	
 	HelpWindow dlg;

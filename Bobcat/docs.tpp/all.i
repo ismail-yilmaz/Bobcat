@@ -14,6 +14,10 @@ TOPIC("shortcuts_en-us")
 #include "shortcuts_en-us.tppi"
 END_TOPIC
 
+TOPIC("specs_en-us")
+#include "specs_en-us.tppi"
+END_TOPIC
+
 TOPIC("usage_en-us")
 #include "usage_en-us.tppi"
 END_TOPIC

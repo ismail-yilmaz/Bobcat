@@ -106,6 +106,9 @@ trTR("Komut sat\304\261r\304\261 se\303\247enekleri")
 T_("Keyboard shortcuts")
 trTR("Klavye k\304\261sayollar\304\261")
 
+T_("Specifications")
+trTR("Teknik \303\226zellikler")
+
 T_("Bobcat Help")
 trTR("Bobcat Yard\304\261m")
 
