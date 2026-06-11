@@ -206,6 +206,14 @@ Doom, running on Bobcat, via [mochadoom](https://github.com/AutumnMeowMeow/mocha
 
 ## [Videos](#Videos)
 
+A short video demonstrating the **drag-and-drop** image feature of Bobcat. This feature allows you to simply grab any inline image directly from the terminal and drop it into your favorite image editor. Plus, even if the image appears clipped or damaged on the terminal display, you'll still get the full, undamaged version!
+
+
+https://github.com/user-attachments/assets/df99ac55-b89a-4c67-baca-73c6f3677373
+
+
+---
+
 A short video demonstrating the **headless** build of Bobcat, running on SDL2-GL backend. This build **does not require a desktop** to run, making it ideal for servers and hobby boards.
 It has its own "virtual GUI". So you'll get all the bells and whistles of the desktop version!
 
