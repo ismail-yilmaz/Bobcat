@@ -24,9 +24,8 @@ Sequences]&]
 Sequences]&]
 [s0; [^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#9^+75 7 Supported Device 
 Control Strings]&]
-[s0; [^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#11^+75 8 Supported Operating 
-Sys][^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#10^+75 t][^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#11^+75 e
-m Commands]&]
+[s0; [^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#10^+75 8 Supported Operating 
+Syst][^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#11^+75 em Commands]&]
 [s0; [^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#11^+75 9 Supported Application 
 Programming Commands]&]
 [s0; [^topic`:`/`/Bobcat`/docs`/specs`_en`-us`#12^+75 10 Supported 
