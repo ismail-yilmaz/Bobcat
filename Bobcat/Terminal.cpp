@@ -594,10 +594,12 @@ String Terminal::GetTitle() const
 
 void Terminal::SetAlias()
 {
+	bool b = HasFocus();
 	WString txt = GetTitle().ToWString();
 	if(EditText(txt, t_("Set terminal title"), t_("Title")))
 		alias = txt.ToString();
 	Sync();
+	if(b) SetFocus();
 }
 
 Value Terminal::GetData() const
@@ -1177,6 +1179,7 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	close   << [this] { term.Stop(); };
 	menu    << [this] { Menu(); };
 	title.SetDisplay(TerminalTitleDisplay());
+	title.IgnoreMouse();
 }
 
 void Terminal::TitleBar::SetData(const Value& v)
@@ -1195,6 +1198,17 @@ void Terminal::TitleBar::FrameLayout(Rect& r)
 	data == "bottom"
 		? LayoutFrameBottom(r, this, cy ? cy : r.Height())
 		: LayoutFrameTop(r, this, cy ? cy : r.Height()); // default
+}
+
+void Terminal::TitleBar::LeftDown(Point pt, dword keyflags)
+{
+	term.SetFocus();
+}
+
+void Terminal::TitleBar::LeftDouble(Point pt, dword keyflags)
+{
+	if(Rect r = title.GetRect(); r.Contains(pt) && keyflags & K_CTRL)
+		term.SetAlias();
 }
 
 void Terminal::TitleBar::Show()

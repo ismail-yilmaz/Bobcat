@@ -209,6 +209,8 @@ struct Terminal : TerminalCtrl {
         void        SetData(const Value& v) override;
         Value       GetData() const override;
         void        FrameLayout(Rect& r) override;
+        void        LeftDown(Point pt, dword keyflags) override;
+        void        LeftDouble(Point pt, dword keyflags) override;
 
         void        Show();
         void        Hide();
