@@ -376,9 +376,6 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
     }
 
     // Safe to hot-reload: cosmetic & UI helpers
-    int dimlevel = ctx.settings.dimlevel;
-    DimWhenUnfocused(dimlevel > 0);
-    DimLevel(dimlevel);
     IntensifyBoldText(p.intensify);
     BlinkInterval(p.blinkinterval);
     UnlockCursor();
@@ -1068,7 +1065,7 @@ void Terminal::EditMenu(Bar& menu)
 			menu.Add(IsSelection() && !IsSelectorMode(), AK_ANNOTATE, Images::Annotate(), [this] { AddAnnotation(); });
 		}
 		menu.Separator();
-		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(); });
+		menu.Add(IsEditable(),  AK_SELECTALL, Images::SelectAll(), [this] { SelectAll(true); });
 	}
 	menu.Separator();
 	menu.Add(AK_FINDER, Images::Find(), [this] { OpenFinder(); });

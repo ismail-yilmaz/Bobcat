@@ -54,6 +54,8 @@ public:
     void        ExpandBottomRightPane();
     void        ResetSplitterPos();
 
+	Ctrl*       GetPassiveCtrl() const;
+	
     void        Goto(int i);
     void        Goto(Ctrl& ctrl);
     void        Prev();

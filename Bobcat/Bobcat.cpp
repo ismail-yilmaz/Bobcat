@@ -454,6 +454,7 @@ void Bobcat::Sync()
 	stack.Wheel(settings.stackwheel);
 	stack.Animation(settings.stackanimation);
 	SyncBackground();
+	SyncBrightness();
 	SyncTitle();
 	navigator.Sync();
 }
@@ -488,11 +489,20 @@ void Bobcat::SyncBackground()
 		}
 	}
 	else
+	if(!IsNull(view))
 		view <<= Null;
 	
 	stack.NoBackground(bkimg);
 	for(int i = 0; i < stack.GetCount(); i++)
 		AsTerminal(stack[i]).Sync().NoBackground(bkimg);
+}
+
+void Bobcat::SyncBrightness()
+{
+	if(Ctrl *c = stack.GetActiveCtrl(); c)
+		AsTerminal(*c).SetBrightness(100);
+	if(Ctrl *c = stack.GetPassiveCtrl(); c)
+		AsTerminal(*c).SetBrightness(100 - settings.dimlevel);
 }
 
 void Bobcat::SyncTerminalProfiles()

@@ -318,6 +318,12 @@ void Stacker::ResetSplitterPos()
 		sp->SetPos(5000);
 }
 
+Ctrl* Stacker::GetPassiveCtrl() const
+{
+	Splitter *sp = GetParentSplitter(activectrl);
+	return sp ? (sp->GetFirstChild() == activectrl ? sp->GetLastChild() : sp->GetFirstChild()) : nullptr;
+}
+
 void Stacker::Goto(int i)
 {
 	if(i >= 0 && i < GetCount()) {

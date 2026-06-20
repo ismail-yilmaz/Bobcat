@@ -114,6 +114,7 @@ struct Bobcat : Pte<Bobcat> {
     void        Sync();
     void        SyncTitle();
     void        SyncBackground();
+    void        SyncBrightness();
     void        SyncTerminalProfiles();
     
     void        MainMenu(Bar& menu);
