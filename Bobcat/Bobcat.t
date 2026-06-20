@@ -1096,6 +1096,11 @@ trTR("\001[g Pty izleme aral\304\261\304\237\304\261 0\342\200\223100 ms aras\30
      "art\304\261rabilir ama CPU kullan\304\261m\304\261n\304\261 da y\303\274kseltir.&\303\226nerilen "
      "de\304\237er 10 ms\342\200\231dir. ]")
 
+T_("\001[g Unfocused terminal dimming level can be a value between 0`-100.&0 "
+     "effectively disables dimming]")
+trTR("\001[g Odaklan\304\261lmayan terminallerin soldurulma de\304\237eri 0`-100 aras\304\261nda olabilir.&"
+     "Bu \303\266zelli\304\237i etkisizle\305\237tirmek i\303\247in aral\304\261\304\237\304\261 0'a getirmeniz yeterlidir. ]")
+
 T_("Hide window caption and frames")
 trTR("Pencere ba\305\237l\304\261\304\237\304\261n\304\261 ve \303\247er\303\247evelerini "
      "gizle")
@@ -1158,6 +1163,9 @@ trTR("Terminal ge\303\247i\305\237 kipi")
 T_("ms")
 trTR("")
 
+T_("%")
+trTR("")
+
 T_("Stack animation duration")
 trTR("Terminal ge\303\247i animasyonu s\303\274resi")
 
@@ -1184,6 +1192,9 @@ trTR("GUI yaz\304\261 tipi")
 
 T_("Titlebar placement")
 trTR("Ba\305\237l\304\261k \303\247ubu\304\237u yerle\305\237imi")
+
+T_("Terminal dimming level")
+trTR("Terminal soldurma d\303\274zeyi")
 
 T_("Don't inherit the environment")
 trTR("Ortam de\304\237i\305\237kenlerini devralma")

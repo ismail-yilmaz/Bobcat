@@ -376,6 +376,9 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
     }
 
     // Safe to hot-reload: cosmetic & UI helpers
+    int dimlevel = ctx.settings.dimlevel;
+    DimWhenUnfocused(dimlevel > 0);
+    DimLevel(dimlevel);
     IntensifyBoldText(p.intensify);
     BlinkInterval(p.blinkinterval);
     UnlockCursor();

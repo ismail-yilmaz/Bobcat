@@ -268,6 +268,7 @@ void Bobcat::Settings()
 	cr(settingspane.imagepath, settings.backgroundimagepath);
 	cr(settingspane.imageblur, settings.backgroundimageblur);
 	cr(settingspane.waitinterval, settings.ptywaitinterval);
+	cr(settingspane.dimlevel, settings.dimlevel);
 	cr.Set();
 
 	profiles.Load();
@@ -784,6 +785,7 @@ Bobcat::Config::Config()
 , backgroundimagemode("normal")
 , backgroundimageblur(0)
 , ptywaitinterval(10)
+, dimlevel(0)
 , splitterorientation("horizontal")
 {
 }
@@ -811,6 +813,7 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("BackgroundImageMode", backgroundimagemode)
 	   ("BackgroundImageBlur", backgroundimageblur)
 	   ("PtyMonitoringInterval", ptywaitinterval)
+	   ("TerminalDimLevel", dimlevel)
 	   ("GuiTheme", guitheme)
 	   ("GuiFont", guifont);
 }

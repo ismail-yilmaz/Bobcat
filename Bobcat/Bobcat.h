@@ -159,6 +159,7 @@ struct Bobcat : Pte<Bobcat> {
         String      backgroundimagemode;
         int         backgroundimageblur;
         int         ptywaitinterval;
+        int         dimlevel;
         String      splitterorientation;
         void        Jsonize(JsonIO& jio);
     };
