@@ -487,17 +487,15 @@ void Profiles::Sync()
 int Profiles::Load()
 {
 	VectorMap<String, Profile> profiles;
-	int rc = LoadProfiles(profiles);
-	if(profiles.GetCount()) {
+	if(LoadProfiles(profiles)) {
 		list.Clear();
 		for(const auto& p : ~profiles)
 			list.Add(p.key, RawToValue(clone(p.value)));
 		list.Sort(1, [](const Value& a, const Value& b) -> int { return a.To<Profile>().order - b.To<Profile>().order; });
-		int current = list.Find(ctx.GetActiveProfile(), 0);
-		if (current >= 0)
+		if(int current = list.Find(ctx.GetActiveProfile(), 0); current >= 0)
 			list.SetCursor(current);
 	}
-	return rc;
+	return !profiles.IsEmpty();
 }
 
 void Profiles::Store()
@@ -508,23 +506,8 @@ void Profiles::Store()
 		Profile p = list.Get(i, 1).To<Profile>();
 		p.order = i;
 		hasDefault |= s == ctx.settings.defaultprofile;
-		try
-		{
-			JsonIO jio;
-			p.Jsonize(jio);
-			String path = ProfileFile(s);
-			if(!FileExists(path))
-				RealizePath(path);
-			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
-		}
-		catch(const JsonizeError& e)
-		{
-			LLOG("Jsonization error: " << e);
-		}
-		catch(const ValueTypeError& e)
-		{
-			LLOG("Value type error: " << e);
-		}
+		if(!StoreProfile(p))
+			LLOG("Warning: Failed to store profile " << s);
 	}
 	if(!hasDefault && list.GetCount()) {
 		ctx.settings.defaultprofile = list.Get(0, 0).To<String>();
@@ -560,10 +543,10 @@ void Profiles::DnDInsert(int line, PasteClip& d)
 Profile LoadProfile(const String& name)
 {
 	Profile p;
-	for(const FindFile& f : FindFile(ProfileFile(name))) {
+	if(String path = ProfileFile(name); FileExists(path)) {
 		try
 		{
-			Value q = ParseJSON(LoadFile(f.GetPath()));
+			Value q = ParseJSON(LoadFile(path));
 			JsonIO jio(q);
 			p.Jsonize(jio);
 		}
@@ -587,9 +570,8 @@ Profile LoadProfile(const String& name)
 	return pick(p);
 }
 
-int LoadProfiles(VectorMap<String, Profile>& v)
+bool LoadProfiles(VectorMap<String, Profile>& v)
 {
-	int failures = 0;
 	for(const String& s : GetProfileFilePaths()) {
 		try
 		{
@@ -602,17 +584,14 @@ int LoadProfiles(VectorMap<String, Profile>& v)
 		}
 		catch(const JsonizeError& e)
 		{
-			failures++;
 			LLOG(e);
 		}
 		catch(const ValueTypeError& e)
 		{
-			failures++;
 			LLOG(e);
 		}
 		catch(const CParser::Error& e)
 		{
-			failures++;
 			LLOG(e);
 		}
 		catch(...)
@@ -620,7 +599,50 @@ int LoadProfiles(VectorMap<String, Profile>& v)
 			LLOG("Unknown exception");
 		}
 	}
-	return v.GetCount() ? failures : -1;
+	return !v.IsEmpty();
+}
+
+bool StoreProfile(Profile& p)
+{
+	try
+	{
+		JsonIO jio;
+		p.Jsonize(jio);
+		String path = ProfileFile(p.name);
+		if(!FileExists(path))
+			RealizePath(path);
+		if(!SaveFile(path, (String) AsJSON(jio.GetResult(), true)))
+			throw Exc("Unable to save file: " << path);
+		return true;
+	}
+	catch(const JsonizeError& e)
+	{
+		LLOG("Jsonization error: " << e);
+	}
+	catch(const ValueTypeError& e)
+	{
+		LLOG("Value type error: " << e);
+	}
+	catch(const Exc& e)
+	{
+		LLOG("File system error: " << e);
+	}
+	catch(...)
+	{
+		LLOG("Unknown exception");
+	}
+	return false;
+}
+
+Profile LoadDefaultProfile(Bobcat& ctx)
+{
+	if(GetProfileFilePaths().IsEmpty()) {
+		if(Profile p(t_("Local")); StoreProfile(p) == 0) {
+			ctx.settings.defaultprofile = p.name;
+			SaveConfig(ctx);
+		}
+	}
+	return LoadProfile(ctx.settings.defaultprofile);
 }
 
 String ProfilesDir()

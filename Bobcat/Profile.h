@@ -133,7 +133,9 @@ public:
 };
 
 Profile        LoadProfile(const String& name);
-int            LoadProfiles(VectorMap<String, Profile>& v);
+Profile        LoadDefaultProfile(Bobcat& ctx);
+bool           LoadProfiles(VectorMap<String, Profile>& v);
+bool           StoreProfile(Profile& p);
 
 String         ProfilesDir();
 String         ProfileFile(const String& name);

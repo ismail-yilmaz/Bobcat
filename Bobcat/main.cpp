@@ -117,8 +117,8 @@ void BobcatAppMain()
 	
 	try {
 		
-		// Try loading the default profile, if any, and fallback to default configuration on failure.
-		Profile p = LoadProfile(app.settings.defaultprofile);
+		// Try loading the active profile, if any, and create and fallback configuration on failure.
+		Profile p = LoadDefaultProfile(app);
 		
 		if(const Vector<String>& cmd = CommandLine(); !cmd.IsEmpty()) {
 			CmdArgList arglist;

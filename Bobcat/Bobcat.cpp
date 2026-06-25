@@ -507,7 +507,7 @@ void Bobcat::SyncBrightness()
 
 void Bobcat::SyncTerminalProfiles()
 {
-	if(VectorMap<String, Profile> v; LoadProfiles(v) >= 0) {
+	if(VectorMap<String, Profile> v; LoadProfiles(v)) {
 		for(const Profile& p : v.GetValues()) {
 			for(Terminal* t : GetTerminalGroup(p)) {
 				t->SetProfile(p, true); // hot-reload
