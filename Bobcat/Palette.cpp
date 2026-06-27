@@ -29,9 +29,9 @@ static const Vector<Tuple<Color, const char*, const char*>>& GetColorList()
 		{ LtMagenta(),           "Color_14", t_("Bright Magenta") },
 		{ LtCyan(),              "Color_15", t_("Bright Cyan") },
 		{ White(),               "Color_16", t_("Bright White") },
-		{ SColorText,            "Ink"     , t_("Ink") },
+		{ White(),               "Ink"     , t_("Ink") },
 		{ SColorHighlightText,   "SelectionInk", t_("Selection Ink") },
-		{ SColorPaper,           "Paper"       , t_("Paper") },
+		{ Black(),               "Paper"       , t_("Paper") },
 		{ SColorHighlight,       "SelectionPaper", t_("Selection Paper") },
 		{ SYellow,               "AnnotationUnderline", t_("Annotation Underline") },
 		{ LtRed(),               "HighlightInk", t_("Highlight Ink") },
@@ -283,8 +283,7 @@ Value Palettes::GetData() const
 int Palettes::Load()
 {
 	VectorMap<String, Palette> palettes;
-	int rc = LoadPalettes(palettes);
-	if(palettes.GetCount()) {
+	if(LoadPalettes(palettes)) {
 		list.Clear();
 		for(const auto& p : ~palettes)
 			list.Add(p.key, RawToValue(clone(p.value)));
@@ -292,7 +291,7 @@ int Palettes::Load()
 		list.FindSetCursor(data);
 		Sync();
 	}
-	return rc;
+	return !palettes.IsEmpty();
 }
 
 void Palettes::Store() const
@@ -301,23 +300,8 @@ void Palettes::Store() const
 		String  s = list.Get(i, 0).To<String>();
 		Palette p = list.Get(i, 1).To<Palette>();
 		p.order = i;
-		try
-		{
-			JsonIO jio;
-			p.Jsonize(jio);
-			String path = PaletteFile(s);
-			if(!FileExists(path))
-				RealizePath(path);
-			SaveFile(path, (String) AsJSON(jio.GetResult(), true));
-		}
-		catch(const JsonizeError& e)
-		{
-			LLOG("Jsonization error: " << e);
-		}
-		catch(const ValueTypeError& e)
-		{
-			LLOG("Value type error: " << e);
-		}
+		if(!StorePalette(p))
+			LLOG("Warning: Failed to store profile " << s);
 	}
 }
 
@@ -351,9 +335,8 @@ Palette LoadPalette(const String& name)
 	return pick(p);
 }
 
-int LoadPalettes(VectorMap<String, Palette>& v)
+bool LoadPalettes(VectorMap<String, Palette>& v)
 {
-	int failures = 0;
 	for(const String& s : GetPaletteFilePaths()) {
 		try
 		{
@@ -363,25 +346,46 @@ int LoadPalettes(VectorMap<String, Palette>& v)
 		}
 		catch(const JsonizeError& e)
 		{
-			failures++;
-			LLOG(e);
+			LLOG("Jsonization error: " << e);
 		}
 		catch(const ValueTypeError& e)
 		{
-			failures++;
-			LLOG(e);
+			LLOG("Value type error: " << e);
 		}
 		catch(const CParser::Error& e)
 		{
-			failures++;
-			LLOG(e);
+			LLOG("Parser error: " << e);
 		}
 		catch(...)
 		{
 			LLOG("Unknown exception");
 		}
 	}
-	return v.GetCount() ? failures : -1;
+	return !v.IsEmpty();
+}
+
+bool StorePalette(Palette& p)
+{
+	try
+	{
+		JsonIO jio;
+		p.Jsonize(jio);
+		String path = PaletteFile(p.name);
+		if(!FileExists(path))
+			RealizePath(path);
+		if(!SaveFile(path, (String) AsJSON(jio.GetResult(), true)))
+			throw Exc("Unable to save file: " << path);
+		return true;
+	}
+	catch(const JsonizeError& e)
+	{
+		LLOG("Jsonization error: " << e);
+	}
+	catch(const ValueTypeError& e)
+	{
+		LLOG("Value type error: " << e);
+	}
+	return false;
 }
 
 String PaletteDir()

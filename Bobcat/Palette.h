@@ -46,7 +46,8 @@ private:
 // Global functions
 
 Palette        LoadPalette(const String& name);
-int            LoadPalettes(VectorMap<String, Palette>& v);
+bool           LoadPalettes(VectorMap<String, Palette>& v);
+bool           StorePalette(Palette& p);
 
 String         PaletteDir();
 String         PaletteFile(const String& name);

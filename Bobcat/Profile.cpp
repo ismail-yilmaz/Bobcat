@@ -152,7 +152,7 @@ void Profile::Jsonize(JsonIO& jio)
 	("PathTranslationMode",  pathtranslation)
 	("PathDelimiter",        pathdelimiter)
 	("FilterCtrlBytes",      filterctrl)
-    ("AnswerbackMessage",    answerbackmsg)
+	("AnswerbackMessage",    answerbackmsg)
 	("OnExit",               onexit)
 	("Palette",              palette)
 	("Finder",               finder)
@@ -262,64 +262,64 @@ Profiles::Setup::Setup()
 
 void Profiles::Setup::MapData(CtrlMapper& m, Profile& p) const
 {
-    m(general.cmd,              p.command)
-     (general.dir,              p.address)
-     (general.shellintegration, p.shellintegration)
-     (general.env,              p.env)
-     (general.noenv,            p.noenv)
-     (general.addexetopath,     p.addtopath)
-     (general.cmdexit,          p.onexit)
-     (general.answerback,       p.answerbackmsg)
-     (general.pty,              p.ptybackend)
-     (general.warnonrootaccess, p.warnonrootaccess)
-     (visuals.font,             p.font)
-     (visuals.linespacing,      p.linespacing)
-     (visuals.cursorstyle,      p.cursorstyle)
-     (visuals.blinkcursor,      p.blinkcursor)
-     (visuals.lockcursor,       p.lockcursor)
-     (visuals.colorprofiles,    p.palette)
-     (visuals.inheritpalette,   p.inheritpalette)
-     (visuals.adjustcolors,     p.adjustcolors)
-     (visuals.lightcolors,      p.lightcolors)
-     (visuals.intensify,        p.intensify)
-     (visuals.dynamiccolors,    p.dynamiccolors)
-     (visuals.blinktext,        p.blinktext)
-     (visuals.blinkinterval,    p.blinkinterval)
-     (visuals.bell,             p.bell)
-     (visuals.flashscreen,      p.flashscreen)
-     (visuals.hidemouse,        p.autohidemouse)
-     (visuals.scrollbar,        p.scrollbar)
-     (visuals.sizehint,         p.sizehint)
-     (visuals.noscroll,         p.dontscrolltoend)
-     (emulation.charset,        p.encoding)
-     (emulation.widechars,      p.ambiguoustowide)
-     (emulation.images,         p.inlineimages)
-     (emulation.hyperlinks,     p.hyperlinks)
-     (emulation.annotations,    p.annotations)
-     (emulation.progress,       p.progress)
-     (emulation.history,        p.history)
-     (emulation.historysize,    p.historysize)
-     (emulation.windowactions,  p.windowactions)
-     (emulation.windowreports,  p.windowreports)
-     (emulation.readclipboard,  p.clipboardread)
-     (emulation.writeclipboard, p.clipboardwrite)
-     (emulation.wheelstep,      p.mousewheelstep)
-     (emulation.erasechar,      p.erasechar)
-     (emulation.rewrap,         p.reversewrap)
-     (emulation.keystyle,       p.functionkeystyle)
-     (emulation.altescapes,     p.altescapeskeys)
-     (emulation.altshifts,      p.altshiftskeys)
-     (emulation.keynavigation,  p.keynavigation)
-     (emulation.alternatescroll,p.alternatescroll)
-     (emulation.delayedrefresh, p.delayedrefresh)
-     (emulation.lazyresize,     p.lazyresize)
-     (emulation.overridetracking, p.overridetracking)
-     (emulation.paste.pathtranslation, p.pathtranslation)
-     (emulation.paste.pathdelimiter,   p.pathdelimiter)
-     (emulation.paste.filter,          p.filterctrl)
-     (emulation.selection.wordselmode,      p.wordselmode)
-     (emulation.selection.findselectedtext, p.findselectedtext)
-     (emulation.selection.wordselpattern, p.wordselpattern);
+	m(general.cmd,              p.command)
+	(general.dir,              p.address)
+	(general.shellintegration, p.shellintegration)
+	(general.env,              p.env)
+	(general.noenv,            p.noenv)
+	(general.addexetopath,     p.addtopath)
+	(general.cmdexit,          p.onexit)
+	(general.answerback,       p.answerbackmsg)
+	(general.pty,              p.ptybackend)
+	(general.warnonrootaccess, p.warnonrootaccess)
+	(visuals.font,             p.font)
+	(visuals.linespacing,      p.linespacing)
+	(visuals.cursorstyle,      p.cursorstyle)
+	(visuals.blinkcursor,      p.blinkcursor)
+	(visuals.lockcursor,       p.lockcursor)
+	(visuals.colorprofiles,    p.palette)
+	(visuals.inheritpalette,   p.inheritpalette)
+	(visuals.adjustcolors,     p.adjustcolors)
+	(visuals.lightcolors,      p.lightcolors)
+	(visuals.intensify,        p.intensify)
+	(visuals.dynamiccolors,    p.dynamiccolors)
+	(visuals.blinktext,        p.blinktext)
+	(visuals.blinkinterval,    p.blinkinterval)
+	(visuals.bell,             p.bell)
+	(visuals.flashscreen,      p.flashscreen)
+	(visuals.hidemouse,        p.autohidemouse)
+	(visuals.scrollbar,        p.scrollbar)
+	(visuals.sizehint,         p.sizehint)
+	(visuals.noscroll,         p.dontscrolltoend)
+	(emulation.charset,        p.encoding)
+	(emulation.widechars,      p.ambiguoustowide)
+	(emulation.images,         p.inlineimages)
+	(emulation.hyperlinks,     p.hyperlinks)
+	(emulation.annotations,    p.annotations)
+	(emulation.progress,       p.progress)
+	(emulation.history,        p.history)
+	(emulation.historysize,    p.historysize)
+	(emulation.windowactions,  p.windowactions)
+	(emulation.windowreports,  p.windowreports)
+	(emulation.readclipboard,  p.clipboardread)
+	(emulation.writeclipboard, p.clipboardwrite)
+	(emulation.wheelstep,      p.mousewheelstep)
+	(emulation.erasechar,      p.erasechar)
+	(emulation.rewrap,         p.reversewrap)
+	(emulation.keystyle,       p.functionkeystyle)
+	(emulation.altescapes,     p.altescapeskeys)
+	(emulation.altshifts,      p.altshiftskeys)
+	(emulation.keynavigation,  p.keynavigation)
+	(emulation.alternatescroll,p.alternatescroll)
+	(emulation.delayedrefresh, p.delayedrefresh)
+	(emulation.lazyresize,     p.lazyresize)
+	(emulation.overridetracking, p.overridetracking)
+	(emulation.paste.pathtranslation, p.pathtranslation)
+	(emulation.paste.pathdelimiter,   p.pathdelimiter)
+	(emulation.paste.filter,          p.filterctrl)
+	(emulation.selection.wordselmode,      p.wordselmode)
+	(emulation.selection.findselectedtext, p.findselectedtext)
+	(emulation.selection.wordselpattern, p.wordselpattern);
 
 }
 
@@ -584,15 +584,15 @@ bool LoadProfiles(VectorMap<String, Profile>& v)
 		}
 		catch(const JsonizeError& e)
 		{
-			LLOG(e);
+			LLOG("Jsonization error: " << e);
 		}
 		catch(const ValueTypeError& e)
 		{
-			LLOG(e);
+			LLOG("Value type error: " << e);
 		}
 		catch(const CParser::Error& e)
 		{
-			LLOG(e);
+			LLOG("Parser error: " << e);
 		}
 		catch(...)
 		{
@@ -636,13 +636,24 @@ bool StoreProfile(Profile& p)
 
 Profile LoadDefaultProfile(Bobcat& ctx)
 {
-	if(GetProfileFilePaths().IsEmpty()) {
-		if(Profile p(t_("Local")); StoreProfile(p) == 0) {
-			ctx.settings.defaultprofile = p.name;
+	String& defprofile = ctx.settings.defaultprofile;
+
+	if(IsNull(defprofile) || !FileExists(ProfileFile(defprofile))) {
+		if(Vector<String> available = GetProfileNames(); available.GetCount()) {
+			defprofile = available[0];
 			SaveConfig(ctx);
 		}
+		else {
+			Profile p(t_("Local"));
+			if(StoreProfile(p)) {
+				defprofile = p.name;
+			}
+			SaveConfig(ctx);
+			return p;
+		}
 	}
-	return LoadProfile(ctx.settings.defaultprofile);
+
+	return LoadProfile(defprofile);
 }
 
 String ProfilesDir()
