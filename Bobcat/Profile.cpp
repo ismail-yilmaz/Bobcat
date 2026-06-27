@@ -73,9 +73,9 @@ Profile::Profile()
 , sizehint(true)
 , order(0)
 {
-	env << "TERM=" << Nvl(GetEnv("TERM"), "xterm-256color") << "\n"
-		<< "COLORTERM=" << Nvl(GetEnv("COLORTERM"), "truecolor") << "\n"
-		<< "TERM_PROGRAM=" << Nvl(GetEnv("TERM_PROGRAM"), "Bobcat") << "\n";
+	env << "TERM=xterm-256color\n"
+		<< "COLORTERM=truecolor\n"
+		<< "TERM_PROGRAM=Bobcat";
 #if defined(PLATFORM_WIN32)
 	#if(defined(flagWIN10))
 		ptybackend = "conpty";

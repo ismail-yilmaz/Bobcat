@@ -18,8 +18,6 @@ using namespace FinderKeys;
 
 constexpr const int SEARCH_MAX = 256000;
 
-static StaticMutex sFinderLock;
-
 Finder::Finder(Terminal& t)
 : term(t)
 , mode(Finder::Mode::CaseSensitive)
@@ -95,52 +93,58 @@ bool Finder::Find(const WString& text, bool co)
 bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 {
 	int slen = s.GetLength();
+	if(!slen)
+		return false;
+	
 	int offset = m.GetKey(0);
 	
-	LTIMING("TrivialSearch");
+	LTIMING("BasicSearch");
 	
-	// Notes: 1) We are using this for search, because it is faster than using WString::Find() here.
-	//        2) m.GetCount() > 1 == text is wrapped.
+	bool tolower = IsCaseInsensitive();
 	
-	auto ScanText = [&](SortedIndex<ItemInfo>& v, int limit, bool tolower) {
+	WString searchstr = tolower ? ToLower(s) : s;
+	int firstchr = searchstr[0];
+
+	auto ScanText = [&](SortedIndex<ItemInfo>& v, int limit) {
 		for(int row = 0, i = 0; row < m.GetCount(); row++) {
-			for(int col = 0; col < m[row].GetLength(); col++, i++) {
+			const WString& line = m[row];
+			int line_len = line.GetLength();
+			for(int col = 0; col < line_len; col++, i++) {
 				if(IsCanceled())
 					return true;
-				int a = m[row][col], b = s[0];
-				if(tolower) {
+				int a = line[col];
+				if(tolower)
 					a = ToLower(a);
-					b = ToLower(b);
-				}
-				if(a == b) {
-					int trow = row, tcol = col, tlen = slen;
-					// Check if the substring is present starting from the current position.
+				if(a == firstchr) {
+					int trow = row, tcol = col, tlen = slen, match_idx = 0;
 					while(tlen > 0 && trow < m.GetCount()) {
-						a = m[trow][tcol], b = s[slen - tlen];
+						int c = m[trow][tcol];
 						if(tolower) {
-							a = ToLower(a);
-							b = ToLower(b);
+							c = ToLower(c);
 						}
-						if(a == b)
+						if(c == searchstr[match_idx]) {
 							tlen--;
-						else
+							match_idx++;
+						}
+						else {
 							break;
-						if(tcol + 1 < m[trow].GetLength())
+						}
+						if(tcol + 1 < m[trow].GetLength()) {
 							tcol++;
+						}
 						else {
 							trow++;
 							tcol = 0;
 						}
 					}
-					// If tlen is 0, then the substring is found.
 					if(!tlen) {
 						ItemInfo q;
 						q.pos.y = offset;
 						q.pos.x = i;
 						q.length = slen;
-						sFinderLock.Enter();
+						lock.Enter();
 						v.Add(q);
-						sFinderLock.Leave();
+						lock.Leave();
 						if(v.GetCount() == limit)
 							return true;
 					}
@@ -150,7 +154,7 @@ bool Finder::BasicSearch(const VectorMap<int, WString>& m, const WString& s)
 		return false;
 	};
 	
-	return ScanText(foundtext, limit, IsCaseInsensitive());
+	return ScanText(foundtext, limit);
 }
 
 bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
@@ -158,16 +162,20 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 	LTIMING("RegexSearch");
 
 	int offset = m.GetKey(0);
-	
-	WString q;
-	for(const WString& ss : m)
-		q << ss;
+	int total = 0;
 
-	if(q.IsEmpty())
+	for(const WString& ss : m)
+		total += ss.GetLength();
+		
+	if(total == 0)
 		return false;
-	
+		
+	String ln;
+	ln.Reserve(total * 2); // Heuristic for average UTF-8 sizing to prevent reallocations
+	for(const WString& ss : m)
+		ln << ToUtf8(ss);
+
 	RegExp r(s.ToString());
-	String ln = ToUtf8(q);
 
 	while(r.GlobalMatch(ln)) {
 		if(IsCanceled())
@@ -177,9 +185,9 @@ bool Finder::RegexSearch(const VectorMap<int, WString>& m, const WString& s)
 		a.pos.y = offset;
 		a.pos.x = Utf32Len(~ln, o);
 		a.length = Utf32Len(~ln + o, r.GetLength());
-		sFinderLock.Enter();
+		lock.Enter();
 		foundtext.Add(a);
-		sFinderLock.Leave();
+		lock.Leave();
 		if(foundtext.GetCount() == limit)
 			return true;
 	}
@@ -220,7 +228,7 @@ bool Finder::HasFound() const
 
 void Finder::Clear()
 {
-	Mutex::Lock __(sFinderLock);
+	SpinLock::Lock __(lock);
 	foundtext.Clear();
 	cancel = false;
 }
@@ -249,13 +257,13 @@ Finder::Config::Config()
 void Finder::Config::Jsonize(JsonIO& jio)
 {
 	jio("SearchMode",        searchmode)
-	   ("SearchLimit",       searchlimit)
-	   ("ShowAll",           showall)
-	   ("ParallelSearch",    parallelize)
-	   ("HarvestingFormat",  saveformat)
-	   ("HarvestingMode",    savemode)
-	   ("Delimiter",         delimiter)
-	   ("Patterns",          patterns);
+	("SearchLimit",       searchlimit)
+	("ShowAll",           showall)
+	("ParallelSearch",    parallelize)
+	("HarvestingFormat",  saveformat)
+	("HarvestingMode",    savemode)
+	("Delimiter",         delimiter)
+	("Patterns",          patterns);
 }
 
 FinderBar::FinderBar(Terminal& t)
@@ -407,18 +415,21 @@ void FinderBar::SetSearchMode(const String& mode)
 void FinderBar::CheckCase()
 {
 	CaseSensitive();
+	Search();
 	Sync();
 }
 
 void FinderBar::IgnoreCase()
 {
 	CaseInsensitive();
+	Search();
 	Sync();
 }
 
 void FinderBar::CheckPattern()
 {
 	Regex();
+	Search();
 	Sync();
 }
 
@@ -431,6 +442,7 @@ void FinderBar::ShowAll(bool b)
 void FinderBar::Co(bool b)
 {
 	co = b;
+	Search();
 	Sync();
 }
 
@@ -565,11 +577,10 @@ void FinderBar::Sync()
 
 void FinderBar::Search0(const WString& txt)
 {
-	if(term.IsSearching()) {
+	if(term.IsSearching())
 		Cancel();
-		return;
-	}
-	Find(txt, co);
+	else
+		Find(txt, co);
 	Sync();
 }
 
@@ -612,7 +623,7 @@ void FinderBar::OnHighlight(HighlightInfo& hl)
 		const ItemInfo& p = Get(index);
 		const ItemInfo* q = hl.iteminfo;
 		int   o = hl.offset;
-		for(auto cell : hl.highlighted) {
+		for(VTCell *cell : hl.highlighted) {
 			if(q->pos.y == p.pos.y && q->pos.x + o == p.pos.x + o) {
 				cell->Normal()
 					.Ink(term.highlight[1]).Paper(term.highlight[3]);

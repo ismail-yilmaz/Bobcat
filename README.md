@@ -60,7 +60,7 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 - **Web Terminal Access:** Run the terminal in a **modern web browser** via **HTML5 Canvas**, enabling remote access.  
 - **Headless Mode:** Operates on minimal setups via an **SDL2-GL backend**, eliminating GUI dependencies.  
 
-And yes—**it can run Doom!** 🎮  
+And yes, **it can run Doom!**  
 
 
 ## Build Requirements

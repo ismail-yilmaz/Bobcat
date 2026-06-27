@@ -65,6 +65,7 @@ private:
 	Mode        mode;
 	int         limit;
 	bool        cancel:1;
+    SpinLock    lock;
 };
 
 class FinderBar : public Finder, public FrameTB<WithFinderBarLayout<ParentCtrl>>
