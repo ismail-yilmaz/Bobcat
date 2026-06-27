@@ -153,6 +153,7 @@ void Linkifier::Scan()
 		}
 		return false;
 	};
+	
 	term.GetPage().FetchRange(term.GetPageRange(), ScanRange);
 }
 
@@ -164,10 +165,10 @@ void Linkifier::OnHighlight(HighlightInfo& hl)
 	LTIMING("Linkifier::OnHighlight");
 
 	term.DoHighlight(links, hl, [this](HighlightInfo& hl) {
-		for(auto q : hl.highlighted) {
-			if(!q->IsHypertext()) {
+		for(VTCell *cell : hl.highlighted) {
+			if(!cell->IsHypertext()) {
 				bool active = pos >= hl.posindex && pos < hl.posindex + hl.iteminfo->length;
-				q->Hyperlink().data = active ? 0 : (dword) -1;
+				cell->Hyperlink().data = active ? 0 : (dword) -1;
 			}
 		}
 	});
