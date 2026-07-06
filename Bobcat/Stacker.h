@@ -14,12 +14,15 @@ public:
     Stacker&    Wheel(bool b = true);
     Stacker&    Animation(int ms = 150);
     int         GetDuration() const;
-    
+
+    Stacker&    MaxPanes(int n);
+    int         GetMaxPanes() const;
+
     Stacker&    NoBackground(bool b = true);
 
     Stacker&    Horz();
     Stacker&    Vert();
-    
+
     Stacker&    HorzSplitter();
     Stacker&    VertSplitert();
     Stacker&    ToggleSplitterOrientation();
@@ -44,18 +47,39 @@ public:
 
     int         Find(Ctrl& ctrl) const;
 
+    // Workspace & Search API
+    int         GetWorkspaceCount() const;
+    int         FindWorkspace(Ctrl& ctrl) const;
+    int         FindInWorkspace(int wsid, Ctrl& ctrl) const;
+
+    Vector<Ctrl*> GetWorkspacePanes(int wsid) const;
+    Vector<Ctrl*> GetWorkspacePanes(Ctrl& ctrl) const;
+
+    // Workspace Identification
+    Stacker&    SetWorkspaceName(int wsid, const String& name);
+    Stacker&    SetWorkspaceName(Ctrl& ctrl, const String& name);
+
+    String      GetWorkspaceName(int wsid) const;
+    String      GetWorkspaceName(Ctrl& ctrl) const;
+
+    int         FindWorkspaceByName(const String& name) const;
+
+    // Workspace Arrangement
+    void        MovePanePrev();
+    void        MovePaneNext();
+
     void        Swap(int a, int b);
     void        Swap(Ctrl& a, Ctrl& b);
     void        SwapNext();
     void        SwapPrev();
-    
+
     void        SwapPanes();
     void        ExpandTopLeftPane();
     void        ExpandBottomRightPane();
     void        ResetSplitterPos();
 
-	Ctrl*       GetPassiveCtrl() const;
-	
+    Ctrl*       GetPassiveCtrl() const;
+
     void        Goto(int i);
     void        Goto(Ctrl& ctrl);
     void        Prev();
@@ -73,15 +97,17 @@ private:
     bool IsNext(Ctrl *next) const;
     void Animate(Ctrl *current, Ctrl *next, bool forward);
 
-    Vector<Ctrl*> list;
-    Array<Splitter> splitters;
-    Ctrl*        activectrl;    // cursor
-    int          duration;
-    bool         wheel:1;
-    bool         vertical:1;
-    bool         splitvert:1;
-    bool         animating:1;
-    bool         swapping:1;
+    Vector<Ctrl*>            list;
+    Array<Splitter>          splitters;
+    VectorMap<Ctrl*, String> workspacenames;
+    Ctrl*                    activectrl;    // cursor
+    int                      duration;
+    int                      maxpanes;
+    bool                     wheel:1;
+    bool                     vertical:1;
+    bool                     splitvert:1;
+    bool                     animating:1;
+    bool                     swapping:1;
 };
 
 #endif
