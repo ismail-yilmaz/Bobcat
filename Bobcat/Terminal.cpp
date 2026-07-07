@@ -133,7 +133,7 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 		else
 			ctx.stack.Add(*this);
 	}
-	if(pty->Start(p.command, m, p.address)) {
+	if(pty->Co(p.asyncio).Start(p.command, m, p.address)) {
 		starttime = GetSysTime();
 		pty->SetSize(GetPageSize());
 		return true;

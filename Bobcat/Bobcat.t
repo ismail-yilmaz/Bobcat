@@ -542,6 +542,9 @@ trTR("Yeni ad")
 T_("Do you really want to delete profile '%s'?")
 trTR("'%s' profilini ger\303\247ekten silmek istiyor musunuz?")
 
+T_("Local")
+trTR("")
+
 
 // Palette.cpp
 
@@ -1098,8 +1101,9 @@ trTR("\001[g Pty izleme aral\304\261\304\237\304\261 0\342\200\223100 ms aras\30
 
 T_("\001[g Unfocused terminal dimming level can be a value between 0`-100.&0 "
      "effectively disables dimming]")
-trTR("\001[g Odaklan\304\261lmayan terminallerin soldurulma de\304\237eri 0`-100 aras\304\261nda olabilir.&"
-     "Bu \303\266zelli\304\237i etkisizle\305\237tirmek i\303\247in aral\304\261\304\237\304\261 0'a getirmeniz yeterlidir. ]")
+trTR("\001[g Odaklan\304\261lmayan terminallerin soldurulma de\304\237eri 0`-100 "
+     "aras\304\261nda olabilir.&Bu \303\266zelli\304\237i etkisizle\305\237tirmek "
+     "i\303\247in aral\304\261\304\237\304\261 0'a getirmeniz yeterlidir. ]")
 
 T_("Hide window caption and frames")
 trTR("Pencere ba\305\237l\304\261\304\237\304\261n\304\261 ve \303\247er\303\247evelerini "
@@ -1201,6 +1205,14 @@ trTR("Ortam de\304\237i\305\237kenlerini devralma")
 
 T_("Add Bobcat's exe path to PATH")
 trTR("Bobcat\342\200\231in exe yolunu PATH\342\200\231e ekle")
+
+T_("Enable background I/O")
+trTR("Arka plan G/\303\207'yi etkinle\305\237tir")
+
+T_("\001[g [ Use a background thread for terminal I/O. Improves I/O performance "
+     "on heavy outputs at the cost of higher memory consumption. Only affects new terminals.]")
+trTR("\001[g [ Terminal G/\303\207 i\305\237lemleri i\303\247in bir arka plan i\305\237 par\303\247ac\304\261\304\237\304\261 kullan\304\261r. "
+     "Yo\304\237un \303\247\304\261kt\304\261 i\305\237lemlerinde performans\304\261 art\304\261r\304\261r, ancak bellek t\303\274ketimini y\303\274kseltir. Sadece yeni a\303\247\304\261lan terminalleri etkiler.]")
 
 T_("Choose the pseudo-terminal backend. Note that winpty backend requires "
      "the PtyAgent.exe file in the exe directory.")
