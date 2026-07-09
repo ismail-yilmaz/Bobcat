@@ -303,7 +303,8 @@ Vector<Ctrl*> Stacker::GetWorkspacePanes(int wsid) const
 				if(c)
 					panes.Add(c);
 		}
-		else if(list[wsid])
+		else
+		if(list[wsid])
 			panes.Add(list[wsid]);
 	}
 	return panes;

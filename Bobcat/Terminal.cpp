@@ -133,6 +133,10 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 		else
 			ctx.stack.Add(*this);
 	}
+	pty->WhenWakeUp = [this] {
+		// In async I/O mode, let async PTYs punch through the Wait() if they have pending data.
+		Single<PtyWaitEvent>().WakeUp();
+	};
 	if(pty->Co(p.asyncio).Start(p.command, m, p.address)) {
 		starttime = GetSysTime();
 		pty->SetSize(GetPageSize());
