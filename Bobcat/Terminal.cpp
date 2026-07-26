@@ -364,6 +364,7 @@ Terminal& Terminal::SetProfile(const Profile& p, bool reload)
         DelayedRefresh(p.delayedrefresh);
         LazyResize(p.lazyresize);
         ShowSizeHint(p.sizehint);
+        TextReflow(p.textreflow);
         SetLocale(p.encoding);
         TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
         SetPadding(Size(0, p.linespacing));
@@ -1107,6 +1108,7 @@ void Terminal::ViewMenu(Bar& menu)
 void Terminal::EmulationMenu(Bar& menu)
 {
 	menu.Add(AK_SHELLINTEGRATION, [this] { shellintegration = !shellintegration; }).Check(shellintegration);
+	menu.Add(AK_TEXTREFLOW,       [this] { TextReflow(!IsTextReflowing()); }).Check(IsTextReflowing());
 	menu.Add(AK_VTFUNCTIONKEYS,   [this] { PCStyleFunctionKeys(HasPCStyleFunctionKeys()); }).Check(!HasPCStyleFunctionKeys());
 	menu.Add(AK_KEYNAVIGATION,    [this] { KeyNavigation(!HasKeyNavigation()); }).Check(HasKeyNavigation());
 	menu.Add(AK_SCROLLBAR,        [this] { ShowScrollBar(!HasScrollBar()); }).Check(HasScrollBar());

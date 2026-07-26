@@ -71,6 +71,7 @@ struct Profile : Moveable<Profile> {
     bool        addtopath;
     bool        filterctrl;
     bool        sizehint;
+    bool        textreflow;
     int         order;
     Finder::Config finder;
     Linkifier::Config linkifier;

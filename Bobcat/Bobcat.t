@@ -1210,9 +1210,13 @@ T_("Enable background I/O")
 trTR("Arka plan G/\303\207'yi etkinle\305\237tir")
 
 T_("\001[g [ Use a background thread for terminal I/O. Improves I/O performance "
-     "on heavy outputs at the cost of higher memory consumption. Only affects new terminals.]")
-trTR("\001[g [ Terminal G/\303\207 i\305\237lemleri i\303\247in bir arka plan i\305\237 par\303\247ac\304\261\304\237\304\261 kullan\304\261r. "
-     "Yo\304\237un \303\247\304\261kt\304\261 i\305\237lemlerinde performans\304\261 art\304\261r\304\261r, ancak bellek t\303\274ketimini y\303\274kseltir. Sadece yeni a\303\247\304\261lan terminalleri etkiler.]")
+     "on heavy outputs at the cost of higher memory consumption. Only affects "
+     "new terminals.]")
+trTR("\001[g [ Terminal G/\303\207 i\305\237lemleri i\303\247in bir arka plan "
+     "i\305\237 par\303\247ac\304\261\304\237\304\261 kullan\304\261r. Yo\304\237un "
+     "\303\247\304\261kt\304\261 i\305\237lemlerinde performans\304\261 art\304\261r\304\261r, "
+     "ancak bellek t\303\274ketimini y\303\274kseltir. Sadece yeni a\303\247\304\261lan "
+     "terminalleri etkiler.]")
 
 T_("Choose the pseudo-terminal backend. Note that winpty backend requires "
      "the PtyAgent.exe file in the exe directory.")
@@ -1270,6 +1274,12 @@ trTR("Zil \303\247al")
 T_("Flash screen")
 trTR("Fla\305\237 \303\247ak")
 
+T_("Show scrollbar")
+trTR("Kayd\304\261rma \303\247ubu\304\237unu g\303\266ster")
+
+T_("Text reflow")
+trTR("Metin ak\304\261\305\237\304\261n\304\261 d\303\274zenle")
+
 T_("Hide mouse cursor while typing")
 trTR("Yazarken fare imlecini gizle")
 
@@ -1278,6 +1288,12 @@ trTR("Boyut ipucunu g\303\266ster")
 
 T_("Don't scroll the page on new output")
 trTR("Yeni \303\247\304\261kt\304\261larda sayfay\304\261 kayd\304\261rma")
+
+T_("Delayed display refresh")
+trTR("Gecikmeli ekran yenileme")
+
+T_("Lazy window resize")
+trTR("Gecikmeli pencere boyutland\304\261rma")
 
 T_("Blink interval")
 trTR("S\303\274re")
@@ -1305,9 +1321,6 @@ trTR("Di\304\237er")
 
 T_("px")
 trTR("px")
-
-T_("Show scrollbar")
-trTR("Kayd\304\261rma \303\247ubu\304\237unu g\303\266ster")
 
 T_("Treat ambiguous width characters as wide characters")
 trTR("Geni\305\237li\304\237i belirsiz karakterleri geni\305\237 karakter olarak "
@@ -1356,12 +1369,6 @@ trTR("\304\260lerleme bildirimi")
 
 T_("Enables progress notification protocol.")
 trTR("\304\260lerleme bildirim protokol\303\274n\303\274 etkinle\305\237tirir.")
-
-T_("Delayed display refresh")
-trTR("Gecikmeli ekran yenileme")
-
-T_("Lazy window resize")
-trTR("Gecikmeli pencere boyutland\304\261rma")
 
 T_("Reverse wrap")
 trTR("Ters kayd\304\261rma")
