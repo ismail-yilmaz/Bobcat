@@ -274,28 +274,35 @@ FinderBar::FinderBar(Terminal& t)
 , showall(false)
 , co(false)
 {
+	t.AddFrame(Height(0));
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
 	prev.Image(Images::Up());
 	next.Image(Images::Down());
 	begin.Image(Images::Begin());
 	end.Image(Images::End());
+	fsave.Image(Images::Reap());
+	csave.Image(Images::Paste());
+	menu.Image(Images::Find());
+	text.AddFrame(end);
+	text.AddFrame(begin);
+	text.AddFrame(next);
+	text.AddFrame(prev);
+	text.AddFrame(csave.Width(0));
+	text.AddFrame(fsave.Width(0));
+	text.AddFrame(display);
+	text.AddFrame(menu);
 	next  << THISFN(Next);
 	prev  << THISFN(Prev);
 	begin << THISFN(Begin);
 	end   << THISFN(End);
 	close << THISFN(Hide);
+	fsave << THISFN(SaveToFile);
+	csave << THISFN(SaveToClipboard);
+	menu << [this] { MenuBar::Execute(THISFN(StdBar)); };
 	text.NullText(t_("Type to search..."));
-	text.AddFrame(display);
-	text.AddFrame(menu);
 	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
-	fsave.Image(Images::Reap());
-	fsave << THISFN(SaveToFile);
-	csave.Image(Images::Paste());
-	csave << THISFN(SaveToClipboard);
-	menu.Image(Images::Find());
-	menu << [this] { MenuBar::Execute(THISFN(StdBar)); };
 	display.SetDisplay(StdRightDisplay());
 	Sync();
 }
@@ -332,16 +339,16 @@ Value FinderBar::GetData() const
 void FinderBar::FrameLayout(Rect& r)
 {
 	data == "top"
-		? LayoutFrameTop(r, this, cy ? cy : r.Width())
-		: LayoutFrameBottom(r, this, cy ? cy : r.Width()); // default
+		? LayoutFrameTop(r, this, cy)
+		: LayoutFrameBottom(r, this, cy); // default
 }
 
 void FinderBar::Show()
 {
-	if(!IsChild()) {
+	if(!GetHeight()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		term.AddFrame(Height(GetStdBarHeight()));
+		Height(GetStdBarHeight()).Show();
 		term.SyncHighlight();
 		term.ShowSizeHint(b);
 	}
@@ -352,12 +359,11 @@ void FinderBar::Show()
 void FinderBar::Hide()
 {
 	Clear();
-	if(IsChild()) {
+	if(GetHeight()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		term.RemoveFrame(*this);
+		Height(0).Hide();
 		term.SyncHighlight();
-		term.RefreshLayout();
 		term.ShowSizeHint(b);
 	}
 	term.SetFocus();
@@ -545,32 +551,30 @@ void FinderBar::Sync()
 	}
 
 	SetSearchStatusText(display, s);
-
+	
 	String k;
 	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
 	fsave.Tip(t_("Save to file") + k);
 	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_CLIP().key[0]) + ") ";
 	csave.Tip(t_("Copy to clipboard") + k);
 	
-	if(cnt && IsRegex()) {
-		if(!fsave.IsChild())
-			text.InsertFrame(2, fsave); // FIXME: Yes, ugly...
-		if(!csave.IsChild())
-			text.InsertFrame(2, csave);
-	}
-	else {
-		if(fsave.IsChild())
-			text.RemoveFrame(fsave);
-		if(csave.IsChild())
-			text.RemoveFrame(csave);
-	}
-	
+	int minsz = prev.GetMinSize().cx;
+
+	bool q1 = cnt && IsRegex();
+	bool q2 = cnt > 1;
 	bool a = !term.IsSearching() && cnt > 0 && index > 0;
 	bool b = !term.IsSearching() && cnt > 0 && index < cnt - 1;
+	
+	fsave.Width(q1 * minsz);
+	csave.Width(q1 * minsz);
 	prev.Enable(a);
+	prev.Width(q2 * minsz);
 	next.Enable(b);
+	next.Width(q2 * minsz);
 	begin.Enable(a);
+	begin.Width(q2 * minsz);
 	end.Enable(b);
+	end.Width(q2 * minsz);
 	text.Error(err);
 	term.Refresh();
 }

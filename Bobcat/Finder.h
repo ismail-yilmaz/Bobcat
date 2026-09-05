@@ -152,7 +152,7 @@ private:
     bool          co:1;
     FrameLeft<ToolButton> menu;
     FrameRight<DisplayCtrl> display;
-    FrameRight<ToolButton> fsave, csave;
+    FrameRight<ToolButton> prev, next, begin, end, fsave, csave;
 };
 
 class FinderSetup : public WithFinderProfileLayout<ParentCtrl> {
