@@ -689,6 +689,24 @@ trTR("E\305\237le\305\237me bulunamad\304\261.")
 T_("Close finder")
 trTR("Bulucuyu kapat")
 
+T_("Go to previous item")
+trTR("\303\226nceki \303\266geye git")
+
+T_("Go to next item")
+trTR("Sonraki \303\266geye git")
+
+T_("Go to first item")
+trTR("\304\260lk \303\266geye git")
+
+T_("Go to last item")
+trTR("Son \303\266geye git")
+
+T_("Save to file")
+trTR("Dosyaya kaydet")
+
+T_("Copy to clipboard")
+trTR("Panoya kopyala")
+
 T_("Type to search...")
 trTR("Aramak i\303\247in yaz\304\261n...")
 
@@ -700,12 +718,6 @@ trTR("B\303\274y\303\274k/k\303\274\303\247\303\274k harf duyars\304\261z arama"
 
 T_("Regex mode")
 trTR("D\303\274zenli ifadeyle arama")
-
-T_("Save to file")
-trTR("Dosyaya kaydet")
-
-T_("Copy to clipboard")
-trTR("Panoya kopyala")
 
 T_("Harvester")
 trTR("Toplay\304\261c\304\261")

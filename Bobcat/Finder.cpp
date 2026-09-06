@@ -275,20 +275,21 @@ FinderBar::FinderBar(Terminal& t)
 , co(false)
 {
 	CtrlLayout(*this);
-	close.Image(Images::Delete()).Tip(t_("Close finder"));
-	prev.Image(Images::Up());
-	next.Image(Images::Down());
-	begin.Image(Images::Begin());
-	end.Image(Images::End());
-	fsave.Image(Images::Reap());
-	csave.Image(Images::Paste());
+	close.Image(Images::Delete()).Tip(t_("Close finder")).Key(AK_HIDE_FINDER);
+	prev.Image(Images::Up()).Tip(t_("Go to previous item")).Key(AK_FIND_PREV);
+	next.Image(Images::Down()).Tip(t_("Go to next item")).Key(AK_FIND_NEXT);
+	begin.Image(Images::Begin()).Tip(t_("Go to first item")).Key(AK_FIND_FIRST);
+	end.Image(Images::End()).Tip(t_("Go to last item")).Key(AK_FIND_LAST);
+	fsave.Image(Images::Reap()).Tip(t_("Save to file")).Key(AK_HARVEST_FILE);
+	csave.Image(Images::Paste()).Tip(t_("Copy to clipboard")).Key(AK_HARVEST_CLIP);
 	menu.Image(Images::Find());
-	text.AddFrame(end);
-	text.AddFrame(begin);
-	text.AddFrame(next);
-	text.AddFrame(prev);
-	text.AddFrame(csave.Width(0));
-	text.AddFrame(fsave.Width(0));
+	AddFrame(close);
+	AddFrame(end);
+	AddFrame(begin);
+	AddFrame(next);
+	AddFrame(prev);
+	AddFrame(csave);
+	AddFrame(fsave);
 	text.AddFrame(display);
 	text.AddFrame(menu);
 	next  << THISFN(Next);
@@ -551,12 +552,6 @@ void FinderBar::Sync()
 	}
 
 	SetSearchStatusText(display, s);
-	
-	String k;
-	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_FILE().key[0]) + ") ";
-	fsave.Tip(t_("Save to file") + k);
-	k = " (" + GetKeyDesc(FinderKeys::AK_HARVEST_CLIP().key[0]) + ") ";
-	csave.Tip(t_("Copy to clipboard") + k);
 	
 	int minsz = prev.GetMinSize().cx;
 

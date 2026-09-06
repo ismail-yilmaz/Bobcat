@@ -191,8 +191,7 @@ LAYOUT(NavigatorItemLayout, 100, 48)
 END_LAYOUT
 
 LAYOUT(FinderBarLayout, 548, 24)
-	ITEM(ToolButton, close, RightPosZ(4, 16).VSizePosZ(2, 3))
-	ITEM(Upp::WithDropChoice<Upp::EditString>, text, HSizePosZ(4, 24).TopPosZ(2, 19))
+	ITEM(Upp::WithDropChoice<Upp::EditString>, text, HSizePosZ(4, 4).TopPosZ(2, 19))
 END_LAYOUT
 
 LAYOUT(FinderProfileLayout, 659, 299)
