@@ -183,7 +183,7 @@ const Display& NormalPaletteSampleDisplay()   { return Single<NormalPaletteSampl
 void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 {
 	int cx = GetTextSize(txt, GetStdFont()).cx;
-	if(!txt.IsEmpty()) cx += Zx(4);
+	if(!txt.IsEmpty()) cx += Zx(8);
 	status.Width(cx) <<= AttrText(txt).Bold().Ink(SColorDisabled);
 }
 
