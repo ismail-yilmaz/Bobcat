@@ -1219,7 +1219,7 @@ void Terminal::TitleBar::Show(bool b)
 	term.HideSizeHint();
 	Height(GetStdBarHeight() * (int) b).Show(b);
 	term.ShowSizeHint(q);
-	if(!b) term.SetFocus();
+//	if(!b) term.SetFocus();
 }
 
 void Terminal::TitleBar::Hide()
