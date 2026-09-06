@@ -175,6 +175,37 @@ struct Terminal : TerminalCtrl {
         Windows
     };
     
+    struct TitleBar : FrameTB<WithTitleBarLayout<ParentCtrl>> {
+        TitleBar(Terminal& ctx);
+        void        SetData(const Value& v) override;
+        Value       GetData() const override;
+        void        FrameLayout(Rect& r) override;
+        void        LeftDown(Point pt, dword keyflags) override;
+        void        LeftDouble(Point pt, dword keyflags) override;
+
+        void        Show(bool b = true);
+        void        Hide();
+        void        Menu();
+        void        Sync();
+
+        Terminal&   term;
+        Value       data;
+    };
+    
+    struct ProgressBar : FrameTB<ProgressIndicator> {
+        ProgressBar(Terminal& t);
+        void        SetData(const Value& v) override;
+        Value       GetData() const override;
+        void        FrameLayout(Rect& r) override;
+
+        void        Show(int percent);
+        void        Hide();
+
+        Terminal&    term;
+        Value        data;
+        TimeCallback timer;
+    };
+
     Bobcat&          ctx;
     One<APtyProcess> pty;
     One<FrameTop<ProgressIndicator>> pi;
@@ -197,43 +228,14 @@ struct Terminal : TerminalCtrl {
     ExitMode     exitmode;
     PathMode     pathmode;
     Time         starttime;
+    TitleBar     titlebar;
+    ProgressBar  progressbar;
     FinderBar    finder;
     Linkifier    linkifier;
     QuickText    quicktext;
     WebSearch    websearch;
     Color        highlight[4];
     TimeCallback updatetimer, belltimer;
-
-    struct TitleBar : FrameTB<WithTitleBarLayout<ParentCtrl>> {
-        TitleBar(Terminal& ctx);
-        void        SetData(const Value& v) override;
-        Value       GetData() const override;
-        void        FrameLayout(Rect& r) override;
-        void        LeftDown(Point pt, dword keyflags) override;
-        void        LeftDouble(Point pt, dword keyflags) override;
-
-        void        Show();
-        void        Hide();
-        void        Menu();
-        void        Sync();
-
-        Terminal&   term;
-        Value       data;
-    }  titlebar;
-    
-    struct ProgressBar : FrameTB<ProgressIndicator> {
-        ProgressBar(Terminal& t);
-        void        SetData(const Value& v) override;
-        Value       GetData() const override;
-        void        FrameLayout(Rect& r) override;
-
-        void        Show(int percent);
-        void        Hide();
-
-        Terminal&    term;
-        Value        data;
-        TimeCallback timer;
-    } progressbar;
 };
 
 // Global functions

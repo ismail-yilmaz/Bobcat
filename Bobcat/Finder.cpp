@@ -274,7 +274,6 @@ FinderBar::FinderBar(Terminal& t)
 , showall(false)
 , co(false)
 {
-	t.AddFrame(Height(0));
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder"));
 	prev.Image(Images::Up());
@@ -304,6 +303,7 @@ FinderBar::FinderBar(Terminal& t)
 	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
 	display.SetDisplay(StdRightDisplay());
+	term.AddFrame(Height(0));
 	Sync();
 }
 

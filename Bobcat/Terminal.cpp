@@ -25,13 +25,13 @@ Terminal::Terminal(Bobcat& ctx_)
 , exitmode(ExitMode::Exit)
 , pathmode(PathMode::Native)
 , starttime(Null)
+, titlebar(*this)
+, progressbar(*this)
 , finder(*this)
 , linkifier(*this)
 , quicktext(*this)
 , websearch(*this)
 , highlight { Yellow(), SColorHighlightText, LtRed(), SColorHighlight }
-, titlebar(*this)
-, progressbar(*this)
 {
 	SetDeviceId("Bobcat " + GetVersion());
 	WantFocus();
@@ -615,12 +615,7 @@ Value Terminal::GetData() const
 
 void Terminal::ShowTitleBar(bool b)
 {
-	if(!titlebar.IsChild() && b) {
-		titlebar.Show();
-	}
-	else
-	if(titlebar.IsChild() && !b)
-		titlebar.Hide();
+	titlebar.Show(b);
 	titlebar.Sync();
 	ctx.SyncTitle();
 }
@@ -632,7 +627,7 @@ void Terminal::HideTitleBar()
 
 bool Terminal::HasTitleBar() const
 {
-	return titlebar.IsChild();
+	return titlebar.IsShown();
 }
 
 void Terminal::EnableResize(bool b)
@@ -663,7 +658,7 @@ void Terminal::HideFinder()
 
 bool Terminal::HasFinder() const
 {
-	return finder.IsChild();
+	return finder.IsShown();
 }
 
 bool Terminal::IsEditable()
@@ -803,7 +798,7 @@ void Terminal::OnProgress(int type, int data)
 
 bool Terminal::InProgress() const
 {
-	return progressbar.IsChild();
+	return progressbar.IsShown();
 }
 
 void Terminal::DragAndDrop(Point pt, PasteClip& d)
@@ -1186,6 +1181,7 @@ Terminal::TitleBar::TitleBar(Terminal& ctx)
 	menu    << [this] { Menu(); };
 	title.SetDisplay(TerminalTitleDisplay());
 	title.IgnoreMouse();
+	term.AddFrame(Height(0));
 }
 
 void Terminal::TitleBar::SetData(const Value& v)
@@ -1202,8 +1198,8 @@ Value Terminal::TitleBar::GetData() const
 void Terminal::TitleBar::FrameLayout(Rect& r)
 {
 	data == "bottom"
-		? LayoutFrameBottom(r, this, cy ? cy : r.Height())
-		: LayoutFrameTop(r, this, cy ? cy : r.Height()); // default
+		? LayoutFrameBottom(r, this, cy)
+		: LayoutFrameTop(r, this, cy); // default
 }
 
 void Terminal::TitleBar::LeftDown(Point pt, dword keyflags)
@@ -1217,21 +1213,18 @@ void Terminal::TitleBar::LeftDouble(Point pt, dword keyflags)
 		term.SetAlias();
 }
 
-void Terminal::TitleBar::Show()
+void Terminal::TitleBar::Show(bool b)
 {
-	bool b = term.HasSizeHint();
+	bool q = term.HasSizeHint();
 	term.HideSizeHint();
-	term.InsertFrame(0, Height(GetStdBarHeight()));
-	term.ShowSizeHint(b);
+	Height(GetStdBarHeight() * (int) b).Show(b);
+	term.ShowSizeHint(q);
+	if(!b) term.SetFocus();
 }
 
 void Terminal::TitleBar::Hide()
 {
-	bool b = term.HasSizeHint();
-	term.HideSizeHint();
-	term.RemoveFrame(*this);
-	term.ShowSizeHint(b);
-	term.SetFocus();
+	Show(false);
 }
 
 void Terminal::TitleBar::Menu()
@@ -1243,7 +1236,7 @@ void Terminal::TitleBar::Menu()
 
 void Terminal::TitleBar::Sync()
 {
-	bool hasfocus = IsChild() && term.IsSplitterPane() && term.HasFocus();
+	bool hasfocus = IsShown() && term.IsSplitterPane() && term.HasFocus();
 	bool multiple = term.ctx.stack.GetCount() > 1;
 	menu.Show(!term.ctx.HasMenuBar());
 	newterm.Show(!term.ctx.HasMenuBar());
@@ -1255,6 +1248,8 @@ void Terminal::TitleBar::Sync()
 Terminal::ProgressBar::ProgressBar(Terminal& t)
 : term(t)
 {
+	t.AddFrame(Height(0));
+	Hide();
 }
 
 void Terminal::ProgressBar::SetData(const Value& v)
@@ -1272,23 +1267,23 @@ void Terminal::ProgressBar::FrameLayout(Rect& r)
 {
 	// Snap to title bar.
 	term.titlebar.data == "bottom"
-		? LayoutFrameBottom(r, this, cy ? cy : r.Height())
-		: LayoutFrameTop(r, this, cy ? cy : r.Height()); // default
+		? LayoutFrameBottom(r, this, cy)
+		: LayoutFrameTop(r, this, cy); // default
 }
 
 void Terminal::ProgressBar::Show(int percent)
 {
-	if(!IsChild()) {
+	if(!IsShown()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		int i = term.FindFrame(term.titlebar);
-		term.InsertFrame(decode(i, 0, 1, 0), Height(Zy(4)));
+		Height(Zy(4)).Show();
 		term.ShowSizeHint(b);
 	}
+
 	timer.Kill();
 	if(IsNull(percent)) { // "Busy" mode...
 		Set(0, 0);
-		timer.Set(-12, [this] { if(IsChild()) static_cast<ProgressIndicator&>(*this)++; });
+		timer.Set(-12, [this] { if(IsShown()) static_cast<ProgressIndicator&>(*this)++; });
 	}
 	else
 		Set(percent, 100);
@@ -1296,10 +1291,10 @@ void Terminal::ProgressBar::Show(int percent)
 
 void Terminal::ProgressBar::Hide()
 {
-	if(IsChild()) {
+	if(IsShown()) {
 		bool b = term.HasSizeHint();
 		term.HideSizeHint();
-		term.RemoveFrame(*this);
+		Height(0).Hide();
 		term.ShowSizeHint(b);
 	}
 	timer.Kill();
