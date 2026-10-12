@@ -249,14 +249,14 @@ Finder::Config::Config()
 , saveformat("txt")
 , savemode("map")
 , delimiter(",")
-, showall(false)
+, showall(true)
 , parallelize(false)
 {
 }
 
 void Finder::Config::Jsonize(JsonIO& jio)
 {
-	jio("SearchMode",        searchmode)
+	jio("SearchMode",     searchmode)
 	("SearchLimit",       searchlimit)
 	("ShowAll",           showall)
 	("ParallelSearch",    parallelize)
@@ -271,7 +271,7 @@ FinderBar::FinderBar(Terminal& t)
 , harvester(*this)
 , term(t)
 , index(0)
-, showall(false)
+, showall(true)
 , co(false)
 {
 	Hide();
@@ -301,6 +301,7 @@ FinderBar::FinderBar(Terminal& t)
 	fsave << THISFN(SaveToFile);
 	csave << THISFN(SaveToClipboard);
 	menu << [this] { MenuBar::Execute(THISFN(StdBar)); };
+	text.HideDrop();
 	text.NullText(t_("Type to search..."));
 	text.WhenBar = THISFN(SearchBar);
 	text.WhenAction << [this] { Search(); };
