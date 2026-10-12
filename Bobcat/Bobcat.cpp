@@ -537,7 +537,7 @@ void Bobcat::FileMenu(Bar& menu)
 	menu.Separator();
 	menu.Add(AK_SCREENSHOT, Images::Screenshot(), [this] { ScreenShot(); });
 	menu.Separator();
-	menu.Add(t_("Exit"),  Images::Shutdown(), [this] { Close(); });
+	menu.Add(AK_EXIT, Images::Shutdown(), [this] { Close(); });
 }
 
 void Bobcat::EditMenu(Bar& menu)
