@@ -274,6 +274,7 @@ FinderBar::FinderBar(Terminal& t)
 , showall(false)
 , co(false)
 {
+	Hide();
 	CtrlLayout(*this);
 	close.Image(Images::Delete()).Tip(t_("Close finder")).Key(AK_HIDE_FINDER);
 	prev.Image(Images::Up()).Tip(t_("Go to previous item")).Key(AK_FIND_PREV);
