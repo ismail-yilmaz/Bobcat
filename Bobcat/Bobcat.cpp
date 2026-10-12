@@ -533,7 +533,7 @@ void Bobcat::FileMenu(Bar& menu)
 	if(Terminal *t = GetActiveTerminal(); t)
 		t->FileMenu(menu);
 	menu.Separator();
-	menu.Add(t_("Reset"), Images::ResetTerminal(), [this] { if(Terminal *t = GetActiveTerminal(); t) t->Reset(); });
+	menu.Add(AK_RESET, Images::ResetTerminal(), [this] { if(Terminal *t = GetActiveTerminal(); t) t->Reset(); });
 	menu.Separator();
 	menu.Add(AK_SCREENSHOT, Images::Screenshot(), [this] { ScreenShot(); });
 	menu.Separator();
