@@ -47,8 +47,8 @@ Bobcat is a modern, feature-rich terminal emulator that works across all major o
 
 - **Multiple Profiles:** Configure different terminal settings and **color schemes** for various tasks.
 - **Split screen:** You can spit the screen to 2 terminal panes side by side (vertical or horizontal).
-- **Minimal vs. Full UI:** Choose between a lightweight or fully-featured interface with a **stacked terminal manager** for easy navigation.  
-- **Simple Configuration:** JSON-based configuration with **real-time updates**, or use a **GUI settings panel**—no manual file editing required.  
+- **Minimal vs. Full UI:** Choose between a lightweight or fully-featured interface with a **stacked/tabbed terminal manager** for easy navigation.  
+- **Simple Configuration:** JSON-based configuration with **real-time updates**, or use a **GUI settings panel** (no manual file editing required).  
 
 ### Windows-Specific Features  
 
@@ -139,6 +139,10 @@ Bobcat on Windows
 Bobcat, running zellij, with a background image of well..., a bobcat!
 
 ![bobcat-zellij](resources/bobcat-zellij-background-linux.png)
+
+Bobcat with vertical tabs and notifications (linux)
+
+![bobcat-tabs](resources/bobcat-tabs-linux.png)
 
 Bobcat, running yazi, in borderless mode on Linux.
 

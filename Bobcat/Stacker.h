@@ -8,7 +8,7 @@
 
 class Stacker : public ParentCtrl {
 public:
-    Stacker();
+    Stacker(Bobcat& ctx);
     virtual ~Stacker() {}
 
     Stacker&    Wheel(bool b = true);
@@ -88,6 +88,7 @@ public:
     void        GoEnd();
 
 private:
+	Bobcat&     ctx;
     Splitter*   GetParentSplitter(Ctrl *c) const;
     void        RemoveSplitter(const Splitter& s);
     bool        RemoveFromSplitter(int i);

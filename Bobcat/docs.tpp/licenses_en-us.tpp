@@ -1094,7 +1094,7 @@ package has a BSD`-3 license:&]
 [ {{10000@(255.255.192) [s0; [C1 Terminal package for U`+`+]&]
 [s0; [C1 `-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-]&]
 [s0;C1 &]
-[s0; [C1 Copyright (c) 2019`-2023, İsmail Yılmaz]&]
+[s0; [C1 Copyright (c) 2019`-2026, İsmail Yılmaz]&]
 [s0; [C1 All rights reserved.]&]
 [s0;C1 &]
 [s0; [C1 Redistribution and use in source and binary forms, with or 
@@ -1147,7 +1147,7 @@ erminal] package, has a BSD`-3 license:&]
 [ {{10000@(255.255.192) [s0; [C1 PtyProcess package for Ultimate`+`+]&]
 [s0; [C1 `-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-]&]
 [s0;C1 &]
-[s0; [C1 Copyright (c) 2018`-2023, İsmail Yılmaz]&]
+[s0; [C1 Copyright (c) 2018`-2026, İsmail Yılmaz]&]
 [s0; [C1 All rights reserved.]&]
 [s0;C1 &]
 [s0; [C1 Redistribution and use in source and binary forms, with or 
@@ -1267,58 +1267,6 @@ ARISING]&]
 [s0; [C1 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE 
 OR OTHER DEALINGS]&]
 [s0; [C1 IN THE SOFTWARE.]&]
-[s0;C1 ]}}&]
-[s0; &]
-[s0; [^https`:`/`/github`.com`/ismail`-yilmaz`/StackCtrl^ StackCtrl] 
-package has a BSD`-3 license:&]
-[s0; &]
-[ {{10000@(255.255.192) [s0; [C1 StackCtrl package for U`+`+]&]
-[s0; [C1 `-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-]&]
-[s0;C1 &]
-[s0; [C1 Copyright (c) 2023, İsmail Yılmaz]&]
-[s0; [C1 All rights reserved.]&]
-[s0;C1 &]
-[s0; [C1 Redistribution and use in source and binary forms, with or 
-without]&]
-[s0; [C1 modification, are permitted provided that the following conditions 
-are met:]&]
-[s0;C1 &]
-[s0; [C1 `* Redistributions of source code must retain the above copyright 
-notice, this]&]
-[s0; [C1   list of conditions and the following disclaimer.]&]
-[s0;C1 &]
-[s0; [C1 `* Redistributions in binary form must reproduce the above 
-copyright notice,]&]
-[s0; [C1   this list of conditions and the following disclaimer in 
-the documentation]&]
-[s0; [C1   and/or other materials provided with the distribution.]&]
-[s0;C1 &]
-[s0; [C1 `* Neither the name of the copyright holder nor the names 
-of its]&]
-[s0; [C1   contributors may be used to endorse or promote products 
-derived from]&]
-[s0; [C1   this software without specific prior written permission.]&]
-[s0;C1 &]
-[s0; [C1 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-`"AS IS`"]&]
-[s0; [C1 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-LIMITED TO, THE]&]
-[s0; [C1 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-PURPOSE ARE]&]
-[s0; [C1 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS 
-BE LIABLE]&]
-[s0; [C1 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-OR CONSEQUENTIAL]&]
-[s0; [C1 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-GOODS OR]&]
-[s0; [C1 SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-HOWEVER]&]
-[s0; [C1 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-STRICT LIABILITY,]&]
-[s0; [C1 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY 
-WAY OUT OF THE USE]&]
-[s0; [C1 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
-DAMAGE.]&]
 [s0;C1 ]}}&]
 [s0; &]
 [s0; [^https`:`/`/www`.ultimatepp`.org`/index`.html^ U`+`+] framework 

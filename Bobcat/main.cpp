@@ -169,11 +169,13 @@ void BobcatAppMain()
 				{
 					app.settings.showmenu = true;
 					app.settings.showtitle = true;
+					app.settings.showtabs = true;
 				}
 				if(arglist.HasOption("hide-bars"))
 				{
 					app.settings.showmenu = false;
 					app.settings.showtitle = false;
+					app.settings.showtabs = false;
 				}
 				if(arglist.HasOption("show-menubar"))
 				{
@@ -190,6 +192,14 @@ void BobcatAppMain()
 				if(arglist.HasOption("hide-titlebar"))
 				{
 					app.settings.showtitle = false;
+				}
+				if(arglist.HasOption("show-tabbar"))
+				{
+					app.settings.showtabs = true;
+				}
+				if(arglist.HasOption("hide-tabbar"))
+				{
+					app.settings.showtabs = false;
 				}
 				if(arglist.HasOption("show-borders"))
 				{

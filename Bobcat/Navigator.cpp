@@ -152,6 +152,13 @@ Navigator::Navigator(Bobcat& ctx_)
 	AddFrame(sb);
 	sb.AutoHide();
 	sb.WhenScroll = [this] { SyncItemLayout(); Refresh(); };
+
+	WhenBar        = [this](Bar& menu) { ctx.TermMenu(menu); };
+	WhenClose      = [this]()          { ctx.ToggleNavigator(); };
+	WhenGotoItem   = [this](Ctrl& c)   { ctx.ToggleNavigator(); ctx.stack.Goto(c); };
+	WhenRemoveItem = [this](Ctrl& c)   { ctx.RemoveTerminal(AsTerminal(c)); };
+
+	ctx.window.Add(SizePos());
 }
 
 Navigator::~Navigator()

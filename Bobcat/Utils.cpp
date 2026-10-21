@@ -610,6 +610,12 @@ MessageCtrl& GetNotificationDaemon()
 	return Single<MessageCtrl>();
 }
 
+static void SyncNotifications()
+{
+	if(Bobcat *ctx = GetContext(); ctx)
+		ctx->SyncNotifications();
+}
+
 Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no, MessageBox::Type type, const Event<int>& action)
 {
 	auto& m = GetNotificationDaemon();
@@ -621,6 +627,7 @@ Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, cons
 	c.UseIcon(false);
 	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), 0);
 	c.WhenAction = action;
+	SyncNotifications();
 	return &c;
 }
 
@@ -669,6 +676,7 @@ Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 	c.UseIcon(false);
 	c.UseCross();
 	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	SyncNotifications();
 	return &c;
 }
 
@@ -681,6 +689,7 @@ Ptr<MessageBox> Error(Ctrl& ctrl, const Upp::String& text, int timeout)
 	c.UseIcon(false);
 	c.UseCross();
 	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	SyncNotifications();
 	return &c;
 }
 
@@ -719,6 +728,8 @@ const Array<CmdArg>& GetCmdArgs()
 		{ CmdArgType::General,     "",  "hide-menubar",           "",         t_("Hide the menu bar.") },
 		{ CmdArgType::General,     "",  "show-titlebar",          "",         t_("Show the title bar.") },
 		{ CmdArgType::General,     "",  "hide-titlebar",          "",         t_("Hide the title bar.") },
+		{ CmdArgType::General,     "",  "show-tabbar",            "",         t_("Show the tab bar.") },
+		{ CmdArgType::General,     "",  "hide-tabbar",            "",         t_("Hide the tab bar.") },
 		{ CmdArgType::General,     "",  "show-borders",           "",         t_("Show window borders.") },
 		{ CmdArgType::General,     "",  "hide-borders",           "",         t_("Hide window borders. (Frameless window mode)") },
 		{ CmdArgType::General,     "f", "fullscreen",             "",         t_("Full screen mode.") },
@@ -1004,12 +1015,14 @@ bool LinuxPtyProcess::CheckPrivileges(Terminal& t)
 		notification = Warning(t, txt);
 		if(t.bell)
 			BeepExclamation();
+		t.ctx.tabbar.Sync();
 	}
 	else
 	if(isroot && !b) {
 		isroot = false;
 		GetNotificationDaemon().Remove(notification);
 	}
+
 	return isroot;
 }
 

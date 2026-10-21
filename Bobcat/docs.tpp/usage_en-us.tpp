@@ -23,10 +23,10 @@ monospaced fonts]&]
 GUI themes.]&]
 [s0; [C1         ][C@3;1 `-`-gui`-theme THEME ][C1        ][1 Set the GUI 
 theme to THEME.]&]
-[s0; [C1     ][C@3;1 `-b, `-`-show`-bars    ][C1           ][1 Show the menu 
-and title bar.]&]
-[s0; [C1     ][C@3;1 `-B, `-`-hide`-bars   ][C1            ][1 Hide the menu 
-and title bar.]&]
+[s0; [C1     ][C@3;1 `-b, `-`-show`-bars    ][C1           ][1 Show the menu, 
+title, and tab bar.]&]
+[s0; [C1     ][C@3;1 `-B, `-`-hide`-bars   ][C1            ][1 Hide the menu, 
+ title, and tab bar.]&]
 [s0; [C1      ][C@3;1    `-`-show`-menubar][C1            ][1 Show the menu 
 bar.]&]
 [s0; [C1         ][C@3;1 `-`-hide`-menubar  ][C1          ][1 Hide the menu 
@@ -34,6 +34,10 @@ bar.]&]
 [s0; [C1    ][C@3;1      `-`-show`-titlebar   ][C1        ][1 Show the title 
 bar.]&]
 [s0; [C1        ][C@3;1  `-`-hide`-titlebar   ][C1        ][1 Hide the title 
+bar.]&]
+[s0; [C1    ][C@3;1      `-`-show`-tabar   ][C1           ][1 Show the tab 
+bar.]&]
+[s0; [C1        ][C@3;1  `-`-hide`-tabar       ][C1       ][1 Hide the tab 
 bar.]&]
 [s0; [C1         ][C@3;1 `-`-show`-borders ][C1           ][1 Show window 
 borders.]&]

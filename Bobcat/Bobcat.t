@@ -13,6 +13,12 @@ trTR("\303\234stte")
 T_("Bottom")
 trTR("Altta")
 
+T_("Left")
+trTR("Solda")
+
+T_("Right")
+trTR("Sa\304\237da")
+
 T_("Horizontal")
 trTR("Yatay")
 
@@ -72,12 +78,6 @@ trTR("Kurulum")
 
 T_("Help")
 trTR("Yard\304\261m")
-
-T_("Reset")
-trTR("S\304\261f\304\261rla")
-
-T_("Exit")
-trTR("\303\207\304\261k\304\261\305\237")
 
 T_("About")
 trTR("Hakk\304\261nda")
@@ -199,6 +199,9 @@ trTR("Komut y\303\274r\303\274tme ba\305\237ar\304\261s\304\261z.&Profil: %s&Kom
 T_("Restart")
 trTR("Yeniden Ba\305\237lat")
 
+T_("Exit")
+trTR("\303\207\304\261k\304\261\305\237")
+
 T_("Command exited.&Profile: %s&Command: %s&Exit code: %d")
 trTR("Komut tamamland\304\261.&Profil: %s&Komut: %s&\303\207\304\261k\304\261\305\237 "
      "kodu: %d")
@@ -251,6 +254,12 @@ trTR("Ba\305\237l\304\261k \303\247ubu\304\237unu g\303\266ster.")
 
 T_("Hide the title bar.")
 trTR("Ba\305\237l\304\261k \303\247ubu\304\237unu gizle.")
+
+T_("Show the tab bar.")
+trTR("Sekme \303\247ubu\304\237unu g\303\266ster.")
+
+T_("Hide the tab bar.")
+trTR("Sekme \303\247ubu\304\237unu gizle.")
 
 T_("Show window borders.")
 trTR("Pencere kenarl\304\261klar\304\261n\304\261 g\303\266ster.")
@@ -684,6 +693,18 @@ T_("No matches found.")
 trTR("E\305\237le\305\237me bulunamad\304\261.")
 
 
+// Tabs.cpp
+
+T_("Failure!")
+trTR("")
+
+T_("Input required")
+trTR("")
+
+T_("Completed")
+trTR("")
+
+
 // Finder.cpp
 
 T_("Close finder")
@@ -828,6 +849,9 @@ trTR("Yeni terminal (b\303\266l)")
 T_("Screenshot")
 trTR("Ekran g\303\266r\303\274nt\303\274s\303\274 al")
 
+T_("Reset")
+trTR("S\304\261f\304\261rla")
+
 T_("Hide window frames")
 trTR("Pencere \303\247er\303\247evelerini gizle")
 
@@ -836,6 +860,9 @@ trTR("Men\303\274 \303\247ubu\304\237unu g\303\266ster")
 
 T_("Show title bar")
 trTR("Ba\305\237l\304\261k \303\247ubu\304\237unu g\303\266ster")
+
+T_("Show tab bar")
+trTR("Sekme \303\247ubu\304\237unu g\303\266ster")
 
 T_("Toggle menu & title bars")
 trTR("Men\303\274 ve ba\305\237l\304\261k \303\247ubuklar\304\261n\304\261 g\303\266ster/gizle")
@@ -1206,11 +1233,14 @@ trTR("(Yeniden ba\305\237latma gerekir)")
 T_("GUI font")
 trTR("GUI yaz\304\261 tipi")
 
-T_("Titlebar placement")
+T_("Title bar placement")
 trTR("Ba\305\237l\304\261k \303\247ubu\304\237u yerle\305\237imi")
 
 T_("Terminal dimming level")
 trTR("Terminal soldurma d\303\274zeyi")
+
+T_("Tab bar placement")
+trTR("Sekme \303\247ubu\304\237u yerle\305\237imi")
 
 T_("Don't inherit the environment")
 trTR("Ortam de\304\237i\305\237kenlerini devralma")
@@ -1277,8 +1307,8 @@ trTR("Kilitli")
 T_("Blinking Text")
 trTR("Yan\304\261p s\303\266nen metin")
 
-T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
-trTR("")
+T_("Text blinking interval can be an integer value between 100 - 60000 ms.")
+trTR("Metin yan\304\261p s\303\266nme aral\304\261\304\237\304\261 100 - 60000 ms. aras\304\261nda olabilir.")
 
 T_("Ring bell")
 trTR("Zil \303\247al")
@@ -1501,6 +1531,7 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
+
 
 
 // PACKAGE 'Terminal' FILE 'Terminal.key'

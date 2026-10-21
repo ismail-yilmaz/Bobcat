@@ -33,37 +33,19 @@ FileSel& BobcatFs()
 }
 
 Bobcat::Bobcat()
-: navigator(*this)
+: stack(*this)
+, tabbar(*this)
+, navigator(*this)
 {
 	SetContext(*this);
 	SyncTitle();
 	window.Sizeable().Zoomable().CenterScreen();
 	window.WhenClose = [this]() { Close(); };
 	window.Add(view.SizePos());
-	window.Add(navigator.SizePos());
 	window.Icon(Images::Icon);
-	view.AddFrame(menubar);
-	view.Add(stack.Animation().Wheel().Horz().SizePos());
-	navigator.WhenBar        = [this](Bar& menu) { TermMenu(menu); };
-	navigator.WhenClose      = [this]()          { ToggleNavigator(); };
-	navigator.WhenGotoItem   = [this](Ctrl& c)   { ToggleNavigator(); stack.Goto(c); };
-	navigator.WhenRemoveItem = [this](Ctrl& c)   { RemoveTerminal(AsTerminal(c)); };
-	stack.WhenAction         = [this]()          { Sync(); };
-	stack.WhenSwap           = [this](int a, int b) { navigator.AnimateSwap(a, b); };
 	SetupMenuBar();
 	GetNotificationDaemon().NoIcon().Append().Animation();
 	Ctrl::SkinChangeSensitive();
-}
-
-bool Bobcat::AddTerminal(const String& key, int type)
-{
-	if(type == WINDOWED) {
-		if(SpawnNewProcess(*this, key))
-			return true;
-	}
-	bool ok = terminals.Create(*this).Start(key, type == SPLIT);
-	if(ok) Sync();
-	return ok;
 }
 
 bool Bobcat::AddTerminal(const Profile& profile, int type)
@@ -75,6 +57,11 @@ bool Bobcat::AddTerminal(const Profile& profile, int type)
 	bool ok = terminals.Create(*this).Start(profile, type == SPLIT);
 	if(ok) Sync();
 	return ok;
+}
+
+bool Bobcat::AddTerminal(const String& key, int type)
+{
+	return AddTerminal(LoadProfile(key), type);
 }
 
 bool Bobcat::NewTerminalFromActiveProfile(int type)
@@ -191,6 +178,10 @@ void Bobcat::Settings()
 	settingspane.titlepos.Add("bottom", sb);
 	settingspane.titlepos.GoBegin();
 
+	settingspane.tabpos.Add("left", t_("Left"));
+	settingspane.tabpos.Add("right", t_("Right"));
+	settingspane.tabpos.GoBegin();
+	
 	settingspane.finderpos.Add("top", st);
 	settingspane.finderpos.Add("bottom", sb);
 	settingspane.finderpos.GoBegin();
@@ -269,6 +260,8 @@ void Bobcat::Settings()
 	cr(settingspane.imageblur, settings.backgroundimageblur);
 	cr(settingspane.waitinterval, settings.ptywaitinterval);
 	cr(settingspane.dimlevel, settings.dimlevel);
+	cr(settingspane.showtabs, settings.showtabs);
+	cr(settingspane.tabpos, settings.tabsalignment);
 	cr.Set();
 
 	profiles.Load();
@@ -387,6 +380,7 @@ bool Bobcat::IsFullScreen() const
 
 Bobcat& Bobcat::SetupMenuBar()
 {
+	view.AddFrame(menubar);
 	menubar.Set([this](Bar& menu) { MainMenu(menu); });
 #if defined(PLATFORM_COCOA) && !defined(VIRTUALGUI)
 	// TODO: Add MacOS menu bar support.
@@ -400,11 +394,13 @@ Bobcat& Bobcat::ShowMenuBar(bool b)
 	if(HasMenuBar() && !b)  {
 		view.RemoveFrame(menubar);
 		settings.showmenu = b;
+		view.RefreshLayoutDeep();
 	}
 	else
 	if(!HasMenuBar() && b) {
 		view.AddFrame(menubar);
 		settings.showmenu = b;
+		view.RefreshLayoutDeep();
 	}
 	return *this;
 }
@@ -423,6 +419,7 @@ Bobcat& Bobcat::ToggleBars()
 {
 	settings.showmenu  ^= 1;
 	settings.showtitle ^= 1;
+	settings.showtabs  ^= 1;
 	Sync();
 	return *this;
 }
@@ -455,8 +452,8 @@ void Bobcat::Sync()
 	stack.Animation(settings.stackanimation);
 	SyncBackground();
 	SyncBrightness();
+	SyncNotifications();
 	SyncTitle();
-	navigator.Sync();
 }
 
 void Bobcat::SyncTitle()
@@ -472,6 +469,7 @@ void Bobcat::SyncTitle()
 			}
 	}
 	navigator.Refresh();
+	tabbar.Refresh();
 	window.Title(s);
 }
 
@@ -503,6 +501,12 @@ void Bobcat::SyncBrightness()
 		AsTerminal(*c).SetBrightness(100);
 	if(Ctrl *c = stack.GetPassiveCtrl(); c)
 		AsTerminal(*c).SetBrightness(100 - settings.dimlevel);
+}
+
+void Bobcat::SyncNotifications()
+{
+	tabbar.Sync();
+	navigator.Sync();
 }
 
 void Bobcat::SyncTerminalProfiles()
@@ -537,7 +541,7 @@ void Bobcat::FileMenu(Bar& menu)
 	menu.Separator();
 	menu.Add(AK_SCREENSHOT, Images::Screenshot(), [this] { ScreenShot(); });
 	menu.Separator();
-	menu.Add(AK_EXIT, Images::Shutdown(), [this] { Close(); });
+	menu.Add(AK_EXIT,  Images::Shutdown(), [this] { Close(); });
 }
 
 void Bobcat::EditMenu(Bar& menu)
@@ -555,6 +559,8 @@ void Bobcat::ViewMenu(Bar& menu)
 	menu.Add(AK_FRAMELESS,     [this] { settings.frameless ^= 1; Sync(); }).Check(settings.frameless);
 	menu.Add(AK_MENUBAR,       [this] { settings.showmenu  ^= 1; Sync(); }).Check(settings.showmenu);
 	menu.Add(AK_TITLEBAR,      [this] { settings.showtitle ^= 1; Sync(); }).Check(settings.showtitle);
+	menu.Add(AK_TABBAR,        [this] { settings.showtabs  ^= 1; Sync(); }).Check(settings.showtabs);
+	menu.Separator();
 	menu.AddKey(AK_TOGGLEBARS, [this] { ToggleBars(); });
 	menu.Add(AK_FULLSCREEN,    [this] { FullScreen(0); }).Check(window.IsFullScreen());
 	menu.AddKey(AK_MAXIMIZE,   [this] { Maximize(!window.IsMaximized()); });
@@ -797,6 +803,8 @@ Bobcat::Config::Config()
 , ptywaitinterval(10)
 , dimlevel(0)
 , splitterorientation("horizontal")
+, showtabs(false)
+, tabsalignment("left")
 {
 }
 
@@ -825,6 +833,8 @@ void Bobcat::Config::Jsonize(JsonIO& jio)
 	   ("PtyMonitoringInterval", ptywaitinterval)
 	   ("TerminalDimLevel", dimlevel)
 	   ("GuiTheme", guitheme)
+	   ("ShowTabBar", showtabs)
+	   ("TabBarAlignment", tabsalignment)
 	   ("GuiFont", guifont);
 }
 

@@ -65,6 +65,7 @@ void SetContext(Bobcat& ctx);
 #include "Linkifier.h"
 #include "Finder.h"
 #include "Navigator.h"
+#include "Tabs.h"
 #include "Profile.h"
 #include "Terminal.h"
 
@@ -73,8 +74,8 @@ struct Bobcat : Pte<Bobcat> {
 
 	enum Type : int  { STACKED, SPLIT, WINDOWED };
 	
-    bool        AddTerminal(const String& key = Null, int type = STACKED);
     bool        AddTerminal(const Profile& profile, int type = STACKED);
+    bool        AddTerminal(const String& key = Null, int type = STACKED);
     bool        NewTerminalFromActiveProfile(int type = STACKED);
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
@@ -107,7 +108,7 @@ struct Bobcat : Pte<Bobcat> {
     Bobcat&     ShowMenuBar(bool b = true);
     Bobcat&     HideMenuBar();
     bool        HasMenuBar() const;
-    
+
     Bobcat&     ToggleBars();
     Bobcat&     ToggleNavigator();
 
@@ -115,6 +116,7 @@ struct Bobcat : Pte<Bobcat> {
     void        SyncTitle();
     void        SyncBackground();
     void        SyncBrightness();
+    void        SyncNotifications();
     void        SyncTerminalProfiles();
     
     void        MainMenu(Bar& menu);
@@ -162,6 +164,8 @@ struct Bobcat : Pte<Bobcat> {
         int         ptywaitinterval;
         int         dimlevel;
         String      splitterorientation;
+        bool        showtabs;
+        String      tabsalignment;
         void        Jsonize(JsonIO& jio);
     };
     
@@ -176,9 +180,10 @@ struct Bobcat : Pte<Bobcat> {
 
     TopWindow  window;
     MenuBar    menubar;
-    Navigator  navigator;
     ViewCtrl   view;
     Stacker    stack;
+    TabBar     tabbar;
+    Navigator  navigator;
     Config     settings;
     Array<Terminal> terminals;
 };

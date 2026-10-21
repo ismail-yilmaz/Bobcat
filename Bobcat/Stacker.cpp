@@ -9,8 +9,9 @@
 
 namespace Upp {
 
-Stacker::Stacker()
-: activectrl(nullptr)
+Stacker::Stacker(Bobcat& ctx_)
+: ctx(ctx_)
+, activectrl(nullptr)
 , duration(0)
 , maxpanes(2)
 , wheel(false)
@@ -19,6 +20,10 @@ Stacker::Stacker()
 , animating(false)
 , swapping(false)
 {
+	WhenAction = [this]() { ctx.Sync(); };
+	WhenSwap   = [this](int a, int b) { ctx.navigator.AnimateSwap(a, b); };
+
+	ctx.view.Add(Animation().Wheel().Horz().SizePos());
 }
 
 Stacker& Stacker::Wheel(bool b)
