@@ -190,9 +190,9 @@ void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 int ExclamationYesNo(const char *qtf)
 {
 	return Prompt(callback(LaunchWebBrowser), BEEP_EXCLAMATION,
-	              Ctrl::GetAppName(), CtrlImg::exclamation(), qtf, false,
-	              t_("&Yes"), t_("&No"), NULL, 0,
-	              YesButtonImage(), NoButtonImage(), Null);
+				Ctrl::GetAppName(), CtrlImg::exclamation(), qtf, false,
+				t_("&Yes"), t_("&No"), NULL, 0,
+				YesButtonImage(), NoButtonImage(), Null);
 }
 
 Font SelectFont(Font f, dword type)
@@ -568,25 +568,25 @@ bool IsBobcatPrivileged()
 	// TODO: Remove this when U++ 2025.2 is released.
 	
 #ifdef PLATFORM_POSIX
-    return geteuid() == 0;
+	return geteuid() == 0;
 #elif PLATFORM_WIN32
-    BOOL isAdmin = FALSE;
-    PSID pAdminGroup = nullptr;
-    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-    if(AllocateAndInitializeSid(
+	BOOL isAdmin = FALSE;
+	PSID pAdminGroup = nullptr;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	if(AllocateAndInitializeSid(
 				&NtAuthority,
 				2,
 				SECURITY_BUILTIN_DOMAIN_RID,
 				DOMAIN_ALIAS_RID_ADMINS,
 				0, 0, 0, 0, 0, 0,
 				&pAdminGroup)) {
-        CheckTokenMembership(nullptr, pAdminGroup, &isAdmin);
-        FreeSid(pAdminGroup);
-    }
-    return isAdmin;
+		CheckTokenMembership(nullptr, pAdminGroup, &isAdmin);
+		FreeSid(pAdminGroup);
+	}
+	return isAdmin;
 #else
-    // Unsupported platform. (Assume no elevation.)
-    return false;
+	// Unsupported platform. (Assume no elevation.)
+	return false;
 #endif
 }
 
@@ -993,36 +993,38 @@ String GetUsernameFromUserId(uid_t uid)
 
 bool LinuxPtyProcess::IsRoot()
 {
-	if(pid_t pgid = GetProcessGroupId(*this); pgid > 0)
-		if(auto [r, e] = GetUserIdsFromProcess(pgid); e == 0) {
-			ruid = r;
-			euid = e;
-			return true;
-		}
-	return false;
+	return isroot;
 }
 
 bool LinuxPtyProcess::CheckPrivileges(Terminal& t)
 {
-	
-	if(bool b = IsRoot(); b && !isroot) {
-		isroot = true;
-		String txt = t_("Warning: Privilege escalation!");
-		txt << "&"
-			<< t_("Process") << ": " << Nvl(GetRunningProcessName(*this), t_("Unknown"))
-			<< ", ruid: "  << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
-			<< ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
-		notification = Warning(t, txt);
-		if(t.bell)
-			BeepExclamation();
-		t.ctx.tabbar.Sync();
+	pid_t pgid = GetProcessGroupId(*this);
+	if(pgid > 0 && pgid != pgrp) {
+		pgrp = pgid;
+		bool wasroot = isroot;
+		if(auto [r, e] = GetUserIdsFromProcess(pgid); e == 0) {
+			ruid = r;
+			euid = e;
+			isroot = true;
+		}
+		else
+			isroot = false;
+		
+		if(isroot && !wasroot) {
+			String txt = t_("Warning: Privilege escalation!");
+			txt << "&"
+				<< t_("Process") << ": " << Nvl(GetRunningProcessName(*this), t_("Unknown"))
+				<< ", ruid: "  << (int) ruid << " (" << GetUsernameFromUserId(ruid) << ")"
+				<< ", euid: " << (int) euid << " (" << GetUsernameFromUserId(euid) << ")";
+			notification = Warning(t, txt);
+			if(t.bell)
+				BeepExclamation();
+			t.ctx.tabbar.Sync();
+		}
+		else
+		if(wasroot && !isroot)
+			GetNotificationDaemon().Remove(notification);
 	}
-	else
-	if(isroot && !b) {
-		isroot = false;
-		GetNotificationDaemon().Remove(notification);
-	}
-
 	return isroot;
 }
 

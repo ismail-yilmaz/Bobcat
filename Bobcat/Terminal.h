@@ -282,6 +282,7 @@ public:
 private:
     uid_t euid   = 0;
     uid_t ruid   = 0;
+    pid_t pgrp   = -1;
     bool  isroot = false;
     Ptr<MessageBox> notification;
 };
