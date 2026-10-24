@@ -193,20 +193,19 @@ void Terminal::Stop()
 
 bool Terminal::Do()
 {
-	if(state == State::Running) {
+	if(IsRunning()) {
+		Write(pty->Get(), IsUtf8Mode());
 		if(pty->IsRunning()) {
-			Write(pty->Get(), IsUtf8Mode());
 			#ifdef PLATFORM_LINUX
-			// Warn the user about root access.
 			if(warnonrootaccess)
 				static_cast<LinuxPtyProcess&>(*pty).CheckPrivileges(*this);
 			#endif
 			return true;
 		}
-		// Process just ended. Capture the exit state permanently.
-        state = pty->GetExitCode() == 0 ? State::Success : State::Failure;
-        Write(pty->Get(), IsUtf8Mode());
+		// Process just ended. Capture the precise exit state permanently.
+		state = pty->GetExitCode() == 0 ? State::Success : State::Failure;
 	}
+
 	if(ShouldExit())
 		return false;
 	else
@@ -215,6 +214,7 @@ bool Terminal::Do()
 	else
 	if(ShouldAsk())
 		AskRestartExit();
+
 	return true;
 }
 
@@ -226,27 +226,27 @@ void Terminal::Reset()
 
 bool Terminal::IsRunning()
 {
-    return state == State::Running;
+	return state == State::Running;
 }
 
 bool Terminal::IsFinished()
 {
-    return state == State::Success || state == State::Failure;
+	return state == State::Success || state == State::Failure;
 }
 
 bool Terminal::IsFailure()
 {
-    return state == State::Failure;
+	return state == State::Failure;
 }
 
 bool Terminal::IsSuccess()
 {
-    return state == State::Success;
+	return state == State::Success;
 }
 
 bool Terminal::IsAsking()
 {
-    return IsFinished() && exitmode == ExitMode::KeepAsking;
+	return IsFinished() && exitmode == ExitMode::KeepAsking;
 }
 
 bool Terminal::IsRoot()
@@ -343,73 +343,73 @@ void Terminal::Layout()
 
 Terminal& Terminal::SetProfile(const Profile& p, bool reload)
 {
-    // Session/state settings: new instances only
-    if(!reload) {
-        profilename = p.name;
-        workingdir  = p.address;
-        shellintegration = p.shellintegration;
-        warnonrootaccess = p.warnonrootaccess;
-        paletteoverridden = false;
-        ring = p.bell;
-        flash = p.flashscreen;
-        bell = ring || flash;
-        filter = p.filterctrl;
-        ShowScrollBar(p.scrollbar);
-        NotifyProgress(p.progress);
-        WindowActions(p.windowactions);
-        WindowReports(p.windowreports);
-        History(p.history);
-        SetExitMode(p.onexit);
-        SetHistorySize(p.historysize);
-        LightColors(p.lightcolors);
-        AdjustColors(p.adjustcolors);
-        DynamicColors(p.dynamiccolors);
-        BlinkingText(p.blinktext);
-        PermitClipboardRead(p.clipboardread);
-        PermitClipboardWrite(p.clipboardwrite);
-        MouseWheelStep(p.mousewheelstep);
-        AutoHideMouseCursor(p.autohidemouse);
-        InlineImages(p.inlineimages);
-        MetaEscapesKeys(p.altescapeskeys);
-        MetaShiftsKeys(p.altshiftskeys);
-        KeyNavigation(p.keynavigation);
-        PCStyleFunctionKeys(p.functionkeystyle == "pc");
-        ReverseWrap(p.reversewrap);
-        DelayedRefresh(p.delayedrefresh);
-        LazyResize(p.lazyresize);
-        ShowSizeHint(p.sizehint);
-        TextReflow(p.textreflow);
-        SetLocale(p.encoding);
-        TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
-        SetPadding(Size(0, p.linespacing));
-        AlternateScroll(p.alternatescroll);
-        ScrollToEnd(!p.dontscrolltoend);
-        OverrideTracking(GetModifierKey(p.overridetracking));
-        Hyperlinks(p.hyperlinks);
-        Annotations(p.annotations);
-        SetPathTranslationMode(p.pathtranslation);
-        SetPathDelimiter(p.pathdelimiter);
-        AnswerBackMessage(p.answerbackmsg);
+	// Session/state settings: new instances only
+	if(!reload) {
+		profilename = p.name;
+		workingdir  = p.address;
+		shellintegration = p.shellintegration;
+		warnonrootaccess = p.warnonrootaccess;
+		paletteoverridden = false;
+		ring = p.bell;
+		flash = p.flashscreen;
+		bell = ring || flash;
+		filter = p.filterctrl;
+		ShowScrollBar(p.scrollbar);
+		NotifyProgress(p.progress);
+		WindowActions(p.windowactions);
+		WindowReports(p.windowreports);
+		History(p.history);
+		SetExitMode(p.onexit);
+		SetHistorySize(p.historysize);
+		LightColors(p.lightcolors);
+		AdjustColors(p.adjustcolors);
+		DynamicColors(p.dynamiccolors);
+		BlinkingText(p.blinktext);
+		PermitClipboardRead(p.clipboardread);
+		PermitClipboardWrite(p.clipboardwrite);
+		MouseWheelStep(p.mousewheelstep);
+		AutoHideMouseCursor(p.autohidemouse);
+		InlineImages(p.inlineimages);
+		MetaEscapesKeys(p.altescapeskeys);
+		MetaShiftsKeys(p.altshiftskeys);
+		KeyNavigation(p.keynavigation);
+		PCStyleFunctionKeys(p.functionkeystyle == "pc");
+		ReverseWrap(p.reversewrap);
+		DelayedRefresh(p.delayedrefresh);
+		LazyResize(p.lazyresize);
+		ShowSizeHint(p.sizehint);
+		TextReflow(p.textreflow);
+		SetLocale(p.encoding);
+		TreatAmbiguousCharsAsWideChars(IsUtf8Mode() && p.ambiguoustowide);
+		SetPadding(Size(0, p.linespacing));
+		AlternateScroll(p.alternatescroll);
+		ScrollToEnd(!p.dontscrolltoend);
+		OverrideTracking(GetModifierKey(p.overridetracking));
+		Hyperlinks(p.hyperlinks);
+		Annotations(p.annotations);
+		SetPathTranslationMode(p.pathtranslation);
+		SetPathDelimiter(p.pathdelimiter);
+		AnswerBackMessage(p.answerbackmsg);
 		SetPalette(LoadPalette(p.palette), reload);
 		palettename = p.palette;
-    }
+	}
 
-    // Safe to hot-reload: cosmetic & UI helpers
-    IntensifyBoldText(p.intensify);
-    BlinkInterval(p.blinkinterval);
-    UnlockCursor();
-    SetCursorStyle(p.cursorstyle);
-    BlinkingCursor(p.blinkcursor);
-    LockCursor(p.lockcursor);
-    SetFont(p.font);
-    SetWordSelectionFilter(p.wordselchars);
-    SetWordSelectionPattern(p.wordselpattern);
-    smartwordsel = p.wordselmode == "smart";
-    findselectedtext = p.findselectedtext;
-    finder.SetConfig(p);
-    linkifier.SetConfig(p);
-    websearch.SetConfig(p);
-    return *this;
+	// Safe to hot-reload: cosmetic & UI helpers
+	IntensifyBoldText(p.intensify);
+	BlinkInterval(p.blinkinterval);
+	UnlockCursor();
+	SetCursorStyle(p.cursorstyle);
+	BlinkingCursor(p.blinkcursor);
+	LockCursor(p.lockcursor);
+	SetFont(p.font);
+	SetWordSelectionFilter(p.wordselchars);
+	SetWordSelectionPattern(p.wordselpattern);
+	smartwordsel = p.wordselmode == "smart";
+	findselectedtext = p.findselectedtext;
+	finder.SetConfig(p);
+	linkifier.SetConfig(p);
+	websearch.SetConfig(p);
+	return *this;
 }
 
 void Terminal::MouseEnter(Point pt, dword keyflags)
@@ -428,7 +428,7 @@ void Terminal::MouseWheel(Point pt, int zdelta, dword keyflags)
 {
 	// Since we are using wheel, combine the keyflags for zoom-in and zoom-out.
 	if(dword k = GetAKModifierKey(AK_ZOOMIN())
-	           | GetAKModifierKey(AK_ZOOMOUT()); k > 0 && k == keyflags) {
+			| GetAKModifierKey(AK_ZOOMOUT()); k > 0 && k == keyflags) {
 		SetFontZoom(zdelta >= 0 ? 1 : -1);
 	}
 	else
@@ -469,7 +469,7 @@ void Terminal::GotFocus()
 
 Terminal& Terminal::SetPalette(const Palette& p, bool reload)
 {
-    if(paletteoverridden && reload)
+	if(paletteoverridden && reload)
 		return *this;
 		
 	for(int i = 0, j = 0; i < Palette::MAX_COLOR_COUNT; i++) {
