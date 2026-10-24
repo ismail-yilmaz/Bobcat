@@ -62,7 +62,7 @@ void Navigator::Item::Paint(Draw& w)
 				}
 			}
 			else
-			if(blinking) {
+			if(ctrl->IsFinished() && blinking) {
 				Image ico;
 				if(ctrl->IsFailure()) {
 					if(ctrl->IsAsking())
