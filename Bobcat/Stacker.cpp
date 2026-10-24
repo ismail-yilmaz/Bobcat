@@ -158,10 +158,16 @@ void Stacker::Remove(Ctrl& ctrl)
 	if(i < 0 || RemoveFromSplitter(i))
 		return;
 
-	if(i > 0)
-		Goto(i - 1);
-	else
-		Goto(i + 1);
+	// Only transfer focus if we are closing the active pane
+	if(&ctrl == activectrl) {
+		if(i > 0)
+			Goto(i - 1);
+		else
+		if(i + 1 < GetCount())
+			Goto(i + 1);
+		else
+			activectrl = nullptr;
+	}
 
 	WhenRemove(i, ctrl);
 	list.Remove(i);
@@ -208,13 +214,15 @@ bool Stacker::RemoveFromSplitter(int i)
 			RemoveChild(s);
 			if(remaining) {
 				s->Remove(*remaining);
-				if(int j = Find(*remaining); j >= 0) {
-					activectrl = list[j];
-					if(activectrl) {
-						Ctrl::Add(activectrl->SizePos());
-						ActivatePane(activectrl);
-					}
+				Ctrl::Add(remaining->SizePos());
+				
+				// Only activate the remaining pane if this splitter was the active workspace
+				if(activectrl == ctrl || activectrl == remaining) {
+					activectrl = remaining;
+					ActivatePane(remaining);
 				}
+				else
+					remaining->Hide();
 			}
 			RemoveSplitter(*s);
 		}
