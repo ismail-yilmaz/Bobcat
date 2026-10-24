@@ -22,6 +22,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , shellintegration(false)
 , warnonrootaccess(false)
 , paletteoverridden(false)
+, updating(false)
 , exitmode(ExitMode::Exit)
 , pathmode(PathMode::Native)
 , state(State::None)
@@ -305,11 +306,22 @@ hash_t Terminal::GetHashValue() const
 
 void Terminal::Update()
 {
-	if(!IsVisible() || (!HasFinder() && !linkifier.IsEnabled()))
+	if(!IsVisible() || (!HasFinder() && !linkifier.IsEnabled())) {
+		if(updating) {
+			updatetimer.Kill();
+			updating = false;
+		}
 		return;
+	}
 
+	// If an update is already pending, do nothing and let the timer fire.
+	if(updating)
+		return;
+	
+	updating = true;
 	auto cb = [this]()
 	{
+		updating = false;
 		SyncHighlight();
 		linkifier.Update();
 		finder.Update();
@@ -317,7 +329,7 @@ void Terminal::Update()
 			Refresh();
 	};
 
-	updatetimer.KillSet(12, cb); // Safeguard against spamming.
+	updatetimer.Set(30, cb); // Safeguard against spamming.
 }
 
 void Terminal::SyncHighlight()

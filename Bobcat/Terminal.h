@@ -228,6 +228,7 @@ struct Terminal : TerminalCtrl {
     bool         findselectedtext:1;
     bool         warnonrootaccess:1;
     bool         paletteoverridden:1;
+    bool         updating:1;
     String       profilename;
     String       palettename;
     String       title;
@@ -245,7 +246,7 @@ struct Terminal : TerminalCtrl {
     QuickText    quicktext;
     WebSearch    websearch;
     Color        highlight[4];
-    TimeCallback updatetimer, belltimer;
+    TimeCallback updatetimer;
 };
 
 // Global functions
