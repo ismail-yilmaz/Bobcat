@@ -113,7 +113,7 @@ struct Bobcat : Pte<Bobcat> {
     Bobcat&     ToggleNavigator();
 
     void        Sync();
-    void        SyncTitle();
+    void        SyncWindowTitle();
     void        SyncBackground();
     void        SyncBrightness();
     void        SyncNotifications();

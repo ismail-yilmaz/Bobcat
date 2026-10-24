@@ -696,13 +696,13 @@ trTR("E\305\237le\305\237me bulunamad\304\261.")
 // Tabs.cpp
 
 T_("Failure!")
-trTR("")
+trTR("Ba\305\237ar\304\261s\304\261z oldu!")
 
 T_("Input required")
-trTR("")
+trTR("M\303\274dahale gerekiyor")
 
 T_("Completed")
-trTR("")
+trTR("Tamamland\304\261")
 
 
 // Finder.cpp
@@ -841,7 +841,7 @@ T_("New terminal")
 trTR("Yeni terminal")
 
 T_("New terminal (window)")
-trTR("")
+trTR("Yeni terminal (pencere)")
 
 T_("New terminal (pane)")
 trTR("Yeni terminal (b\303\266l)")
@@ -1307,8 +1307,8 @@ trTR("Kilitli")
 T_("Blinking Text")
 trTR("Yan\304\261p s\303\266nen metin")
 
-T_("Text blinking interval can be an integer value between 100 - 60000 ms.")
-trTR("Metin yan\304\261p s\303\266nme aral\304\261\304\237\304\261 100 - 60000 ms. aras\304\261nda olabilir.")
+T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
+trTR("Metin yan\304\261p s\303\266nme aral\304\261\304\237\304\261 100 - 60000 milisaniye aras\304\261nda bir de\304\237er olabilir.")
 
 T_("Ring bell")
 trTR("Zil \303\247al")

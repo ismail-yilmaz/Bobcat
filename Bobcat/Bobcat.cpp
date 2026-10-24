@@ -38,7 +38,7 @@ Bobcat::Bobcat()
 , navigator(*this)
 {
 	SetContext(*this);
-	SyncTitle();
+	SyncWindowTitle();
 	window.Sizeable().Zoomable().CenterScreen();
 	window.WhenClose = [this]() { Close(); };
 	window.Add(view.SizePos());
@@ -453,14 +453,16 @@ void Bobcat::Sync()
 	SyncBackground();
 	SyncBrightness();
 	SyncNotifications();
-	SyncTitle();
+	SyncWindowTitle();
 }
 
-void Bobcat::SyncTitle()
+void Bobcat::SyncWindowTitle()
 {
 	String s = "Bobcat";
-	if(const Terminal *t = GetActiveTerminal(); !settings.showtitle && t) {
-			s << " [" << t->GetTitle() << "]";
+	bool showtermtitle = !settings.showtitle && !settings.showtabs;
+	if(const Terminal *t = GetActiveTerminal(); t) {
+			if(showtermtitle)
+				s << " [" << t->GetTitle() << "]";
 			if(Splitter *p = t->GetParentSplitter(); p) {
 				if(p->GetFirstChild() == t)
 					s << " (" << (p->IsHorz() ? t_("left pane") : t_("top pane")) << ")";
@@ -659,7 +661,7 @@ void Bobcat::ListMenu(Bar& menu)
 	menu.Separator();
 	for(int i = 0; i < stack.GetCount(); i++) {
 		Terminal& t = AsTerminal(stack[i]);
-		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); SyncTitle(); }).Radio(stack.GetCursor() == i);
+		menu.Add(t.GetTitle(), [this, i] { stack.Goto(i); SyncWindowTitle(); }).Radio(stack.GetCursor() == i);
 	}
 }
 
