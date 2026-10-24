@@ -33,6 +33,7 @@ struct Terminal : TerminalCtrl {
     void        Reset();
     
     bool        IsRunning();
+    bool        IsFinished();
     bool        IsFailure();
     bool        IsSuccess();
     bool        IsAsking();
@@ -175,6 +176,14 @@ struct Terminal : TerminalCtrl {
         Windows
     };
     
+    enum class State {
+        None,
+        Running,
+        Success,
+        Failure,
+        Killed
+    };
+    
     struct TitleBar : FrameTB<WithTitleBarLayout<ParentCtrl>> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
@@ -227,6 +236,7 @@ struct Terminal : TerminalCtrl {
     String       pathdelimiter;
     ExitMode     exitmode;
     PathMode     pathmode;
+    State        state;
     Time         starttime;
     TitleBar     titlebar;
     ProgressBar  progressbar;

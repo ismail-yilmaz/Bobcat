@@ -24,6 +24,7 @@ Terminal::Terminal(Bobcat& ctx_)
 , paletteoverridden(false)
 , exitmode(ExitMode::Exit)
 , pathmode(PathMode::Native)
+, state(State::None)
 , starttime(Null)
 , titlebar(*this)
 , progressbar(*this)
@@ -138,10 +139,13 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 		Single<PtyWaitEvent>().WakeUp();
 	};
 	if(pty->Co(p.asyncio).Start(p.command, m, p.address)) {
+		state = State::Running;
 		starttime = GetSysTime();
 		pty->SetSize(GetPageSize());
 		return true;
 	}
+	
+	state = State::Failure;
 	AskRestartExitError(this, p);
 	return false;
 }
@@ -189,14 +193,19 @@ void Terminal::Stop()
 
 bool Terminal::Do()
 {
-	if(pty->IsRunning()) {
-		Write(pty->Get(), IsUtf8Mode());
-		#ifdef PLATFORM_LINUX
-		// Warn the user about root access.
-		if(warnonrootaccess)
-			static_cast<LinuxPtyProcess&>(*pty).CheckPrivileges(*this);
-		#endif
-		return true;
+	if(state == State::Running) {
+		if(pty->IsRunning()) {
+			Write(pty->Get(), IsUtf8Mode());
+			#ifdef PLATFORM_LINUX
+			// Warn the user about root access.
+			if(warnonrootaccess)
+				static_cast<LinuxPtyProcess&>(*pty).CheckPrivileges(*this);
+			#endif
+			return true;
+		}
+		// Process just ended. Capture the exit state permanently.
+        state = pty->GetExitCode() == 0 ? State::Success : State::Failure;
+        Write(pty->Get(), IsUtf8Mode());
 	}
 	if(ShouldExit())
 		return false;
@@ -217,22 +226,27 @@ void Terminal::Reset()
 
 bool Terminal::IsRunning()
 {
-	return pty && pty->IsRunning();
+    return state == State::Running;
+}
+
+bool Terminal::IsFinished()
+{
+    return state == State::Success || state == State::Failure;
 }
 
 bool Terminal::IsFailure()
 {
-	return !IsRunning() && pty->GetExitCode() != 0;
+    return state == State::Failure;
 }
 
 bool Terminal::IsSuccess()
 {
-	return !IsRunning() && pty->GetExitCode() == 0;
+    return state == State::Success;
 }
 
 bool Terminal::IsAsking()
 {
-	return !IsRunning() && exitmode == ExitMode::KeepAsking;
+    return IsFinished() && exitmode == ExitMode::KeepAsking;
 }
 
 bool Terminal::IsRoot()
@@ -794,6 +808,8 @@ void Terminal::OnProgress(int type, int data)
 		progressbar.Hide();
 		break;
 	}
+
+	ctx.SyncNotifications();
 }
 
 bool Terminal::InProgress() const
