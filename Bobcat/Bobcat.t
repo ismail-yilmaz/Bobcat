@@ -136,6 +136,27 @@ trTR("")
 
 // Utils.cpp
 
+T_("Privilege escalation!")
+trTR("Yetki y\303\274kseltme!")
+
+T_("Failure!")
+trTR("Ba\305\237ar\304\261s\304\261z oldu!")
+
+T_("Input required!")
+trTR("M\303\274dahale gerekiyor!")
+
+T_("Error!")
+trTR("Hata!")
+
+T_("Waiting for input...")
+trTR("Kullan\304\261c\304\261 giri\305\237i bekleniyor...")
+
+T_("Working...")
+trTR("\303\207al\304\261\305\237\304\261yor...")
+
+T_("Completed.")
+trTR("Tamamland\304\261.")
+
 T_("&Yes")
 trTR("&Evet")
 
@@ -413,6 +434,12 @@ trTR("Not")
 T_("Progress failed.&Error code: %d")
 trTR("\304\260lerleme ba\305\237ar\304\261s\304\261z.&Hata kodu: %d")
 
+T_("Waiting for input...")
+trTR("Kullan\304\261c\304\261 giri\305\237i bekleniyor...")
+
+T_("Error!")
+trTR("Hata!")
+
 T_("Color Profiles...")
 trTR("Renk Profilleri...")
 
@@ -680,9 +707,6 @@ trTR("Renk Profili: %")
 
 // Navigator.cpp
 
-T_("Privilege escalation!")
-trTR("Yetki y\303\274kseltme!")
-
 T_("Close navigator")
 trTR("Gezgini kapat")
 
@@ -691,18 +715,6 @@ trTR("Terminal ara")
 
 T_("No matches found.")
 trTR("E\305\237le\305\237me bulunamad\304\261.")
-
-
-// Tabs.cpp
-
-T_("Failure!")
-trTR("Ba\305\237ar\304\261s\304\261z oldu!")
-
-T_("Input required")
-trTR("M\303\274dahale gerekiyor")
-
-T_("Completed")
-trTR("Tamamland\304\261")
 
 
 // Finder.cpp
@@ -1308,7 +1320,8 @@ T_("Blinking Text")
 trTR("Yan\304\261p s\303\266nen metin")
 
 T_("Text blinking interval can be an nteger value between 100 - 60000 ms.")
-trTR("Metin yan\304\261p s\303\266nme aral\304\261\304\237\304\261 100 - 60000 milisaniye aras\304\261nda bir de\304\237er olabilir.")
+trTR("Metin yan\304\261p s\303\266nme aral\304\261\304\237\304\261 100 - 60000 "
+     "milisaniye aras\304\261nda bir de\304\237er olabilir.")
 
 T_("Ring bell")
 trTR("Zil \303\247al")
@@ -1531,7 +1544,6 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
-
 
 
 // PACKAGE 'Terminal' FILE 'Terminal.key'

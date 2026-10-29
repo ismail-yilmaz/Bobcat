@@ -45,9 +45,9 @@ struct TabBar : ParentCtrl {
     int           tabcy;
     int           tabswidth;
     int           closetab;
-    bool          blinking;
-    bool          pressed;
-    bool          dnd;
+    bool          blinking:1;
+    bool          pressed:1;
+    bool          dnd:1;
 
     Event<int>    WhenClose;
     Event<int, Bar&> WhenBar;

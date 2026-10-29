@@ -31,12 +31,13 @@ struct Terminal : TerminalCtrl {
     bool        Do();
     void        Restart();
     void        Reset();
-    
+  
     bool        IsRunning();
     bool        IsFinished();
     bool        IsFailure();
     bool        IsSuccess();
     bool        IsAsking();
+    bool        IsKilled();
     
     bool        IsRoot();
     
@@ -118,9 +119,13 @@ struct Terminal : TerminalCtrl {
     bool        OnAnnotation(Point pt, String& s);
     
     void        OnNotification(const String& text);
+    void        ClearNotifications();
     
     void        OnProgress(int type, int data);
     bool        InProgress() const;
+
+	void        ClearProgramStatusInfo(bool full = false);
+    void        OnProgramStatus(const VectorMap<String, String>& p);
 
     bool        OnSelectorScan(dword key);
     
@@ -132,6 +137,8 @@ struct Terminal : TerminalCtrl {
     void        OpenFinder();
     
     void        OnBell();
+    
+    void        OnReset(bool full);
     
     const VTPage& GetPage() const;
     int         GetPosAsIndex(Point pt, bool relative = false) const;
@@ -183,7 +190,7 @@ struct Terminal : TerminalCtrl {
         Failure,
         Killed
     };
-    
+     
     struct TitleBar : FrameTB<WithTitleBarLayout<ParentCtrl>> {
         TitleBar(Terminal& ctx);
         void        SetData(const Value& v) override;
@@ -247,6 +254,7 @@ struct Terminal : TerminalCtrl {
     WebSearch    websearch;
     Color        highlight[4];
     TimeCallback updatetimer;
+    VectorMap<String, ProgramInfo> programinfo;
 };
 
 // Global functions
@@ -256,12 +264,44 @@ void                       InsertUnicodeCodePoint(Terminal& term);
 bool                       AnnotationEditor(String& s, const char *title);
 int                        AdjustLineOffset(Terminal& term, const Vector<int>& in, Vector<int>& out);
 
+// Host app information
+struct ProgramInfo : Moveable<ProgramInfo> {
+    enum class State {
+        Idle,
+        Done,
+        Working,
+        Blocked,
+        Error
+    } status;
+    
+    String app;
+    String title;
+    String msg;
+    Ptr<MessageBox> notification;
+    int    progress;
+    
+    ProgramInfo();
+    ProgramInfo(const String& s);
+    
+    bool IsIdle() const;
+    bool IsDone() const;
+    bool IsWorking() const;
+    bool IsBlocked() const;
+    bool IsError() const;
+    bool IsUrgent() const;
+};
+
+ProgramInfo GetProgramInfo(Terminal& term);
+
 // Global highlight callback
 void SetHighlightCallback(Terminal& t, VectorMap<int, VTLine>& line, const Vector<ItemInfo>& items,
                                             const Event<VTCell&, const ItemInfo&, int>& cb);
 
 // Displays
 const Display& TerminalTitleDisplay();
+
+// Terminal and program status
+void SetStatusDisplayInfo(Terminal& t, DisplayInfo& info, bool hd = false);
 
 // Terminal specific notifications
 Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t, const Profile& p);

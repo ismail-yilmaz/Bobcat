@@ -8,17 +8,6 @@
 
 namespace Upp {
 
-struct TabInfo : Moveable<TabInfo> {
-	Ptr<Terminal> term;
-	bool focus:1;
-	bool hover:1;
-	bool dnd:1;
-	bool msg:1;
-	int  state;
-	Image icon;
-	TabInfo() : focus(false), hover(false), dnd(false), msg(false), state(CTRL_NORMAL), icon(Images::Terminal()) {}
-};
-
 TabBar::TabBar(Bobcat& ctx_)
 : ctx(ctx_)
 , pos(-1, -1)
@@ -26,7 +15,6 @@ TabBar::TabBar(Bobcat& ctx_)
 , tabcy(GetStdFontCy() * 2 + 12)
 , tabswidth(200)
 , closetab(-1)
-, blinking(false)
 , pressed(false)
 , dnd(false)
 {
@@ -57,17 +45,20 @@ void TabBar::Paint(Draw& w)
 
 		Rect rect = RectC(0, y, sz.cx, tabcy);
 
-		TabInfo info;
-		info.term  = &term;
-		info.focus = (i == q);
-		info.hover = (i == cursor);
-		info.dnd   = (dnd && info.hover);
-		info.msg   = blinking;
+		DisplayInfo info;
+		info.title   = term.GetTitle();
+		info.focus   = (i == q);
+		info.hover   = (i == cursor);
+		info.dnd     = (dnd && info.hover);
+		info.showmsg = true;
+		info.icon    = Images::Terminal();
+
+		SetStatusDisplayInfo(term, info, false);
 
 		if(info.hover & !dnd) {
-			bool pressed = (closetab == i);
+			bool pressedbtn = (closetab == i);
 			bool hot = GetCloseRect(i).Contains(pos);
-			info.state = pressed ? CTRL_PRESSED : hot ? CTRL_HOT : CTRL_NORMAL;
+			info.state = pressedbtn ? CTRL_PRESSED : hot ? CTRL_HOT : CTRL_NORMAL;
 		}
 
 		StdTabDisplay().Paint(w, rect, RawToValue(info), SColorText, SColorFace, 0);
@@ -82,14 +73,24 @@ void TabBar::Animate()
 		return;
 	}
 
-	auto HasMessage = [&](const Ctrl& c) -> bool {
+	auto HasAnim = [&](const Ctrl& c) -> bool {
 		Terminal& t  = AsTerminal(const_cast<Ctrl&>(c));
-		return !t.IsRunning() || t.IsRoot();
+		ProgramInfo pinfo = GetProgramInfo(t);
+		return !t.IsRunning()
+			 || t.IsRoot()
+			 || t.InProgress()
+			 || pinfo.IsWorking()
+			 || pinfo.IsUrgent();
 	};
 
-	if(!ExistsTimeCallback(TIMEID_BLINK) && FindMatch(ctx.stack, HasMessage) >= 0)
-		SetTimeCallback(-500, [this] { blinking ^= 1; Refresh(); }, TIMEID_BLINK);
-	
+	if(FindMatch(ctx.stack, HasAnim) >= 0) {
+		if(!ExistsTimeCallback(TIMEID_BLINK))
+			SetTimeCallback(-30, [this] { Refresh(); }, TIMEID_BLINK);
+	}
+	else {
+		KillTimeCallback(TIMEID_BLINK);
+	}
+
 	Refresh();
 }
 
@@ -107,7 +108,7 @@ void TabBar::SyncSb()
 {
 	sb.SetTotal(ctx.stack.GetCount() * tabcy);
 	sb.SetPage(GetSize().cy);
-	
+
 	int q = ctx.stack.GetCursor();
 	if(q >= 0 && q < ctx.stack.GetCount()) {
 		int y = q * tabcy;
@@ -200,9 +201,9 @@ void TabBar::RightDown(Point p, dword keyflags)
 
 void TabBar::MiddleDown(Point p, dword keyflags)
 {
-//	int h = GetTab(p);
-//	if(h >= 0)
-//		WhenClose(h);
+//    int h = GetTab(p);
+//    if(h >= 0)
+//        WhenClose(h);
 }
 
 void TabBar::DragAndDrop(Point p, PasteClip& d)
@@ -275,44 +276,21 @@ struct StdTabDisplayCls : Display
 {
 	void Paint(Draw& w, const Rect& r, const Value& q, Color ink, Color paper, dword style) const override
 	{
-		const TabInfo& info = q.To<TabInfo>();
-		if(!info.term)
+		const DisplayInfo& info = q.To<DisplayInfo>();
+		if(IsNull(info.title))
 			return;
-		
+
 		const Button::Style& z = Button::StyleNormal();
-	
+
 		if(info.hover || info.focus)
 			ChPaint(w, r, z.look[info.hover ? CTRL_HOT : CTRL_NORMAL]);
 
-		String msg;
-		Color msgcolor = Null;
-		Image mimg = Null;
-		bool isblink = false;
-
-		auto AddAlert = [&](String m, Color c, Image img = Null) {
-			msg << (msg.GetCount() ? " | " : "") << m;
-			msgcolor = Nvl(msgcolor, c);
-			if(!IsNull(img) && IsNull(mimg))
-				mimg = Colorize(img, msgcolor);
-			isblink = true;
-		};
-
-		if(info.term->IsRunning()) {
-			if(info.term->IsRoot())
-				AddAlert(t_("Privilege escalation!"), SRed, Images::Exclamation());
-		}
-		else
-		if(info.term->IsFinished()) {
-			if(info.term->IsFailure())
-				AddAlert(t_("Failure!"), SRed, Images::Error());
-			if(info.term->IsAsking())
-				AddAlert(t_("Input required"), Yellow(), Images::Question());
-			if(info.term->IsSuccess() && msg.IsEmpty())
-				AddAlert(t_("Completed"), SLtGreen, Images::Information());
-		}
-
 		Color cc = info.focus ? SColorHighlight : SColorShadow;
-		w.DrawRect(r.left + 3, r.top + 6, 4, r.Height() - 12, Nvl(info.msg ? msgcolor : cc, cc));
+		Color barc = cc;
+		if(info.urgent && info.showmsg && !IsNull(info.msgcolor))
+			barc = info.msgcolor;
+
+		w.DrawRect(r.left + 3, r.top + 6, 4, r.Height() - 12, barc);
 
 		int tx = r.left + 15;
 		int cx = max(0, r.right - 32 - tx);
@@ -323,43 +301,40 @@ struct StdTabDisplayCls : Display
 			w.DrawImage(r.CenterRect(min(dico.GetSize(), r.GetSize())), dico);
 		}
 
-		String title = info.term->GetTitle();
 		Font tfont = StdFont().Bold(info.focus);
-		Image timg = info.icon;
-		
+
 		AttrText t1;
-		t1.Text(title).SetFont(tfont).Ink(ink);
+		t1.Text(info.title).SetFont(tfont).Ink(ink);
 		if(!IsNull(info.icon))
 			t1.SetImage(info.icon);
 
-		int fcy = tfont.GetHeight();
-		int th = max(GetTextSize(title, tfont).cy, IsNull(info.icon) ? 0 : info.icon.GetSize().cy);
+		int th = max(GetTextSize(info.title, tfont).cy, IsNull(info.icon) ? 0 : info.icon.GetSize().cy);
 		int ty = r.top;
 		int tcy = r.Height();
 
-		if(msg.GetCount()) {
+		if(info.msg.GetCount()) {
 			Font sfont = StdFont();
-			int mh = max(GetTextSize(msg, sfont).cy, IsNull(mimg) ? 0 : mimg.GetSize().cy);
+			int mh = max(GetTextSize(info.msg, sfont).cy, IsNull(info.mimg) ? 0 : info.mimg.GetSize().cy);
 			ty = r.top + (r.Height() - th - mh - 2) / 2;
 			tcy = th;
 
-			if(!isblink || info.msg) {
+			if(info.showmsg) {
 				AttrText t2;
-				t2.Text(msg).SetFont(sfont).Ink(Nvl(msgcolor, ink));
-				if(!IsNull(mimg))
-					t2.SetImage(mimg);
+				t2.Text(info.msg).SetFont(sfont).Ink(Nvl(info.msgcolor, ink));
+				if(!IsNull(info.mimg))
+					t2.SetImage(Colorize(info.mimg, Nvl(info.msgcolor, ink)));
 				StdDisplay().Paint(w, RectC(tx, ty + th + 2, cx, mh), t2, ink, Null, 0);
 			}
 		}
-		
+
 		StdDisplay().Paint(w, RectC(tx, ty, cx, tcy), t1, ink, Null, 0);
 
-        if(!info.dnd && info.hover) {
-            Rect cr = RectC(r.right - 24, r.top + (r.Height() - 16) / 2, 16, 16);
-            if(info.state != CTRL_NORMAL)
-                ChPaint(w, cr, z.look[info.state]);
-            w.DrawImage(cr.left, cr.top, Images::Delete());
-        }
+		if(!info.dnd && info.hover) {
+			Rect cr = RectC(r.right - 24, r.top + (r.Height() - 16) / 2, 16, 16);
+			if(info.state != CTRL_NORMAL)
+				ChPaint(w, cr, z.look[info.state]);
+			w.DrawImage(cr.left, cr.top, Images::Delete());
+		}
 	}
 };
 

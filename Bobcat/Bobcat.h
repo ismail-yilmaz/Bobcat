@@ -47,8 +47,10 @@ namespace Upp {
 struct Bobcat;
 struct Terminal;
 struct Profile;
+struct ProgramInfo;
 struct ItemInfo;
 struct HighlightInfo;
+struct DisplayInfo;
 
 // Global context
 Ptr<Bobcat> GetContext();
@@ -211,6 +213,32 @@ struct HighlightInfo : Moveable<HighlightInfo> {
     bool            adjusted = false;
 };
 
+// Generic display info structure.
+
+struct DisplayInfo : Moveable<DisplayInfo> {
+	String title;
+	String msg;
+	Color  msgcolor;
+	Image  icon;
+	Image  mimg;
+	bool   focus:1;
+	bool   hover:1;
+	bool   dnd:1;
+	bool   showmsg:1;
+	bool   urgent:1;
+	int    state;
+
+	DisplayInfo()
+		: msgcolor(Null)
+		, focus(false)
+		, hover(false)
+		, dnd(false)
+		, showmsg(true)
+		, urgent(false)
+		, state(CTRL_NORMAL)
+		, icon(Images::Terminal()) {}
+};
+
 // Command line arguments/options parsing stuff
 
 enum class CmdArgType {
@@ -294,6 +322,7 @@ MessageCtrl& GetNotificationDaemon();
 
 Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, const String& no,
                             MessageBox::Type type, const Event<int>& action);
+Ptr<MessageBox> Notify(Ctrl& ctrl, const String& text, int timeout = 0);
 Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout = 0);
 Ptr<MessageBox> Error(Ctrl& ctrl, const String& text, int timeout = 0);
 }
