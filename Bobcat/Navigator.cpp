@@ -16,8 +16,7 @@ namespace Upp {
 using namespace NavigatorKeys;
 
 Navigator::Item::Item()
-: blinking(false)
-, dnd(false)
+: dnd(false)
 {
 	CtrlLayout(*this);
 	WhenAction = [this] { if(ctrl) WhenItem(*(ctrl)); };
@@ -44,40 +43,40 @@ void Navigator::Item::Paint(Draw& w)
 		dp.Begin();
 		dp.RoundedRectangle(q, 8.0, 8.0).Fill(SColorFace());
 		dp.DrawImage(q.Deflated(8), img);
+
 		if(ctrl) {
-			if(ctrl->IsRunning()) {
-				if(dnd) {
-					const Image& ico = Images::DropClipHD();
-					RGBA c = SColorHighlight();
-					c.a = 128;
-					dp.RoundedRectangle(q, 8.0, 8.0).Fill(c);
-					Size sz = min(ico.GetSize(), q.GetSize());
-					dp.DrawImage(q.CenterRect(sz), ico);
-				}
-				// Always overlay
-				if(blinking && ctrl->IsRoot()) {
-					const char *txt = t_("Privilege escalation!");
-					Point pt = q.CenterPos(GetTextSize(txt, StdFont().Bold()));
-					dp.DrawText(pt.x, pt.y, txt, StdFont().Bold(), LtRed());
-				}
-			}
-			else
-			if(ctrl->IsFinished() && blinking) {
-				Image ico;
-				if(ctrl->IsFailure()) {
-					if(ctrl->IsAsking())
-						ico = Images::ExclamationHD();
-					else
-						ico = Images::ErrorHD();
-				}
-				else
-				if(ctrl->IsAsking())
-					ico = Images::QuestionHD();
-				else
-				if(ctrl->IsSuccess())
-					ico = Images::OkHD();
+			if(dnd) {
+				const Image& ico = Images::DropClipHD();
+				RGBA c = SColorHighlight();
+				c.a = 128;
+				dp.RoundedRectangle(q, 8.0, 8.0).Fill(c);
 				Size sz = min(ico.GetSize(), q.GetSize());
 				dp.DrawImage(q.CenterRect(sz), ico);
+			}
+
+			DisplayInfo info;
+			SetStatusDisplayInfo(*ctrl, info, true);
+
+			if(info.showmsg && (!info.msg.IsEmpty() || !IsNull(info.mimg))) {
+				Font font = StdFont().Bold();
+				Size txtsz = !info.msg.IsEmpty() ? GetTextSize(info.msg, font) : Size(0, 0);
+				Size imgsz = !IsNull(info.mimg) ? min(info.mimg.GetSize(), q.GetSize()) : Size(0, 0);
+				int spacing = (imgsz.cy > 0 && txtsz.cy > 0) ? 4 : 0;
+				int totalcy = imgsz.cy + spacing + txtsz.cy;
+				int y = q.top + (q.Height() - totalcy) / 2;
+
+				if(imgsz.cy > 0) {
+					Point imgpt(q.left + (q.Width() - imgsz.cx) / 2, y);
+					dp.DrawImage(imgpt.x, imgpt.y, Colorize(info.mimg, info.msgcolor));
+					y += imgsz.cy + spacing;
+				}
+
+				if(txtsz.cy > 0) {
+					AttrText txt(info.msg);
+					txt.SetFont(font).Ink(Nvl(info.msgcolor, SColorText()));
+					txt.Align(txtsz.cx <= q.Width() - 8 ? ALIGN_CENTER : ALIGN_LEFT);
+					StdDisplay().Paint(dp, Rect(q.left + 4, y, q.right - 4, y + txtsz.cy), txt, Null, Null, 0);
+				}
 			}
 		}
 
@@ -250,6 +249,7 @@ int Navigator::SyncItemLayout()
 			row++;
 		}
 	}
+	
 	return cnt;
 }
 
@@ -267,7 +267,6 @@ void Navigator::Sync()
 		if(SyncItemLayout() == 0)
 			return;
 		Size fsz = GetStdFontSize();
-		int blinking = 0;
 		for(int i = 0; i < cnt; i++) {
 			Item& m = items[i];
 			m.ctrl = &AsTerminal(ctx.stack[i]);
@@ -276,8 +275,6 @@ void Navigator::Sync()
 			ImageDraw w(csz);
 			m.ctrl->Paint(w);
 			m.img = Rescale(w, max(1, isz.cx - 4), max(1, isz.cy - fsz.cy));
-			if(!m.ctrl->IsRunning() || m.ctrl->IsRoot())
-				blinking++;
 			if(!m.IsChild())
 				Add(m);
 			m.WantFocus();
@@ -295,8 +292,7 @@ void Navigator::Sync()
 			};
 			m.Update();
 		}
-		if(blinking)
-			KillSetTimeCallback(-500, [this] { Animate(); }, Navigator::TIMEID_BLINK);
+		Animate();
 		Refresh();
 	};
 
@@ -307,11 +303,32 @@ void Navigator::Sync()
 
 void Navigator::Animate()
 {
-	for(Item& m : items)
-		if(m.ctrl && (!m.ctrl->IsRunning() || m.ctrl->IsRoot())) {
-			m.blinking ^= 1;
-			m.Refresh();
-		}
+	if(!IsVisible()) {
+		KillTimeCallback(TIMEID_BLINK);
+		return;
+	}
+
+	auto HasAnim = [](const Item& m) -> bool {
+		if(!m.ctrl)
+			return false;
+		ProgramInfo pinfo = GetProgramInfo(*m.ctrl);
+		return !m.ctrl->IsRunning()
+			|| m.ctrl->IsRoot()
+			|| m.ctrl->IsAsking()
+			|| m.ctrl->InProgress()
+			|| pinfo.IsWorking()
+			|| pinfo.IsUrgent();
+	};
+
+	if(FindMatch(items, HasAnim) >= 0) {
+		if(!ExistsTimeCallback(TIMEID_BLINK))
+			SetTimeCallback(-30, [this] { Refresh(); }, TIMEID_BLINK);
+	}
+	else {
+		KillTimeCallback(TIMEID_BLINK);
+	}
+
+	Refresh();
 }
 
 void Navigator::Layout()
@@ -394,7 +411,7 @@ void Navigator::AnimateSwap(int i, int ii)
 
 	a.SetRect(ra);
 	b.SetRect(rb);
-	
+
 	Swap(a.ctrl, b.ctrl);
 	Swap(a.img, b.img);
 

@@ -180,6 +180,164 @@ const Display& DefaultPaletteNameDisplay()    { return Single<DefaulPaletteNameD
 const Display& NormalPaletteNameDisplay()     { return Single<NormalPaletteNameDisplayCls>();  }
 const Display& NormalPaletteSampleDisplay()   { return Single<NormalPaletteSampleDisplayCls>();}
 
+Image PaintProgressIcon(double percentage, Color ink, bool showpercent = false, bool spinner = false, bool hd = false)
+{
+	auto sCacheKey = [&]() -> String {
+		StringBuffer s;
+		RawCat(s, percentage);
+		RawCat(s, showpercent);
+		RawCat(s, spinner);
+		RawCat(s, hd);
+		return String(s);
+	};
+	
+	auto sCacheValue = [&]() -> Image {
+		Size sz(16, 16);
+		double x = 8.0, y = 8.0, radius = 6.0, stroke = 2.0;
+		if(hd) {
+			sz *= 3;
+			x *= 3;
+			y *= 3,
+			radius *= 3;
+			stroke *= 2.0;
+		}
+		
+		ImagePainter dp(sz);
+		const double start = spinner ? -M_PI / 2 + 2 * M_PI * (percentage / 100.0) : -M_PI / 2;
+		const double sweep = spinner ?  M_PI / 2 : 2 * M_PI * (percentage / 100.0);
+		
+		// Draw background circle.
+		dp.Clear(RGBAZero());
+		dp.Begin();
+		dp.Circle(x, y, radius).Fill(RGBAZero()).Stroke(stroke, SColorShadow());
+		dp.End();
+		
+		// Draw the pie section.
+		dp.Begin();
+		dp.Move(x, y).Arc(x, y, radius, start, sweep).Fill(ink);
+		dp.End();
+		
+		// Optional: Paint percentage as text
+		if(!spinner && showpercent) {
+			String txt = Format("%0.f%%", percentage);
+			Size   tsz = GetTextSize(txt, StdFont());
+			dp.DrawText(x - tsz.cx / 2, y - tsz.cy / 2, txt, StdFont(), InvertColor());
+		}
+		
+		return dp;
+	};
+	
+	return MakeImage(sCacheKey, sCacheValue, true);
+}
+
+void SetStatusDisplayInfo(Terminal& term, DisplayInfo& info, bool hd)
+{
+	static int starttime = msecs();
+	
+	bool blink = (msecs(starttime) / 500) % 2 == 0;
+	int frame = (msecs(starttime) / 100) % 8;
+
+	ProgramInfo pinfo = GetProgramInfo(term);
+	info.urgent = pinfo.IsUrgent();
+	info.showmsg = true; // Default to solid
+
+	enum {
+		MSG_ROOT,
+		MSG_FAILURE,
+		MSG_ASKING,
+		MSG_ERROR,
+		MSG_BLOCKED,
+		MSG_WORKING,
+		MSG_COMPLETED
+	};
+
+	static const char* sMsg[] = {
+		t_("Privilege escalation!"),
+		t_("Failure!"),
+		t_("Input required!"),
+		t_("Error!"),
+		t_("Waiting for input..."),
+		t_("Working..."),
+		t_("Completed.")
+	};
+
+	auto FormatMsg = [&](int key) -> String {
+		String m;
+		if(!IsNull(pinfo.app))
+			m << pinfo.app << ": ";
+		m << Nvl(pinfo.msg, sMsg[key]);
+		return m;
+	};
+
+	bool spinner = false;
+	
+	auto GetTerminalProgress = [&]() -> int {
+		spinner = term.InProgress() && term.progressbar.GetTotal() == 0;
+		return term.progressbar.Get();
+	};
+	
+	auto GetProgramProgress = [&]() -> int {
+		spinner = IsNull(pinfo.progress);
+		return spinner ? ((msecs(starttime) / 10) % 100) : pinfo.progress;
+	};
+
+	// Precedence Order: Non-program process alerts take highest precedence
+	if(term.IsRoot()) {
+		info.msg = sMsg[MSG_ROOT];
+		info.msgcolor = SRed();
+		info.mimg = hd ? Images::ExclamationHD() : Images::Exclamation();
+		info.showmsg = blink;
+	}
+	else
+	if(term.IsFailure()) {
+		info.msg = sMsg[MSG_FAILURE];
+		info.msgcolor = SRed();
+		info.mimg = hd ? Images::ErrorHD() : Images::Error();
+		info.showmsg = blink;
+	}
+	else
+	if(term.IsAsking()) {
+		info.msg =sMsg[MSG_ASKING];
+		info.msgcolor = Yellow();
+		info.mimg = hd ? Images::QuestionHD() : Images::Question();
+		info.showmsg = blink;
+	}
+	else
+	if(pinfo.IsError()) {
+		info.msg = FormatMsg(MSG_ERROR);
+		info.msgcolor = SRed();
+		info.mimg = hd ? Images::ErrorHD() : Images::Error();
+		info.showmsg = blink;
+	}
+	else
+	if(pinfo.IsBlocked()) {
+		info.msg = FormatMsg(MSG_BLOCKED);
+		info.msgcolor = Yellow();
+		info.mimg = hd ? Images::QuestionHD() : Images::Question();
+		info.showmsg = blink;
+	}
+	else
+	if(pinfo.IsWorking()) {
+		info.msg = FormatMsg(MSG_WORKING);
+		info.msgcolor = SCyan();
+		int progress = GetProgramProgress();
+		info.mimg = PaintProgressIcon(progress, SCyan(), false, spinner, hd);
+	}
+	else
+	if(term.InProgress()) {
+		info.msg = sMsg[MSG_WORKING];
+		info.msgcolor = SCyan();
+		int progress = GetTerminalProgress();
+		info.mimg = PaintProgressIcon(progress, SCyan(), false, spinner, hd);
+	}
+	else
+	if(pinfo.IsDone() || term.IsSuccess()) {
+		info.msg = FormatMsg(MSG_COMPLETED);
+		info.msgcolor = SLtGreen();
+		info.mimg = hd ? Images::OkHD() : Images::Ok();
+	}
+}
+
 void SetSearchStatusText(FrameLR<DisplayCtrl>& status, const String& txt)
 {
 	int cx = GetTextSize(txt, GetStdFont()).cx;
@@ -625,7 +783,7 @@ Ptr<MessageBox> AskYesNo(Ctrl& ctrl, const String& text, const String& yes, cons
 	c.ButtonL(IDYES, yes);
 	c.ButtonR(IDNO, no);
 	c.UseIcon(false);
-	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), 0);
+	c.Set(ctrl, DeQtf(text), m.IsAnimated(), m.IsAppending(), 0);
 	c.WhenAction = action;
 	SyncNotifications();
 	return &c;
@@ -667,6 +825,19 @@ Ptr<MessageBox> AskRestartExitOK(Ptr<Terminal> t)
 	return AskRestartExitOK(t, LoadProfile(t->profilename));
 }
 
+Ptr<MessageBox> Notify(Ctrl& ctrl, const String& text, int timeout)
+{
+	auto& m = GetNotificationDaemon();
+	auto& c = m.Create();
+	c.MessageType(MessageBox::Type::INFORMATION);
+	c.Placement(m.GetPlacement());
+	c.UseIcon(false);
+	c.UseCross();
+	c.Set(ctrl, DeQtf(text), m.IsAnimated(), m.IsAppending(), timeout);
+	SyncNotifications();
+	return &c;
+}
+
 Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 {
 	auto& m = GetNotificationDaemon();
@@ -675,7 +846,7 @@ Ptr<MessageBox> Warning(Ctrl& ctrl, const String& text, int timeout)
 	c.Placement(m.GetPlacement());
 	c.UseIcon(false);
 	c.UseCross();
-	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	c.Set(ctrl, DeQtf(text), m.IsAnimated(), m.IsAppending(), timeout);
 	SyncNotifications();
 	return &c;
 }
@@ -688,7 +859,7 @@ Ptr<MessageBox> Error(Ctrl& ctrl, const Upp::String& text, int timeout)
 	c.Placement(m.GetPlacement());
 	c.UseIcon(false);
 	c.UseCross();
-	c.Set(ctrl, text, m.IsAnimated(), m.IsAppending(), timeout);
+	c.Set(ctrl, DeQtf(text), m.IsAnimated(), m.IsAppending(), timeout);
 	SyncNotifications();
 	return &c;
 }

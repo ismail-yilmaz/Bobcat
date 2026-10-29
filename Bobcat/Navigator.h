@@ -58,8 +58,7 @@ struct Navigator : ParentCtrl {
         
         Ptr<Terminal> ctrl;
         Image         img;
-        bool          blinking:1;
-       
+        
     private:
         Point         pos = {0, 0};
         bool          dnd:1;

@@ -1229,7 +1229,15 @@ report requests are not included in this table.]&]
 :: [s0; [G+75 1337]]
 :: [s0; [G+75 Display inline images. (iTerm2)]]
 :: [s0; [G+75 Level 1]]
-:: [s0; [C@5$(245)+75 OSC 1337 ; args ST]]}}&]
+:: [s0; [C@5$(245)+75 OSC 1337 ; args ST]]
+:: [s0; [G+75 7501]]
+:: [s0; [G+75 Program status report. (Ghostty)]]
+:: [s0; [G+75 Level 1]]
+:: [s0; [C@5$(245)+75 OSC 7501 ; args ST]]
+:: [s0; [G+75 7771]]
+:: [s0; [G+75 Font glyph coverage inquiry. (mintty)]]
+:: [s0; [G+75 Level 1]]
+:: [s0; [C@5$(245)+75 OSC 7771;`[?`|!`] ;codepoint; ... ST]]}}&]
 [s0;b20;a20;pht300; [*G+75 Notes]&]
 [s0;l200;i200;b20;O0; [G+75 TerminalCtrl`'s responses to commands and 
 report requests are not included in this table.]&]
@@ -1926,4 +1934,56 @@ input and the start of the command output.]&]
 output.]&]
 [s0;l200;i200;b20;O0; [G+75 TerminalCtrl currently supports only a 
 minimal `-but reasonable`- subset of this protocol. This may 
-change in the future.]]]
+change in the future.]&]
+[s0;b20;a20;pht300; [*G+75 Font Glyph Coverage Inquiry Protocol]&]
+[ {{3333:5144:1523B20;A20;G(220)@(220.225.230) [s0; [G+75 Sequence]]
+:: [s0; [G+75 Description]]
+:: [s0; [G+75 Device Level]]
+::@2 [s0; [C@5$(245)+75 OSC 7771 ; `[mode`] ; codepoint ; ... ST]]
+:: [s0; [G+75 Queries the terminal`'s font glyph coverage (tofu detection)]]
+:: [s0; [G+75 Level 1]]}}&]
+[s0;b20;a20;pht300; [*G+75 Notes]&]
+[s0;l200;i200;b20;O0; [G+75 Applications (in) must set the ``][C@5$(245)+75 mode][G+75 `` 
+to ``][C@5$(245)+75 ?][G+75 `` for inquiry. TerminalCtrl (out) will 
+set it to ``][C@5$(245)+75 !][G+75 ``.]&]
+[s0;l200;i200;b20;O0; [C@5$(245)+75 codepoint][G+75  must be represented 
+as a decimal unicode codepoint. TerminalCtrl will return the 
+same decimal codepoint if the codepoint can be displayed with 
+the current font. Any number of codepoints can be queried in 
+a single query.]&]
+[s0;b20;a20;pht300; [*G+75 Program Status Protocol]&]
+[ {{3333:5301:1366B20;A20;G(220)@(220.225.230) [s0; [G+75 Sequence]]
+:: [s0; [G+75 Description]]
+:: [s0; [G+75 Device Level]]
+::@2 [s0; [C@5$(245)+75 OSC 7501 ; `[parameters`] ST]]
+:: [s0; [G+75 Notifies the client code of the current state of a running 
+host program or shell command.]]
+:: [s0; [G+75 Level 1]]}}&]
+[s0;b20;a20;pht300; [*G+75 Notes]&]
+[s0;l200;i200;b20;O0; [G+75 Implements the OSC 7501 program status 
+reporting protocol.]&]
+[s0;l200;i200;b20;O0; [C@5$(245)+75 parameters][G+75  are colon`-separated 
+][C@5$(245)+75 key`=value][G+75  pairs.]&]
+[s0;l200;i200;b20;O0; [G+75 If the ][C@5$(245)+75 parameters][G+75  string 
+is exactly ][C@5$(245)+75 ?][G+75 , TerminalCtrl will reply with 
+][C@5$(245)+75 OSC 7501 ; ? ST][G+75  to indicate support for the 
+protocol.]&]
+[s0;l200;i200;b20;O0; [G+75 The ][C@5$(245)+75 state][G+75  key is mandatory 
+and its value must be one of the following exact strings: ][C@5$(245)+75 idle][G+75 , 
+][C@5$(245)+75 working][G+75 , ][C@5$(245)+75 done][G+75 , ][C@5$(245)+75 blocked][G+75 , 
+][C@5$(245)+75 error][G+75 , or ][C@5$(245)+75 clear][G+75 . If the ][C@5$(245)+75 state][G+75  
+key is missing or contains an unrecognized value, the entire 
+status report is ignored.]&]
+[s0;l200;i200;b20;O0; [G+75 The ][C@5$(245)+75 msg][G+75  key is optional. 
+Its value must be a Base64`-encoded string representing a single 
+line of human`-readable text. It must not contain control characters.]&]
+[s0;l200;i200;b20;O0; [G+75 Keys must consist only of lowercase letters 
+(][C@5$(245)+75 a`-z][G+75 ).]&]
+[s0;l200;i200;b20;O0; [G+75 Values must consist only of alphanumeric 
+characters and the symbols ][C@5$(245)+75 `_ . , `+ / `= `-][G+75 .]&]
+[s0;l200;i200;b20;O0; [G+75 Any key`-value pair that violates the character 
+restrictions is ignored, but the rest of the report continues 
+to be processed.]&]
+[s0;l200;i200;b20;O0; [G+75 If a key is repeated in a single sequence, 
+the last value overwrites the previous ones.]&]
+[s0;G+75 ]]

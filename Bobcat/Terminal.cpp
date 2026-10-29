@@ -56,6 +56,8 @@ Terminal::Terminal(Bobcat& ctx_)
 	WhenSelectorScan         = THISFN(OnSelectorScan);
 	WhenBell                 = THISFN(OnBell);
 	WhenScroll               = THISFN(Update);
+	WhenProgramStatus        = THISFN(OnProgramStatus);
+	WhenReset                = THISFN(OnReset);
 }
 
 Terminal::~Terminal()
@@ -145,7 +147,7 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 		pty->SetSize(GetPageSize());
 		return true;
 	}
-	
+
 	state = State::Failure;
 	AskRestartExitError(this, p);
 	return false;
@@ -187,6 +189,7 @@ void Terminal::Restart()
 void Terminal::Stop()
 {
 	exitmode = ExitMode::Exit;
+	state = State::Killed;
 	if(!pty->IsRunning())
 		return;
 	pty->Kill();
@@ -204,7 +207,9 @@ bool Terminal::Do()
 			return true;
 		}
 		// Process just ended. Capture the precise exit state permanently.
-		state = pty->GetExitCode() == 0 ? State::Success : State::Failure;
+		if(!IsKilled())
+			state = pty->GetExitCode() == 0 ? State::Success : State::Failure;
+		ClearProgramStatusInfo();
 	}
 
 	if(ShouldExit())
@@ -248,6 +253,11 @@ bool Terminal::IsSuccess()
 bool Terminal::IsAsking()
 {
 	return IsFinished() && exitmode == ExitMode::KeepAsking;
+}
+
+bool Terminal::IsKilled()
+{
+	return state == State::Killed;
 }
 
 bool Terminal::IsRoot()
@@ -317,7 +327,7 @@ void Terminal::Update()
 	// If an update is already pending, do nothing and let the timer fire.
 	if(updating)
 		return;
-	
+
 	updating = true;
 	auto cb = [this]()
 	{
@@ -483,14 +493,14 @@ Terminal& Terminal::SetPalette(const Palette& p, bool reload)
 {
 	if(paletteoverridden && reload)
 		return *this;
-		
+
 	for(int i = 0, j = 0; i < Palette::MAX_COLOR_COUNT; i++) {
 		if(i < TerminalCtrl::MAX_COLOR_COUNT)
 			SetColor(i, p.table[i]);
 		else
 			highlight[j++] = p.table[i];
 	}
-	
+
 	palettename = p.name;
 	return *this;
 }
@@ -793,6 +803,11 @@ void Terminal::OnNotification(const String& text)
 	GetNotificationDaemon().NoIcon().Information(*this, text);
 }
 
+void Terminal::ClearNotifications()
+{
+	GetNotificationDaemon().Clear(this);
+}
+
 bool Terminal::OnSelectorScan(dword key)
 {
 	// Allow text to be searched via finder and on web.
@@ -827,6 +842,83 @@ void Terminal::OnProgress(int type, int data)
 bool Terminal::InProgress() const
 {
 	return progressbar.IsShown();
+}
+
+void Terminal::ClearProgramStatusInfo(bool full)
+{
+	auto& m = GetNotificationDaemon();
+	programinfo.RemoveIf([&](int i) {
+		ProgramInfo& pi = programinfo[i];
+		bool rem = full || pi.IsWorking() || pi.IsBlocked() || pi.IsIdle();
+		if(rem && pi.notification)
+			m.Remove(pi.notification);
+		return rem;
+	});
+}
+
+void Terminal::OnProgramStatus(const VectorMap<String, String>& p)
+{
+	String id = p.Get("id", Null);
+	String statestr = p.Get("state", Null);
+
+	auto& m = GetNotificationDaemon();
+	
+	auto sRemoveInfo = [&](int i) {
+		if(ProgramInfo& pi = programinfo[i]; pi.notification)
+			m.Remove(pi.notification);
+		programinfo.Remove(i);
+	};
+	
+	if(statestr == "clear") {
+		if(IsNull(id)) {
+			ClearProgramStatusInfo(true);
+		}
+		else {
+			for(int i = programinfo.GetCount() - 1; i >= 0; i--) {
+				if(const String& k = programinfo.GetKey(i); k == id || k.StartsWith(id + "/"))
+					sRemoveInfo(i);
+			}
+		}
+	}
+	else {
+		ProgramInfo pi(statestr);
+
+		if(int i = programinfo.Find(id); i >= 0)
+			sRemoveInfo(i);
+
+		if(programinfo.GetCount() >= 256)
+			sRemoveInfo(0);
+
+		ProgramInfo& s = programinfo.Add(id);
+		s.status = pi.status;
+		s.app   = TrimBoth(p.Get("app", Null));
+		s.title = TrimBoth(p.Get("title", Null));
+		s.msg   = TrimBoth(p.Get("msg", Null));
+		s.progress = StrInt(p.Get("progress", Null));
+
+		if(s.IsBlocked() || s.IsError()) {
+			String txt;
+			if(!IsNull(s.app))
+				txt << s.app << ": ";
+
+			if(!IsNull(s.msg))
+				txt << s.msg;
+			else
+				txt << (s.IsBlocked() ? t_("Waiting for input") : t_("Error occurred"));
+			
+			OnBell();
+				
+			if(s.IsBlocked())
+				s.notification = Warning(*this, txt);
+			else
+			if(s.IsError())
+				s.notification = Error(*this, txt);
+
+			return;
+		}
+	}
+
+	ctx.SyncNotifications();
 }
 
 void Terminal::DragAndDrop(Point pt, PasteClip& d)
@@ -1050,6 +1142,13 @@ void Terminal::OnBell()
 		BeepExclamation();
 	if(flash)
 		FlashDisplay();
+}
+
+void Terminal::OnReset(bool full)
+{
+	ClearProgramStatusInfo(full);
+	GetNotificationDaemon().Clear(this);
+	ctx.SyncNotifications();
 }
 
 void Terminal::FileMenu(Bar& menu)
@@ -1327,6 +1426,71 @@ void Terminal::ProgressBar::Hide()
 	}
 	timer.Kill();
 	Set(0, 0);
+}
+
+ProgramInfo::ProgramInfo()
+: status(State::Idle)
+, progress(Null)
+{
+}
+
+ProgramInfo::ProgramInfo(const String& s)
+: progress(Null)
+{
+	status = decode(
+		s,
+		"idle", State::Idle,
+		"done", State::Done,
+		"working", State::Working,
+		"blocked", State::Blocked,
+		"error", State::Error,
+		State::Idle
+	);
+}
+
+bool ProgramInfo::IsIdle() const
+{
+	return status == State::Idle;
+}
+
+bool ProgramInfo::IsDone() const
+{
+	return status == State::Done;
+}
+
+bool ProgramInfo::IsWorking() const
+{
+	return status == State::Working;
+}
+
+bool ProgramInfo::IsBlocked() const
+{
+	return status == State::Blocked;
+}
+
+bool ProgramInfo::IsError() const
+{
+	return status == State::Error;
+}
+
+bool ProgramInfo::IsUrgent() const
+{
+	return IsBlocked() || IsError();
+}
+
+ProgramInfo GetProgramInfo(Terminal& term)
+{
+	if(term.programinfo.IsEmpty())
+		return ProgramInfo();
+
+	int best = 0;
+	for(int i = 1; i < term.programinfo.GetCount(); i++)
+		// >= ensures that if two records have the same priority status,
+		// the most recently updated entry (higher index) is selected.
+		if(term.programinfo[i].status >= term.programinfo[best].status)
+			best = i;
+
+	return term.programinfo[best];
 }
 
 Terminal& AsTerminal(Ctrl& c)
