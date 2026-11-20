@@ -48,32 +48,32 @@ Bobcat::Bobcat()
 	Ctrl::SkinChangeSensitive();
 }
 
-bool Bobcat::AddTerminal(const Profile& profile, int type)
+bool Bobcat::AddTerminal(const Profile& profile, ViewMode mode)
 {
-	if(type == WINDOWED) {
+	if(mode == ViewMode::Windowed) {
 		if(SpawnNewProcess(*this, profile.name))
 			return true;
 	}
-	bool ok = terminals.Create(*this).Start(profile, type == SPLIT);
+	bool ok = terminals.Create(*this).Start(profile, mode);
 	if(ok) Sync();
 	return ok;
 }
 
-bool Bobcat::AddTerminal(const String& key, int type)
+bool Bobcat::AddTerminal(const String& key, ViewMode mode)
 {
-	return AddTerminal(LoadProfile(key), type);
+	return AddTerminal(LoadProfile(key), mode);
 }
 
-bool Bobcat::NewTerminalFromActiveProfile(int type)
+bool Bobcat::NewTerminalFromActiveProfile(ViewMode mode)
 {
 	Terminal *t = GetActiveTerminal();
-	if(type == WINDOWED) {
+	if(mode == ViewMode::Windowed) {
 		Profile p = LoadProfile(t->profilename);
 		String pname = p.inheritpalette ? t->palettename : p.palette;
 		if(SpawnNewProcess(*this, p.name, t->workingdir, pname))
 			return true;
 	}
-	bool ok = terminals.Create(*this).Start(t, type == SPLIT);
+	bool ok = terminals.Create(*this).Start(t, mode);
 	if(ok) Sync();
 	return ok;
 }
@@ -461,14 +461,8 @@ void Bobcat::SyncWindowTitle()
 	String s = "Bobcat";
 	bool showtermtitle = !settings.showtitle && !settings.showtabs;
 	if(const Terminal *t = GetActiveTerminal(); t) {
-			if(showtermtitle)
-				s << " [" << t->GetTitle() << "]";
-			if(Splitter *p = t->GetParentSplitter(); p) {
-				if(p->GetFirstChild() == t)
-					s << " (" << (p->IsHorz() ? t_("left pane") : t_("top pane")) << ")";
-				else
-					s << " (" << (p->IsHorz() ? t_("right pane") : t_("bottom pane")) << ")";
-			}
+		if(showtermtitle)
+			s << " [" << t->GetTitle() << "]";
 	}
 	navigator.Refresh();
 	tabbar.Refresh();
@@ -600,13 +594,13 @@ void Bobcat::HelpMenu(Bar& menu)
 
 void Bobcat::TermMenu(Bar& menu)
 {
-	menu.Add(AK_NEWTAB, Images::DefaultTerminal(), [this] { NewTerminalFromActiveProfile(STACKED); });
-	menu.AddKey(AK_NEWPANE,                        [this] { NewTerminalFromActiveProfile(SPLIT); });
-	menu.AddKey(AK_NEWWINDOW,                      [this] { NewTerminalFromActiveProfile(WINDOWED); });
-	
+	menu.Add(AK_NEWTAB, Images::DefaultTerminal(),   [this] { NewTerminalFromActiveProfile(ViewMode::Stacked); });
+	menu.AddKey(AK_NEWPANE,                          [this] { NewTerminalFromActiveProfile(ViewMode::AutoSplit); });
+	menu.AddKey(AK_NEWWINDOW,                        [this] { NewTerminalFromActiveProfile(ViewMode::Windowed); });
 	Vector<String> pnames = GetProfileNames();
 	if(pnames.GetCount())
 		menu.Sub(t_("New terminal from..."), [this, pnames = pick(pnames)](Bar& menu) { TermSubmenu(menu, pnames); });
+	menu.Sub(t_("New terminal (split)..."), [this](Bar& menu) { TermSplitMenu(menu); });
 	menu.AddKey(AK_PROFILEMENU, [this] { OpenProfileMenu(*this); });
 	menu.AddKey(AK_NAVIGATOR,   [this] { ToggleNavigator(); });
 }
@@ -639,7 +633,7 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 				6, (KeyInfo& (*)()) AK_SPROFILE7,
 				7, (KeyInfo& (*)()) AK_SPROFILE8,
 				8, (KeyInfo& (*)()) AK_SPROFILE9,
-				(KeyInfo& (*)()) AK_SPROFILE10), [this, name] { AddTerminal(name, SPLIT); });
+				(KeyInfo& (*)()) AK_SPROFILE10), [this, name] { AddTerminal(name, ViewMode::AutoSplit); });
 			menu.AddKey(decode(i,
 				0, (KeyInfo& (*)()) AK_WPROFILE1,
 				1, (KeyInfo& (*)()) AK_WPROFILE2,
@@ -650,9 +644,17 @@ void Bobcat::TermSubmenu(Bar& menu, const Vector<String>& list)
 				6, (KeyInfo& (*)()) AK_WPROFILE7,
 				7, (KeyInfo& (*)()) AK_WPROFILE8,
 				8, (KeyInfo& (*)()) AK_WPROFILE9,
-				(KeyInfo& (*)()) AK_WPROFILE10), [this, name] { AddTerminal(name, WINDOWED); });
+				(KeyInfo& (*)()) AK_WPROFILE10), [this, name] { AddTerminal(name, ViewMode::Windowed); });
 			}
 	}
+}
+
+void Bobcat::TermSplitMenu(Bar& menu)
+{
+	menu.Add(AK_SPLITTER_SPLITLEFT, Images::SplitLeft(), [this] { NewTerminalFromActiveProfile(ViewMode::LeftSplit); });
+	menu.Add(AK_SPLITTER_SPLITRIGHT, Images::SplitRight(), [this] { NewTerminalFromActiveProfile(ViewMode::RightSplit); });
+	menu.Add(AK_SPLITTER_SPLITTOP, Images::SplitTop(), [this] { NewTerminalFromActiveProfile(ViewMode::TopSplit); });
+	menu.Add(AK_SPLITTER_SPLITBOTTOM, Images::SplitBottom(), [this] { NewTerminalFromActiveProfile(ViewMode::BottomSplit); });
 }
 
 void Bobcat::ListMenu(Bar& menu)

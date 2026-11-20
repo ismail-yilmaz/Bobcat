@@ -61,6 +61,17 @@ void SetContext(Bobcat& ctx);
 #define LAYOUTFILE <Bobcat/Bobcat.lay>
 #include <CtrlCore/lay.h>
 
+enum class ViewMode {
+	Stacked,
+	Windowed,
+	AutoSplit,
+	LeftSplit,
+	RightSplit,
+	TopSplit,
+	BottomSplit,
+};
+
+#include "Splitter.h"
 #include "Stacker.h"
 #include "WebSearch.h"
 #include "QuickText.h"
@@ -73,12 +84,10 @@ void SetContext(Bobcat& ctx);
 
 struct Bobcat : Pte<Bobcat> {
     Bobcat();
-
-	enum Type : int  { STACKED, SPLIT, WINDOWED };
 	
-    bool        AddTerminal(const Profile& profile, int type = STACKED);
-    bool        AddTerminal(const String& key = Null, int type = STACKED);
-    bool        NewTerminalFromActiveProfile(int type = STACKED);
+    bool        AddTerminal(const Profile& profile, ViewMode mode = ViewMode::Stacked);
+    bool        AddTerminal(const String& key = Null, ViewMode mode = ViewMode::Stacked);
+    bool        NewTerminalFromActiveProfile(ViewMode mode = ViewMode::Stacked);
     void        RemoveTerminal(Terminal& t);
     void        ActivateTerminal();
     Terminal*   GetActiveTerminal();
@@ -130,6 +139,7 @@ struct Bobcat : Pte<Bobcat> {
     void        HelpMenu(Bar& menu);
     void        TermMenu(Bar& menu);
     void        TermSubmenu(Bar& menu, const Vector<String>& list);
+    void        TermSplitMenu(Bar& menu);
     void        ListMenu(Bar& menu);
     void        SizeMenu(Bar& menu);
     
@@ -219,15 +229,15 @@ struct DisplayInfo : Moveable<DisplayInfo> {
 	String title;
 	String msg;
 	Color  msgcolor;
-	Image  icon;
-	Image  mimg;
 	bool   focus:1;
 	bool   hover:1;
 	bool   dnd:1;
 	bool   showmsg:1;
 	bool   urgent:1;
 	int    state;
-
+	Image  icon;
+	Image  mimg;
+	
 	DisplayInfo()
 		: msgcolor(Null)
 		, focus(false)

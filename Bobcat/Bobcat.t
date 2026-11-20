@@ -46,18 +46,6 @@ trTR("Genel")
 T_("Settings")
 trTR("Ayarlar")
 
-T_("left pane")
-trTR("sol b\303\266lme")
-
-T_("top pane")
-trTR("\303\274st b\303\266lme")
-
-T_("right pane")
-trTR("sa\304\237 b\303\266lme")
-
-T_("bottom pane")
-trTR("alt b\303\266lme")
-
 T_("File")
 trTR("Dosya")
 
@@ -84,6 +72,9 @@ trTR("Hakk\304\261nda")
 
 T_("New terminal from...")
 trTR("Yeni terminal a\303\247...")
+
+T_("New terminal (split)...")
+trTR("Yerni terminal a\303\247 (ekran\304\261 b\303\266l)...")
 
 T_("Screenshot is copied to the clipboard.")
 trTR("Ekran g\303\266r\303\274nt\303\274s\303\274 panoya kopyaland\304\261.")
@@ -434,11 +425,11 @@ trTR("Not")
 T_("Progress failed.&Error code: %d")
 trTR("\304\260lerleme ba\305\237ar\304\261s\304\261z.&Hata kodu: %d")
 
-T_("Waiting for input...")
-trTR("Kullan\304\261c\304\261 giri\305\237i bekleniyor...")
+T_("Waiting for input")
+trTR("")
 
-T_("Error!")
-trTR("Hata!")
+T_("Error occurred")
+trTR("")
 
 T_("Color Profiles...")
 trTR("Renk Profilleri...")
@@ -1011,6 +1002,18 @@ trTR("Sol veya \303\274st paneli geni\305\237let")
 T_("Expand right or bottom splitter pone")
 trTR("Sa\304\237 veya alt paneli geni\305\237let")
 
+T_("Split left")
+trTR("Ekran\304\261 soldan b\303\266l")
+
+T_("Split right")
+trTR("Ekran\304\261 sa\304\237dan b\303\266l")
+
+T_("Split top")
+trTR("Ekran\304\261 \303\274stten b\303\266l")
+
+T_("Split bottom")
+trTR("Ekran\304\261 alttan b\303\266l")
+
 
 // Terminal.key
 
@@ -1544,6 +1547,7 @@ trTR("URI")
 T_("\001[g Use [* %s] as a placeholder for the search phrase ]")
 trTR("\001[g [* %s] kal\304\261b\304\261n\304\261 aranacak deyim i\303\247in "
      "yer tutucu olarak kullan\304\261n ]")
+
 
 
 // PACKAGE 'Terminal' FILE 'Terminal.key'

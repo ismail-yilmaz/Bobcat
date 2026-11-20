@@ -71,7 +71,7 @@ void Terminal::PostParse()
 	Update();
 }
 
-bool Terminal::StartPty(const Profile& p, bool pane)
+bool Terminal::StartPty(const Profile& p, ViewMode mode)
 {
 	#ifdef PLATFORM_POSIX
 	#ifdef PLATFORM_LINUX
@@ -132,10 +132,20 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 
 	MakeTitle(profilename);
 	if(ctx.stack.Find(*this) < 0) {
-		if(pane)
-			ctx.stack.Split(*this);
-		else
+		switch(mode) {
+		case ViewMode::AutoSplit:
+		case ViewMode::LeftSplit:
+		case ViewMode::RightSplit:
+		case ViewMode::TopSplit:
+		case ViewMode::BottomSplit:
+			if(ctx.stack.GetCount() > 0) {
+				ctx.stack.Split(*this, mode);
+				break;
+			}
+		default:
 			ctx.stack.Add(*this);
+			break;
+		}
 	}
 	pty->WhenWakeUp = [this] {
 		// In async I/O mode, let async PTYs punch through the Wait() if they have pending data.
@@ -153,19 +163,19 @@ bool Terminal::StartPty(const Profile& p, bool pane)
 	return false;
 }
 
-bool Terminal::Start(const Profile& p, bool pane)
+bool Terminal::Start(const Profile& p, ViewMode mode)
 {
 	SetProfile(p);
-	return StartPty(p, pane);
+	return StartPty(p, mode);
 }
 
-bool Terminal::Start(const String& profile_name, bool pane)
+bool Terminal::Start(const String& profile_name, ViewMode mode)
 {
 	Profile p = LoadProfile(profile_name);
-	return Start(p, pane);
+	return Start(p, mode);
 }
 
-bool Terminal::Start(Terminal *term, bool pane)
+bool Terminal::Start(Terminal *term, ViewMode mode)
 {
 	Profile p;
 	if(term) {
@@ -174,8 +184,16 @@ bool Terminal::Start(Terminal *term, bool pane)
 			p.address = term->workingdir;
 		if(p.inheritpalette)
 			p.palette = term->palettename;
+		bool sp = findarg(mode,
+			ViewMode::AutoSplit,
+			ViewMode::LeftSplit,
+			ViewMode::RightSplit,
+			ViewMode::TopSplit,
+			ViewMode::BottomSplit) >= 0;
+		if(sp && ctx.stack.Find(*term) >= 0 && ctx.stack.GetActiveCtrl() != term)
+			ctx.stack.Goto(*term);
 	}
-	return Start(p, pane);
+	return Start(p, mode);
 }
 
 void Terminal::Restart()
@@ -183,7 +201,7 @@ void Terminal::Restart()
 	SoftReset();
 	Profile p = LoadProfile(profilename);
 	SetExitMode(p.onexit);
-	StartPty(p);
+	StartPty(p, ctx.stack.GetViewMode());
 }
 
 void Terminal::Stop()
@@ -1278,9 +1296,9 @@ void Terminal::ContextMenu(Bar& menu)
 	menu.AddKey(AppKeys::AK_EXIT, [this] { ctx.Close(); });
 }
 
-Splitter* Terminal::GetParentSplitter() const
+MultiSplitter* Terminal::GetParentSplitter() const
 {
-	return dynamic_cast<Splitter*>(GetParent());
+	return dynamic_cast<MultiSplitter*>(GetParent());
 }
 
 bool Terminal::IsSplitterPane() const

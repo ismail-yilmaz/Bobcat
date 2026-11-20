@@ -9,11 +9,14 @@
 
 namespace Upp {
 
+constexpr const int MAX_PANE_COUNT = 16;
+
 Stacker::Stacker(Bobcat& ctx_)
 : ctx(ctx_)
 , activectrl(nullptr)
 , duration(0)
-, maxpanes(2)
+, maxpanes(MAX_PANE_COUNT)
+, viewmode(ViewMode::AutoSplit)
 , wheel(false)
 , vertical(false)
 , splitvert(false)
@@ -24,6 +27,38 @@ Stacker::Stacker(Bobcat& ctx_)
 	WhenSwap   = [this](int a, int b) { ctx.navigator.AnimateSwap(a, b); };
 
 	ctx.view.Add(Animation().Wheel().Horz().SizePos());
+}
+
+void Stacker::ChildGotFocus()
+{
+	if(!animating) {
+		int i = FindMatch(list, [](Ctrl *c) { return c && c->HasFocusDeep(); });
+		if(i >= 0 && activectrl != list[i]) {
+			activectrl = list[i];
+			TrackFocus(activectrl);
+			WhenAction();
+		}
+	}
+	ParentCtrl::ChildGotFocus();
+}
+
+void Stacker::TrackFocus(Ctrl *ctrl)
+{
+	if(!ctrl)
+		return;
+	int ix = FindIndex(focushistory, ctrl);
+	if(ix >= 0)
+		focushistory.Remove(ix);
+	focushistory.Insert(0, ctrl);
+}
+
+Ctrl *Stacker::GetPrevPane(MultiSplitter *scope, Ctrl *excl) const
+{
+	int ix = FindMatch(focushistory, [&](Ctrl *c) {
+		return c && c != excl && FindIndex(list, c) >= 0
+			&& (!scope || GetParentSplitter(c) == scope);
+	});
+	return ix >= 0 ? focushistory[ix] : nullptr;
 }
 
 Stacker& Stacker::Wheel(bool b)
@@ -57,9 +92,8 @@ int Stacker::GetMaxPanes() const
 Stacker& Stacker::NoBackground(bool b)
 {
 	Transparent(b);
-	if(splitters.GetCount() > 0)
-		for(Splitter& s : splitters)
-			s.Transparent(b);
+	for(MultiSplitter& s : splitters)
+		s.Transparent(b);
 	return *this;
 }
 
@@ -78,19 +112,62 @@ Stacker& Stacker::Vert()
 Stacker& Stacker::HorzSplitter()
 {
 	splitvert = false;
+	viewmode = ViewMode::RightSplit;
 	return *this;
 }
 
 Stacker& Stacker::VertSplitert()
 {
 	splitvert = true;
+	viewmode = ViewMode::BottomSplit;
 	return *this;
+}
+
+Stacker& Stacker::AutoSplit()
+{
+	return SetViewMode(ViewMode::AutoSplit);
+}
+
+Stacker& Stacker::SplitLeft()
+{
+	return SetViewMode(ViewMode::LeftSplit);
+}
+
+Stacker& Stacker::SplitRight()
+{
+	return SetViewMode(ViewMode::RightSplit);
+}
+
+Stacker& Stacker::SplitTop()
+{
+	return SetViewMode(ViewMode::TopSplit);
+}
+
+Stacker& Stacker::SplitBottom()
+{
+	return SetViewMode(ViewMode::BottomSplit);
+}
+
+Stacker& Stacker::SetViewMode(ViewMode mode)
+{
+	viewmode = mode;
+	if(mode == ViewMode::TopSplit || mode == ViewMode::BottomSplit)
+		splitvert = true;
+	else
+	if(mode == ViewMode::LeftSplit || mode == ViewMode::RightSplit)
+		splitvert = false;
+	return *this;
+}
+
+ViewMode Stacker::GetViewMode() const
+{
+	return viewmode;
 }
 
 Stacker& Stacker::ToggleSplitterOrientation()
 {
-	if(Splitter *s = GetParentSplitter(activectrl); s)
-		s->IsHorz() ? s->Vert() : s->Horz();
+	if(MultiSplitter *s = GetParentSplitter(activectrl); s && activectrl)
+		s->ToggleOrientation(*activectrl);
 	WhenAction();
 	return *this;
 }
@@ -116,33 +193,149 @@ Stacker& Stacker::Insert(int i, Ctrl& ctrl)
 
 Stacker& Stacker::Split(Ctrl& ctrl)
 {
-	Splitter *sp = GetParentSplitter(activectrl);
+	ViewMode md = viewmode;
+	if(md == ViewMode::Stacked || md == ViewMode::Windowed)
+		md = splitvert ? ViewMode::BottomSplit : ViewMode::RightSplit;
+	return Split(ctrl, md);
+}
 
-	if(sp && sp->GetCount() >= maxpanes)
-		return *this;
+Stacker& Stacker::Split(Ctrl& ctrl, ViewMode mode)
+{
+	if(mode == ViewMode::Stacked || mode == ViewMode::Windowed)
+		return Add(ctrl);
 
-	if(int i = GetCursor(); i >= 0) {
-		list.Insert(i + 1, &ctrl);
+	int i = GetCursor();
+	if(i < 0)
+		return Add(ctrl);
 
-		if(sp)
-			sp->Add(ctrl);
-		else {
-			if(list[i])
-				list[i]->Remove();
+	return Split(*list[i], ctrl, mode);
+}
 
-			Splitter& s = splitters.Add();
-			splitvert ? s.Vert() : s.Horz();
-			Ctrl::Add(s.SizePos());
+Stacker& Stacker::Split(Ctrl& target, Ctrl& ctrl, ViewMode mode)
+{
+	if(mode == ViewMode::Stacked || mode == ViewMode::Windowed)
+		return Add(ctrl);
 
-			if(list[i])
-				s.Add(*list[i]);
+	int i = Find(target);
+	if(i < 0)
+		return Add(ctrl);
 
-			s.Add(ctrl);
-		}
-		WhenInsert(i + 1, ctrl);
-		ActivatePane(&ctrl);
+	MultiSplitter* sp = GetParentSplitter(list[i]);
+
+	if(maxpanes < 2 || (sp && sp->GetCount() >= maxpanes))
+		return Add(ctrl);
+
+	Ctrl* anchor = list[i];
+	if(mode == ViewMode::AutoSplit) {
+		Size sz = anchor ? anchor->GetSize() : Size(0, 0);
+		if(sz.cx <= 0 || sz.cy <= 0)
+			sz = GetSize();
+		if(sz.cx > 0 && sz.cy > 0)
+			mode = sz.cx >= sz.cy ? ViewMode::RightSplit : ViewMode::BottomSplit;
+		else
+			mode = splitvert ? ViewMode::BottomSplit : ViewMode::RightSplit;
 	}
 
+	Ctrl* oldroot = sp ? sp->GetFirstPane() : anchor;
+	String oldname;
+	if(oldroot) {
+		int idx = workspacenames.Find(oldroot);
+		if(idx >= 0)
+			oldname = workspacenames[idx];
+	}
+
+	bool before = (mode == ViewMode::LeftSplit || mode == ViewMode::TopSplit);
+	int ins = before ? i : i + 1;
+	list.Insert(ins, &ctrl);
+
+	if(sp && anchor) {
+		switch(mode) {
+		case ViewMode::LeftSplit:
+			sp->SplitLeft(*anchor, ctrl);
+			break;
+		case ViewMode::RightSplit:
+			sp->SplitRight(*anchor, ctrl);
+			break;
+		case ViewMode::TopSplit:
+			sp->SplitTop(*anchor, ctrl);
+			break;
+		case ViewMode::BottomSplit:
+			sp->SplitBottom(*anchor, ctrl);
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		if(anchor)
+			anchor->Remove();
+
+		MultiSplitter& s = splitters.Add();
+		s.Transparent(IsTransparent());
+		Ctrl::Add(s.SizePos());
+		sp = &s;
+
+		if(anchor) {
+			switch(mode) {
+			case ViewMode::LeftSplit:
+				s.SplitLeft(*anchor, ctrl);
+				break;
+			case ViewMode::RightSplit:
+				s.SplitRight(*anchor, ctrl);
+				break;
+			case ViewMode::TopSplit:
+				s.SplitTop(*anchor, ctrl);
+				break;
+			case ViewMode::BottomSplit:
+				s.SplitBottom(*anchor, ctrl);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	if(sp && !oldname.IsEmpty()) {
+		Ctrl* newroot = sp->GetFirstPane();
+		if(newroot && newroot != oldroot) {
+			workspacenames.RemoveKey(oldroot);
+			workspacenames.GetAdd(newroot) = oldname;
+		}
+	}
+
+	WhenInsert(ins, ctrl);
+	ActivatePane(&ctrl);
+
+	return *this;
+}
+
+Stacker& Stacker::SplitAuto(Ctrl& ctrl)
+{
+	Split(ctrl, ViewMode::AutoSplit);
+	return *this;
+}
+
+Stacker& Stacker::SplitLeft(Ctrl& ctrl)
+{
+	Split(ctrl, ViewMode::LeftSplit);
+	return *this;
+}
+
+Stacker& Stacker::SplitRight(Ctrl& ctrl)
+{
+	Split(ctrl, ViewMode::RightSplit);
+	return *this;
+}
+
+Stacker& Stacker::SplitTop(Ctrl& ctrl)
+{
+	Split(ctrl, ViewMode::TopSplit);
+	return *this;
+}
+
+Stacker& Stacker::SplitBottom(Ctrl& ctrl)
+{
+	Split(ctrl, ViewMode::BottomSplit);
 	return *this;
 }
 
@@ -151,6 +344,9 @@ void Stacker::Remove(Ctrl& ctrl)
 	LLOG("Remove(" << &ctrl << ")");
 
 	int i = Find(ctrl);
+	int hi = FindIndex(focushistory, &ctrl);
+	if(hi >= 0)
+		focushistory.Remove(hi);
 
 	if(!GetParentSplitter(&ctrl))
 		workspacenames.RemoveKey(&ctrl);
@@ -160,11 +356,15 @@ void Stacker::Remove(Ctrl& ctrl)
 
 	// Only transfer focus if we are closing the active pane
 	if(&ctrl == activectrl) {
-		if(i > 0)
-			Goto(i - 1);
+		Ctrl *nx = GetPrevPane(nullptr, &ctrl);
+		if(nx)
+			Goto(*nx);
 		else
 		if(i + 1 < GetCount())
 			Goto(i + 1);
+		else
+		if(i > 0)
+			Goto(i - 1);
 		else
 			activectrl = nullptr;
 	}
@@ -185,12 +385,14 @@ bool Stacker::RemoveFromSplitter(int i)
 	if(i < 0 || i >= list.GetCount())
 		return false;
 
-	Ctrl *ctrl = list[i];
+	Ctrl* ctrl = list[i];
 	if(!ctrl)
 		return false;
 
-	if(Splitter *s = GetParentSplitter(ctrl); s) {
-		bool wasroot = (s->GetFirstChild() == ctrl);
+	if(MultiSplitter* s = GetParentSplitter(ctrl); s) {
+		bool wasroot = (s->GetFirstPane() == ctrl);
+		Vector<Ctrl*> oldpanes = s->GetPanes();
+		int oldidx = FindIndex(oldpanes, ctrl);
 		String oldname;
 
 		if(wasroot) {
@@ -204,22 +406,23 @@ bool Stacker::RemoveFromSplitter(int i)
 		s->Remove(*ctrl);
 
 		if(wasroot && s->GetCount() > 0 && !oldname.IsEmpty()) {
-			Ctrl* newroot = s->GetFirstChild();
-			if(newroot)
+			if(Ctrl* newroot = s->GetFirstPane())
 				workspacenames.Add(newroot, oldname);
 		}
 
+		bool sync = false;
 		if(s->GetCount() == 1) {
-			Ctrl* remaining = s->GetFirstChild();
+			Ctrl* remaining = s->GetFirstPane();
 			RemoveChild(s);
 			if(remaining) {
 				s->Remove(*remaining);
 				Ctrl::Add(remaining->SizePos());
-				
+
 				// Only activate the remaining pane if this splitter was the active workspace
 				if(activectrl == ctrl || activectrl == remaining) {
 					activectrl = remaining;
 					ActivatePane(remaining);
+					sync = true;
 				}
 				else
 					remaining->Hide();
@@ -227,13 +430,24 @@ bool Stacker::RemoveFromSplitter(int i)
 			RemoveSplitter(*s);
 		}
 		else
-		if(s->GetCount() > 1 && ctrl == activectrl)
-			ActivatePane(s->GetFirstChild());
+		if(s->GetCount() > 1 && ctrl == activectrl) {
+			Ctrl* nx = GetPrevPane(s, ctrl);
+			if(!nx) {
+				Vector<Ctrl*> panes = s->GetPanes();
+				nx = oldidx >= 0 && oldidx < panes.GetCount() ? panes[oldidx] : panes.Top();
+			}
+			activectrl = nx;
+			ActivatePane(activectrl);
+			sync = true;
+		}
 
 		WhenRemove(i, *ctrl);
 		list.Remove(i);
+		if(sync)
+			WhenAction();
 		return true;
 	}
+	
 	return false;
 }
 
@@ -273,8 +487,8 @@ int Stacker::GetWorkspaceCount() const
 {
 	int count = 0;
 	for(int i = 0; i < list.GetCount(); ++i) {
-		Splitter* sp = GetParentSplitter(list[i]);
-		if(!sp || sp->GetFirstChild() == list[i])
+		MultiSplitter *sp = GetParentSplitter(list[i]);
+		if(!sp || sp->GetFirstPane() == list[i])
 			count++;
 	}
 	return count;
@@ -282,8 +496,8 @@ int Stacker::GetWorkspaceCount() const
 
 int Stacker::FindWorkspace(Ctrl& ctrl) const
 {
-	Splitter* sp = GetParentSplitter(&ctrl);
-	Ctrl* root = sp ? sp->GetFirstChild() : &ctrl;
+	MultiSplitter *sp = GetParentSplitter(&ctrl);
+	Ctrl *root = sp ? sp->GetFirstPane() : &ctrl;
 	if(!root)
 		return -1;
 	return FindIndex(list, root);
@@ -294,28 +508,20 @@ int Stacker::FindInWorkspace(int wsid, Ctrl& ctrl) const
 	if(wsid < 0 || wsid >= list.GetCount())
 		return -1;
 
-	Splitter* sp = GetParentSplitter(list[wsid]);
+	MultiSplitter *sp = GetParentSplitter(list[wsid]);
 	if(!sp)
 		return (&ctrl == list[wsid]) ? 0 : -1;
 
-	int idx = 0;
-	for(Ctrl* c = sp->GetFirstChild(); c; c = c->GetNext(), ++idx)
-		if(c == &ctrl)
-			return idx;
-
-	return -1;
+	return sp->FindPane(ctrl);
 }
 
 Vector<Ctrl*> Stacker::GetWorkspacePanes(int wsid) const
 {
 	Vector<Ctrl*> panes;
 	if(wsid >= 0 && wsid < list.GetCount()) {
-		Splitter* sp = GetParentSplitter(list[wsid]);
-		if(sp) {
-			for(Ctrl* c = sp->GetFirstChild(); c; c = c->GetNext())
-				if(c)
-					panes.Add(c);
-		}
+		MultiSplitter *sp = GetParentSplitter(list[wsid]);
+		if(sp)
+			panes = sp->GetPanes();
 		else
 		if(list[wsid])
 			panes.Add(list[wsid]);
@@ -334,7 +540,7 @@ Vector<Ctrl*> Stacker::GetWorkspacePanes(Ctrl& ctrl) const
 Stacker& Stacker::SetWorkspaceName(int wsid, const String& name)
 {
 	if(wsid >= 0 && wsid < list.GetCount()) {
-		Ctrl* root = list[wsid];
+		Ctrl *root = list[wsid];
 		int idx = workspacenames.Find(root);
 		if(idx >= 0)
 			workspacenames[idx] = name;
@@ -355,7 +561,7 @@ Stacker& Stacker::SetWorkspaceName(Ctrl& ctrl, const String& name)
 String Stacker::GetWorkspaceName(int wsid) const
 {
 	if(wsid >= 0 && wsid < list.GetCount()) {
-		Ctrl* root = list[wsid];
+		Ctrl *root = list[wsid];
 		int idx = workspacenames.Find(root);
 		if(idx >= 0)
 			return workspacenames[idx];
@@ -375,7 +581,7 @@ int Stacker::FindWorkspaceByName(const String& name) const
 {
 	for(int i = 0; i < workspacenames.GetCount(); ++i) {
 		if(workspacenames[i] == name) {
-			Ctrl* root = workspacenames.GetKey(i);
+			Ctrl *root = workspacenames.GetKey(i);
 			return FindIndex(list, root);
 		}
 	}
@@ -387,7 +593,7 @@ void Stacker::MovePanePrev()
 	if(!activectrl)
 		return;
 
-	if(Splitter* sp = GetParentSplitter(activectrl)) {
+	if(GetParentSplitter(activectrl)) {
 		int wsid = FindWorkspace(*activectrl);
 		int localidx = FindInWorkspace(wsid, *activectrl);
 
@@ -404,7 +610,7 @@ void Stacker::MovePaneNext()
 	if(!activectrl)
 		return;
 
-	if(Splitter* sp = GetParentSplitter(activectrl)) {
+	if(GetParentSplitter(activectrl)) {
 		int wsid = FindWorkspace(*activectrl);
 		int localidx = FindInWorkspace(wsid, *activectrl);
 		Vector<Ctrl*> panes = GetWorkspacePanes(wsid);
@@ -430,111 +636,32 @@ void Stacker::Swap(int a, int b)
 		return;
 	}
 
-	Splitter *splittera = GetParentSplitter(ctrla);
-	Splitter *splitterb = GetParentSplitter(ctrlb);
-
-	Vector<Ctrl*> childrena, childrenb;
-	Vector<int> posesa, posesb;
-
-	if(splittera) {
-		for(Ctrl *c = splittera->GetFirstChild(); c; c = c->GetNext())
-			childrena.Add(c);
-		for(int i = 0; i < childrena.GetCount() - 1; ++i)
-			posesa.Add(splittera->GetPos(i));
-	}
-
-	if(splitterb && splitterb != splittera) {
-		for(Ctrl *c = splitterb->GetFirstChild(); c; c = c->GetNext())
-			childrenb.Add(c);
-		for(int i = 0; i < childrenb.GetCount() - 1; ++i)
-			posesb.Add(splitterb->GetPos(i));
-	}
+	MultiSplitter *splittera = GetParentSplitter(ctrla);
+	MultiSplitter *splitterb = GetParentSplitter(ctrlb);
 
 	if(splittera && splitterb) {
-		if(splittera == splitterb) {
-			int idxa = FindIndex(childrena, ctrla);
-			int idxb = FindIndex(childrena, ctrlb);
-
-			if(idxa >= 0 && idxb >= 0) {
-				for(Ctrl *c : childrena)
-					splittera->Remove(*c);
-
-				childrena.Swap(idxa, idxb);
-
-				for(Ctrl *c : childrena)
-					splittera->Add(*c);
-				for(int i = 0; i < posesa.GetCount(); ++i)
-					splittera->SetPos(posesa[i], i);
-			}
-		}
+		if(splittera == splitterb)
+			splittera->Swap(*ctrla, *ctrlb);
 		else {
-			int idxa = FindIndex(childrena, ctrla);
-			int idxb = FindIndex(childrenb, ctrlb);
-
-			if(idxa >= 0 && idxb >= 0) {
-				for(Ctrl *c : childrena)
-					splittera->Remove(*c);
-				for(Ctrl *c : childrenb)
-					splitterb->Remove(*c);
-
-				childrena[idxa] = ctrlb;
-				childrenb[idxb] = ctrla;
-
-				for(Ctrl *c : childrena)
-					splittera->Add(*c);
-				for(int i = 0; i < posesa.GetCount(); ++i)
-					splittera->SetPos(posesa[i], i);
-
-				for(Ctrl *c : childrenb)
-					splitterb->Add(*c);
-				for(int i = 0; i < posesb.GetCount(); ++i)
-					splitterb->SetPos(posesb[i], i);
-			}
+			splittera->Replace(*ctrla, *ctrlb);
+			splitterb->Replace(*ctrlb, *ctrla);
 		}
 	}
 	else
 	if(splittera && !splitterb) {
-		int idxa = FindIndex(childrena, ctrla);
-
-		if(idxa >= 0) {
-			for(Ctrl *c : childrena)
-				splittera->Remove(*c);
-
-			ctrlb->Remove();
-			ctrla->Hide();
-			Ctrl::Add(ctrla->SizePos());
-
-			childrena[idxa] = ctrlb;
-
-			for(Ctrl *c : childrena)
-				splittera->Add(*c);
-			for(int i = 0; i < posesa.GetCount(); ++i)
-				splittera->SetPos(posesa[i], i);
-
-			splittera->Show();
-		}
+		ctrlb->Remove();
+		ctrla->Hide();
+		Ctrl::Add(ctrla->SizePos());
+		splittera->Replace(*ctrla, *ctrlb);
+		splittera->Show();
 	}
 	else
 	if(splitterb && !splittera) {
-		int idxb = FindIndex(childrenb, ctrlb);
-
-		if(idxb >= 0) {
-			for(Ctrl *c : childrenb)
-				splitterb->Remove(*c);
-
-			ctrla->Remove();
-			ctrlb->Hide();
-			Ctrl::Add(ctrlb->SizePos());
-
-			childrenb[idxb] = ctrla;
-
-			for(Ctrl *c : childrenb)
-				splitterb->Add(*c);
-			for(int i = 0; i < posesb.GetCount(); ++i)
-				splitterb->SetPos(posesb[i], i);
-
-			splitterb->Show();
-		}
+		ctrla->Remove();
+		ctrlb->Hide();
+		Ctrl::Add(ctrlb->SizePos());
+		splitterb->Replace(*ctrlb, *ctrla);
+		splitterb->Show();
 	}
 
 	WhenSwap(a, b);
@@ -570,44 +697,40 @@ void Stacker::SwapPrev()
 
 void Stacker::SwapPanes()
 {
-	if(Splitter *sp = GetParentSplitter(activectrl); sp && sp->GetCount() >= 2) {
-		Ctrl *first = sp->GetFirstChild();
-		Ctrl *last = sp->GetLastChild();
-		if(first && last) {
-			activectrl = first->HasFocus() ? first : last;
-			if(activectrl) {
-				Swap(*first, *last);
-				activectrl->SetFocus();
-			}
+	if(MultiSplitter *sp = GetParentSplitter(activectrl); sp && sp->GetCount() >= 2 && activectrl) {
+		Ctrl *other = sp->GetSibling(*activectrl);
+		if(other) {
+			Swap(*activectrl, *other);
+			activectrl->SetFocus();
 		}
 	}
 }
 
 void Stacker::ExpandTopLeftPane()
 {
-	if(Splitter *sp = GetParentSplitter(activectrl); sp)
-		sp->SetPos(clamp(sp->GetPos() + 500, 0, 10000));
+	if(MultiSplitter *sp = GetParentSplitter(activectrl); sp && activectrl)
+		sp->SetPos(*activectrl, clamp(sp->GetPos(*activectrl) + 500, 0, 10000));
 }
 
 void Stacker::ExpandBottomRightPane()
 {
-	if(Splitter *sp = GetParentSplitter(activectrl); sp)
-		sp->SetPos(clamp(sp->GetPos() - 500, 0, 10000));
+	if(MultiSplitter *sp = GetParentSplitter(activectrl); sp && activectrl)
+		sp->SetPos(*activectrl, clamp(sp->GetPos(*activectrl) - 500, 0, 10000));
 }
 
 void Stacker::ResetSplitterPos()
 {
-	if(Splitter *sp = GetParentSplitter(activectrl); sp)
-		sp->SetPos(5000);
+	if(MultiSplitter *sp = GetParentSplitter(activectrl); sp && activectrl)
+		sp->SetPos(*activectrl, 5000);
 }
 
 Ctrl* Stacker::GetPassiveCtrl() const
 {
-	Splitter *sp = GetParentSplitter(activectrl);
-	if(!sp)
+	MultiSplitter *sp = GetParentSplitter(activectrl);
+	if(!sp || !activectrl)
 		return nullptr;
 
-	return sp->GetFirstChild() == activectrl ? sp->GetFirstChild()->GetNext() : sp->GetFirstChild();
+	return sp->GetSibling(*activectrl);
 }
 
 void Stacker::Goto(int i)
@@ -667,27 +790,35 @@ void Stacker::ActivatePane(Ctrl *ctrl)
 	if(!activectrl)
 		activectrl = ctrl;
 
-	Splitter *currentsp = GetParentSplitter(activectrl);
-	Splitter *nextsp = GetParentSplitter(ctrl);
+	MultiSplitter *currentsp = GetParentSplitter(activectrl);
+	MultiSplitter *nextsp = GetParentSplitter(ctrl);
 
 	if(activectrl == ctrl) {
+		TrackFocus(ctrl);
 		currentsp ? currentsp->Show() : activectrl->Show();
-		activectrl->SetFocus();
+		if(!activectrl->HasFocusDeep())
+			activectrl->SetFocus();
 		return;
 	}
 
 	GuiLock __;
 
 	if(ctrl != activectrl && ((currentsp != nextsp) || (!currentsp && !nextsp)) && duration >= 100) {
-		Ctrl* nextctrl = nextsp ? static_cast<Ctrl*>(nextsp) : ctrl;
-		Ctrl* currentctrl = currentsp ? static_cast<Ctrl*>(currentsp) : activectrl;
+		Ctrl *nextctrl = nextsp ? static_cast<Ctrl*>(nextsp) : ctrl;
+		Ctrl *currentctrl = currentsp ? static_cast<Ctrl*>(currentsp) : activectrl;
 		Animate(currentctrl, nextctrl, IsNext(ctrl));
 	}
 
-	currentsp ? currentsp->Hide() : activectrl->Hide();
+	if(currentsp != nextsp)
+		currentsp ? currentsp->Hide() : activectrl->Hide();
+	else
+	if(!currentsp)
+		activectrl->Hide();
 	activectrl = ctrl;
+	TrackFocus(ctrl);
 	nextsp ? nextsp->Show() : activectrl->Show();
-	activectrl->SetFocus();
+	if(!activectrl->HasFocusDeep())
+		activectrl->SetFocus();
 }
 
 bool Stacker::IsNext(Ctrl *nextctrl) const
@@ -751,14 +882,14 @@ void Stacker::Animate(Ctrl *currentctrl, Ctrl *nextctrl, bool forward)
 	animating = false;
 }
 
-Splitter *Stacker::GetParentSplitter(Ctrl *c) const
+MultiSplitter *Stacker::GetParentSplitter(Ctrl *c) const
 {
-	return c ? dynamic_cast<Splitter*>(c->GetParent()) : nullptr;
+	return c ? dynamic_cast<MultiSplitter*>(c->GetParent()) : nullptr;
 }
 
-void Stacker::RemoveSplitter(const Splitter& s)
+void Stacker::RemoveSplitter(const MultiSplitter& s)
 {
-	if(int i = FindMatch(splitters, [&](const Splitter& q) { return &q == &s; }); i >= 0)
+	if(int i = FindMatch(splitters, [&](const MultiSplitter& q) { return &q == &s; }); i >= 0)
 		splitters.Remove(i);
 }
 

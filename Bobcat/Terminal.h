@@ -23,10 +23,11 @@ struct Terminal : TerminalCtrl {
     
     void        GotFocus() override;
     
-    bool        StartPty(const Profile& profile, bool pane = false);
-    bool        Start(const String& profile_name, bool pane = false);
-    bool        Start(const Profile& profile, bool pane = false);
-    bool        Start(Terminal *term, bool pane = false);
+    bool        StartPty(const Profile& profile, ViewMode mode);
+    bool        Start(const String& profile_name, ViewMode mode);
+    bool        Start(const Profile& profile, ViewMode mode);
+    bool        Start(Terminal *term, ViewMode mode);
+ 
     void        Stop();
     bool        Do();
     void        Restart();
@@ -160,8 +161,8 @@ struct Terminal : TerminalCtrl {
     void        ContextMenu(Bar& menu);
 
 
-    Splitter*   GetParentSplitter() const;
-    bool        IsSplitterPane() const;
+    MultiSplitter* GetParentSplitter() const;
+    bool           IsSplitterPane() const;
     
     Time        GetUpTime() const;
     

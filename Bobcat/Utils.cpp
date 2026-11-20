@@ -235,7 +235,6 @@ void SetStatusDisplayInfo(Terminal& term, DisplayInfo& info, bool hd)
 	static int starttime = msecs();
 	
 	bool blink = (msecs(starttime) / 500) % 2 == 0;
-	int frame = (msecs(starttime) / 100) % 8;
 
 	ProgramInfo pinfo = GetProgramInfo(term);
 	info.urgent = pinfo.IsUrgent();

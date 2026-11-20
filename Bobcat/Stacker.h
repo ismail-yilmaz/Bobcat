@@ -11,6 +11,8 @@ public:
     Stacker(Bobcat& ctx);
     virtual ~Stacker() {}
 
+    void ChildGotFocus() override;
+
     Stacker&    Wheel(bool b = true);
     Stacker&    Animation(int ms = 150);
     int         GetDuration() const;
@@ -25,11 +27,25 @@ public:
 
     Stacker&    HorzSplitter();
     Stacker&    VertSplitert();
+    Stacker&    AutoSplit();
+    Stacker&    SplitLeft();
+    Stacker&    SplitRight();
+    Stacker&    SplitTop();
+    Stacker&    SplitBottom();
+    Stacker&    SetViewMode(ViewMode mode);
+    ViewMode    GetViewMode() const;
     Stacker&    ToggleSplitterOrientation();
 
     Stacker&    Add(Ctrl& ctrl);
     Stacker&    Insert(int i, Ctrl& ctrl);
     Stacker&    Split(Ctrl& ctrl);
+    Stacker&    Split(Ctrl& ctrl, ViewMode mode);
+    Stacker&    Split(Ctrl& target, Ctrl& ctrl, ViewMode mode = ViewMode::AutoSplit);
+    Stacker&    SplitAuto(Ctrl& ctrl);
+    Stacker&    SplitLeft(Ctrl& ctrl);
+    Stacker&    SplitRight(Ctrl& ctrl);
+    Stacker&    SplitTop(Ctrl& ctrl);
+    Stacker&    SplitBottom(Ctrl& ctrl);
 
     void        Remove(Ctrl& ctrl);
     void        Remove(int i);
@@ -88,22 +104,26 @@ public:
     void        GoEnd();
 
 private:
-	Bobcat&     ctx;
-    Splitter*   GetParentSplitter(Ctrl *c) const;
-    void        RemoveSplitter(const Splitter& s);
-    bool        RemoveFromSplitter(int i);
-    void        ActivatePane(Ctrl* ctrl);
+    Bobcat&        ctx;
+    MultiSplitter* GetParentSplitter(Ctrl *c) const;
+    void           RemoveSplitter(const MultiSplitter& s);
+    bool           RemoveFromSplitter(int i);
+    void           ActivatePane(Ctrl* ctrl);
+    void           TrackFocus(Ctrl *ctrl);
+    Ctrl*          GetPrevPane(MultiSplitter *scope, Ctrl *excl) const;
 
     // Animation related stuff.
     bool IsNext(Ctrl *next) const;
     void Animate(Ctrl *current, Ctrl *next, bool forward);
 
     Vector<Ctrl*>            list;
-    Array<Splitter>          splitters;
+    Vector<Ctrl*>            focushistory;
+    Array<MultiSplitter>     splitters;
     VectorMap<Ctrl*, String> workspacenames;
     Ctrl*                    activectrl;    // cursor
     int                      duration;
     int                      maxpanes;
+    ViewMode                 viewmode;
     bool                     wheel:1;
     bool                     vertical:1;
     bool                     splitvert:1;
